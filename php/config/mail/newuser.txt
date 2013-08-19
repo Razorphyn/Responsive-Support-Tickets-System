@@ -1,0 +1,2 @@
+New Member
+&lt;p&gt;{SITE_NAME}&amp;nbsp;&amp;nbsp; &amp;nbsp;&lt;br /&gt; {SITE_ADDRESS}&lt;/p&gt; &lt;p&gt;{USER_NAME}&lt;br /&gt; {USER_ACTIVATION_LINK}&lt;br /&gt; {USER_EMAIL}&lt;/p&gt; 

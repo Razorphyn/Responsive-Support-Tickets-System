@@ -1,0 +1,2 @@
+New Ticket
+&lt;p&gt;{SITE_NAME}&amp;nbsp;&amp;nbsp; &amp;nbsp;&lt;br /&gt; {SITE_ADDRESS}&lt;/p&gt; &lt;p&gt;{TICKET_TITLE}&lt;br /&gt; {TICKET_URL}&lt;br /&gt; {TICKET_DEPARTMENT}&lt;br /&gt; {TICKET_STATUS}&lt;br /&gt; {TICKET_PRIORITY}&lt;br /&gt; {TICKET_CREATOR_NAME}&lt;br /&gt; {TICKET_OPERATOR_NAME}&lt;/p&gt; 

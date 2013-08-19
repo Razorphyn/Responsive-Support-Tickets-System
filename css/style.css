@@ -1,0 +1,72 @@
+/* ---------- Frontend ---------- */
+
+body {margin:0;padding:0 20px 20px!important;background:#f2f2f2 url('images/bk.jpg')!important}
+
+textarea{width:100% !important;max-width:100%;display:block;word-wrap: break-word!important}
+table{text-align:center!important;position:relaitve!important}
+table td,table th{text-align:center!important;display:table-cell!important;word-wrap: break-word!important}
+table tr{text-align:center!important}
+.navbar{-webkit-box-shadow:  0px 0px 5px 5px #ccc;box-shadow:  0px 0px 5px 5px #ccc;behavior: url(../css/PIE.htc)}
+
+.container > hr {margin: 60px 0;border-color:#ccc}
+
+.daddy{background:#fff;padding: 15px 30px;-webkit-box-shadow:  0px 0px 5px 5px #ccc;box-shadow:  0px 0px 5px 5px #ccc;-webkit-border-radius: 10px;border-radius: 10px;behavior: url(../css/PIE.htc);margin-top:2.7%}
+
+.jumbotron {text-align: center;}
+.jumbotron h1 {font-size: 6.25em;line-height: 1;}
+.jumbotron .lead {font-size: 1.5em;line-height: 1.25;}
+.jumbotron .btn {font-size: 1.31em;padding: 1.30% 1.25%;}
+
+.marketing {margin: 5.6% 0;}
+.marketing p + h4 {margin-top: 2.6%;}
+
+.register{display:none}
+.pwdres{display:none}
+.opthome{cursor:pointer}
+.opthome:hover{color:#F2860A}
+.act{margin-top:1.85% 1.04%}
+
+#loading{position:relative;display:block;margin:0 auto}
+.loading{position:relative;display:block;margin:0 auto}
+
+.user_depa_container{margin:2.8% 0;padding:0.93% 0.52%;width:100%;border:1px solid #000;-webkit-border-radius: 5px;border-radius: 5px;behavior: url(../css/PIE.htc)}
+.pagefun{color:#CC3333}
+.sectname{color:#f2860a}
+
+#deptable {text-align:center}
+#adddep{display:none}
+
+.loading-bar {padding: 0.93% 1.05%;display: block;clear:both;text-align: center;box-shadow: inset 0px -45px 30px -40px rgba(0, 0, 0, 0.05);border-radius: 5px;-webkit-border-radius: 5px;margin: 20px 0;font-size: 1.1em;font-family: "museo-sans", sans-serif;border: 1px solid #ddd;margin-right: 1px;font-weight: bold;cursor: pointer;position: relative;behavior: url(../css/PIE.htc)}
+.loading-bar:hover {box-shadow: inset 0px 45px 30px -40px rgba(0, 0, 0, 0.05);behavior: url(../css/PIE.htc)}
+
+.evenmessage{width:92%!important;-webkit-box-shadow:  0px 0px 0px 5px #1840b2;box-shadow:  0px 0px 0px 5px #1840b2;margin:2.8% 0;padding:3.4%;position:relative!important;display:block;clear:both;-webkit-border-radius: 10px;border-radius: 10px;behavior: url(../css/PIE.htc)}
+.oddmessage{width:92%!important;-webkit-box-shadow:  0px 0px 0px 5px #197909;box-shadow:  0px 0px 0px 5px #197909;margin:2.8% 0;padding:3.4%;position:relative!important;display:block;clear:both;-webkit-border-radius: 10px;border-radius: 10px;behavior: url(../css/PIE.htc)}
+
+.usrinfo{height:100%!important;margin-bottom:15px}
+.username{font-size:1.3em;font-weight:600;color:#cc3333}
+.date{font-size:0.8em;font-weight:300}
+.attachment{margin-top:5.678%!important;color:#777;font-size:0.9}
+.download{font-size:0.85em}
+
+.loading_bar_body {height: 100%;width: 100%;top:0;left:0;background: url(images/ajax-loader.gif) no-repeat 50% 50%;}
+
+table.dataTable tr.odd td.sorting_1 {background-color:#F9F9F9 !important}
+table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
+
+.loadinfo{position:relative;display:block;margin:3px auto;text-align:center;}
+.rescont{display:none}
+.refid{font-size:0.8em;word-break:break-all;}
+.flagcont{border:1px solid #ccc;-webkit-border-radius: 5px;border-radius: 5px;padding:10px;font-size:1em;margin-bottom:7px;behavior: url(../css/PIE.htc)}
+
+.download_form{position:relative;float:left}
+
+.showcompl{width:100%;cursor:pointer}
+.question{font-size:1.1em;color:#0d9125}
+.reqlogin{font-size:0.8em;text-align:center}
+
+.expande{display:none}
+.cif{cursor:pointer}
+
+.overlay{width: 100%;height: 100%;position: fixed;top: 0;left: 0;z-index: 1000;display: none;}
+.modal{display: none;background:#eee;padding:0 20px 20px;overflow:auto;z-index:1001;position:absolute;}
+.modal h1 {background: none repeat scroll 0 0 #EB5A3D;border: 1px solid #DE3817;border-radius: 10px 10px 0 0;box-shadow: 0 1px 1px #F9D0C8 inset;color: #FFFCEB;font-size: 20px;font-weight: 500;margin: 0 0 20px;padding: 12px 10px 10px;text-align: center;}

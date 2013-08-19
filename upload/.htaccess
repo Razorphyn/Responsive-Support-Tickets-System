@@ -1,0 +1,5 @@
+Deny from All
+Options All -Indexes
+IndexIgnore *
+Options -ExecCGI
+AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
