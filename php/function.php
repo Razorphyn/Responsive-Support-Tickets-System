@@ -55,7 +55,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 
 //Function
 
-if(isset($_POST['act']) && $_POST['act']=='register'){
+if(isset($_POST['act']) && $_POST['act']=='register'){//check
 	if($_POST['pwd']==$_POST['rpwd']){
 		$mustang=(preg_replace('/\s+/','',$_POST['name'])!='') ? (string)$_POST['name']:exit();
 		$viper= preg_replace('/\s+/','',$_POST['mail']);
@@ -105,7 +105,7 @@ if(isset($_POST['act']) && $_POST['act']=='register'){
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST['act']=='send_again'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST['act']=='send_again'){//check
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -136,7 +136,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='login'){
+else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='login'){//check
 	$viper=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
 	$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
 	try{
@@ -172,7 +172,7 @@ else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='l
 	exit();
 }
 
-else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_ticket'){
+else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_ticket'){//check
 	$encid=preg_replace('/\s+/','',$_POST['enc']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	try{
@@ -231,7 +231,7 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 	exit();
 }
 	
-else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate_account'){
+else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate_account'){//check
 	$key=preg_replace('/\s+/','',$_POST['key']);
 	if(60!=strlen($key)){
 		echo json_encode(array(0=>'Invalid Key'));
@@ -278,7 +278,7 @@ else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST['act']=='verify'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST['act']=='verify'){//check
 	if(!isset($_SESSION['cktime']) || ($_SESSION['cktime']-time())>300){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -314,7 +314,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && $_POST['act']=='forgot'){
+else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 	$viper=$_POST['mail'];
 	$mustang=$_POST['name'];
 	try{
@@ -357,7 +357,7 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){
 	exit();
 }
 
-else if(isset($_POST['act']) && $_POST['act']=='reset_password'){
+else if(isset($_POST['act']) && $_POST['act']=='reset_password'){//check
 	$npwd=(string)$_POST['npass'];
 	$rpwd=(string)$_POST['rnpass'];
 	$rmail=(string)$_POST['rmail'];
@@ -388,7 +388,7 @@ else if(isset($_POST['act']) && $_POST['act']=='reset_password'){
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='logout'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='logout'){//check
 	session_unset();
 	session_destroy();
 	echo json_encode(array(0=>'logout'));
@@ -617,7 +617,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='retrive_depart'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='retrive_depart'){//check
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -790,7 +790,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 	exit();
 }
 
-else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){
+else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){//check
 	$offset = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
 	$postnumbers = is_numeric($_POST['number']) ? $_POST['number'] : exit();
 	$encid=preg_replace('/\s+/','',$_POST['id']);
@@ -855,7 +855,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='save_setting'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='save_setting'){//check
 	$mustang=(preg_replace('/\s+/','',$_POST['name'])!='') ? (string)$_POST['name']:exit();
 	$alert=($_POST['almail']!='no') ? 'yes':'no';
 	$dfmail=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
@@ -1094,7 +1094,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_status'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_status'){//check
 	if($_SESSION['status']==0)
 		$charger=($_POST['status']==1 || $_POST['status']==2)? 1:0;
 	else
@@ -1177,7 +1177,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST['act']=='move_opera_ticket'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST['act']=='move_opera_ticket'){// deep check
 	$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
@@ -1218,7 +1218,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_title'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_title'){//check
 	$tit=(preg_replace('/\s+/','',$_POST['tit'])!='')? htmlentities(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
@@ -1241,7 +1241,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_connection'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_connection'){//check
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$con=(is_numeric($_POST['contype']))? $_POST['contype']:exit();
@@ -1279,7 +1279,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSION['status']<3){
+else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSION['status']<3){//check
 	$encid=preg_replace('/\s+/','',$_POST['ticket_id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$file=preg_replace('/\s+/','',$_POST['file_download']);
@@ -1325,7 +1325,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_index'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_index'){//check
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$tit=(preg_replace('/\s+/','',$_POST['title'])!='')? preg_replace('/\s+/',' ',$_POST['title']):exit();
@@ -1410,7 +1410,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='rating'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='rating'){//check
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	$encid=preg_replace('/\s+/','',$_POST['tkid']);
@@ -1458,7 +1458,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){//check
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	if($GT86>10 && $rate>0){
@@ -1501,7 +1501,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//add PDO
+else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//check
 	$enid=preg_replace('/\s+/','',$_POST['enid']);
 	$tit=preg_replace('/\s+/',' ',$_POST['title']);
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
@@ -1529,174 +1529,142 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 		$opid=(is_numeric($_POST['opid']))? (int)$_POST['opid']:'';
 		$usmail=preg_replace('/\s+/','',$_POST['mail']);
 	}
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
-		$query = "SELECT 
-					a.enc_id,
-						b.department_name,
-						c.name,
-						a.title,
-						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
-						a.created_time,
-						a.last_reply,
-						CASE a.ticket_status WHEN '0' THEN '<span class=\'label label-success\'>Closed</span>' WHEN '1' THEN '<span class=\'label label-important\'>Open</span>' WHEN '2' THEN '<span class=\'label label-warning\'>To Assign</span>' WHEN '3' THEN '<span class=\'label label-important\'>Reported</span>' ELSE 'Error' END 
-					FROM ".$SupportTicketsTable." a 
-					JOIN ".$SupportDepaTable." b
-						ON	b.id=a.department_id
-					JOIN ".$SupportUserTable." c
-						ON c.id=a.operator_id
-					WHERE " ;
-		$merge=array('type'=>array(),'val'=>array());
-		if($_SESSION['status']==0){
-			$query.=' `user_id`='.$_SESSION['id'];
-			if($enid!=''){
-				$query.=' AND a.ref_id=?';
-				$merge['type'][]='s';
-				$merge['val'][]=$enid;
-			}
-			if($tit!=''){
-				$query.=' AND a.title LIKE ?';
-				$merge['type'][]='s';
-				$merge['val'][]='%'.$tit.'%';
-			}
-			if($dep!=''){
-				$query.=' AND a.department_id=?';
-				$merge['type'][]='i';
-				$merge['val'][]=$dep;
-			}
-			if($op!=''){
-				$query.=' AND a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
-				$merge['type'][]='s';
-				$merge['val'][]='%'.$op.'%';
-			}
-			if($from!=''){
-				$query.=' AND a.created_time >= ?';
-				$merge['type'][]='s';
-				$merge['val'][]=$from;
-			}
-			if($to!=''){
-				$query.=' AND a.created_time =< ?';
-				$merge['type'][]='s';
-				$merge['val'][]=$to;
-			}
-		}
-		else if($_SESSION['status']==1){
-			$query.=' `user_id`='.$_SESSION['id'].' OR `operator_id`='.$_SESSION['id'];
-			if($enid!=''){
-				$query.=' AND a.ref_id=?';
-				$merge['type'][]='s';
-				$merge['val'][]=$enid;
-			}
-			if($tit!=''){
-				$query.=' AND a.title LIKE ?';
-				$merge['type'][]='s';
-				$merge['val'][]='%'.$tit.'%';
-			}
-			if($dep!=''){
-				$query.=' AND a.department_id=?';
-				$merge['type'][]='i';
-				$merge['val'][]=$dep;
-			}
-			if($from!=''){
-				$query.=' AND a.created_time >= ?';
-				$merge['type'][]='s';
-				$merge['val'][]=$from;
-			}
-			if($to!=''){
-				$query.=' AND a.created_time <= ?';
-				$merge['type'][]='s';
-				$merge['val'][]=$to;
-			}
-		}
-		else if($_SESSION['status']==2){
-			$tail=array();
-			if($id!=''){
-				$tail[]='a.user_i`=?';
-				$merge['type'][]='i';
-				$merge['val'][]=$id;
-			}
-			if($enid!=''){
-				$tail[]='a.ref_id=?';
-				$merge['type'][]='s';
-				$merge['val'][]=$enid;
-			}
-			if($tit!=''){
-				$tail[]='a.title LIKE ?';
-				$merge['type'][]='s';
-				$merge['val'][]='%'.$tit.'%';
-			}
-			if($dep!=''){
-				$tail[]='a.department_id=?';
-				$merge['type'][]='i';
-				$merge['val'][]=$dep;
-			}
-			if($opid!=''){
-				$tail[]='a.operator_id=?';
-				$merge['type'][]='i';
-				$merge['val'][]=$opid;
-			}
-			if($op!=''){
-				$tail[]='a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
-				$merge['type'][]='s';
-				$merge['val'][]='%'.$op.'%';
-			}
-			if($from!=''){
-				$tail[]='a.created_time >= ?';
-				$merge['type'][]='s';
-				$merge['val'][]=$from;
-			}
-			if($to!=''){
-				$tail[]='a.created_time <= ?';
-				$merge['type'][]='s';
-				$merge['val'][]=$to;
-			}
-			if($usmail!=''){
-				$tail[]='(a.user_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1) OR operator_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1))';
-				$merge['type'][]='ss';
-				$merge['val'][]='%'.$usmail.'%';
-				$merge['val'][]='%'.$usmail.'%';
-			}
-			$query.=implode(' AND ',$tail);
-		}
-		$query.=' ORDER BY `last_reply` DESC';
-		$bind_names = array();
-		$bind_names[] = implode('',$merge['type']);    
-		$journey=count($merge['val']);
-		for ($i=0; $i<$journey;$i++) {
-			$bind_name = 'bind'.$i;
-			$$bind_name = $merge['val'][$i];
-			$bind_names[] = &$$bind_name;
-		}
-		$prepared = $stmt->prepare($query);
-		if($prepared){
-			if(call_user_func_array(array($stmt, "bind_param"), $bind_names)){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($encid, $depname, $opname, $title, $priority, $dat, $last, $tkstat);
-					$list=array('response'=>'ret','search'=>array());
-					if($stmt->num_rows>0){
-						while (mysqli_stmt_fetch($stmt)) 
-							$list['search'][]=array('id'=>$encid,'dname'=>$depname,'opname'=>$opname,'title'=>$title,'priority'=>$priority,'date'=>$dat,'reply'=>$last,'status'=>$tkstat);
-					}
-					echo json_encode($list);
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			$query = "SELECT 
+							a.enc_id,
+							b.department_name,
+							c.name,
+							a.title,
+							CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
+							a.created_time,
+							a.last_reply,
+							CASE a.ticket_status WHEN '0' THEN '<span class=\'label label-success\'>Closed</span>' WHEN '1' THEN '<span class=\'label label-important\'>Open</span>' WHEN '2' THEN '<span class=\'label label-warning\'>To Assign</span>' WHEN '3' THEN '<span class=\'label label-important\'>Reported</span>' ELSE 'Error' END AS stat
+						FROM ".$SupportTicketsTable." a 
+						JOIN ".$SupportDepaTable." b
+							ON	b.id=a.department_id
+						JOIN ".$SupportUserTable." c
+							ON c.id=a.operator_id
+						WHERE " ;
+			$merge=array();
+			if($_SESSION['status']==0){
+				$query.=' `user_id`='.$_SESSION['id'];
+				if($enid!=''){
+					$query.=' AND a.ref_id=?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$enid);
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				if($tit!=''){
+					$query.=' AND a.title LIKE ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$tit.'%');
+				}
+				if($dep!=''){
+					$query.=' AND a.department_id=?';
+					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$dep);
+				}
+				if($op!=''){
+					$query.=' AND a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$op.'%');
+				}
+				if($from!=''){
+					$query.=' AND a.created_time >= ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$from);
+				}
+				if($to!=''){
+					$query.=' AND a.created_time =< ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$to);
+				}
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			else if($_SESSION['status']==1){
+				$query.=' `user_id`='.$_SESSION['id'].' OR `operator_id`='.$_SESSION['id'];
+				if($enid!=''){
+					$query.=' AND a.ref_id=?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$enid);
+				}
+				if($tit!=''){
+					$query.=' AND a.title LIKE ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$tit.'%');
+				}
+				if($dep!=''){
+					$query.=' AND a.department_id=?';
+					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$dep);
+				}
+				if($from!=''){
+					$query.=' AND a.created_time >= ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$from);
+				}
+				if($to!=''){
+					$query.=' AND a.created_time <= ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$to);
+				}
+			}
+			else if($_SESSION['status']==2){
+				$tail=array();
+				if($id!=''){
+					$tail[]='a.user_i`=?';
+					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$id);
+				}
+				if($enid!=''){
+					$tail[]='a.ref_id=?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$enid);
+				}
+				if($tit!=''){
+					$tail[]='a.title LIKE ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$tit.'%');
+				}
+				if($dep!=''){
+					$tail[]='a.department_id=?';
+					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$dep);
+				}
+				if($opid!=''){
+					$tail[]='a.operator_id=?';
+					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$opid);
+				}
+				if($op!=''){
+					$tail[]='a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$op.'%');
+				}
+				if($from!=''){
+					$tail[]='a.created_time >= ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$from);
+				}
+				if($to!=''){
+					$tail[]='a.created_time <= ?';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$to);
+				}
+				if($usmail!=''){
+					$tail[]='(a.user_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1) OR operator_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1))';
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$usmail.'%');
+					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$usmail.'%');
+				}
+				$query.=implode(' AND ',$tail);
+			}
+			$query.=' ORDER BY `last_reply` DESC';
+
+			$STH = $DBH->prepare($query);
+
+			$journey=count($merge);
+			for ($i=0; $i<$journey;$i++) {
+				$STH->bindParam($i+1,$merge['val'],$merge['type']);
+			}
+			$STH->exec();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$list=array('response'=>'ret','search'=>array());
+			if(!empty($r)){
+				while ($a = $STH->fetch())
+					$list['search'][]=array('id'=>$a['enc_id'],'dname'=>$a['department_name'],'opname'=>$a['name'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+			}
+			echo json_encode($list);
 	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+	catch(PDOException $e){
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
+	$DBH=null;
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='report_ticket'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='report_ticket'){//check
 
 	if(preg_replace('/\s+/','',strip_tags($_POST['message']))!='')
 		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
@@ -1724,7 +1692,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(4,$side,PDO::PARAM_STR);
 			$STH->bindParam(5,$message,PDO::PARAM_STR);	
 			$STH->bindParam(6,$message,PDO::PARAM_STR);	
-			$STH->exec();	
+			$STH->exec();
 			$_SESSION[$_GET['id']]['reason']=$message;
 			echo json_encode(array(0=>'Submitted'));
 		}
@@ -1754,7 +1722,7 @@ else{
 }
 
 
-function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){
+function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){//check
 	$query = "SELECT id
 				FROM(
 						(SELECT b.id  
