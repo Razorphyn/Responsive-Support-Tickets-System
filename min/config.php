@@ -111,7 +111,7 @@ $min_serveOptions['maxAge'] = 1800;
  * uncomment the following lines:
  */
 function closureCompiler($js) {
-    require_once 'Minify/JS/ClosureCompiler.php';
+    require_once 'lib/Minify/JS/ClosureCompiler.php';
     return Minify_JS_ClosureCompiler::minify($js);
 }
 $min_serveOptions['minifiers']['application/x-javascript'] = 'closureCompiler';
