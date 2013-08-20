@@ -5,11 +5,15 @@ A full of functions Ticket Support System
 
 The package is under beta test.
 
-ToDo list
+ToDo List
 -
-- Check 4-5 functions
-- Move from mysqli to PDO
+- Switch MySQLi to PDO
+- Three deep checks
+- Check switch from mysqli to PDO(missing things, incorrect variable binding or extra wrong echo)
 
+Demo
+-
+[DEMO](http://razorphyn.com/products/support/)
 Admin Login:
 - admin@admin.com
 - Admin
