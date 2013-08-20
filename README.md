@@ -7,12 +7,12 @@ The package is under beta test.
 
 ToDo list
 -
--Check 4-5 functions
--Move from mysqli to PDO
+- Check 4-5 functions
+- Move from mysqli to PDO
 
 Admin Login:
--admin@admin.com
--Admin
+- admin@admin.com
+- Admin
 
 Documentation
 -
