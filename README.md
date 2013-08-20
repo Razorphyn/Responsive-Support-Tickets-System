@@ -3,9 +3,14 @@ Responsive Support Tickets System
 
 A full of functions Ticket Support System
 
-The package is under beta test, I have to check 4-5 functions and optimize the code
+The package is under beta test.
 
-Admin Logi:
+ToDo list
+-
+-Check 4-5 functions
+-Move from mysqli to PDO
+
+Admin Login:
 -admin@admin.com
 -Admin
 
