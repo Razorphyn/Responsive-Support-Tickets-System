@@ -54,234 +54,180 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 }
 
 //Function
+
 if(isset($_POST['act']) && $_POST['act']=='register'){
 	if($_POST['pwd']==$_POST['rpwd']){
 		$mustang=(preg_replace('/\s+/','',$_POST['name'])!='') ? (string)$_POST['name']:exit();
 		$viper= preg_replace('/\s+/','',$_POST['mail']);
 		$viper=($viper!='') ? $viper:exit();
 		$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			
 			$query = "INSERT INTO ".$SupportUserTable." (`name`,`reg_key`,`mail`,`password`,`ip_address`) VALUES (?,?,?,?,?) ";
-			if($prepared = $stmt->prepare($query)){
-				$ip=retrive_ip();
-				$reg=get_random_string(60);
-				if($stmt->bind_param('sssss',$mustang, $reg,$viper,$pass,$ip)){
-					if($stmt->execute()){
-						$_SESSION['id']=$stmt->insert_id;
-						$_SESSION['name']=$mustang;
-						$_SESSION['mail']=$viper;
-						$_SESSION['status']=3;
-						$_SESSION['time']=time();
-						$_SESSION['ip']=retrive_ip();
-						$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewMem ".$_SESSION['id']." ";
-						if(substr(php_uname(), 0, 7) == "Windows")
-							pclose(popen("start /B ".$ex,"r")); 
-						else
-							shell_exec($ex." > /dev/null 2>/dev/null &");
-						echo json_encode(array(0=>'Registred'));
-					}
-					else{
-						if((int)$stmt->errno==1062)
-							echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-				}
+			$ip=retrive_ip();
+			$reg=get_random_string(60);
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
+			$STH->bindParam(2,$reg,PDO::PARAM_STR);
+			$STH->bindParam(3,$viper,PDO::PARAM_STR);
+			$STH->bindParam(4,$pass,PDO::PARAM_STR);
+			$STH->bindParam(5,$ip,PDO::PARAM_STR);
+			$STH->exec();
+				$_SESSION['id']=$DBH->lastInsertId();;
+				$_SESSION['name']=$mustang;
+				$_SESSION['mail']=$viper;
+				$_SESSION['status']=3;
+				$_SESSION['time']=time();
+				$_SESSION['ip']=retrive_ip();
+				$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+				$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewMem ".$_SESSION['id']." ";
+				if(substr(php_uname(), 0, 7) == "Windows")
+					pclose(popen("start /B ".$ex,"r")); 
 				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+					shell_exec($ex." > /dev/null 2>/dev/null &");
+				echo json_encode(array(0=>'Registred'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){
+			if((int)$e->getCode()==1062)
+				echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
+			else{
+				file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+				echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+			}
+			$DBH=null;
+			exit();
+		}
 	}
+	else
+		echo json_encode(array(0=>'Password Mismatch'));
 	exit();
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST['act']=='send_again'){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			$query = "UPDATE ".$SupportUserTable." SET  reg_key=? WHERE id=? ";
-			if($prepared = $stmt->prepare($query)){
-				$ip=retrive_ip();
-				$reg=get_random_string(60);
-				if($stmt->bind_param('si',$reg,$_SESSION['id'])){
-					if($stmt->execute()){
-						$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewMem ".$_SESSION['id']." ";
-						if(substr(php_uname(), 0, 7) == "Windows")
-							pclose(popen("start /B ".$ex,"r")); 
-						else
-							shell_exec($ex." > /dev/null 2>/dev/null &");
-						echo json_encode(array(0=>'Sent'));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
+			$STH = $DBH->prepare($query);
+
+			$ip=retrive_ip();
+			$reg=get_random_string(60);
+
+			$STH->bindParam(1,$reg,PDO::PARAM_STR);
+			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->execute();
+
+			$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+			$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewMem ".$_SESSION['id']." ";
+			if(substr(php_uname(), 0, 7) == "Windows")
+				pclose(popen("start /B ".$ex,"r")); 
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				shell_exec($ex." > /dev/null 2>/dev/null &");
+			echo json_encode(array(0=>'Sent'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			$DBH=null;
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+			exit();
+		}
 	exit();
 }
 
 else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='login'){
 	$viper=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
 	$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-    if($stmt){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$query = "SELECT `id`,`name`,`mail`,`status`,`mail_alert` FROM ".$SupportUserTable." WHERE `mail`=?  AND `password`= ? LIMIT 1";
-		$prepared = $stmt->prepare($query);
-		if($prepared){
-			if($stmt->bind_param('ss', $viper,$pass)){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($sessionid, $aventador, $rmail, $st, $alert);
-					if($stmt->num_rows>0){
-						while (mysqli_stmt_fetch($stmt)) {
-							$_SESSION['time']=time();
-							$_SESSION['id']=$sessionid;
-							$_SESSION['name']=$aventador;
-							$_SESSION['mail']=$rmail;
-							$_SESSION['status']=$st;
-							$_SESSION['mail_alert']=$alert;
-							$_SESSION['ip']=retrive_ip();
-						}
-						echo json_encode(array(0=>'Logged'));
-					}
-					else
-						echo json_encode(array(0=>'Wrong Credentials'));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$viper,PDO::PARAM_STR);
+		$STH->bindParam(2,$pass,PDO::PARAM_STR);
+		$STH->execute();
+		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+		if(!empty($r)){
+			while ($a = $STH->fetch()){
+				$_SESSION['time']=time();
+				$_SESSION['id']=$a['id'];
+				$_SESSION['name']=$a['name'];
+				$_SESSION['mail']=$a['mail'];
+				$_SESSION['status']=$a['status'];
+				$_SESSION['mail_alert']=$a['mail_alert'];
+				$_SESSION['ip']=retrive_ip();
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			echo json_encode(array(0=>'Logged'));
 		}
 		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			echo json_encode(array(0=>'Wrong Credentials'));
+		$DBH=null;
 	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
 	exit();
 }
 
 else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_ticket'){
-		$encid=preg_replace('/\s+/','',$_POST['enc']);
-		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
-			$query = "UPDATE ".$SupportTicketsTable." a
-						INNER JOIN ".$SupportUserTable." b
-							ON b.id=a.operator_id
-						SET b.assigned_tickets= CASE  WHEN b.assigned_tickets!='0' THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END  
-					WHERE a.enc_id=?";
-			if($prepared = $stmt->prepare($query)){
-				if($stmt->bind_param('s', $encid)){
-					if($stmt->execute()){
-						$query = "DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id`=(SELECT `id` FROM ".$SupportTicketsTable." WHERE `enc_id`=?) ";
-						if($prepared = $stmt->prepare($query)){
-							if($stmt->bind_param('s', $encid)){
-								if($stmt->execute()){
-									$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
-									if($prepared = $stmt->prepare($query)){
-										if($stmt->bind_param('s', $encid)){
-											if($stmt->execute()){
-												$stmt->store_result();
-												$result = $stmt->bind_result($mustang);
-												if($stmt->num_rows>0){
-													$path='../upload/';
-													while (mysqli_stmt_fetch($stmt)) {
-														if(file_exists($path.$mustang)){
-															file_put_contents($path.$mustang,'');
-															unlink($path.$mustang);
-														}
-													}
-												}
-												$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
-												if($prepared = $stmt->prepare($query)){
-													if($stmt->bind_param('s', $encid)){
-														if($stmt->execute()){
-															$query = "DELETE FROM ".$SupportFlagTable." WHERE `enc_id`=?";
-															if($prepared = $stmt->prepare($query)){
-																if($stmt->bind_param('s', $encid)){
-																	if($stmt->execute()){
-																		$query = "DELETE FROM ".$SupportTicketsTable." WHERE `enc_id`=?";
-																		if($prepared = $stmt->prepare($query)){
-																			if($stmt->bind_param('s', $encid)){
-																				if($stmt->execute()){
-																					echo json_encode(array(0=>'Deleted'));
-																				}
-																				else
-																					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																			}
-																			else
-																				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																		}
-																		else
-																			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																	}
-																	else
-																		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																}
-																else
-																	echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-															}
-															else
-																echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-														}
-														else
-															echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-													}
-													else
-														echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-												}
-												else
-													echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-											}
-											else
-												echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-										}
-										else
-											echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-									}
-									else
-										echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+	$encid=preg_replace('/\s+/','',$_POST['enc']);
+	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		
+		$query="UPDATE ".$SupportTicketsTable." a
+					INNER JOIN ".$SupportUserTable." b
+						ON b.id=a.operator_id
+					SET b.assigned_tickets= CASE  WHEN b.assigned_tickets!='0' THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END  
+				WHERE a.enc_id=?";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->execute();
+		
+		$query = "DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id`=(SELECT `id` FROM ".$SupportTicketsTable." WHERE `enc_id`=?) ";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->execute();
+		
+		$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->execute();
+		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+		if(!empty($r)){
+			$path='../upload/';
+			while ($a = $STH->fetch()){
+				if(file_exists($path.$a['enc'])){
+					file_put_contents($path.$a['enc'],'');
+					unlink($path.$a['enc']);
 				}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			}
+			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+			$STH->exec();
 		}
-		else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		$query = "DELETE FROM ".$SupportFlagTable." WHERE `enc_id`=?";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->exec();
+		
+		$query = "DELETE FROM ".$SupportTicketsTable." WHERE `enc_id`=?";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->exec();
+		echo json_encode(array(0=>'Deleted'));
 	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+		exit();
+	}
 	exit();
 }
 	
@@ -292,100 +238,78 @@ else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate
 		exit();
 	}
 	else{
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			
 			$query = "SELECT `id`,`name`,`mail`,`mail_alert` FROM ".$SupportUserTable." WHERE `reg_key`=? LIMIT 1";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('s', $key)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($sessionid,$aventador,$rmail,$alert);
-						if($stmt->num_rows>0){
-							while (mysqli_stmt_fetch($stmt)) {
-								$_SESSION['id']=$sessionid;
-								$_SESSION['name']=$aventador;
-								$_SESSION['mail']=$rmail;
-								$_SESSION['mail_alert']=$alert;
-								$_SESSION['ip']=retrive_ip();
-							}
-							$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key='' WHERE `id`=?";
-							$prepared = $stmt->prepare($query);
-							if($prepared){
-								if($stmt->bind_param('i', $_SESSION['id'])){
-									if($stmt->execute()){
-										$_SESSION['status']=0;
-										$_SESSION['time']=time();
-										echo json_encode(array(0=>'Activated'));
-									}
-									else
-										echo json_encode(array(0=>'Cannot update Status, please contact the administrator. Error: '.mysqli_stmt_error($stmt)));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>'No Key Match'));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$key,PDO::PARAM_STR,60);
+			$STH->execute();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				$path='../upload/';
+				while ($a = $STH->fetch()){
+					$_SESSION['id']=$a['id'];
+					$_SESSION['name']=$a['name'];
+					$_SESSION['mail']=$a['mail'];
+					$_SESSION['mail_alert']=$a['mail_alert'];
+					$_SESSION['ip']=retrive_ip();
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+
+				$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key='' WHERE `id`=?";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT,87);
+				$STH->exec();
+				$_SESSION['status']=0;
+				$_SESSION['time']=time();
+				echo json_encode(array(0=>'Activated'));
 			}
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode(array(0=>'No Key Match'));
+			$DBH=null;
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			$DBH=null;
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+		}
 	}
 	exit();
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST['act']=='verify'){
 	if(!isset($_SESSION['cktime']) || ($_SESSION['cktime']-time())>300){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query = "SELECT `status` FROM ".$SupportUserTable." WHERE `mail`=?  AND `id`= ? LIMIT 1";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('si', $_SESSION['mail'],$_SESSION['id'])){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($st);
-						if($stmt->num_rows>0){
-							while(mysqli_stmt_fetch($stmt)){
-								if($st!=$_SESSION['status']){
-									$_SESSION['status']=$st;
-									echo json_encode(array(0=>"Load"));
-								}
-								else{
-									$_SESSION['cktime']=time();
-									echo json_encode(array(0=>'Time'));
-								}
-							}
-						}
-						else
-							echo json_encode(array(0=>'Wrong Credentials'));
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_SESSION['mail'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->execute();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				while ($a = $STH->fetch()){
+					if($st!=$_SESSION['status']){
+						$_SESSION['status']=$st;
+						echo json_encode(array(0=>"Load"));
 					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+					else{
+						$_SESSION['cktime']=time();
+						echo json_encode(array(0=>'Time'));
+					}
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 			}
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode(array(0=>'Wrong Credentials'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			$DBH=null;
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+		}
 	}
 	exit();
 }
@@ -393,54 +317,43 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 else if(isset($_POST['act']) && $_POST['act']=='forgot'){
 	$viper=$_POST['mail'];
 	$mustang=$_POST['name'];
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-    if($stmt = $mysqli->stmt_init()){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 		$query = "SELECT `id` FROM ".$SupportUserTable." WHERE mail=? AND name=? LIMIT 1";
-		if($prepared = $stmt->prepare($query)){
-			if($stmt->bind_param('ss', $viper,$mustang)){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($camaro);
-					if($stmt->num_rows>0){
-						while(mysqli_stmt_fetch($stmt))
-							$camaro=$camaro;
-						$query = "UPDATE ".$SupportUserTable." SET tmp_password=? WHERE id=?";
-						if($prepared = $stmt->prepare($query)){
-							$rands=uniqid(hash('sha256',get_random_string(60)),true);
-							if($stmt->bind_param('si', $rands,$camaro)){
-								if($stmt->execute()){
-									$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-									$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php Forgot ".$camaro." ".$rands;
-									if(substr(php_uname(), 0, 7) == "Windows")
-										pclose(popen("start /B ".$ex,"r")); 
-									else
-										shell_exec($ex." > /dev/null 2>/dev/null &");
-									echo json_encode(array(0=>'Reset'));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-					else
-						echo json_encode(array(0=>'Wrong Credential'));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$viper,PDO::PARAM_STR);
+		$STH->bindParam(2,$mustang,PDO::PARAM_STR);
+		$STH->execute();
+		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+		if(!empty($r)){
+			while ($a = $STH->fetch())
+				$camaro=$a['id'];
+			$query = "UPDATE ".$SupportUserTable." SET tmp_password=? WHERE id=?";
+			$STH = $DBH->prepare($query);
+			$rands=uniqid(hash('sha256',get_random_string(60)),true);
+			$STH->bindParam(1,$rands,PDO::PARAM_STR);
+			$STH->bindParam(2,$camaro,PDO::PARAM_INT);
+			$STH->exec();
+
+			$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+			$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php Forgot ".$camaro." ".$rands;
+			if(substr(php_uname(), 0, 7) == "Windows")
+				pclose(popen("start /B ".$ex,"r")); 
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				shell_exec($ex." > /dev/null 2>/dev/null &");
+			
+			echo json_encode(array(0=>'Reset'));
 		}
 		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			echo json_encode(array(0=>'Wrong Credentials'));
 	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+	catch(PDOException $e){
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
+	$DBH=null;
 	exit();
 }
 
@@ -450,34 +363,39 @@ else if(isset($_POST['act']) && $_POST['act']=='reset_password'){
 	$rmail=(string)$_POST['rmail'];
 	if(preg_replace('/\s+/','',$rpwd)!='' && $rpwd==$npwd){
 		$pass=hash('whirlpool',crypt($rpwd,'$#%H4!df84a$%#RZ@£'));
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		if($stmt = $mysqli->stmt_init()){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query = "UPDATE ".$SupportUserTable." SET password=?,tmp_password=NULL WHERE mail=? AND tmp_password=?";
-			if($prepared = $stmt->prepare($query)){
-				if($stmt->bind_param('sss', $pass,$rmail,$_POST['key'])){
-					if($stmt->execute()){
-						echo json_encode(array(0=>'Updated'));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$pass,PDO::PARAM_STR);
+			$STH->bindParam(2,$rmail,PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['key'],PDO::PARAM_STR);
+			$STH->exec();
+			
+			echo json_encode(array(0=>'Updated'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$stmt->close();
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+		}
 	}
 	else
 		echo json_encode(array(0=>'Password Mismatch'));
+	$DBH=null;
 	exit();
 }
 
-else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['createtk']=='Create New Ticket'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='logout'){
+	session_unset();
+	session_destroy();
+	echo json_encode(array(0=>'logout'));
+	exit();
+}
+
+else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['createtk']=='Create New Ticket'){//add PDO
 	$letarr=array('M','d','C','f','K','w','p','T','B','X');
 	$error=array();
 	if(preg_replace('/\s+/','',strip_tags($_POST['message']))!='')
@@ -699,58 +617,50 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='logout'){
-	session_unset();
-	session_destroy();
-	echo json_encode(array(0=>'logout'));
-	exit();
-}
-
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='retrive_depart'){
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 		if($_POST['sect']=='new' && $_SESSION['status']==0)
 			$query = "SELECT * FROM ".$SupportDepaTable." WHERE active='1' AND public_view='1'";
 		else if($_POST['sect']=='new' && $_SESSION['status']!=0)
 			$query = "SELECT * FROM ".$SupportDepaTable." WHERE active='1' ";
 		else if($_POST['sect']=='admin' && $_SESSION['status']==2)
-			$query = "SELECT id,department_name,CASE active WHEN '1' THEN 'Yes' ELSE 'No' END, CASE public_view WHEN '1' THEN 'Yes' ELSE 'No' END FROM ".$SupportDepaTable;
+			$query = "SELECT id,department_name,
+			CASE active WHEN '1' THEN 'Yes' ELSE 'No' END AS active, CASE public_view WHEN '1' THEN 'Yes' ELSE 'No' END AS public FROM ".$SupportDepaTable;
 		else
 			exit();
-		$prepared = $stmt->prepare($query);
-		if($prepared){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($dpaidn, $dname, $active, $public);
-					if($stmt->num_rows>0){
-						$dn=array('response'=>'ret','information'=>array());
-						if($_POST['sect']=='new'){
-							while (mysqli_stmt_fetch($stmt))
-								$dn['information'][]="<option value='".$dpaidn."'>".$dname."</option>";
-						}
-						else if($_POST['sect']=='admin' && $_SESSION['status']==2){
-							while (mysqli_stmt_fetch($stmt))
-								$dn['information'][]=array('id'=>$dpaidn,'name'=>$dname,'active'=>$active,'public'=>$public);
-						}
-						echo json_encode($dn);
-					}
-					else
-						echo json_encode(array('response'=>array('empty'),'information'=>array()));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$viper,PDO::PARAM_STR);
+		$STH->bindParam(2,$pass,PDO::PARAM_STR);
+		$STH->execute();
+		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+		if(!empty($r)){
+			$dn=array('response'=>'ret','information'=>array());
+			if($_POST['sect']=='new'){
+				while ($a = $STH->fetch())
+					$dn['information'][]="<option value='".$a['id']."'>".$a['department_name']."</option>";
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			else if($_POST['sect']=='admin' && $_SESSION['status']==2){
+				while ($a = $STH->fetch())
+					$dn['information'][]=array('id'=>$$a['id'],'name'=>$a['department_name'],'active'=>$$a['active'],'public'=>$a['public']);
+			}
+			echo json_encode($dn);
 		}
 		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+			echo json_encode(array('response'=>array('empty'),'information'=>array()));
+	}
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='retrive_tickets'){
+else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='retrive_tickets'){//add PDO
 	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
 	$stmt = $mysqli->stmt_init();
 	if($stmt){
@@ -881,72 +791,63 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 }
 
 else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){
-	
 	$offset = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
 	$postnumbers = is_numeric($_POST['number']) ? $_POST['number'] : exit();
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:'';
 	if(isset($_SESSION[$encid]['id']) && $encid!='' ){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		$query = "SELECT 
-						a.id,
-						IF(b.name IS NOT NULL,b.name,'Unknown'),
-						a.message,
-						a.created_time,
-						a.attachment 
-					FROM ".$SupportMessagesTable." a
-					LEFT JOIN ".$SupportUserTable." b
-						ON b.id=a.user_id
-					WHERE `ticket_id`=? ORDER BY `created_time` DESC LIMIT ".$offset.",".$postnumbers;
-		$prepared = $stmt->prepare($query);
-		if($prepared){
-			if($stmt->bind_param('s', $_SESSION[$encid]['id'])){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($msid,$camaro, $message, $time, $attch);
-					if($stmt->num_rows>0){
-						$ret=array('ret'=>'Entry','messages'=>array());
-						$messageid=array();
-						$count=0;
-						while (mysqli_stmt_fetch($stmt)){
-							$ret['messages'][$msid]=array($camaro,$message,$time);
-							if($attch==1)
-								$messageid[]=$msid;
-							$count++;
-						}
-						if(count($messageid)>0){
-							$messageid=implode(',',$messageid);
-							$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
-							$prepared = $stmt->prepare($query);
-							if($prepared){
-								if($stmt->execute()){
-									$stmt->store_result();
-									$result = $stmt->bind_result($mustang, $enc, $msid);
-									if($stmt->num_rows>0){
-										while (mysqli_stmt_fetch($stmt))
-											$ret['messages'][$msid][]='<div class="row-fluid"><div class="span2 offset2"><form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$enc.'"/><input type="submit" class="btn btn-link download" value="'.$mustang.'"></form></div></div>';
-									}
-								}
-								else
-									$error=mysqli_stmt_error($stmt);
-							}
-							else
-								$error=mysqli_stmt_error($stmt);
-						}
-						$ret['messages']=array_values($ret['messages']);
-						echo json_encode($ret);
-					}
-					else
-						echo json_encode(array('ret'=>'End'));
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			$query = "SELECT 
+							a.id,
+							IF(b.name IS NOT NULL,b.name,'Unknown') as name,
+							a.message,
+							a.created_time,
+							a.attachment 
+						FROM ".$SupportMessagesTable." a
+						LEFT JOIN ".$SupportUserTable." b
+							ON b.id=a.user_id
+						WHERE `ticket_id`=? ORDER BY `created_time` DESC LIMIT ".$offset.",".$postnumbers;
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_SESSION[$encid]['id'],PDO::PARAM_STR);
+			$STH->execute();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				$ret=array('ret'=>'Entry','messages'=>array());
+				$messageid=array();
+				$count=0;
+				while ($a = $STH->fetch()){
+					$ret['messages'][$msid]=array($a['name'],$a['message'],$a['created_time']);
+					if($a['attachment']==1)
+						$messageid[]=$a['id'];
+					$count++;
 				}
-				else
-					echo json_encode(array('ret'=>mysqli_stmt_error($stmt)));
+				if(count($messageid)>0){
+					$messageid=implode(',',$messageid);
+					$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$viper,PDO::PARAM_STR);
+					$STH->bindParam(2,$pass,PDO::PARAM_STR);
+					$STH->execute();
+					$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+					if(!empty($r)){
+						while ($a = $STH->fetch())
+							$ret['messages'][$a['message_id']][]='<div class="row-fluid"><div class="span2 offset2"><form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.$a['name'].'"></form></div></div>';
+					}
+				}
+				$ret['messages']=array_values($ret['messages']);
+				echo json_encode($ret);
 			}
+			else
+				echo json_encode(array('ret'=>'End'));
 		}
-		else
-			echo json_encode(array('ret'=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+		}
+		$DBH=null;
+		exit();
 	}
 	else
 		echo json_encode(array('Error'=>'FATAL ERROR'));
@@ -958,87 +859,76 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	$mustang=(preg_replace('/\s+/','',$_POST['name'])!='') ? (string)$_POST['name']:exit();
 	$alert=($_POST['almail']!='no') ? 'yes':'no';
 	$dfmail=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		if(isset($_POST['oldpwd']) && isset($_POST['nldpwd']) && isset($_POST['rpwd']) && $_POST['nldpwd']==$_POST['rpwd']){
 			$opass=hash("whirlpool",crypt($_POST['oldpwd'],'$#%H4!df84a$%#RZ@£'));
 			$query = "SELECT `id` FROM ".$SupportUserTable." WHERE `password`= ? LIMIT 1";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('s', $opass)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($camaro);
-						if($stmt->num_rows>0){
-							while (mysqli_stmt_fetch($stmt)) {
-								$camaroret=$camaro;
-							}
-							if($camaroret==$_SESSION['id']){
-								$pass=hash("whirlpool",crypt($_POST['nldpwd'],'$#%H4!df84a$%#RZ@£'));
-								$query = "UPDATE ".$SupportUserTable." SET `name`=?, `mail`=?, `mail_alert`=?, `password`=? WHERE id=".$_SESSION['id'];
-								$passupd=true;
-								$check=true;
-							}
-							else
-								$wrongpass=true;
-						}
-						else
-							$wrongpass=true;
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$opass,PDO::PARAM_STR);
+			$STH->execute();	
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				while ($a = $STH->fetch()){
+					$camaroret=$a['id'];
+				}
+				if($camaroret==$_SESSION['id']){
+					$pass=hash("whirlpool",crypt($_POST['nldpwd'],'$#%H4!df84a$%#RZ@£'));
+					$query = "UPDATE ".$SupportUserTable." SET `name`=?, `mail`=?, `mail_alert`=?, `password`=? WHERE id=".$_SESSION['id'];
+					$passupd=true;
+					$check=true;
 				}
 				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+					$wrongpass=true;
+
+				echo json_encode(array(0=>'Logged'));
 			}
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				$wrongpass=true;
 		}
 		else{
 			$query = "UPDATE ".$SupportUserTable." SET `name`=?, `mail`=?, `mail_alert`=? WHERE id=".$_SESSION['id'];
 			$check=true;
 		}
 		if(isset($check) && $check==true){
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if(isset($passupd) && $passupd==true){
-					unset($passupd);
-					$bind=$stmt->bind_param('ssss', $mustang,$dfmail,$alert,$pass);
-				}
-				else
-					$bind=$stmt->bind_param('sss', $mustang,$dfmail,$alert);
-				if($bind){
-					if($stmt->execute()){
-						$_SESSION['name']=$mustang;
-						$_SESSION['mail_alert']=$alert;
-						$_SESSION['mail']=$dfmail;
-						if(isset($_SESSION['operators']))$_SESSION['operators'][$_SESSION['id']]=$mustang;
-						echo json_encode(array(0=>'Saved'));
-					}
-					else{
-						if((int)$stmt->errno==1062)
-							echo json_encode(array(0=>"User with mail: ".$dfmail." is already registred"));
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			if(isset($passupd) && $passupd==true){
+				unset($passupd);
+				$STH->bindParam(1,$mustang,PDO::PARAM_STR);
+				$STH->bindParam(2,$dfmail,PDO::PARAM_STR);
+				$STH->bindParam(3,$alert,PDO::PARAM_STR);
+				$STH->bindParam(4,$pass,PDO::PARAM_STR);
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			else{
+				$STH->bindParam(1,$mustang,PDO::PARAM_STR);
+				$STH->bindParam(2,$dfmail,PDO::PARAM_STR);
+				$STH->bindParam(3,$alert,PDO::PARAM_STR);
+			}
+			$STH->execute();
+			$_SESSION['name']=$mustang;
+			$_SESSION['mail_alert']=$alert;
+			$_SESSION['mail']=$dfmail;
+			echo json_encode(array(0=>'Saved'));
 		}
 		else if(isset($wrongpass) && $wrongpass==true)
 			echo json_encode(array(0=>'Wrong Old Password'));
 		else
 			echo json_encode(array(0=>'New Passwords Mismatch'));
 	}
-	$mysqli->close();
+	catch(PDOException $e){
+		if((int)$e->getCode()==1062)
+			echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
+		else{
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+		}
+	}
+	$DBH=null;
 	exit();
 }
 
-else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['post_reply']=='Post Reply'){
+else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['post_reply']=='Post Reply'){//add PDO
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$error=array();
@@ -1211,110 +1101,89 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$charger=($_POST['status']==0 || $_POST['status']==1 || $_POST['status']==2)? $_POST['status']:0;
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
-		if($charger==0){
-			$fquery = "UPDATE ".$SupportTicketsTable." a
+	if($charger==0){
+		$fquery = "UPDATE ".$SupportTicketsTable." a
+					LEFT OUTER JOIN ".$SupportUserTable." b
+					ON b.id=a.operator_id
+					SET 
+						b.solved_tickets= CASE WHEN a.ticket_status!='0' THEN (b.solved_tickets+1) ELSE b.solved_tickets END , 
+						b.assigned_tickets= CASE  WHEN a.ticket_status!='0' AND b.assigned_tickets>=1 THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
+					WHERE a.enc_id=? ";
+		$lquery = "UPDATE ".$SupportTicketsTable." a
+					SET
+						a.ticket_status='0'
+					WHERE a.enc_id=? ";
+	}
+	else if($charger==2){
+		$fquery = "UPDATE ".$SupportTicketsTable." a
+					LEFT OUTER JOIN ".$SupportUserTable." b
+						ON b.id=a.operator_id
+					SET 
+						b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END , 
+						b.assigned_tickets= CASE  WHEN a.ticket_status='1' AND b.assigned_tickets>=1 THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
+					WHERE a.enc_id=?";
+		$lquery="UPDATE ".$SupportTicketsTable." a
+					SET 
+						a.operator_id=0,
+						a.ticket_status='2'
+					WHERE a.enc_id=?";
+	}
+	else if($charger==1){
+		$fquery = "UPDATE ".$SupportTicketsTable." a 
 						LEFT OUTER JOIN ".$SupportUserTable." b
 						ON b.id=a.operator_id
-						SET 
-							b.solved_tickets= CASE WHEN a.ticket_status!='0' THEN (b.solved_tickets+1) ELSE b.solved_tickets END , 
-							b.assigned_tickets= CASE  WHEN a.ticket_status!='0' AND b.assigned_tickets>=1 THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
-						WHERE a.enc_id=? ";
-
-			$lquery = "UPDATE ".$SupportTicketsTable." a
-						SET
-							a.ticket_status='0'
-						WHERE a.enc_id=? ";
-		}
-		else if($charger==2){
-			$fquery = "UPDATE ".$SupportTicketsTable." a
-						LEFT OUTER JOIN ".$SupportUserTable." b
-							ON b.id=a.operator_id
-						SET 
-							b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END , 
-							b.assigned_tickets= CASE  WHEN a.ticket_status='1' AND b.assigned_tickets>=1 THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
-						WHERE a.enc_id=?";
-			$lquery="UPDATE ".$SupportTicketsTable." a
-						SET 
-							a.operator_id=0,
-							a.ticket_status='2'
-						WHERE a.enc_id=?";
-		}
-		else if($charger==1){
-			$fquery = "UPDATE ".$SupportTicketsTable." a 
-							LEFT OUTER JOIN ".$SupportUserTable." b
-							ON b.id=a.operator_id
-						SET 
-							b.assigned_tickets= CASE WHEN a.ticket_status='0' THEN (b.assigned_tickets+1) ELSE b.assigned_tickets END,
-							b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END
-						WHERE a.enc_id=?";
-			$lquery = "UPDATE ".$SupportTicketsTable." a
-						SET
-							a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END
-						WHERE a.enc_id=?";
-		}
-		else
-			exit();
-		if($stmt->prepare($fquery)){
-			if($stmt->bind_param('s', $encid)){
-				if($stmt->execute()){
-					if($stmt->prepare($lquery)){
-						if($stmt->bind_param('s', $encid)){
-							if($stmt->execute()){
-								$query = "SELECT ticket_status FROM ".$SupportTicketsTable." WHERE enc_id=?";
-								if($prepared = $stmt->prepare($query)){
-									if($stmt->bind_param('s', $encid)){
-										if($stmt->execute()){
-											$stmt->store_result();
-											$result = $stmt->bind_result($tkst);
-											if($stmt->num_rows>0){
-												while (mysqli_stmt_fetch($stmt))
-													$_SESSION[$encid]['status']=$tkst;
-												echo json_encode(array(0=>'Saved'));
-											}
-										}
-										else
-											echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-									}
-									else
-										echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+					SET 
+						b.assigned_tickets= CASE WHEN a.ticket_status='0' THEN (b.assigned_tickets+1) ELSE b.assigned_tickets END,
+						b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END
+					WHERE a.enc_id=?";
+		$lquery = "UPDATE ".$SupportTicketsTable." a
+					SET
+						a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END
+					WHERE a.enc_id=?";
 	}
 	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+		exit();
+
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		$STH = $DBH->prepare($fquery);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->exec();
+		
+		$STH = $DBH->prepare($lquery);
+		$STH->bindParam(1,$tit,PDO::PARAM_STR);
+		$STH->bindParam(2,$prio,PDO::PARAM_STR);
+		$STH->bindParam(3,$charger,PDO::PARAM_STR);
+		$STH->bindParam(4,$encid,PDO::PARAM_STR,87);
+		$STH->exec();
+		
+		$query = "SELECT ticket_status FROM ".$SupportTicketsTable." WHERE enc_id=?";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(4,$encid,PDO::PARAM_STR,87);
+		$STH->execute();
+		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+		if(!empty($r)){
+			while ($a = $STH->fetch())
+				$_SESSION[$encid]['status']=$a['ticket_status'];
+		}
+		echo json_encode(array(0=>'Saved'));
+	}
+	catch(PDOException $e){
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST['act']=='move_opera_ticket'){//controllare
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST['act']=='move_opera_ticket'){//check
 	$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$opid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $dpid,$_SESSION[$encid]['usr_id']);
 		if(!is_numeric($opid))
 			$opid=0;
@@ -1330,24 +1199,22 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 							c.assigned_tickets=IF(c.id!=a.operator_id,c.assigned_tickets+1,c.assigned_tickets),
 							a.operator_id=?
 						WHERE a.enc_id=? ";
-		$prepared = $stmt->prepare($query);
-		if($prepared){
-			if($stmt->bind_param('iiiis', $dpid,$opid,$opid,$opid,$encid)){
-				if($stmt->execute()){
-					echo json_encode(array(0=>'Moved'));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$dpid,PDO::PARAM_INT);
+		$STH->bindParam(2,$opid,PDO::PARAM_INT);
+		$STH->bindParam(3,$opid,PDO::PARAM_INT);
+		$STH->bindParam(4,$opid,PDO::PARAM_INT);
+		$STH->bindParam(5,$encid,PDO::PARAM_STR);
+		$STH->execute();
+		
+		echo json_encode(array(0=>'Moved'));
 	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+	catch(PDOException $e){
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
 	exit();
 }
 
@@ -1355,28 +1222,22 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	$tit=(preg_replace('/\s+/','',$_POST['tit'])!='')? htmlentities(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$query="UPDATE ".$SupportTicketsTable." SET title=? WHERE enc_id=?";
-		$prepared = $stmt->prepare($query);
-		if($prepared){
-			if($stmt->bind_param('ss', $tit,$encid)){
-				if($stmt->execute()){
-					echo json_encode(array(0=>'Updated',1=>$tit));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$tit,PDO::PARAM_STR);
+		$STH->bindParam(2,$encid,PDO::PARAM_STR);
+		$STH->execute();
+		
+		echo json_encode(array(0=>'Updated',1=>$tit));
 	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
 	exit();
 }
 
@@ -1397,28 +1258,24 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		}
 		$pass=implode('',$pass);
 	}
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$query="UPDATE ".$SupportTicketsTable." SET contype=?,ftp_user=?,ftp_password=? WHERE enc_id=?";
-		$prepared = $stmt->prepare($query);
-		if($prepared){
-			if($stmt->bind_param('ssss', $con,$usr,$pass,$encid)){
-				if($stmt->execute()){
-					echo json_encode(array(0=>'Updated'));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$con,PDO::PARAM_STR);
+		$STH->bindParam(2,$usr,PDO::PARAM_STR);
+		$STH->bindParam(3,$pass,PDO::PARAM_STR);
+		$STH->bindParam(4,$encid,PDO::PARAM_STR,87);
+		$STH->execute();
+
+		echo json_encode(array(0=>'Updated'));
 	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
 	exit();
 }
 
@@ -1426,51 +1283,45 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 	$encid=preg_replace('/\s+/','',$_POST['ticket_id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$file=preg_replace('/\s+/','',$_POST['file_download']);
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		
 		$query="SELECT name FROM ".$SupportUploadTable." WHERE ticket_id=? AND enc=? LIMIT 1";
-		$prepared = $stmt->prepare($query);
-		if($prepared){
-			if($stmt->bind_param('ss', $encid,$file)){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($mustang);
-					if($stmt->num_rows>0){
-						while (mysqli_stmt_fetch($stmt)){
-							$enc='../upload/'.$file;
-							if(DecryptFile($enc)){
-								$mime=retrive_mime($enc,$mustang);
-								if($mime!='Error'){
-									header("Content-Type: ".$mime);
-									header("Cache-Control: no-store, no-cache");
-									header("Content-Description: ".$mustang);
-									header("Content-Disposition: attachment;filename=".$mustang);
-									header("Content-Transfer-Encoding: binary");
-									readfile($enc);
-									CryptFile($enc);
-									echo '<script>parent.noty({text: "Your download will start soon",type:"information",timeout:9000});</script>';
-								}
-								else
-									echo '<script>parent.noty({text: "Can\'t retrive Content-Type",type:"error",timeout:9000});</script>';
-							}
-						}
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(2,$file,PDO::PARAM_STR);
+		$STH->execute();
+		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+		if(!empty($r)){
+			while($a=$STH->fetch()){
+				$enc='../upload/'.$file;
+				if(DecryptFile($enc)){
+					$mime=retrive_mime($enc,$a['name']);
+					if($mime!='Error'){
+						header("Content-Type: ".$mime);
+						header("Cache-Control: no-store, no-cache");
+						header("Content-Description: ".$a['name']);
+						header("Content-Disposition: attachment;filename=".$a['name']);
+						header("Content-Transfer-Encoding: binary");
+						readfile($enc);
+						CryptFile($enc);
+						echo '<script>parent.noty({text: "Your download will start soon",type:"information",timeout:9000});</script>';
 					}
 					else
-						echo '<script>parent.noty({text: "No matches",type:"error",timeout:9000});</script>';
+						echo '<script>parent.noty({text: "Can\'t retrive Content-Type",type:"error",timeout:9000});</script>';
 				}
-				else
-					echo '<script>parent.noty({text: "Executing Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
 			}
-			else
-				echo '<script>parent.noty({text: "Binding Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});';
 		}
 		else
-			echo '<script>parent.noty({text: "Preparring Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});';
+			echo '<script>parent.noty({text: "No matches",type:"error",timeout:9000});</script>';
 	}
-	else
-		echo '<script>parent.noty({text: "Initialization Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});';
-	$mysqli->close();
+	catch(PDOException $e){
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>''));
+		echo '<script>parent.noty({text: "We are sorry, but an error has occurred, please contact the administrator if it persist",type:"error",timeout:9000});</script>';
+	}
 	exit();
 }
 
@@ -1485,87 +1336,77 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	else
 		$charger=($_POST['status']==0 || $_POST['status']==1 || $_POST['status']==2)? $_POST['status']:0;
 
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
-		if($charger==0){
-			$fquery = "UPDATE ".$SupportTicketsTable." a
-						LEFT OUTER JOIN ".$SupportUserTable." b
-							ON b.id=a.operator_id
-						SET 
-							b.solved_tickets= CASE WHEN a.ticket_status='1' THEN (b.solved_tickets+1) ELSE b.solved_tickets END , 
-							b.assigned_tickets= CASE  WHEN ( a.ticket_status!='0' AND b.assigned_tickets>=1) THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
-						WHERE a.enc_id=?";
-			$lquery = "UPDATE ".$SupportTicketsTable." a
-						SET 
-							a.title=? , 
-							a.priority=?,
-							a.ticket_status=?
-						WHERE a.enc_id=?";
-		}
-		else if($charger==1){
-			$fquery = "UPDATE ".$SupportTicketsTable." a
-						LEFT OUTER JOIN ".$SupportUserTable." b
-							ON b.id=a.operator_id
-						SET
-							b.assigned_tickets= CASE WHEN a.ticket_status='0' THEN (b.assigned_tickets+1) ELSE b.assigned_tickets END,
-							b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END
-						WHERE a.enc_id=?";
-			$lquery = "UPDATE ".$SupportTicketsTable." a
-						SET
-							a.title=? , 
-							a.priority=?, 
-							a.ticket_status= CASE WHEN a.operator_id=0 THEN '2' ELSE ? END,
-							a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END 
-						WHERE a.enc_id=?";
-		}
-		else if($charger==2){
-			$fquery = "UPDATE ".$SupportTicketsTable." a
-						LEFT JOIN ".$SupportUserTable." b
-							ON b.id=a.operator_id
-						SET
-							b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END , 
-							b.assigned_tickets= CASE  WHEN a.ticket_status='1' AND b.assigned_tickets>=1 THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
-						WHERE a.enc_id=?";
-			$lquery = "UPDATE ".$SupportTicketsTable." a
-						SET
-							a.title=? , 
-							a.priority=?,
-							a.operator_id=0,
-							a.ticket_status=?
-						WHERE a.enc_id=?";
-		}
-		else
-			exit();
-		if($prepared = $stmt->prepare($fquery)){
-			if($stmt->bind_param('s',$encid)){
-				if($stmt->execute()){
-					if($prepared = $stmt->prepare($lquery)){
-						if($stmt->bind_param('ssss',$tit,$prio,$charger, $encid)){
-							if($stmt->execute()){
-								echo json_encode(array(0=>'Saved'));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+	if($charger==0){
+		$fquery = "UPDATE ".$SupportTicketsTable." a
+					LEFT OUTER JOIN ".$SupportUserTable." b
+						ON b.id=a.operator_id
+					SET 
+						b.solved_tickets= CASE WHEN a.ticket_status='1' THEN (b.solved_tickets+1) ELSE b.solved_tickets END , 
+						b.assigned_tickets= CASE  WHEN ( a.ticket_status!='0' AND b.assigned_tickets>=1) THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
+					WHERE a.enc_id=?";
+		$lquery = "UPDATE ".$SupportTicketsTable." a
+					SET 
+						a.title=? , 
+						a.priority=?,
+						a.ticket_status=?
+					WHERE a.enc_id=?";
+	}
+	else if($charger==1){
+		$fquery = "UPDATE ".$SupportTicketsTable." a
+					LEFT OUTER JOIN ".$SupportUserTable." b
+						ON b.id=a.operator_id
+					SET
+						b.assigned_tickets= CASE WHEN a.ticket_status='0' THEN (b.assigned_tickets+1) ELSE b.assigned_tickets END,
+						b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END
+					WHERE a.enc_id=?";
+		$lquery = "UPDATE ".$SupportTicketsTable." a
+					SET
+						a.title=? , 
+						a.priority=?, 
+						a.ticket_status= CASE WHEN a.operator_id=0 THEN '2' ELSE ? END,
+						a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END 
+					WHERE a.enc_id=?";
+	}
+	else if($charger==2){
+		$fquery = "UPDATE ".$SupportTicketsTable." a
+					LEFT JOIN ".$SupportUserTable." b
+						ON b.id=a.operator_id
+					SET
+						b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END , 
+						b.assigned_tickets= CASE  WHEN a.ticket_status='1' AND b.assigned_tickets>=1 THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
+					WHERE a.enc_id=?";
+		$lquery = "UPDATE ".$SupportTicketsTable." a
+					SET
+						a.title=? , 
+						a.priority=?,
+						a.operator_id=0,
+						a.ticket_status=?
+					WHERE a.enc_id=?";
 	}
 	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+		exit();
+		
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		$STH = $DBH->prepare($fquery);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->exec();
+		
+		$STH = $DBH->prepare($lquery);
+		$STH->bindParam(1,$tit,PDO::PARAM_STR);
+		$STH->bindParam(2,$prio,PDO::PARAM_STR);
+		$STH->bindParam(3,$charger,PDO::PARAM_STR);
+		$STH->bindParam(4,$encid,PDO::PARAM_STR);
+		$STH->exec();
+	
+		echo json_encode(array(0=>'Saved'));
+	}
+	catch(Exception $e){
+		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		$DBH=null;
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
 	exit();
 }
 
@@ -1576,48 +1417,44 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$note=preg_replace('/\s+/',' ',$_POST['comment']);
 	if(isset($_SESSION[$encid]['status']) && $_SESSION[$encid]['status']==0){
-		$query = "UPDATE ".$SupportUserTable." a
+		try{
+			$query = "UPDATE ".$SupportUserTable." a
 					INNER JOIN ".$SupportTicketsTable." b 
 						ON b.operator_id=a.id
 					SET a.rating=ROUND(((a.number_rating * a.rating - (CASE WHEN b.operator_rate>0 THEN b.operator_rate ELSE 0 END) + ?)/(CASE WHEN a.number_rating=0 THEN 1 ELSE a.number_rating+1 END)),2),
 						a.number_rating=CASE WHEN b.operator_rate>0 THEN a.number_rating ELSE a.number_rating+1 END,
 						b.operator_rate=? 
 					WHERE  b.enc_id=?";
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
-			if($stmt->prepare($query)){
-				if($stmt->bind_param('dds', $rate,$rate,$encid)){
-					if($stmt->execute()){
-						$query = "INSERT INTO ".$SupportRateTable." (`ref_id`,`enc_id`,`usr_id`,`rate`,`note`) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE `rate`=?,`note`=?";
-						if($stmt->prepare($query)){
-							if($stmt->bind_param('ssiisis',$_SESSION[$encid]['ref_id'],$encid,$_SESSION['id'],$rate,$note,$rate,$note)){
-								if($stmt->execute()){
-									echo json_encode(array(0=>'Voted'));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			$STH = $DBH->prepare($query);
+			$STH->bindValue(1,strval($rate));
+			$STH->bindValue(2,strval($rate));
+			$STH->bindParam(3,$encid,PDO::PARAM_STR);
+			$STH->exec();
+			
+			$query = "INSERT INTO ".$SupportRateTable." (`ref_id`,`enc_id`,`usr_id`,`rate`,`note`) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE `rate`=?,`note`=?";
+			
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_SESSION[$encid]['ref_id'],PDO::PARAM_STR);
+			$STH->bindParam(2,$encid,PDO::PARAM_STR);
+			$STH->bindParam(3,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->bindParam(4,$rate,PDO::PARAM_INT);
+			$STH->bindParam(5,$note,PDO::PARAM_STR);
+			$STH->bindParam(6,$rate,PDO::PARAM_INT);
+			$STH->bindParam(7,$note,PDO::PARAM_STR);
+			$STH->exec();
+			
+			echo json_encode(array(0=>'Voted'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		catch(PDOException $e){
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+		}
 	}
 	else
 		echo json_encode(array(0=>'You must close the ticket before rate the operator!'));
+	$DBH=null;
 	exit();
 }
 
@@ -1625,54 +1462,46 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	if($GT86>10 && $rate>0){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			$query = "INSERT INTO ".$SupportRateFaqTable." (`faq_id`,`usr_id`,`rate`) VALUES (?,?,?) ON DUPLICATE KEY UPDATE `updated`='1'";
-			if($stmt->prepare($query)){
-				if($stmt->bind_param('iii',$GT86,$_SESSION['id'],$rate)){
-					if($stmt->execute()){
-						$query = "UPDATE ".$SupportFaqTable." a
-									INNER JOIN ".$SupportRateFaqTable." b 
-										ON b.faq_id=a.id
-									SET 
-										a.rate=CASE WHEN b.updated='1' THEN ROUND(((a.num_rate * a.rate - b.rate) + ?)/(a.num_rate),2) ELSE ROUND ((a.rate + ?)/(a.num_rate+1),2) END,
-										a.num_rate=CASE WHEN b.updated='1' THEN a.num_rate ELSE a.num_rate+1 END,
-										b.updated='0',
-										b.rate=?
-									WHERE  a.id=?";
-						if($stmt->prepare($query)){
-							if($stmt->bind_param('iiii', $rate,$rate,$rate,$GT86)){
-								if($stmt->execute()){
-									echo json_encode(array(0=>'Voted'));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$GT86,PDO::PARAM_INT);
+			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->bindParam(3,$rate,PDO::PARAM_INT);
+			$STH->exec();
+
+			$query = "UPDATE ".$SupportFaqTable." a
+						INNER JOIN ".$SupportRateFaqTable." b 
+							ON b.faq_id=a.id
+						SET 
+							a.rate=CASE WHEN b.updated='1' THEN ROUND(((a.num_rate * a.rate - b.rate) + ?)/(a.num_rate),2) ELSE ROUND ((a.rate + ?)/(a.num_rate+1),2) END,
+							a.num_rate=CASE WHEN b.updated='1' THEN a.num_rate ELSE a.num_rate+1 END,
+							b.updated='0',
+							b.rate=?
+						WHERE  a.id=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$rate,PDO::PARAM_INT);
+			$STH->bindParam(2,$rate,PDO::PARAM_INT);
+			$STH->bindParam(3,$rate,PDO::PARAM_INT);
+			$STH->bindParam(4,$GT86,PDO::PARAM_INT);
+			$STH->exec();
+			echo json_encode(array(0=>'Voted'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		catch(PDOException $e){
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			$DBH=null;
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+			exit();
+		}
 	}
 	else
 		echo json_encode(array(0=>'Invalid Information'));
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){
+else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//add PDO
 	$enid=preg_replace('/\s+/','',$_POST['enid']);
 	$tit=preg_replace('/\s+/',' ',$_POST['title']);
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
@@ -1882,28 +1711,29 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$error[]='No information has been found about you and the ticket';
 
 	if(!isset($error[0])){
-		$side=($_SESSION[$encid]['usr_id']==$_SESSION['id'])? 'User':'Operator';
-		$query = "INSERT INTO ".$SupportFlagTable." (ref_id,enc_id,usr_id,side,reason) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE reason=?";
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
-			if($prepared = $stmt->prepare($query)){
-				if($stmt->bind_param('ssisss',$_SESSION[$encid]['ref_id'],$encid,$_SESSION['id'],$side,$message,$message)){
-					if($stmt->execute()){
-						$_SESSION[$_GET['id']]['reason']=$message;
-						echo json_encode(array(0=>'Submitted'));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		try{
+			$side=($_SESSION[$encid]['usr_id']==$_SESSION['id'])? 'User':'Operator';
+			$query = "INSERT INTO ".$SupportFlagTable." (ref_id,enc_id,usr_id,side,reason) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE reason=?";
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+				
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_SESSION[$encid]['ref_id'],PDO::PARAM_STR);
+			$STH->bindParam(2,$encid,PDO::PARAM_STR);
+			$STH->bindParam(3,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->bindParam(4,$side,PDO::PARAM_STR);
+			$STH->bindParam(5,$message,PDO::PARAM_STR);	
+			$STH->bindParam(6,$message,PDO::PARAM_STR);	
+			$STH->exec();	
+			$_SESSION[$_GET['id']]['reason']=$message;
+			echo json_encode(array(0=>'Submitted'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		catch(PDOException $e){
+			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+			$DBH=null;
+			exit();
+		}
 	}
 	else
 		echo json_encode(array(0=>'Error/s: '.implode(', ',$error)));
@@ -1925,7 +1755,7 @@ else{
 
 
 function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){
-	$query = "SELECT *
+	$query = "SELECT id
 				FROM(
 						(SELECT b.id  
 							FROM ".$SupportUserTable." b
@@ -1940,30 +1770,26 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 						ORDER BY assigned_tickets,solved_tickets ASC LIMIT 1)
 					) tab
 				LIMIT 1";
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	$prepared = $stmt->prepare($query);
-	if($prepared){
-		if($stmt->bind_param('i', $dep)){
-			if($stmt->execute()){
-				$stmt->store_result();
-				$result = $stmt->bind_result($camaro);
-				if($stmt->num_rows>0){
-					while (mysqli_stmt_fetch($stmt))
-						$selopid=$camaro;
-					return $selopid;
-				}
-				else
-					return 'No Operator Available';
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		$prepared = $stmt->prepare($query);
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$dep,PDO::PARAM_INT);
+		$STH->execute();
+		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+		if(!empty($r)){
+			while ($a = $STH->fetch()){
+				return $a['id'];
 			}
-			else
-				return mysqli_stmt_error($stmt);
 		}
 		else
-			return mysqli_stmt_error($stmt);
+			return 'No Operator Available';
 	}
-	else
-		return mysqli_stmt_error($stmt);
+	catch(PDOException $e){
+		return $e->getMessage();
+		$DBH=null;
+	}
 }
 
 function retrive_mime($encname,$mustang){
