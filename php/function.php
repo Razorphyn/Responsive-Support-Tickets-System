@@ -59,7 +59,7 @@ if(isset($_POST['act']) && $_POST['act']=='register'){
 		$mustang=(preg_replace('/\s+/','',$_POST['name'])!='') ? (string)$_POST['name']:exit();
 		$viper= preg_replace('/\s+/','',$_POST['mail']);
 		$viper=($viper!='') ? $viper:exit();
-		$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
+		$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@Â£'));
 		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
 		$stmt = $mysqli->stmt_init();
 		if($stmt){
@@ -138,7 +138,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 
 else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='login'){
 	$viper=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
-	$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
+	$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@Â£'));
 	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
 	$stmt = $mysqli->stmt_init();
     if($stmt){
@@ -188,7 +188,7 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 			$query = "UPDATE ".$SupportTicketsTable." a
 						INNER JOIN ".$SupportUserTable." b
 							ON b.id=a.operator_id
-						SET b.assigned_tickets= CASE  WHEN a.ticket_status!='0' THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END  
+						SET b.assigned_tickets= CASE  WHEN b.assigned_tickets!='0' THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END  
 					WHERE a.enc_id=?";
 			if($prepared = $stmt->prepare($query)){
 				if($stmt->bind_param('s', $encid)){
@@ -449,7 +449,7 @@ else if(isset($_POST['act']) && $_POST['act']=='reset_password'){
 	$rpwd=(string)$_POST['rnpass'];
 	$rmail=(string)$_POST['rmail'];
 	if(preg_replace('/\s+/','',$rpwd)!='' && $rpwd==$npwd){
-		$pass=hash('whirlpool',crypt($rpwd,'$#%H4!df84a$%#RZ@£'));
+		$pass=hash('whirlpool',crypt($rpwd,'$#%H4!df84a$%#RZ@Â£'));
 		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
 		if($stmt = $mysqli->stmt_init()){
 			$query = "UPDATE ".$SupportUserTable." SET password=?,tmp_password=NULL WHERE mail=? AND tmp_password=?";
@@ -962,7 +962,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	$stmt = $mysqli->stmt_init();
 	if($stmt){
 		if(isset($_POST['oldpwd']) && isset($_POST['nldpwd']) && isset($_POST['rpwd']) && $_POST['nldpwd']==$_POST['rpwd']){
-			$opass=hash("whirlpool",crypt($_POST['oldpwd'],'$#%H4!df84a$%#RZ@£'));
+			$opass=hash("whirlpool",crypt($_POST['oldpwd'],'$#%H4!df84a$%#RZ@Â£'));
 			$query = "SELECT `id` FROM ".$SupportUserTable." WHERE `password`= ? LIMIT 1";
 			$prepared = $stmt->prepare($query);
 			if($prepared){
@@ -975,7 +975,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 								$camaroret=$camaro;
 							}
 							if($camaroret==$_SESSION['id']){
-								$pass=hash("whirlpool",crypt($_POST['nldpwd'],'$#%H4!df84a$%#RZ@£'));
+								$pass=hash("whirlpool",crypt($_POST['nldpwd'],'$#%H4!df84a$%#RZ@Â£'));
 								$query = "UPDATE ".$SupportUserTable." SET `name`=?, `mail`=?, `mail_alert`=?, `password`=? WHERE id=".$_SESSION['id'];
 								$passupd=true;
 								$check=true;
@@ -1043,8 +1043,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$error=array();
 	if(preg_replace('/\s+/','',$_POST['message'])!='')
-		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
-		//$message=preg_replace('/\s+/',' ',$_POST['message']);
+		$message=preg_replace('/\s+/',' ',$_POST['message']);
 	else
 		$error[]='Empty Message';
 
@@ -1205,7 +1204,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_status'){//controllare
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_status'){
 	if($_SESSION['status']==0)
 		$charger=($_POST['status']==1 || $_POST['status']==2)? 1:0;
 	else
@@ -1475,7 +1474,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_index'){//controllare
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_index'){
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$tit=(preg_replace('/\s+/','',$_POST['title'])!='')? preg_replace('/\s+/',' ',$_POST['title']):exit();
