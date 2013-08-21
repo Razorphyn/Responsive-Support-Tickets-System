@@ -52,6 +52,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							a.operator_id,
 							a.ticket_status,
 							a.department_id,
+							a.website,
 							a.contype,
 							a.ftp_user,
 							a.ftp_password,
@@ -74,6 +75,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							a.operator_id,
 							a.ticket_status,
 							a.department_id,
+							a.website,
 							a.contype,
 							a.ftp_user,
 							a.ftp_password,
@@ -91,7 +93,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 				if($stmt->bind_param('s', $_GET['id'])){
 					if($stmt->execute()){
 						$stmt->store_result();
-						$result = $stmt->bind_result($tkid,$refid,$title,$usrid,$opid,$stat,$departmentid,$connection,$usercred,$conpass,$rate,$note,$reason);
+						$result = $stmt->bind_result($tkid,$refid,$title,$usrid,$opid,$stat,$departmentid,$web,$connection,$usercred,$conpass,$rate,$note,$reason);
 						if($stmt->num_rows>0){
 							while (mysqli_stmt_fetch($stmt))
 								$_SESSION[$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
@@ -339,7 +341,6 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				<hr>
 				<div class="jumbotron" >
 					<h2 class='pagefun'><?php echo $title; ?></h2>
-					
 					</div>
 					<hr>
 					<div class='row-fluid refid'>
@@ -347,6 +348,8 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 						<div class='span10' ><span id='reference_id'><?php echo $refid; ?></span></div>
 					</div>
 					<div class='row-fluid'>
+						<div class='span2'><strong>Website</strong></div>
+						<div class='span4'><input type='text' id='webs' value="<?php echo addslashes($web); ?>"/></div>
 						<div class='span2'><strong>Connection Type</strong></div>
 						<div class='span4'><select id='contype'><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
 					</div>
@@ -525,7 +528,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		
 		$("#updtitle").click(function(){var a=$("#nwtittk").val().replace(/\s+/g," ");""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{act:"update_ticket_title",tit:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Updated"==b[0]?$(".pagefun").html(b[1]):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"Empty Title",type:"error",timeout:9E3})});
 		
-		$("#updtconn").click(function(){var a=$("#contype > option:checked").val(),c=$("#conuser").val(),d=$("#conpass").val();$.ajax({type:"POST",url:"../php/function.php",data:{act:"update_ticket_connection",contype:a,user:c,pass:d,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Updated"==b[0]?noty({text:"Updated",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})});
+		$("#updtconn").click(function(){var a=$("#contype > option:checked").val(),web=$('#webs').val(),c=$("#conuser").val(),d=$("#conpass").val();$.ajax({type:"POST",url:"../php/function.php",data:{act:"update_ticket_connection",website:web,contype:a,user:c,pass:d,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Updated"==b[0]?noty({text:"Updated",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})});
 		
 		$('.cif').click(function(){
 			el=$(this).children('i');
