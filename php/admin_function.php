@@ -57,255 +57,186 @@ else{
 	}
 
 	//Functions
-	if(isset($_POST['act']) && $_POST['act']=='retrive_reported_ticket'){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
-			$query = "SELECT a.id,a.ref_id,a.enc_id,CASE b.status WHEN '0' THEN 'User' WHEN '1' THEN 'Operator' WHEN '2' THEN 'Adminsitrator' ELSE 'Useless' END,a.reason,b.mail  
-			FROM ".$SupportFlagTable." a
-			LEFT JOIN ".$SupportUserTable." b
-				ON b.id=a.usr_id";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($id,$refid,$encid, $role, $reason, $mail);
-					$list=array('response'=>'ret','ticket'=>array());
-					$list['ticket']=array();
-					if($stmt->num_rows>0){
-						while (mysqli_stmt_fetch($stmt))
-							$list['ticket'][]=array('id'=>$id-14,'ref_id'=>$refid,'encid'=>$encid,'role'=>$role,'reason'=>$reason,'mail'=>$mail);
-					}
-					echo json_encode($list);
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+	if(isset($_POST['act']) && $_POST['act']=='retrive_reported_ticket'){  //check
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+				$query = "SELECT 
+							a.id,
+							a.ref_id,
+							a.enc_id,
+							CASE b.status WHEN '0' THEN 'User' WHEN '1' THEN 'Operator' WHEN '2' THEN 'Adminsitrator' ELSE 'Useless' END AS urole,
+							a.reason,
+							b.mail  
+				FROM ".$SupportFlagTable." a
+				LEFT JOIN ".$SupportUserTable." b
+					ON b.id=a.usr_id";
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$list=array('response'=>'ret','ticket'=>array());
+			if(!empty($r)){
+				while ($a = $STH->fetch())
+					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'encid'=>$a['enc_id'],'role'=>$a['urole'],'reason'=>$a['reason'],'mail'=>$a['mail']);
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));			
+			echo json_encode($list);
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='add_depart'){
+	else if(isset($_POST['act'])  && $_POST['act']=='add_depart'){//check
 		$mustang=(preg_replace('/\s+/','',$_POST['tit'])!='')? preg_replace('/\s+/',' ',$_POST['tit']):exit();
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		$public=(is_numeric($_POST['pubdep']))? $_POST['pubdep']:exit();
-		
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query = "INSERT INTO ".$SupportDepaTable."(`department_name`,`active`,`public_view`) VALUES (?,?,?)";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('sss', $mustang,$active,$public)){
-					if($stmt->execute()){
-						$data=array();
-						$data['response']='Added';
-						$dpid=$stmt->insert_id;
-						$active=((int)$active==0) ? 'No':'Yes';
-						$public=((int)$public==0) ? 'No':'Yes';
-						$data['information']=array('id'=>$dpid,'name'=>$mustang,'active'=>$active,'public'=>$public);
-						echo json_encode($data);
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
+			$STH->bindParam(2,$active,PDO::PARAM_STR);
+			$STH->bindParam(3,$public,PDO::PARAM_STR);
+			$STH->execute();
+			$data=array();
+			$data['response']='Added';
+			$dpid=$DBH->lastInsertId();
+			$active=((int)$active==0) ? 'No':'Yes';
+			$public=((int)$public==0) ? 'No':'Yes';
+			$data['information']=array('id'=>$dpid,'name'=>$mustang,'active'=>$active,'public'=>$public);
+			echo json_encode($data);
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='edit_depart'){
+	else if(isset($_POST['act'])  && $_POST['act']=='edit_depart'){//check
 		$camaro=(is_numeric($_POST['id'])) ? (int)$_POST['id']:exit();
 		$mustang=(preg_replace('/\s+/','',$_POST['name'])!='')? preg_replace('/\s+/',' ',$_POST['name']):exit();
 		$active=(is_numeric($_POST['active'])) ? $_POST['active']:exit();
 		$public=(is_numeric($_POST['pub'])) ? $_POST['pub']:exit();
-		
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query = "UPDATE ".$SupportDepaTable." SET `department_name`=?,`active`=?,`public_view`=? WHERE id=? ";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('sssi', $mustang,$active,$public,$camaro)){
-					if($stmt->execute()){
-						echo json_encode(array(0=>'Succeed'));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
+			$STH->bindParam(2,$active,PDO::PARAM_STR);
+			$STH->bindParam(3,$public,PDO::PARAM_STR);
+			$STH->bindParam(4,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			echo json_encode(array(0=>'Succeed'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='del_dep'){
+	else if(isset($_POST['act'])  && $_POST['act']=='del_dep'){//check
 	$sub=(preg_replace('/\s+/','',$_POST['sub'])!='')? preg_replace('/\s+/',' ',$_POST['sub']):exit();
 	$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']:exit();
 	
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();	
-    if($stmt){
+	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 		if($sub=='del_name'){
-			$sedquery="DELETE FROM ".$SupportUserPerDepaTable." WHERE `department_id`=?;";
-			$delquery="DELETE FROM ".$SupportDepaTable." WHERE `id`= ?  ;";
-			if($stmt->prepare($sedquery)){
-				if($stmt->bind_param('i', $camaro)){
-					if($stmt->execute()){
-						if($stmt->prepare($delquery)){
-							if($stmt->bind_param('i', $camaro)){
-								if($stmt->execute()){
-									echo json_encode(array(0=>'Deleted'));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			try{
+				$sedquery="DELETE FROM ".$SupportUserPerDepaTable." WHERE `department_id`=?;";
+				$delquery="DELETE FROM ".$SupportDepaTable." WHERE `id`= ?  ;";
+				
+				$STH = $DBH->prepare($sedquery);
+				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->execute();
+				
+				$STH = $DBH->prepare($delquery);
+				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->execute();
+				echo json_encode(array(0=>'Deleted'));
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			catch(PDOException $e){  
+				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+			}
 		}
 		else if($sub=='del_every'){
 			$sedquery="DELETE FROM ".$SupportUserPerDepaTable." WHERE `department_id`=?";
 			$delquery="DELETE FROM ".$SupportDepaTable." WHERE `id`= ?";
 			$seltk="SELECT id FROM ".$SupportTicketsTable." WHERE `department_id`= ?";
 			$deltk="DELETE FROM ".$SupportTicketsTable." WHERE `department_id`= ?";
-
-			if($stmt->prepare($sedquery)){
-				if($stmt->bind_param('i', $camaro)){
-					if($stmt->execute()){
-						if($stmt->prepare($delquery)){
-							if($stmt->bind_param('i', $camaro)){
-								if($stmt->execute()){
-									if($stmt->prepare($seltk)){
-										if($stmt->bind_param('i', $camaro)){
-											if($stmt->execute()){
-												$stmt->store_result();
-												$result = $stmt->bind_result($ids);
-												if($stmt->num_rows>0){
-													$list=array();
-													while (mysqli_stmt_fetch($stmt))
-														$list[]=$ids;
-													$list=implode(',',$list);
-													if($stmt->prepare($deltk)){
-														if($stmt->bind_param('i', $camaro)){
-															if($stmt->execute()){
-																$delmsg="DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id` IN (".$list.")";
-																if($stmt->prepare($delmsg)){
-																		if($stmt->execute()){
-																			$selupl="SELECT enc FROM ".$SupportUploadTable." WHERE `num_id` IN (".$list.")";
-																			if($stmt->prepare($selupl)){
-																					if($stmt->execute()){
-																						$stmt->store_result();
-																						$result = $stmt->bind_result($enc);
-																						if($stmt->num_rows>0){
-																							file_put_contents('ok',$list);
-																							$path='../upload/';
-																							while (mysqli_stmt_fetch($stmt)){
-																								file_put_contents($path.$enc,'');
-																								unlink($path.$enc);
-																							}
-																							$delup="DELETE FROM ".$SupportUploadTable." WHERE `num_id` IN (".$list.")";
-																							if($stmt->prepare($delup)){
-																									if($stmt->execute())
-																										echo json_encode(array(0=>'Deleted'));
-																									else
-																										echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																							}
-																							else
-																								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																						}
-																						else
-																							echo json_encode(array(0=>'Deleted'));
-																					}
-																					else
-																						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																			}
-																			else
-																				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																		}
-																		else
-																			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																}
-																else
-																	echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-															}
-															else
-																echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-														}
-														else
-															echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-													}
-													else
-														echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-												}
-												else
-													echo json_encode(array(0=>'Deleted'));
-											}
-											else
-												echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-										}
-										else
-											echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-									}
-									else
-										echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			try{
+				$STH = $DBH->prepare($sedquery);
+				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->execute();
+			
+				$STH = $DBH->prepare($delquery);
+				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->execute();
+				
+				$STH = $DBH->prepare($seltk);
+				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->execute();
+				
+				$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+				if(!empty($r)){
+					$list=array();
+					while ($a = $STH->fetch()){
+						$list[]=$a['id'];
+					}
+					$list=implode(',',$list);
+					
+					$STH = $DBH->prepare($deltk);
+					$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+					$STH->execute();
+					
+					$delmsg="DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id` IN (".$list.")";
+					$STH = $DBH->prepare($delmsg);
+					$STH->execute();
+					
+					$selupl="SELECT enc FROM ".$SupportUploadTable." WHERE `num_id` IN (".$list.")";
+					$STH = $DBH->prepare($selupl);
+					$STH->execute();
+					
+					$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+					if(!empty($r)){
+						$path='../upload/';
+						while ($a = $STH->fetch()){
+							file_put_contents($path.$enc,'');
+							unlink($path.$enc);
 						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+						
+						$delup="DELETE FROM ".$SupportUploadTable." WHERE `num_id` IN (".$list.")";
+						$STH = $DBH->prepare($delup);
+						$STH->execute();
+						echo json_encode(array(0=>'Deleted'));
 					}
 					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+						echo json_encode(array(0=>'Deleted'));
+			
 				}
 				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+					echo json_encode(array(0=>'Deleted'));
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			catch(PDOException $e){  
+				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+			}
 		}
 		else
 			echo json_encode(array(0=>'Cannot select sub process'));
-	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
 	exit();
 }
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_options'){
+	else if(isset($_POST['act'])  && $_POST['act']=='save_options'){//check
 		$senreply=(is_numeric($_POST['senrep'])) ? $_POST['senrep']:exit();
 		$senope=(is_numeric($_POST['senope'])) ? $_POST['senope']:exit();
 		$upload=(is_numeric($_POST['upload'])) ? $_POST['upload']:exit();
@@ -322,7 +253,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_stmp'){
+	else if(isset($_POST['act'])  && $_POST['act']=='save_stmp'){//check
 		
 		$serv=(is_numeric($_POST['serv'])) ? $_POST['serv']:exit();
 		$mustang=(string)$_POST['name'];
@@ -351,7 +282,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_mail_body'){
+	else if(isset($_POST['act'])  && $_POST['act']=='save_mail_body'){//check
 		$sub=(preg_replace('/\s+/','',$_POST['sub'])!='')? preg_replace('/\s+/',' ',$_POST['sub']):exit();
 		$mess=(preg_replace('/\s+/','',$_POST['message'])!='')? preg_replace('/\s+/',' ',$_POST['message']):exit();
 		$act=(int)$_POST['sec'];
@@ -370,7 +301,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['upload_logo'])  && isset($_FILES['new_logo'])){
+	else if(isset($_POST['upload_logo'])  && isset($_FILES['new_logo'])){//check
 		$target_path = "../css/logo/".basename($_FILES['new_logo']['name']);
 		if($_FILES['new_logo']['type']=='image/gif' || $_FILES['new_logo']['type']=='image/jpeg' || $_FILES['new_logo']['type']=='image/png' || $_FILES['new_logo']['type']=='image/pjpeg'){
 				if(move_uploaded_file($_FILES['new_logo']['tmp_name'], $target_path)) {
@@ -386,37 +317,42 @@ else{
 	}
 
 	else if(isset($_POST['act']) && $_POST['act']=='retrive_users'){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
-			$query = "SELECT `id`,`name`,`mail`,CASE `status` WHEN '0' THEN 'User'  WHEN '1' THEN 'Operator'  WHEN '2' THEN 'Administrator'  WHEN '3' THEN 'Activation'  WHEN '4' THEN 'Banned' ELSE 'Error' END,CASE `holiday` WHEN '0' THEN 'No' ELSE 'Yes' END, CASE `number_rating` WHEN '0' THEN 'No Rating' WHEN `number_rating`!='0' THEN `rating` ELSE 'Error' END FROM ".$SupportUserTable;
-			if($stmt->prepare($query)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($camaro, $mustang, $viper, $charger, $hol, $rate);
-						if($stmt->num_rows>0){
-							$users=array('response'=>'ret','information'=>array());
-							while (mysqli_stmt_fetch($stmt)) {
-								$users['information'][]=array('num'=>$camaro-54,'name'=>$mustang,'mail'=>$viper,'status'=>$charger,'holiday'=>$hol,"rating"=>$rate);
-							}
-							echo json_encode($users);
-						}
-						else
-							echo json_encode(array('response'=>array('empty'),'information'=>array()));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+			$query = "SELECT 
+						`id`,
+						`name`,
+						`mail`,
+						CASE `status` WHEN '0' THEN 'User'  WHEN '1' THEN 'Operator'  WHEN '2' THEN 'Administrator'  WHEN '3' THEN 'Activation'  WHEN '4' THEN 'Banned' ELSE 'Error' END AS ustat,
+						CASE `holiday` WHEN '0' THEN 'No' ELSE 'Yes' END AS hol, 
+						CASE WHEN `number_rating`='0' THEN 'No Rating' WHEN `number_rating`!='0' THEN `rating` ELSE 'Error' END AS rt
+					FROM ".$SupportUserTable;
+			
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				$users=array('response'=>'ret','information'=>array());
+				while ($a = $STH->fetch()){
+					$users['information'][]=array('num'=>$a['id']-54,'name'=>$a['name'],'mail'=>$a['mail'],'status'=>$a['ustat'],'holiday'=>$a['hol'],"rating"=>$a['rt']);
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode($users);
+			}
+			else
+				echo json_encode(array('response'=>array('empty'),'information'=>array()));
+							
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='update_user_info'){
+	else if(isset($_POST['act']) && $_POST['act']=='update_user_info'){//Add PDO
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		$mustang=(string) $_POST['name'];
 		$viper=(string) $_POST['mail'];
@@ -580,44 +516,44 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='select_depa_usr'){
+	else if(isset($_POST['act']) && $_POST['act']=='select_depa_usr'){//check
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
-			$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-			$stmt = $mysqli->stmt_init();
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query = "SELECT `department_id` FROM ".$SupportUserPerDepaTable." WHERE `user_id`=? ORDER BY `department_name` ASC";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('i', $camaro)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($depaid);
-							$ret=array('res'=>'ok','depa'=>array(0=>'<div class="user_depa_container">'));
-							$camaros=array();
-							while (mysqli_stmt_fetch($stmt)){
-								$camaros[$depaid]=$depaid;
-							}
-							retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable);
-							foreach($_SESSION['departments'] as $k=>$n){
-								if(array_key_exists($k,$camaros))
-									$ret['depa'][]='<label class="checkbox inline"><input type="checkbox" name="ass_usr_depa" value="'.$k.'" checked />'.$n.'</label>';
-								else
-									$ret['depa'][]='<label class="checkbox inline"><input type="checkbox" name="ass_usr_depa" value="'.$k.'" />'.$n.'</label>';
-							}
-							unset($_SESSION['depa']);
-							$ret['depa'][]='</div>';
-							echo json_encode($ret);
-					}
+			
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$ret=array('res'=>'ok','depa'=>array(0=>'<div class="user_depa_container">'));
+			$camaros=array();
+			while ($a = $STH->fetch()){
+				$camaros[$a['department_id']]=$a['department_id'];
+			}
+			$b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable));
+			if($b!=false){
+				foreach($b as $k=>$n){
+					if(array_key_exists($k,$camaros))
+						$ret['depa'][]='<label class="checkbox inline"><input type="checkbox" name="ass_usr_depa" value="'.$k.'" checked />'.$n.'</label>';
 					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+						$ret['depa'][]='<label class="checkbox inline"><input type="checkbox" name="ass_usr_depa" value="'.$k.'" />'.$n.'</label>';
 				}
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			$mysqli->close();
+			$ret['depa'][]='</div>';
+			echo json_encode($ret);
+		}
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='del_usr'){
+	else if(isset($_POST['act']) && $_POST['act']=='del_usr'){//Add PDO
 		$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']+54:exit();
 		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
 		$stmt = $mysqli->stmt_init();	
@@ -738,107 +674,94 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='automatic_assign_ticket'){//controllare
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+	else if(isset($_POST['act']) && $_POST['act']=='automatic_assign_ticket'){//deep check
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query="SELECT id,department_id,user_id FROM ".$SupportTicketsTable." WHERE ticket_status='2'";
 			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($camaro,$depa,$opeid);
-					if($stmt->num_rows>0){
-						$tktoedit=array();
-						while (mysqli_stmt_fetch($stmt))
-							$tktoedit[]=array($camaro,$depa,$opeid);
-						foreach($tktoedit as $k=>$v){
-							$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $v[1], $v[2]);
-							if(is_numeric($selopid)){
-								$query = "UPDATE ".$SupportTicketsTable." a ,
-												".$SupportUserTable." b 
-											SET 
-												b.assigned_tickets=(b.assigned_tickets+1) ,
-												a.operator_id=?,
-												a.ticket_status= CASE WHEN a.ticket_status='2' THEN '1' ELSE a.ticket_status END  
-											WHERE a.id=? AND b.id=?";
-								if($stmt->prepare($query)){
-									if($stmt->bind_param('iii', $selopid,$v[0],$selopid)){
-										if(!$stmt->execute())
-											{echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();}
-									}
-									else
-										{echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();}
-								}
-								else
-									{echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();}
-							}
-							else if($selopid!='No Operator Available')
-								{echo json_encode(array(0=>$selopid));exit();}
-						}
-						echo json_encode(array(0=>'Assigned'));
-					}
-					else
-						echo json_encode(array(0=>'No Ticket to Assign'));
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				$tktoedit=array();
+				while ($a = $STH->fetch()){
+					$tktoedit[]=array($a['id'],$a['department_id'],$a['user_id']);
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				
+				foreach($tktoedit as $k=>$v){
+					$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $v[1], $v[2]);
+					if(is_numeric($selopid)){
+						$query = "UPDATE 
+										".$SupportTicketsTable." a ,
+										".$SupportUserTable." b 
+									SET 
+										b.assigned_tickets=(b.assigned_tickets+1) ,
+										a.operator_id=?,
+										a.ticket_status= CASE WHEN a.ticket_status='2' THEN '1' ELSE a.ticket_status END  
+									WHERE a.id=? AND b.id=?";
+						$STH = $DBH->prepare($query);
+						$STH->bindParam(1,$selopid,PDO::PARAM_INT);
+						$STH->bindParam(2,$v[0],PDO::PARAM_INT);
+						$STH->bindParam(3,$selopid,PDO::PARAM_INT);
+						$STH->execute();
+					}
+				}
+				echo json_encode(array(0=>'Assigned'));
 			}
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode(array(0=>'No Ticket to Assign'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='retrive_operator_assign'){
+	else if(isset($_POST['act']) && $_POST['act']=='retrive_operator_assign'){//check
 		$encid=preg_replace('/\s+/','',$_POST['enc']);
 		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 		$departmentid=(is_numeric($_POST['id'])) ? $_POST['id']:exit();
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query="SELECT id,name,status FROM ((SELECT a.id,a.name,a.status  FROM ".$SupportUserTable." a WHERE  a.status='2' AND a.id!='".$_SESSION['id']."' AND a.id!='".$_SESSION[$encid]['op_id']."') UNION (SELECT a.id,a.name,a.status  FROM  ".$SupportUserTable." a LEFT JOIN  ".$SupportUserPerDepaTable." b ON a.id=b.user_id  WHERE b.department_id=? AND a.id!=".$_SESSION['id'].")) AS tab ORDER BY tab.status ASC, tab.name ASC";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('i', $departmentid)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($camaro, $mustang, $charger);
-						if($stmt->num_rows>0){
-							$list=array(0=>'Ex',1=>'<option value="0">---</option>');
-							while (mysqli_stmt_fetch($stmt))
-								$list[]='<option value="'.$camaro.'">'.$mustang.'</option>';
-							echo json_encode($list);
-						}
-						else
-							echo json_encode(array(0=>'Unavailable'));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$departmentid,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				$list=array(0=>'Ex',1=>'<option value="0">---</option>');
+				while ($a = $STH->fetch()){
+					$list[]='<option value="'.$a['id'].'">'.$a['name'].'</option>';
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode($list);
 			}
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode(array(0=>'Unavailable'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='move_admin_ticket'){//controllare
+	else if(isset($_POST['act']) && $_POST['act']=='move_admin_ticket'){//deep check
 		$opid=(is_numeric($_POST['opid'])) ? $_POST['opid']:exit();
 		$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 		$encid=preg_replace('/\s+/','',$_POST['id']);
 		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			if($opid==-1){
 				$opid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $dpid,$_SESSION[$encid]['usr_id']);
 				if(!is_numeric($opid))
@@ -856,35 +779,34 @@ else{
 							c.assigned_tickets=IF(c.id!=a.operator_id,c.assigned_tickets+1,c.assigned_tickets),
 							a.operator_id=?
 						WHERE a.enc_id=? ";
-			if($stmt->prepare($query)){
-				if($stmt->bind_param('iiiiiis',$opid,$dpid,$opid,$opid,$opid,$opid,$encid)){
-					if($stmt->execute()){
-						if($opid>0)
-							echo json_encode(array(0=>'AMoved'));
-						else
-							echo json_encode(array(0=>'No Operator Available'));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$opid,PDO::PARAM_INT);
+			$STH->bindParam(2,$dpid,PDO::PARAM_INT);
+			$STH->bindParam(3,$opid,PDO::PARAM_INT);
+			$STH->bindParam(4,$opid,PDO::PARAM_INT);
+			$STH->bindParam(5,$opid,PDO::PARAM_INT);
+			$STH->bindParam(6,$opid,PDO::PARAM_INT);
+			$STH->bindParam(7,$encid,PDO::PARAM_INT);
+			$STH->execute();
+			
+			if($opid>0)
+				echo json_encode(array(0=>'AMoved'));
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode(array(0=>'No Operator Available'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='delete_files'){
+	else if(isset($_POST['act']) && $_POST['act']=='delete_files'){//Add PDO
 		$from=$_POST['from']." 00:00:00";
 		$to=$_POST['to']." 23:59:59";
 		$query = "SELECT enc,message_id FROM ".$SupportUploadTable." WHERE `upload_date` BETWEEN ? AND ? ";
 		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
+		$stmt = $mysqli->stmt_init();	
 		if($stmt){
 			if($prepared = $stmt->prepare($query)){
 				if($stmt->bind_param('ss', $from,$to)){
@@ -949,37 +871,32 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act']) && $_POST['act']=='retrive_faq'){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
-			$query = "SELECT id,question,position,CASE active WHEN 0 THEN 'No' ELSE 'Yes' END,CASE rate WHEN 0 THEN 'Unrated' ELSE rate END FROM ".$SupportFaqTable;
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($id,$q, $p, $ac, $r);
-					$list=array('response'=>'ret','faq'=>array());
-					$list['faq']=array();
-					if($stmt->num_rows>0){
-						while (mysqli_stmt_fetch($stmt))
-							$list['faq'][]=array('id'=>$id-14,'question'=>$q,'position'=>$p,'active'=>$ac,'rate'=>$r);
-					}
-					echo json_encode($list);
+	else if(isset($_POST['act']) && $_POST['act']=='retrive_faq'){//check
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+			$query = "SELECT id,question,position,CASE active WHEN 0 THEN 'No' ELSE 'Yes' END AS ac,CASE rate WHEN 0 THEN 'Unrated' ELSE rate END AS rat FROM ".$SupportFaqTable;
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$list=array('response'=>'ret','faq'=>array());
+			if(!empty($r)){
+				while ($a = $STH->fetch()){
+					$list['faq'][]=array('id'=>$a['id']-14,'question'=>$a['question'],'position'=>$a['position'],'active'=>$a['ac'],'rate'=>$a['rat']);
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			echo json_encode($list);
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 	
-	else if(isset($_POST['act'])  && $_POST['act']=='add_faq'){
+	else if(isset($_POST['act'])  && $_POST['act']=='add_faq'){//check
 	
 		$question=(preg_replace('/\s+/','',$_POST['question'])!='')? preg_replace('/\s+/',' ',$_POST['question']):exit();
 		$answer=(preg_replace('/\s+/','',$_POST['answer'])!='')? preg_replace('/\s+/',' ',$_POST['answer']):exit();
@@ -1034,69 +951,58 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act'])  && $_POST['act']=='del_faq'){
+	else if(isset($_POST['act'])  && $_POST['act']=='del_faq'){//check
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
-		
-		$query="DELETE FROM ".$SupportRateFaqTable." WHERE `faq_id`=?";
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
-			if($stmt->prepare($query)){
-				if($stmt->bind_param('i', $camaro)){
-					if($stmt->execute()){
-						$query="DELETE FROM ".$SupportFaqTable." WHERE `id`=?";
-						if($stmt->prepare($query)){
-							if($stmt->bind_param('i', $camaro)){
-								if($stmt->execute()){
-									echo json_encode(array(0=>'Deleted'));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			
+			$query="DELETE FROM ".$SupportRateFaqTable." WHERE `faq_id`=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$query="DELETE FROM ".$SupportFaqTable." WHERE `id`=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(PARAM_INT);
+			$STH->execute();
+			
+			echo json_encode(array(0=>'Deleted'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();	
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
+		exit();
 	}
 	
-	else if(isset($_POST['act'])  && $_POST['act']=='edit_faq'){
+	else if(isset($_POST['act'])  && $_POST['act']=='edit_faq'){//check
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		$question=(preg_replace('/\s+/','',$_POST['question'])!='')? preg_replace('/\s+/',' ',$_POST['question']):exit();
 		$answer=(preg_replace('/\s+/','',$_POST['answer'])!='')? preg_replace('/\s+/',' ',$_POST['answer']):exit();
 		$pos=(is_numeric($_POST['position']))? $_POST['position']:NULL;
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
-		
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			if($pos==NULL){
-				$query = "SELECT (IF ((SELECT c.id FROM ".$SupportFaqTable." c LIMIT 1) IS NOT NULL,(SELECT MAX(d.position) FROM ".$SupportFaqTable." d )+1,0)) FROM ".$SupportFaqTable;
-				if($stmt->prepare($query)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($rpos);
-						while (mysqli_stmt_fetch($stmt))
-							$pos=$rpos;
+				try{
+					$query = "SELECT (IF ((SELECT c.id FROM ".$SupportFaqTable." c LIMIT 1) IS NOT NULL,(SELECT MAX(d.position) FROM ".$SupportFaqTable." d )+1,0)) AS rpos FROM ".$SupportFaqTable;
+					
+					$STH = $DBH->prepare($query);
+					$STH->execute();
+					
+					$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+					if(!empty($r)){
+						while ($a = $STH->fetch()){
+							$pos=$a['rpos'];
+						}
 					}
-					else
-						echo json_encode(array(0=>"Reaload the page to see the changes. Error: ".mysqli_stmt_error($stmt)));
 				}
-				else
-					echo json_encode(array(0=>"Reaload the page to see the changes. Error: ".mysqli_stmt_error($stmt)));
+				catch(PDOException $e){
+					file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				}
 			}
 			$query = "UPDATE ".$SupportFaqTable."
 						SET question=?,
@@ -1104,83 +1010,69 @@ else{
 							position=?,
 							active=? 
 						WHERE id=? ";
-			if($stmt->prepare($query)){
-				if($stmt->bind_param('ssisi', $question,$answer,$pos,$active,$camaro)){
-					if($stmt->execute()){
-						echo json_encode(array(0=>'Succeed',1=>$pos));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$question,PDO::PARAM_STR);
+			$STH->bindParam(2,$answer,PDO::PARAM_STR);
+			$STH->bindParam(3,$pos,PDO::PARAM_INT);
+			$STH->bindParam(4,$active,PDO::PARAM_STR);
+			$STH->bindParam(5,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			echo json_encode(array(0=>'Succeed',1=>$pos));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		catch(PDOException $e){
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 	
-	else if(isset($_POST['act']) && $_POST['act']=='retrive_faq_answer'){
+	else if(isset($_POST['act']) && $_POST['act']=='retrive_faq_answer'){//check
 		$cs=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query = "SELECT answer FROM ".$SupportFaqTable." WHERE id=? LIMIT 1";
-			if($stmt->prepare($query)){
-				if($stmt->bind_param('i',$cs)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($a);
-						$list=array(0=>'ret');
-						if($stmt->num_rows>0){
-							while (mysqli_stmt_fetch($stmt))
-								$list[]=html_entity_decode($a);
-						}
-						echo json_encode($list);
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$cs,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$list=array(0=>'ret');
+			if(!empty($r)){
+				while ($a = $STH->fetch()){
+					$list[]=html_entity_decode($a['answer']);
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			echo json_encode($list);
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 	
-	else if(isset($_POST['act'])  && $_POST['act']=='rem_flag'){
+	else if(isset($_POST['act'])  && $_POST['act']=='rem_flag'){//check
 		$encid=preg_replace('/\s+/','',$_POST['id']);
 		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 		
-		$query="DELETE FROM ".$SupportFlagTable." WHERE `enc_id`=?";
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
-			if($stmt->prepare($query)){
-				if($stmt->bind_param('s', $encid)){
-					if($stmt->execute()){
-						echo json_encode(array(0=>'Deleted'));
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			
+			$query="DELETE FROM ".$SupportFlagTable." WHERE `enc_id`=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$encid,PDO::PARAM_STR);
+			$STH->execute();
+			echo json_encode(array(0=>'Deleted'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();	
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
+		
 	}
 	
 	else{
@@ -1200,30 +1092,30 @@ else{
 }
 	
 function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable){
-		if(isset($_SESSION['status']) && $_SESSION['status']<3){
-			$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-			$stmt = $mysqli->stmt_init();
-			if($stmt){
+	if(isset($_SESSION['status']) && $_SESSION['status']<3){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 				$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable;
-				$prepared = $stmt->prepare($query);
-				if($prepared){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($camaro, $mustang);
-						if($stmt->num_rows>0){
-							$_SESSION['departments']=array();
-							while (mysqli_stmt_fetch($stmt))
-								$_SESSION['departments'][$camaro]=$mustang;
-						}
-					}
+			$prepared = $stmt->prepare($query);
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				$b=array();
+				while ($a = $STH->fetch()){
+					$b[$a['id']]=$a['department_name'];
 				}
+				return json_encode($b);
 			}
-			$mysqli->close();
-			
+		}
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		}
 	}
+}
 
-function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){
+function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){// Add PDO, Switch SESSION with return
 	$query = "SELECT *
 				FROM(
 						(SELECT b.id  
