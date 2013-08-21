@@ -1197,7 +1197,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_title'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_title'){
 	$tit=(preg_replace('/\s+/','',$_POST['tit'])!='')? htmlentities(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
@@ -1220,10 +1220,11 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_connection'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_connection'){
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$con=(is_numeric($_POST['contype']))? $_POST['contype']:exit();
+	$web=(preg_replace('/\s+/','',$_POST['website'])!='')? $_POST['website']:'';
 	$usr=(preg_replace('/\s+/','',$_POST['user'])!='')? $_POST['user']:'';
 	$pass=(preg_replace('/\s+/','',$_POST['pass'])!='')? $_POST['pass']:'';
 	if($pass!='' && $pass!=null){
@@ -1240,12 +1241,13 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		$query="UPDATE ".$SupportTicketsTable." SET contype=?,ftp_user=?,ftp_password=? WHERE enc_id=?";
+		$query="UPDATE ".$SupportTicketsTable." SET website=?,contype=?,ftp_user=?,ftp_password=? WHERE enc_id=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$con,PDO::PARAM_STR);
-		$STH->bindParam(2,$usr,PDO::PARAM_STR);
-		$STH->bindParam(3,$pass,PDO::PARAM_STR);
-		$STH->bindParam(4,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$web,PDO::PARAM_STR);
+		$STH->bindParam(2,$con,PDO::PARAM_STR);
+		$STH->bindParam(3,$usr,PDO::PARAM_STR);
+		$STH->bindParam(4,$pass,PDO::PARAM_STR);
+		$STH->bindParam(5,$encid,PDO::PARAM_STR,87);
 		$STH->execute();
 
 		echo json_encode(array(0=>'Updated'));
@@ -1481,7 +1483,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//check, doesn't return results
+else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//Error: doesn't return results
 	$enid=preg_replace('/\s+/','',$_POST['enid']);
 	$tit=preg_replace('/\s+/',' ',$_POST['title']);
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
@@ -1644,7 +1646,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='report_ticket'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='report_ticket'){
 
 	if(preg_replace('/\s+/','',strip_tags($_POST['message']))!='')
 		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
