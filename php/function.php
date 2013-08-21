@@ -93,7 +93,7 @@ if(isset($_POST['act']) && $_POST['act']=='register'){//check
 			if((int)$e->getCode()==1062)
 				echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
 			else{
-				file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 				echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			}
 			$DBH=null;
@@ -128,15 +128,14 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			echo json_encode(array(0=>'Sent'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
-			$DBH=null;
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
-			exit();
 		}
+	$DBH=null;
 	exit();
 }
 
-else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='login'){//check
+else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='login'){
 	$viper=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
 	$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
 	try{
@@ -162,13 +161,12 @@ else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='l
 		}
 		else
 			echo json_encode(array(0=>'Wrong Credentials'));
-		$DBH=null;
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
-		$DBH=null;
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
+	$DBH=null;
 	exit();
 }
 
@@ -209,21 +207,23 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
-			$STH->exec();
+			$STH->execute();
 		}
+		
 		$query = "DELETE FROM ".$SupportFlagTable." WHERE `enc_id`=?";
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
-		$STH->exec();
+		$STH->execute();
 		
 		$query = "DELETE FROM ".$SupportTicketsTable." WHERE `enc_id`=?";
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
-		$STH->exec();
+		$STH->execute();
+		
 		echo json_encode(array(0=>'Deleted'));
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		exit();
@@ -260,21 +260,20 @@ else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate
 				$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key='' WHERE `id`=?";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT,87);
-				$STH->exec();
+				$STH->execute();
 				$_SESSION['status']=0;
 				$_SESSION['time']=time();
 				echo json_encode(array(0=>'Activated'));
 			}
 			else
 				echo json_encode(array(0=>'No Key Match'));
-			$DBH=null;
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
-			$DBH=null;
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
+	$DBH=null;
 	exit();
 }
 
@@ -306,11 +305,11 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 				echo json_encode(array(0=>'Wrong Credentials'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
-			$DBH=null;
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
+	$DBH=null;
 	exit();
 }
 
@@ -335,7 +334,7 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 			$rands=uniqid(hash('sha256',get_random_string(60)),true);
 			$STH->bindParam(1,$rands,PDO::PARAM_STR);
 			$STH->bindParam(2,$camaro,PDO::PARAM_INT);
-			$STH->exec();
+			$STH->execute();
 
 			$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
 			$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php Forgot ".$camaro." ".$rands;
@@ -350,7 +349,7 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 			echo json_encode(array(0=>'Wrong Credentials'));
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	$DBH=null;
@@ -373,12 +372,12 @@ else if(isset($_POST['act']) && $_POST['act']=='reset_password'){//check
 			$STH->bindParam(1,$pass,PDO::PARAM_STR);
 			$STH->bindParam(2,$rmail,PDO::PARAM_STR);
 			$STH->bindParam(3,$_POST['key'],PDO::PARAM_STR);
-			$STH->exec();
+			$STH->execute();
 			
 			echo json_encode(array(0=>'Updated'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
@@ -388,7 +387,7 @@ else if(isset($_POST['act']) && $_POST['act']=='reset_password'){//check
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='logout'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='logout'){
 	session_unset();
 	session_destroy();
 	echo json_encode(array(0=>'logout'));
@@ -400,7 +399,6 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 	$error=array();
 	if(preg_replace('/\s+/','',strip_tags($_POST['message']))!='')
 		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
-		//$message=preg_replace('/\s+/',' ',$_POST['message']);
 	else
 		$error[]='Empty Message';
 
@@ -617,7 +615,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='retrive_depart'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='retrive_depart'){
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -653,17 +651,17 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			echo json_encode(array('response'=>array('empty'),'information'=>array()));
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='retrive_tickets'){//add PDO
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
+else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='retrive_tickets'){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		if($_SESSION['status']==0){
 			$query = "SELECT 
 						a.enc_id,
@@ -682,23 +680,14 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 					WHERE a.user_id=".$_SESSION['id']." 
 					ORDER BY a.last_reply DESC 
 					LIMIT 350";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($encid, $depname, $opname, $title, $priority, $dat, $last, $tkstat);
-					$list=array('response'=>'ret','tickets'=>array('user'=>array()));
-					if($stmt->num_rows>0){
-						while (mysqli_stmt_fetch($stmt)) {
-							$list['tickets']['user'][]=array('id'=>$encid,'dname'=>$depname,'opname'=>$opname,'title'=>$title,'priority'=>$priority,'date'=>$dat,'reply'=>$last,'status'=>$tkstat);
-						}
-					}
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			$list=array('response'=>'ret','tickets'=>array('user'=>array()));
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				while ($a = $STH->fetch())
+					$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 		}
 		else if($_SESSION['status']==1){
 			$query = "SELECT 
@@ -719,38 +708,31 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 					WHERE a.ticket_status='1' AND a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."' 
 					ORDER BY a.last_reply DESC 
 					LIMIT 350" ;
-			if($stmt->prepare($query)){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result( $encid, $depname, $opname,$opid, $title, $priority, $dat, $last, $tkstat);
-					$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array()));
-					if($stmt->num_rows>0){
-						while (mysqli_stmt_fetch($stmt)) {
-							if($opid==$_SESSION['id'])
-								$list['tickets']['op'][]=array('id'=>$encid,'dname'=>$depname,'opname'=>$opname,'title'=>$title,'priority'=>$priority,'date'=>$dat,'reply'=>$last,'status'=>$tkstat);
-							else
-								$list['tickets']['user'][]=array('id'=>$encid,'dname'=>$depname,'opname'=>$opname,'title'=>$title,'priority'=>$priority,'date'=>$dat,'reply'=>$last,'status'=>$tkstat);
-						}
-					}
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array()));
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				while ($a = $STH->fetch()){
+					if($opid==$_SESSION['id'])
+						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+					else
+						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 		}
 		else if($_SESSION['status']==2){
 			$query = "SELECT 
 							a.user_id,
 							a.enc_id,
-							IF(b.department_name IS NOT NULL, b.department_name,'Unknown') ,
-							CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE ( IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) ) END,
+							IF(b.department_name IS NOT NULL, b.department_name,'Unknown') AS dname,
+							CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE ( IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) ) END AS opname,
 							a.operator_id,
 							a.title,
-							CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
+							CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
 							a.created_time,
 							a.last_reply,
-							CASE a.ticket_status WHEN '0' THEN '<span class=\'label label-success\'>Closed</span>' WHEN '1' THEN '<span class=\'label label-important\'>Open</span>' WHEN '2' THEN '<span class=\'label label-warning\'>To Assign</span>' WHEN '3' THEN '<span class=\'label label-important\'>Reported</span>' ELSE 'Error' END 
+							CASE a.ticket_status WHEN '0' THEN '<span class=\'label label-success\'>Closed</span>' WHEN '1' THEN '<span class=\'label label-important\'>Open</span>' WHEN '2' THEN '<span class=\'label label-warning\'>To Assign</span>' WHEN '3' THEN '<span class=\'label label-important\'>Reported</span>' ELSE 'Error' END AS stat
 						
 						FROM ".$SupportTicketsTable." a
 						LEFT JOIN ".$SupportDepaTable." b
@@ -759,34 +741,29 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 							ON c.id=a.operator_id
 						ORDER BY a.last_reply DESC 
 						LIMIT 350";
-			if($stmt->prepare($query)){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($userid,$encid, $depname, $opname, $opid, $title, $priority, $dat, $last, $tkstat);
-					$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array(),'admin'=>array()));
-					if($stmt->num_rows>0){
-						while (mysqli_stmt_fetch($stmt)){
-							if($opid==$_SESSION['id'])
-								$list['tickets']['op'][]=array('id'=>$encid,'dname'=>$depname,'opname'=>$opname,'title'=>$title,'priority'=>$priority,'date'=>$dat,'reply'=>$last,'status'=>$tkstat);
-							else if($userid==$_SESSION['id'])
-								$list['tickets']['user'][]=array('id'=>$encid,'dname'=>$depname,'opname'=>$opname,'title'=>$title,'priority'=>$priority,'date'=>$dat,'reply'=>$last,'status'=>$tkstat);
-							else
-								$list['tickets']['admin'][]=array('id'=>$encid,'dname'=>$depname,'opname'=>$opname,'title'=>$title,'priority'=>$priority,'date'=>$dat,'reply'=>$last,'status'=>$tkstat);
-						}
-					}
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array(),'admin'=>array()));
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				while ($a = $STH->fetch()){
+					if($a['operator_id']==$_SESSION['id'])
+						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+					else if($a['user_id']==$_SESSION['id'])
+						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+					else
+						$list['tickets']['admin'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 		}
 		if(isset($list))
 			echo json_encode($list);
 	}
-	else
-		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-	$mysqli->close();
+	catch(PDOException $e){
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
+	$DBH=null;
 	exit();
 }
 
@@ -825,16 +802,22 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 				}
 				if(count($messageid)>0){
 					$messageid=implode(',',$messageid);
-					$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
-					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$viper,PDO::PARAM_STR);
-					$STH->bindParam(2,$pass,PDO::PARAM_STR);
-					$STH->execute();
-					$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-					if(!empty($r)){
-						while ($a = $STH->fetch())
-							$ret['messages'][$a['message_id']][]='<div class="row-fluid"><div class="span2 offset2"><form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.$a['name'].'"></form></div></div>';
+					try{
+						$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
+						$STH = $DBH->prepare($query);
+						$STH->bindParam(1,$viper,PDO::PARAM_STR);
+						$STH->bindParam(2,$pass,PDO::PARAM_STR);
+						$STH->execute();
+						$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+						if(!empty($r)){
+							while ($a = $STH->fetch())
+								$ret['messages'][$a['message_id']][]='<div class="row-fluid"><div class="span2 offset2"><form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.$a['name'].'"></form></div></div>';
+						}
 					}
+					catch(PDOException $e){
+						file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+					}
+					
 				}
 				$ret['messages']=array_values($ret['messages']);
 				echo json_encode($ret);
@@ -843,7 +826,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 				echo json_encode(array('ret'=>'End'));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 		$DBH=null;
@@ -855,7 +838,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='save_setting'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='save_setting'){
 	$mustang=(preg_replace('/\s+/','',$_POST['name'])!='') ? (string)$_POST['name']:exit();
 	$alert=($_POST['almail']!='no') ? 'yes':'no';
 	$dfmail=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
@@ -881,8 +864,6 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 				}
 				else
 					$wrongpass=true;
-
-				echo json_encode(array(0=>'Logged'));
 			}
 			else
 				$wrongpass=true;
@@ -920,7 +901,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		if((int)$e->getCode()==1062)
 			echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
 		else{
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
@@ -1094,7 +1075,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_status'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_status'){
 	if($_SESSION['status']==0)
 		$charger=($_POST['status']==1 || $_POST['status']==2)? 1:0;
 	else
@@ -1147,20 +1128,18 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		
 		$STH = $DBH->prepare($fquery);
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
-		$STH->exec();
-		
+		$STH->execute();
+
 		$STH = $DBH->prepare($lquery);
-		$STH->bindParam(1,$tit,PDO::PARAM_STR);
-		$STH->bindParam(2,$prio,PDO::PARAM_STR);
-		$STH->bindParam(3,$charger,PDO::PARAM_STR);
-		$STH->bindParam(4,$encid,PDO::PARAM_STR,87);
-		$STH->exec();
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->execute();
 		
 		$query = "SELECT ticket_status FROM ".$SupportTicketsTable." WHERE enc_id=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(4,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
 		$STH->execute();
 		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
 		if(!empty($r)){
@@ -1170,7 +1149,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		echo json_encode(array(0=>'Saved'));
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
@@ -1211,7 +1190,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		echo json_encode(array(0=>'Moved'));
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
@@ -1234,7 +1213,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		echo json_encode(array(0=>'Updated',1=>$tit));
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
@@ -1272,7 +1251,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		echo json_encode(array(0=>'Updated'));
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
@@ -1317,7 +1296,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 			echo '<script>parent.noty({text: "No matches",type:"error",timeout:9000});</script>';
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo json_encode(array(0=>''));
 		echo '<script>parent.noty({text: "We are sorry, but an error has occurred, please contact the administrator if it persist",type:"error",timeout:9000});</script>';
@@ -1391,26 +1370,26 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$STH = $DBH->prepare($fquery);
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
-		$STH->exec();
+		$STH->execute();
 		
 		$STH = $DBH->prepare($lquery);
 		$STH->bindParam(1,$tit,PDO::PARAM_STR);
 		$STH->bindParam(2,$prio,PDO::PARAM_STR);
 		$STH->bindParam(3,$charger,PDO::PARAM_STR);
 		$STH->bindParam(4,$encid,PDO::PARAM_STR);
-		$STH->exec();
+		$STH->execute();
 	
 		echo json_encode(array(0=>'Saved'));
 	}
 	catch(Exception $e){
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='rating'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='rating'){
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	$encid=preg_replace('/\s+/','',$_POST['tkid']);
@@ -1421,7 +1400,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$query = "UPDATE ".$SupportUserTable." a
 					INNER JOIN ".$SupportTicketsTable." b 
 						ON b.operator_id=a.id
-					SET a.rating=ROUND(((a.number_rating * a.rating - (CASE WHEN b.operator_rate>0 THEN b.operator_rate ELSE 0 END) + ?)/(CASE WHEN a.number_rating=0 THEN 1 ELSE a.number_rating+1 END)),2),
+					SET a.rating=ROUND(((a.number_rating * a.rating - (CASE WHEN b.operator_rate>0 THEN b.operator_rate ELSE 0 END) + ?)/(CASE WHEN a.number_rating=0 THEN 1 WHEN b.operator_rate>0 THEN  a.number_rating ELSE a.number_rating+1 END)),2),
 						a.number_rating=CASE WHEN b.operator_rate>0 THEN a.number_rating ELSE a.number_rating+1 END,
 						b.operator_rate=? 
 					WHERE  b.enc_id=?";
@@ -1431,7 +1410,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindValue(1,strval($rate));
 			$STH->bindValue(2,strval($rate));
 			$STH->bindParam(3,$encid,PDO::PARAM_STR);
-			$STH->exec();
+			$STH->execute();
 			
 			$query = "INSERT INTO ".$SupportRateTable." (`ref_id`,`enc_id`,`usr_id`,`rate`,`note`) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE `rate`=?,`note`=?";
 			
@@ -1443,12 +1422,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(5,$note,PDO::PARAM_STR);
 			$STH->bindParam(6,$rate,PDO::PARAM_INT);
 			$STH->bindParam(7,$note,PDO::PARAM_STR);
-			$STH->exec();
+			$STH->execute();
 			
 			echo json_encode(array(0=>'Voted'));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
@@ -1458,7 +1437,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	if($GT86>10 && $rate>0){
@@ -1470,11 +1449,11 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(1,$GT86,PDO::PARAM_INT);
 			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->bindParam(3,$rate,PDO::PARAM_INT);
-			$STH->exec();
+			$STH->execute();
 
 			$query = "UPDATE ".$SupportFaqTable." a
 						INNER JOIN ".$SupportRateFaqTable." b 
-							ON b.faq_id=a.id
+							ON b.faq_id=a.id AND b.usr_id=?
 						SET 
 							a.rate=CASE WHEN b.updated='1' THEN ROUND(((a.num_rate * a.rate - b.rate) + ?)/(a.num_rate),2) ELSE ROUND ((a.rate + ?)/(a.num_rate+1),2) END,
 							a.num_rate=CASE WHEN b.updated='1' THEN a.num_rate ELSE a.num_rate+1 END,
@@ -1482,15 +1461,16 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 							b.rate=?
 						WHERE  a.id=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$rate,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->bindParam(2,$rate,PDO::PARAM_INT);
 			$STH->bindParam(3,$rate,PDO::PARAM_INT);
-			$STH->bindParam(4,$GT86,PDO::PARAM_INT);
-			$STH->exec();
+			$STH->bindParam(4,$rate,PDO::PARAM_INT);
+			$STH->bindParam(5,$GT86,PDO::PARAM_INT);
+			$STH->execute();
 			echo json_encode(array(0=>'Voted'));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			$DBH=null;
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			exit();
@@ -1501,7 +1481,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//check, doesn't return results
 	$enid=preg_replace('/\s+/','',$_POST['enid']);
 	$tit=preg_replace('/\s+/',' ',$_POST['title']);
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
@@ -1549,7 +1529,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 						WHERE " ;
 			$merge=array();
 			if($_SESSION['status']==0){
-				$query.=' `user_id`='.$_SESSION['id'];
+				$query.=' a.user_id='.$_SESSION['id'];
 				if($enid!=''){
 					$query.=' AND a.ref_id=?';
 					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$enid);
@@ -1576,7 +1556,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 				}
 			}
 			else if($_SESSION['status']==1){
-				$query.=' `user_id`='.$_SESSION['id'].' OR `operator_id`='.$_SESSION['id'];
+				$query.=' a.user_id='.$_SESSION['id'].' OR a.operator_id='.$_SESSION['id'];
 				if($enid!=''){
 					$query.=' AND a.ref_id=?';
 					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$enid);
@@ -1639,7 +1619,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 				}
 				$query.=implode(' AND ',$tail);
 			}
-			$query.=' ORDER BY `last_reply` DESC';
+			$query.=' ORDER BY a.last_reply DESC';
 
 			$STH = $DBH->prepare($query);
 
@@ -1647,7 +1627,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			for ($i=0; $i<$journey;$i++) {
 				$STH->bindParam($i+1,$merge['val'],$merge['type']);
 			}
-			$STH->exec();
+			$STH->execute();
 			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$list=array('response'=>'ret','search'=>array());
 			if(!empty($r)){
@@ -1657,7 +1637,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			echo json_encode($list);
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	$DBH=null;
@@ -1692,12 +1672,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(4,$side,PDO::PARAM_STR);
 			$STH->bindParam(5,$message,PDO::PARAM_STR);	
 			$STH->bindParam(6,$message,PDO::PARAM_STR);	
-			$STH->exec();
+			$STH->execute();
 			$_SESSION[$_GET['id']]['reason']=$message;
 			echo json_encode(array(0=>'Submitted'));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', $e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			$DBH=null;
 			exit();
@@ -1722,7 +1702,7 @@ else{
 }
 
 
-function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){//check
+function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){
 	$query = "SELECT id
 				FROM(
 						(SELECT b.id  
@@ -1741,7 +1721,7 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		$prepared = $stmt->prepare($query);
+		
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$dep,PDO::PARAM_INT);
 		$STH->execute();
