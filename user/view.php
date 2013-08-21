@@ -40,9 +40,10 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 	include_once '../php/mobileESP.php';
 	$uagent_obj = new uagent_info();
 	$isMob=$uagent_obj->DetectMobileQuick();
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	if($stmt){
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 		if($_SESSION['status']==2 || $_SESSION['status']==1){
 			$query = "SELECT 
 							a.id,
@@ -89,164 +90,162 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							ON c.enc_id=a.enc_id AND c.usr_id='".$_SESSION['id']."'
 						WHERE a.enc_id=? AND a.user_id=".$_SESSION['id']." LIMIT 1";
 		}
-		if($stmt->prepare($query)){
-				if($stmt->bind_param('s', $_GET['id'])){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($tkid,$refid,$title,$usrid,$opid,$stat,$departmentid,$web,$connection,$usercred,$conpass,$rate,$note,$reason);
-						if($stmt->num_rows>0){
-							while (mysqli_stmt_fetch($stmt))
-								$_SESSION[$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
-							$rate=($rate!=NULL)? $rate:'';
-							if($conpass!='' && $conpass!=null){
-								$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
-								
-								$conpass=str_split($conpass);
-								$c=count($conpass);
-								for($i=0;$i<$c;$i++){
-									if(array_key_exists($conpass[$i],$crypttable))
-										$conpass[$i]=$crypttable[$crypttable[$conpass[$i]]];
-								}
-								$conpass=implode('',$conpass);
-							}
-
-							$query = "SELECT 
-											a.id,
-											a.user_id,
-											b.name,
-											a.message,
-											a.created_time,
-											a.attachment 
-										FROM ".$SupportMessagesTable." a
-										LEFT JOIN ".$SupportUserTable." b
-											ON b.id=a.user_id
-										WHERE a.ticket_id=? ORDER BY created_time DESC LIMIT 10";
-							$prepared = $stmt->prepare($query);
-							if($prepared){
-								if($stmt->bind_param('s', $_SESSION[$_GET['id']]['id'])){
-									if($stmt->execute()){
-										$stmt->store_result();
-										$result = $stmt->bind_result($msid,$shelby,$usrn, $message, $time,$attch);
-										if($stmt->num_rows>0){
-											$list=array();
-											$messageid=array();
-											$count=0;
-											while (mysqli_stmt_fetch($stmt)){
-												$list[$msid]=array(0=>$usrn,1=>$message,2=>$time);
-												if($attch==1)
-													$messageid[]=$msid;
-												$count++;
-											}
-											if(count($messageid)>0){
-												$messageid=implode(',',$messageid);
-												$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
-												$prepared = $stmt->prepare($query);
-												if($prepared){
-													if($stmt->execute()){
-														$stmt->store_result();
-														$result = $stmt->bind_result($vanquish, $enc, $msid);
-														if($stmt->num_rows>0){
-															while (mysqli_stmt_fetch($stmt))
-																$list[$msid][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$enc.'"/><input type="submit" class="btn btn-link download" value="'.$vanquish.'"></form>';
-														}
-													}
-													else
-														$error=mysqli_stmt_error($stmt);
-												}
-												else
-													$error=mysqli_stmt_error($stmt);
-											}
-											$list=array_values($list);
-										}
-										else{
-											$error='No Messages';
-											header("location: index.php");
-										}
-									}
-									else
-										$error=mysqli_stmt_error($stmt);
-								}
-								else
-									$error=mysqli_stmt_error($stmt);
-							}
-							else
-								$error=mysqli_stmt_error($stmt);
-						}
-						else{
-							$error="You don't have the permission to read this ticket.";
-							header("location: index.php");
-						}
-					}
-					else
-						$error=mysqli_stmt_error($stmt);
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$_GET['id'],PDO::PARAM_STR);
+		$STH->execute();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			if(!empty($r)){
+				while ($a = $STH->fetch()){
+					$tkid=$a['id'];
+					$refid=$a['ref_id'];
+					$title=$a['title'];
+					$usrid=$a['user_id'];
+					$opid=$a['operator_id'];
+					$stat=$a['ticket_status'];
+					$departmentid=$a['department_id'];
+					$cweb=$a['website'];
+					$connection=$a['contype'];
+					$usercred=$a['ftp_user'];
+					$conpass=$a['ftp_password'];
+					$rate=$a['rate'];
+					$note=$a['note'];
+					$reason=$a['reason'];
+					$_SESSION[$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
 				}
-				else
-					$error=mysqli_stmt_error($stmt);
+				unset($a);
+				$rate=($rate!=NULL)? $rate:'';
+				if($conpass!='' && $conpass!=null){
+					$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
+
+					$conpass=str_split($conpass);
+					$c=count($conpass);
+					for($i=0;$i<$c;$i++){
+						if(array_key_exists($conpass[$i],$crypttable))
+							$conpass[$i]=$crypttable[$crypttable[$conpass[$i]]];
+					}
+					$conpass=implode('',$conpass);
+				}
+				$query = "SELECT 
+								a.id,
+								a.user_id,
+								b.name,
+								a.message,
+								a.created_time,
+								a.attachment 
+							FROM ".$SupportMessagesTable." a
+							LEFT JOIN ".$SupportUserTable." b
+								ON b.id=a.user_id
+							WHERE a.ticket_id=? ORDER BY created_time DESC LIMIT 10";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$_SESSION[$_GET['id']]['id'],PDO::PARAM_STR);
+				$STH->execute();
+				$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+				if(!empty($r)){
+					$list=array();
+					$messageid=array();
+					$count=0;
+					while ($a = $STH->fetch()){
+						$msid=$a['id'];
+						$shelby=$a['user_id'];
+						$usrn=$a['name'];
+						$message=$a['message'];
+						$time=$a['created_time'];
+						$attch=$a['attachment'];
+						$list[$msid]=array(0=>$usrn,1=>$message,2=>$time);
+						if($attch==1)
+							$messageid[]=$msid;
+						$count++;
+					}
+					unset($a);
+					
+					if(count($messageid)>0){
+						$messageid=implode(',',$messageid);
+						$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
+						$STH = $DBH->prepare($query);
+						$STH->execute();
+						if(!empty($r)){
+							$list=array();
+							$messageid=array();
+							$count=0;
+							while ($a = $STH->fetch()){
+								$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.$a['name'].'"></form>';
+							}
+						}
+						unset($a);
+					}
+					$list=array_values($list);
+				}
+				else{
+					header("location: index.php");
+				}
 			}
-			else
-				$error=mysqli_stmt_error($stmt);
+			else{
+				header("location: index.php");
+			}
 	}
-	else
-		$error=mysqli_stmt_error($stmt);
-	$mysqli->close();
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		$error='We are sorry, but an error has occurred, please contact the administrator if it persist';
+	}
+	$DBH=null;
+										
 
 function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable){
-	if(isset($_SESSION['name'])){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+	if(isset($_SESSION['status'])){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable;
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->execute()){
-					$stmt->store_result();
-					$result = $stmt->bind_result($shelby, $vanquish);
-					if($stmt->num_rows>0){
-						$_SESSION['departments']=array();
-						while (mysqli_stmt_fetch($stmt))
-							$_SESSION['departments'][$shelby]=$vanquish;
-					}
-				}
+			$STH = $DBH->prepare($query);
+			$STH->execute();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$b=array();
+			if(!empty($r)){
+				while ($a = $STH->fetch())
+					$b[$a['id']]=$a['department_name'];
 			}
+			return json_encode($b);
+		}
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			return json_encode(array(0=>"Can't retrieve Departments"));
 		}
 	}
 }
 
 function retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable,$SupportUserPerDepaTable,$departmentid,$exop){
 	if(isset($_SESSION['status'])){
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
-			$query="SELECT id,name,status 
-						FROM (
-								(SELECT a.id,a.name,a.status  FROM ".$SupportUserTable." a WHERE  a.status='2' AND a.id!='".$_SESSION['id']."' AND a.id!='".$exop."')
-									UNION 
-								(SELECT a.id,a.name,a.status  FROM  ".$SupportUserTable." a LEFT JOIN  ".$SupportUserPerDepaTable." b ON a.id=b.user_id  WHERE b.department_id=? AND a.id!='".$_SESSION['id']."')
-							) 
-						AS  tab ORDER BY tab.status ASC, tab.name ASC";
-			if($stmt->prepare($query)){
-				if($stmt->bind_param('i', $departmentid)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($shelby, $vanquish, $aston);
-						$_SESSION['depa_ope']=array();
-						if($stmt->num_rows>0){
-							while (mysqli_stmt_fetch($stmt)) {
-								$_SESSION['depa_ope'][$shelby]=$vanquish;
-							}
-						}
-					}
-					else
-						file_put_contents('viewerror.txt','Execute Error: '.mysqli_stmt_error($stmt));
-				}
-				else
-					file_put_contents('viewerror.txt','Bind Error: '.mysqli_stmt_error($stmt));
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			$query="SELECT 
+						id,
+						name,
+						status 
+					FROM (
+							(SELECT a.id,a.name,a.status  FROM ".$SupportUserTable." a WHERE  a.status='2' AND a.id!='".$_SESSION['id']."' AND a.id!='".$exop."')
+								UNION 
+							(SELECT a.id,a.name,a.status  FROM  ".$SupportUserTable." a LEFT JOIN  ".$SupportUserPerDepaTable." b ON a.id=b.user_id  WHERE b.department_id=? AND a.id!='".$_SESSION['id']."')
+						) 
+					AS  tab ORDER BY tab.status ASC, tab.name ASC";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$departmentid,PDO::PARAM_INT);
+			$STH->execute();
+			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$b=array();
+			if(!empty($r)){
+				while ($a = $STH->fetch())
+					$b[$a['id']]=$a['name'];
 			}
-			else
-				file_put_contents('viewerror.txt','Prepare Error: '.mysqli_stmt_error($stmt));
+			$DBH=null;
+			return json_encode($b);
 		}
-		else
-			file_put_contents('viewerror.txt','Stmt Error: '.mysqli_stmt_error($stmt));
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			$DBH=null;
+			return json_encode(array(0=>"Can't retrieve Operators"));
+		}
 	}
 }
 
@@ -349,7 +348,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					</div>
 					<div class='row-fluid'>
 						<div class='span2'><strong>Website</strong></div>
-						<div class='span4'><input type='text' id='webs' value="<?php echo addslashes($web); ?>"/></div>
+						<div class='span4'><input type='text' id='webs' value="<?php echo $cweb; ?>"/></div>
 						<div class='span2'><strong>Connection Type</strong></div>
 						<div class='span4'><select id='contype'><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
 					</div>
@@ -389,23 +388,23 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							<br/>
 						<?php } ?>
 					</div>
-					<?php if($_SESSION['status']==1){ retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable);?>
+					<?php if($_SESSION['status']==1){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable));?>
 						<hr>
 						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department </p>
 						<div class='expande'>
 							<div class='row-fluid'>
 								<div class='span2'>Change Departement</div>
-								<div class='span3'><select id='departments'><?php foreach($_SESSION['departments'] as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; ?></select></div>
+								<div class='span3'><select id='departments'><?php foreach($b as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; ?></select></div>
 								<div class='span1'><input type='submit' class='btn btn-success' id='updtdpop' onclick='javascript:return false;' value='Update'/></div>
 							</div>
 						</div>
-					<?php } if($_SESSION['status']==2){ retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable);retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid);?>
+					<?php } if($_SESSION['status']==2){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable));retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid);?>
 						<hr>
 						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department and Operator</p>
 						<div class='expande'>
 							<div class='row-fluid'>
 								<div class='span2'>Change Departement</div>
-								<div class='span3'><select id='departments'><?php foreach($_SESSION['departments'] as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; ?></select></div>
+								<div class='span3'><select id='departments'><?php foreach($b as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; ?></select></div>
 							</div>
 							<div class='row-fluid'>
 								<div class='span2'>Change Operator</div>.
