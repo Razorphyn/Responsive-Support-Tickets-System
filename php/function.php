@@ -171,7 +171,7 @@ else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='l
 	exit();
 }
 
-else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_ticket'){//check
+else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_ticket'){
 	$encid=preg_replace('/\s+/','',$_POST['enc']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	try{
@@ -191,7 +191,7 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
 		$STH->execute();
-		
+
 		$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
@@ -400,7 +400,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='lo
 	exit();
 }
 
-else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['createtk']=='Create New Ticket'){//add PDO
+else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['createtk']=='Create New Ticket'){
 	$letarr=array('M','d','C','f','K','w','p','T','B','X');
 	$error=array();
 	if(preg_replace('/\s+/','',strip_tags($_POST['message']))!='')
@@ -441,180 +441,158 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 		}
 		if(isset($setting[6]) && $setting[6]!=null && $setting[6]!='')
 			$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		
 			//Create Ticket
 			$query = "INSERT INTO ".$SupportTicketsTable."(`department_id`,`user_id`,`title`,`priority`,`website`,`contype`,`ftp_user`,`ftp_password`,`created_time`,`last_reply`) VALUES (?,?,?,?,?,?,?,?,?,?)";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				$date=date("Y-m-d H:i:s");
-				if($stmt->bind_param('iisissssss', $dep,$_SESSION['id'],$tit,$prio,$wsurl,$contype,$ftpus,$ftppass,$date,$date)){
-					if($stmt->execute()){
-						echo '<script>parent.$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",debug : true,hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});</script>';
-						//Assign Reference Number
-						$tkid=$stmt->insert_id;
-						$ip=retrive_ip();
-						$refid=uniqid(hash('sha256',$tkid.$tit.$_SESSION['id']),true);
-						$randomref=get_random_string(6);
-						$spadd=str_split(strrev($_SESSION['id'].''));
-						$lll=count($spadd);
-						for($i=0;$i<$lll;$i++) $spadd[$i]=$letarr[$spadd[$i]];
-						$randomref=implode('',$spadd).$randomref;
-						$query = "UPDATE ".$SupportTicketsTable." SET enc_id=?,ref_id=? WHERE id=? ";
-						if($prepared = $stmt->prepare($query)){
-							if($stmt->bind_param('ssi', $refid,$randomref,$tkid)){
-								if($stmt->execute()){
-									//Insert Message
-									$query = "INSERT INTO ".$SupportMessagesTable."(`user_id`,`message`,`ticket_id`,`ip_address`,`created_time`) VALUES (?,?,?,?,?);";
-									if($prepared = $stmt->prepare($query)){
-										if($stmt->bind_param('isiss', $_SESSION['id'],$message,$tkid,$ip,$date)){
-											if($stmt->execute()){
-												//File Upload
-												if(isset($setting[5]) && $setting[5]==1){
-													$msid=$stmt->insert_id;
-													if(isset($_FILES['filename'])){
-														$count=count($_FILES['filename']['name']);
-														if($count>0){
-															echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
-															if(!is_dir('../upload')) mkdir('../upload');
-															$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
-															$date=date("Y-m-d H:i:s");
-															$uploadarr=array();
-															$movedfiles=array();
-															for($i=0;$i<$count;$i++){
-																if($_FILES['filename']['error'][$i]==0){
-																	if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0){
-																		if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
-																			$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
-																			$target_path = "../upload/".$encname;
-																			if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
-																				if(CryptFile("../upload/".$encname)){
-																					$movedfiles[]=$_FILES['filename']['name'][$i];
-																					$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
-																					$query.='("'.$_FILES['filename']['name'][$i].'","'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
-																					echo '<script>parent.noty({text: "'.$_FILES['filename']['name'][$i].' has been uploaded",type:"success",timeout:2000});</script>';
-																				}
-																			}
-																		}
-																	}
-																	else
-																		echo '<script>parent.noty({text: "The file '.$_FILES['filename']['name'][$i].' is too big or null. Max file size: '.ini_get('upload_max_filesize').'",type:"error",timeout:9000});</script>';
-																}
-																else if($_FILES['filename']['error'][$i]!=4)
-																		echo '<script>parent.noty({text: "File Name:'.$_FILES['filename']['name'][$i].' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
-																}
-																if(isset($uploadarr[0])){
-																	$query=substr_replace($query,'',-1);
-																	if($stmt->prepare($query)){
-																		if($stmt->execute()){
-																			$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
-																			$prepared = $stmt->prepare($query);
-																			if($prepared){
-																				if($stmt->bind_param('i', $msid)){
-																					if($stmt->execute()){
-																						echo json_encode(array(0=>'Updated',1=>$tit));
-																					}
-																					else
-																						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																				}
-																				else
-																					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																			}
-																			else
-																				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																		}
-																		else{
-																			echo '<script>parent.noty({text: "Upload Execute Insert Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-																		}
-																	}
-																	else
-																		echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "Prepare Upload Insert Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-																}
-																else
-																	echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: Prepare Upload Error: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-																echo '<script>parent.noty({text: "File Upload Finished",type:"information",timeout:2000});</script>';
-															}
-														}
-														
-													}
-													//Assign Ticket
-													$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $dep,$_SESSION['id']);
-													$selopid=(is_numeric($selopid))?$selopid:null;
-													if(is_numeric($selopid)){
-														$query = "UPDATE ".$SupportTicketsTable." a ,".$SupportUserTable." b SET a.operator_id=?,a.ticket_status='1',b.assigned_tickets=(b.assigned_tickets+1) WHERE a.id=? AND b.id=? ";
-														if($prepared = $stmt->prepare($query)){
-															if($stmt->bind_param('iii', $selopid,$tkid,$selopid)){
-																if($stmt->execute()){
-																	$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-																	$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php AssTick ".$refid." ";
-																	if(substr(php_uname(), 0, 7) == "Windows")
-																		pclose(popen("start /B ".$ex,"r")); 
-																	else
-																		shell_exec($ex." > /dev/null 2>/dev/null &");
-																	if($_SESSION['mail_alert']=='yes'){
-																		$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-																		$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewTick ".$refid." ";
-																		if(substr(php_uname(), 0, 7) == "Windows")
-																			pclose(popen("start /B ".$ex,"r")); 
-																		else
-																			shell_exec($ex." > /dev/null 2>/dev/null &");
-																	}
-																	echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
-																}
-																else
-																	echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-															}
-															else
-																echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-														}
-														else
-															echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-													}
-													else{
-														$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-														$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewTick ".$refid." ";
-														if(substr(php_uname(), 0, 7) == "Windows")
-															pclose(popen("start /B ".$ex,"r")); 
-														else
-															shell_exec($ex." > /dev/null 2>/dev/null &");
-														echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
-													}
-												}
-												else
-													echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+			$STH = $DBH->prepare($query);
+			$date=date("Y-m-d H:i:s");
+			$STH->bindParam(1,$dep,PDO::PARAM_INT);
+			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->bindParam(3,$tit,PDO::PARAM_STR);
+			$STH->bindParam(4,$prio,PDO::PARAM_INT);
+			$STH->bindParam(5,$wsurl,PDO::PARAM_STR);
+			$STH->bindParam(6,$contype,PDO::PARAM_STR);
+			$STH->bindParam(7,$ftpus,PDO::PARAM_STR);
+			$STH->bindParam(8,$ftppass,PDO::PARAM_STR);
+			$STH->bindParam(9,$date,PDO::PARAM_STR);
+			$STH->bindParam(10,$date,PDO::PARAM_STR);
+			$STH->execute();
+
+			echo '<script>parent.$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",debug : true,hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});</script>';
+			//Assign Reference Number
+			
+			$tkid=$DBH->lastInsertId();
+			$ip=retrive_ip();
+			$refid=uniqid(hash('sha256',$tkid.$tit.$_SESSION['id']),true);
+			$randomref=get_random_string(6);
+			$spadd=str_split(strrev($_SESSION['id'].''));
+			$lll=count($spadd);
+			for($i=0;$i<$lll;$i++) $spadd[$i]=$letarr[$spadd[$i]];
+			
+			$randomref=implode('',$spadd).$randomref;
+			$query = "UPDATE ".$SupportTicketsTable." SET enc_id=?,ref_id=? WHERE id=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$refid,PDO::PARAM_STR);
+			$STH->bindParam(2,$randomref,PDO::PARAM_STR);
+			$STH->bindParam(3,$tkid,PDO::PARAM_INT);
+			$STH->execute();
+		
+			//Insert Message
+			$query = "INSERT INTO ".$SupportMessagesTable."(`user_id`,`message`,`ticket_id`,`ip_address`,`created_time`) VALUES (?,?,?,?,?);";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->bindParam(2,$message,PDO::PARAM_STR);
+			$STH->bindParam(3,$tkid,PDO::PARAM_INT);
+			$STH->bindParam(4,$ip,PDO::PARAM_STR);
+			$STH->bindParam(5,$date,PDO::PARAM_STR);
+			$STH->execute();
+			
+			//File Upload
+			if(isset($setting[5]) && $setting[5]==1){
+				$msid=$DBH->lastInsertId();
+				if(isset($_FILES['filename'])){
+					$count=count($_FILES['filename']['name']);
+					if($count>0){
+						echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
+						if(!is_dir('../upload')) mkdir('../upload');
+						$uploadarr=array();
+						$movedfiles=array();
+						$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
+															
+						for($i=0;$i<$count;$i++){
+							if($_FILES['filename']['error'][$i]==0){
+								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0){
+									if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
+										$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
+										$target_path = "../upload/".$encname;
+										if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
+											if(CryptFile("../upload/".$encname)){
+												$movedfiles[]=$_FILES['filename']['name'][$i];
+												$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
+												$query.='("'.$_FILES['filename']['name'][$i].'","'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
+												
+												echo '<script>parent.noty({text: "'.$_FILES['filename']['name'][$i].' has been uploaded",type:"success",timeout:2000});</script>';
 											}
-											else
-												echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
 										}
-										else
-											echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
 									}
-									else
-										echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
 								}
 								else
-									echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+									echo '<script>parent.noty({text: "The file '.$_FILES['filename']['name'][$i].' is too big or null. Max file size: '.ini_get('upload_max_filesize').'",type:"error",timeout:9000});</script>';
 							}
-							else
-								echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+							else if($_FILES['filename']['error'][$i]!=4)
+								echo '<script>parent.noty({text: "File Name:'.$_FILES['filename']['name'][$i].' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 						}
-						else{
-							if((int)$stmt->errno==1062)
-								echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "You have already created a Ticket named: '.$tit.'",type:"error",timeout:9000});</script>';
-							else
-								echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "Ticket Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+						if(isset($uploadarr[0])){
+							$query=substr_replace($query,'',-1);
+							try{
+								$STH = $DBH->prepare($query);
+								$STH->execute();
+								
+								$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
+								$STH = $DBH->prepare($query);
+								$STH->bindParam(1,$msid,PDO::PARAM_INT);
+								$STH->execute();
+								
+							}
+							catch(PDOException $e){
+								file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+								echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "An error has occurred, please contact the administrator.",type:"error",timeout:9000});</script>';
+							}
 						}
+						echo '<script>parent.noty({text: "File Upload Finished",type:"information",timeout:2000});</script>';
 					}
-					else
-						echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "Ticket Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
 				}
-				else
-					echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "Ticket Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
 			}
-			else
-				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "Ticket Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-			$mysqli->close();
+
+			//Assign Ticket
+			$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $dep,$_SESSION['id']);
+			$selopid=(is_numeric($selopid))?$selopid:null;
+			if(is_numeric($selopid)){
+				$query = "UPDATE ".$SupportTicketsTable." a ,".$SupportUserTable." b SET a.operator_id=?,a.ticket_status='1',b.assigned_tickets=(b.assigned_tickets+1) WHERE a.id=? AND b.id=? ";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$selopid,PDO::PARAM_INT);
+				$STH->bindParam(2,$tkid,PDO::PARAM_INT);
+				$STH->bindParam(3,$selopid,PDO::PARAM_INT);
+				$STH->execute();
+
+				$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+				$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php AssTick ".$refid." ";
+				if(substr(php_uname(), 0, 7) == "Windows")
+					pclose(popen("start /B ".$ex,"r")); 
+				else
+					shell_exec($ex." > /dev/null 2>/dev/null &");
+
+				if($_SESSION['mail_alert']=='yes'){
+					$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+					$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewTick ".$refid." ";
+					if(substr(php_uname(), 0, 7) == "Windows")
+						pclose(popen("start /B ".$ex,"r")); 
+					else
+						shell_exec($ex." > /dev/null 2>/dev/null &");
+				}
+			}
+			else{
+				$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+				$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewTick ".$refid." ";
+				if(substr(php_uname(), 0, 7) == "Windows")
+					pclose(popen("start /B ".$ex,"r")); 
+				else
+					shell_exec($ex." > /dev/null 2>/dev/null &");
+				echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
+			}
+			echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
+		}
+		catch(PDOException $e){
+			if((int)$e->getCode()==1062)
+				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "You have already created a Ticket named: '.$tit.'",timeout:2000});</script>';
+			else{
+				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "We are sorry, but an error has occurred, please contact the administrator if it persist",type:"information",timeout:2000});</script>';
+			}
+		}
 	}
 	else
 		echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "'.implode(',',$error).'",type:"error",timeout:9000})</script>';
@@ -927,7 +905,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['post_reply']=='Post Reply'){//add PDO
+else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['post_reply']=='Post Reply'){
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$error=array();
@@ -938,152 +916,125 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 
 	if(!isset($error[0])){
 		if(isset($_SESSION[$encid]['id'])){
-			$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-			$stmt = $mysqli->stmt_init();
-			if($stmt){
+			try{
+				$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+				$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 				if($_SESSION[$encid]['status']==0 && $_SESSION['id']==$_SESSION[$encid]['usr_id']){
+					try{
 					$query = "UPDATE ".$SupportTicketsTable." a ,".$SupportUserTable." b SET a.ticket_status= CASE WHEN a.operator_id=0 THEN '2' ELSE '1' END, b.assigned_tickets= CASE WHEN a.ticket_status='0' THEN (b.assigned_tickets+1) ELSE b.assigned_tickets END,b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END,a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END WHERE a.enc_id=? OR b.id=a.operator_id";
-					if($stmt->prepare($query)){
-						if($stmt->bind_param('s', $encid)){
-							if($stmt->execute()){
-								$query = "SELECT ticket_status FROM ".$SupportTicketsTable." WHERE id=? LIMIT 1";
-								if($stmt->prepare($query)){
-									if($stmt->bind_param('i', $_SESSION[$encid]['id'])){
-										if($stmt->execute()){
-											$stmt->store_result();
-											$result = $stmt->bind_result($tkst);
-											if($stmt->num_rows>0){
-												while (mysqli_stmt_fetch($stmt)) 
-													$_SESSION[$encid]['status']=$tkst;
-												echo '<script>parent.$("#statustk").val(\'1\').change();</script>';
-											}
-											else
-												echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket.No Matches.",type:"error",timeout:9000});</script>';
-										}
-										else
-											echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket.Select Execute Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-									}
-									else
-										echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket.Select Bind Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-								}
-								else
-									echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket.Select Prepare Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-							}
-							else
-								echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket.Update Prepare Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-						}
-						else
-							echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket.Update Bind Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+					$STH->execute();
+					
+					$query = "SELECT ticket_status FROM ".$SupportTicketsTable." WHERE id=? LIMIT 1";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$_SESSION[$encid]['id'],PDO::PARAM_INT);
+					$STH->execute();
+					
+					$STH->setFetchMode(PDO::FETCH_ASSOC);
+					$a = $STH->fetch();
+					if(!empty($a)){
+						do{
+							$_SESSION[$encid]['status']=$tkst;
+						}while ($a = $STH->fetch());
+						echo '<script>parent.$("#statustk").val(\'1\').change();</script>';
 					}
-					else
-						echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket.Update Prepare Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+					echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket",type:"error",timeout:9000});</script>';
+					}
+					catch(PDOException $e){
+						file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+						echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket",type:"error",timeout:9000});</script>';
+					}
 				}
 				$ip=retrive_ip();
 				$date=date("Y-m-d H:i:s");
 				$query = "INSERT INTO ".$SupportMessagesTable."(`user_id`,`message`,`ticket_id`,`ip_address`,`created_time`) VALUES (?,?,?,?,?);";
-				if($stmt->prepare($query)){
-					if($stmt->bind_param('isiss', $_SESSION['id'],$message,$_SESSION[$encid]['id'],$ip,$date)){
-						if($stmt->execute()){
-							if(isset($setting[5]) && $setting[5]==1){
-								$msid=$stmt->insert_id;
-								//Upload File
-								if(isset($_FILES['filename'])){
-									$count=count($_FILES['filename']['name']);
-									if($count>0){
-										echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
-										if(!is_dir('../upload')) mkdir('../upload');
-										$maxsize=covert_size(ini_get('upload_max_filesize'));
-										if(isset($setting[6]) && $setting[6]!=null)
-											$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
-										$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
-										$date=date("Y-m-d H:i:s");
-										$uploadarr=array();
-										$movedfiles=array();
-										for($i=0;$i<$count;$i++){
-											if($_FILES['filename']['error'][$i]==0){
-												if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0){
-													if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
-														$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
-														if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], "../upload/".$encname)){
-															if(CryptFile("../upload/".$encname)){
-																$movedfiles[]=$_FILES['filename']['name'][$i];
-																$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
-																$query.='("'.$_FILES['filename']['name'][$i].'","'.$encname.'","'.$_SESSION['id'].'","'.$_SESSION[$encid]['id'].'","'.$encid.'","'.$msid.'","'.$date.'"),';
-																echo '<script>parent.noty({text: "'.$_FILES['filename']['name'][$i].' has been uploaded",type:"success",timeout:2000});</script>';
-															}
-														}
-													}
-												}
-												else
-													echo '<script>parent.noty({text: "The file '.$_FILES['filename']['name'][$i].' is too big or null. Max file size: '.ini_get('upload_max_filesize').'",type:"error",timeout:9000});</script>';
-											}
-											else if($_FILES['filename']['error'][$i]!=4)
-												echo '<script>parent.noty({text: "Error:'.$_FILES['filename']['name'][$i].' Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
-										}
-										if(isset($uploadarr[0])){
-											$query=substr_replace($query,'',-1);
-											if($stmt->prepare($query)){
-												if($stmt->execute()){
-													$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
-													$prepared = $stmt->prepare($query);
-													if($prepared){
-														if($stmt->bind_param('i', $msid)){
-															if($stmt->execute()){
-																echo json_encode(array(0=>'Updated',1=>$tit));
-															}
-															else
-																echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-														}
-														else
-															echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-													}
-													else
-														echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-												}
-												else{
-													echo '<script>parent.noty({text: "Upload Execute Insert Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
+				$STH->bindParam(2,$message,PDO::PARAM_STR);
+				$STH->bindParam(3,$_SESSION[$encid]['id'],PDO::PARAM_INT);
+				$STH->bindParam(4,$ip,PDO::PARAM_STR);
+				$STH->bindParam(5,$date,PDO::PARAM_STR);
+				$STH->execute();
+		
+				if(isset($setting[5]) && $setting[5]==1){
+					$msid=$DBH->lastInsertId();
+					
+					//Upload File
+					if(isset($_FILES['filename'])){
+						$count=count($_FILES['filename']['name']);
+						if($count>0){
+							echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
+							if(!is_dir('../upload')) mkdir('../upload');
+							$maxsize=covert_size(ini_get('upload_max_filesize'));
+							if(isset($setting[6]) && $setting[6]!=null)
+								$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
+							
+							$uploadarr=array();
+							$movedfiles=array();
+							
+							$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
+							for($i=0;$i<$count;$i++){
+								if($_FILES['filename']['error'][$i]==0){
+									if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0){
+										if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
+											$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
+											if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], "../upload/".$encname)){
+												if(CryptFile("../upload/".$encname)){
+													$movedfiles[]=$_FILES['filename']['name'][$i];
+													$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
+													$query.='("'.$_FILES['filename']['name'][$i].'","'.$encname.'","'.$_SESSION['id'].'","'.$_SESSION[$encid]['id'].'","'.$encid.'","'.$msid.'","'.$date.'"),';
+													echo '<script>parent.noty({text: "'.$_FILES['filename']['name'][$i].' has been uploaded",type:"success",timeout:2000});</script>';
 												}
 											}
-											else
-												echo '<script>parent.noty({text: "Prepare Upload Insert Error: '.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
 										}
-										echo '<script>parent.noty({text: "File Upload Finished",type:"information",timeout:2000});</script>';
 									}
+									else
+										echo '<script>parent.noty({text: "The file '.$_FILES['filename']['name'][$i].' is too big or null. Max file size: '.ini_get('upload_max_filesize').'",type:"error",timeout:9000});</script>';
 								}
-							}
-							if($_SESSION['id']==$_SESSION[$encid]['usr_id']){
-								$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-								$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 0";
-							}
-							else if($_SESSION[$encid]['status']==1){
-								$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-								$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 1";
-							}
-							if(isset($ex)){
-								if(substr(php_uname(), 0, 7) == "Windows")
-									pclose(popen("start /B ".$ex,"r")); 
-								else
-									shell_exec($ex." > /dev/null 2>/dev/null &");
+								else if($_FILES['filename']['error'][$i]!=4)
+									echo '<script>parent.noty({text: "Error:'.$_FILES['filename']['name'][$i].' Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 							}
 							if(isset($uploadarr[0])){
-								$json=json_encode($uploadarr);
-								echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".$_SESSION['name']."',".$json.");</script>";
-							}
-							else
-								echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".$_SESSION['name']."',null);</script>";
+								$query=substr_replace($query,'',-1);
+								$STH = $DBH->prepare($query);
+								$STH->execute();
+											
+								$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
+								$STH = $DBH->prepare($query);
+								$STH->bindParam(1,$msid,PDO::PARAM_INT);
+								$STH->execute();
+							}	
+							echo '<script>parent.noty({text: "File Upload Finished",type:"information",timeout:2000});</script>';
 						}
-						else
-							echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
 					}
+				}
+				if($_SESSION['id']==$_SESSION[$encid]['usr_id']){
+					$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+					$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 0";
+				}
+				else if($_SESSION[$encid]['status']==1){
+					$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+					$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 1";
+				}
+				if(isset($ex)){
+					if(substr(php_uname(), 0, 7) == "Windows")
+						pclose(popen("start /B ".$ex,"r")); 
 					else
-						echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+						shell_exec($ex." > /dev/null 2>/dev/null &");
+				}
+				if(isset($uploadarr[0])){
+					$json=json_encode($uploadarr);
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".$_SESSION['name']."',".$json.");</script>";
 				}
 				else
-					echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".$_SESSION['name']."',null);</script>";
 			}
-			else
-				echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "'.mysqli_stmt_error($stmt).'",type:"error",timeout:9000});</script>';
-			$mysqli->close();
+			catch(PDOException $e){
+				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "We are sorry, but an error has occured, please contact the adminsitrator",type:"error",timeout:9000});</script>';
+			}
 		}
 		else
 			echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "No Identification Founded",type:"error",timeout:9000});</script>';
@@ -1280,7 +1231,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSION['status']<3){//check
+else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSION['status']<3){
 	$encid=preg_replace('/\s+/','',$_POST['ticket_id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$file=preg_replace('/\s+/','',$_POST['file_download']);
@@ -1327,7 +1278,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_index'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_index'){
 	$encid=preg_replace('/\s+/','',$_POST['id']);
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$tit=(preg_replace('/\s+/','',$_POST['title'])!='')? preg_replace('/\s+/',' ',$_POST['title']):exit();
@@ -1504,7 +1455,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//check
+else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){
 	$enid=preg_replace('/\s+/','',$_POST['enid']);
 	$tit=preg_replace('/\s+/',' ',$_POST['title']);
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
