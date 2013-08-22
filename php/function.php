@@ -1483,7 +1483,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//Error: doesn't return results
+else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){//check
 	$enid=preg_replace('/\s+/','',$_POST['enid']);
 	$tit=preg_replace('/\s+/',' ',$_POST['title']);
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
@@ -1534,90 +1534,90 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 				$query.=' a.user_id='.$_SESSION['id'];
 				if($enid!=''){
 					$query.=' AND a.ref_id=?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$enid);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$enid);
 				}
 				if($tit!=''){
 					$query.=' AND a.title LIKE ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$tit.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$tit.'%');
 				}
 				if($dep!=''){
 					$query.=' AND a.department_id=?';
-					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$dep);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$dep);
 				}
 				if($op!=''){
 					$query.=' AND a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$op.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$op.'%');
 				}
 				if($from!=''){
 					$query.=' AND a.created_time >= ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$from);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$from);
 				}
 				if($to!=''){
 					$query.=' AND a.created_time =< ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$to);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$to);
 				}
 			}
 			else if($_SESSION['status']==1){
 				$query.=' a.user_id='.$_SESSION['id'].' OR a.operator_id='.$_SESSION['id'];
 				if($enid!=''){
 					$query.=' AND a.ref_id=?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$enid);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$enid);
 				}
 				if($tit!=''){
 					$query.=' AND a.title LIKE ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$tit.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$tit.'%');
 				}
 				if($dep!=''){
 					$query.=' AND a.department_id=?';
-					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$dep);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$dep);
 				}
 				if($from!=''){
 					$query.=' AND a.created_time >= ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$from);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$from);
 				}
 				if($to!=''){
 					$query.=' AND a.created_time <= ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$to);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$to);
 				}
 			}
 			else if($_SESSION['status']==2){
 				$tail=array();
 				if($id!=''){
 					$tail[]='a.user_i`=?';
-					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$id);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$id);
 				}
 				if($enid!=''){
 					$tail[]='a.ref_id=?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$enid);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$enid);
 				}
 				if($tit!=''){
 					$tail[]='a.title LIKE ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$tit.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$tit.'%');
 				}
 				if($dep!=''){
 					$tail[]='a.department_id=?';
-					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$dep);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$dep);
 				}
 				if($opid!=''){
 					$tail[]='a.operator_id=?';
-					$merge[]=array('type'=>'PDO::PARAM_INT','val'=>$opid);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$opid);
 				}
 				if($op!=''){
 					$tail[]='a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$op.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$op.'%');
 				}
 				if($from!=''){
 					$tail[]='a.created_time >= ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$from);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$from);
 				}
 				if($to!=''){
 					$tail[]='a.created_time <= ?';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>$to);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$to);
 				}
 				if($usmail!=''){
 					$tail[]='(a.user_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1) OR operator_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1))';
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$usmail.'%');
-					$merge[]=array('type'=>'PDO::PARAM_STR','val'=>'%'.$usmail.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$usmail.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$usmail.'%');
 				}
 				$query.=implode(' AND ',$tail);
 			}
@@ -1627,7 +1627,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 
 			$journey=count($merge);
 			for ($i=0; $i<$journey;$i++) {
-				$STH->bindParam($i+1,$merge['val'],$merge['type']);
+				$STH->bindParam($i+1,$merge[$i]['val'],$merge[$i]['type']);
 			}
 			$STH->execute();
 			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
