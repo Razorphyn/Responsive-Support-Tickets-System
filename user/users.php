@@ -301,7 +301,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			var a=$(this),
 				e = a.parent().find('input[name="usr_old_stat"]').val().replace(/\s+/g,"");
 			$(this).attr('disabled','disabled');
-			if(e=='Operator' || e=='Adiministrator'){
+			if(e=='Operator' || e=='Administrator'){
 				$(this).after("<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 				var c = $(this).val();
 				$.ajax({
@@ -321,7 +321,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 								a.after("<br/><div class='rate_container'>"+tail+"</div>");
 							}
 							else
-								a.after("<p>This user hasn't got any rating");
+								a.after("<br/><p>This user hasn't got any rating");
 						}
 						else{
 							noty({text: b[0],type: "error",timeout: 9E3})
