@@ -508,6 +508,43 @@ else{
 		}
 		exit();
 	}
+	
+	else if(isset($_POST['act']) && $_POST['act']=='select_usr_rate'){
+		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+			$query = "SELECT 
+							b.rate,
+							b.note,
+							b.enc_id,
+							c.mail
+						FROM ".$SupportTicketsTable." a
+						LEFT JOIN ".$SupportRateTable." b
+							ON b.ref_id=a.ref_id
+						LEFT JOIN ".$SupportUserTable." c
+							ON c.id=b.usr_id
+						WHERE a.operator_id=? ORDER BY b.id ASC LIMIT 700";
+
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$ret=array('res'=>'ok','rate'=>array());
+			$camaros=array();
+			while ($a = $STH->fetch()){
+				$ret['rate'][]=array($a['rate'],$a['note'],$a['enc_id'],$a['mail']);
+			}
+			echo json_encode($ret);
+		}
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
+		exit();
+	}
 
 	else if(isset($_POST['act']) && $_POST['act']=='del_usr'){//check
 		$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']+54:exit();
@@ -954,7 +991,6 @@ else{
 	}
 	
 	else{
-		
 		if(!isset($_SESSION['id']))
 			$error='You are logged out, please reload the page and log in';
 		else

@@ -160,57 +160,14 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 						bProcessing: !0,
 						aaData: a.information,
 						oLanguage: {sEmptyTable: "No Users"},
-						aoColumns: [{
-							sTitle: "Number",
-							mDataProp: "num",
-							sWidth: "60px",
-							sClass: "visible-desktop",
-							fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
-								$(nTd).html("<span><strong class='visible-phone'>Number: </strong></span><span>" + $(nTd).html() + '</span>');
-							}
-						}, {
-							sTitle: "Name",
-							mDataProp: "name",
-							fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
-								$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');
-							}
-						}, {
-							sTitle: "Mail",
-							mDataProp: "mail",
-							fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
-								$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');
-							}
-						}, {
-							sTitle: "Status/Role",
-							mDataProp: "status",
-							fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
-								$(nTd).html("<span><strong class='visible-phone'>Status/Role: </strong></span><span> " + $(nTd).html() + '</span>');
-							}
-						}, {
-							sTitle: "Holiday",
-							mDataProp: "holiday",
-							sWidth: "60px",
-							sClass: "hidden-phone",
-							fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
-								$(nTd).html("<span><strong class='visible-phone'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');
-							}
-						}, {
-							sTitle: "Rating",
-							mDataProp: "rating",
-							sWidth: "60px",
-							sClass: "hidden-phone",
-							fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
-								$(nTd).html("<span><strong class='visible-phone'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');
-							}
-						}, {
-							sTitle: "Tooggle",
-							mDataProp: "action",
-							bSortable: !1,
-							bSearchable: !1,
-							sWidth: "60px",
-							fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
-								$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');
-							}
+						aoColumns: [
+							{sTitle: "Number",mDataProp: "num",sWidth: "60px",sClass: "visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Number: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Name",mDataProp: "name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Mail",mDataProp: "mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Status/Role",mDataProp: "status",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status/Role: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Holiday",mDataProp: "holiday",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Rating",mDataProp: "rating",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Tooggle",mDataProp: "action",bSortable: !1,bSearchable: !1,sWidth: "60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
 						}]
 					})
 				}
@@ -220,9 +177,23 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		});
 		request.fail(function (a, b) {noty({text: "Ajax Error: " + b,type: "error",timeout: 9E3})});	
 
-		$("#usertable").on("click", ".edituser", function() { $(this).val(); var b = this.parentNode.parentNode.parentNode.parentNode, c = table.fnGetPosition(b, null, !0), a = table.fnGetData(b); 0 < $("#" + a.num).length ? $("html,body").animate({scrollTop:$("#" + a.num).offset().top}, 1500) : (b = "<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='usr_edit_name' placeholder='Department Name' value='" + a.name + "'required /></div><div class='span2'>Role/Status</div><div class='span4'><select class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row-fluid'><div class='span2'>Mail</div><div class='span4'><input type='text' name='usr_edit_mail' value='" + a.mail + "' required/></div><div class='span2'><label>On Holiday?</label></div><div class='span4'><select name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>", $("#userlist").after(b), $('select[name="usr_role"]:first option').filter(function() { return $(this).html() == a.status }).attr("selected", "selected"), $('select[name="usr_holiday"]:first option').filter(function() { return $(this).html() == a.holiday }).attr("selected", "selected"), "Operator" == a.status && $(".load_usr_depa:first").css("display", "block")) });	
-		
-				
+		$("#usertable").on("click", ".edituser", function () {
+			$(this).val();
+			var b = this.parentNode.parentNode.parentNode.parentNode,
+				c = table.fnGetPosition(b, null, !0),
+				a = table.fnGetData(b);
+			if(0 < $("#" + a.num).length)
+				$("html,body").animate({scrollTop: $("#" + a.num).offset().top}, 1500)
+			else{
+				var b = "<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><input type='hidden' name='usr_old_stat' value='"+a.status+"'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='usr_edit_name' placeholder='Department Name' value='" + a.name + "'required /></div><div class='span2'>Role/Status</div><div class='span4'><select class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row-fluid'><div class='span2'>Mail</div><div class='span4'><input type='text' name='usr_edit_mail' value='" + a.mail + "' required/></div><div class='span2'><label>On Holiday?</label></div><div class='span4'><select name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><button style='display:none' class='btn btn-info load_usr_rate' value='" + a.num + "' onclick='javascript:return false;'>Load Rates</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; 
+				$("#userlist").after(b);
+				$('select[name="usr_role"]:first option').filter(function(){return $(this).html() == a.status}).attr("selected", "selected");
+				$('select[name="usr_holiday"]:first option').filter(function () {return $(this).html() == a.holiday}).attr("selected", "selected");
+				if("Operator" == a.status) $(".load_usr_depa:first").css("display", "block");
+				if("Operator" == a.status || "Administrator" == a.status) $(".load_usr_rate:first").css("display", "block");
+			}
+		});		
+
 		$(document).on("click", ".submit_changes", function () {
 			var a = $(this).parent();
 			a.children("input").each(function () {
@@ -245,15 +216,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			"" != e.replace(/\s+/g, "") && "" != f.replace(/\s+/g, "") ? ($.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {
-					act: "update_user_info",
-					id: b,
-					name: e,
-					mail: f,
-					status: g,
-					holiday: c,
-					seldepa: h
-				},
+				data: {act: "update_user_info",id: b,name: e,mail: f,status: g,holiday: c,seldepa: h},
 				dataType: "json",
 				success: function (d) {
 					"Updated" == d[0] ? (
@@ -324,22 +287,53 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			$.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {
-					act: "select_depa_usr",
-					id: c
-				},
+				data: {act: "select_depa_usr",id: c},
 				dataType: "json",
 				success: function (b) {
-					"ok" == b.res ? (a.parent().find(".loading").remove(), a.after(b.depa.join(""))) : noty({
-						text: b[0],
-						type: "error",
-						timeout: 9E3
-					})
+					"ok" == b.res ? (a.parent().find(".loading").remove(), a.after(b.depa.join(""))) : noty({text: b[0],type: "error",timeout: 9E3})
 				}
 			}).fail(function (b, a) {
 				noty({text: a,type: "error",timeout: 9E3});$(this).removeAttr('disabled');
 			})
-		});		
+		});
+		
+		$(document).on("click", ".load_usr_rate", function () {
+			var a=$(this),
+				e = a.parent().find('input[name="usr_old_stat"]').val().replace(/\s+/g,"");
+			$(this).attr('disabled','disabled');
+			if(e=='Operator' || e=='Adiministrator'){
+				$(this).after("<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
+				var c = $(this).val();
+				$.ajax({
+					type: "POST",
+					url: "../php/admin_function.php",
+					data: {act: "select_usr_rate",id: c},
+					dataType: "json",
+					success: function (b) {
+						if(b.res=='ok'){
+							a.parent().find(".loading").remove();
+							var count=b.rate.length;
+							if(count>0){
+								var tail=new Array();
+								for(i=0;i<count;i++)
+									tail.push("<div class='row-fluid'><div class='span3'>"+b.rate[i][3]+"</div><div class='span3'><a href='view?id="+b.rate[i][2]+"'>View Ticket</a></div><div class='span3'>"+b.rate[i][0]+"</div></div><div class='row-fluid info_rate'><div class='span11'>"+b.rate[i][1]+"</div></div>");
+								tail=tail.join("");
+								a.after("<br/><div class='rate_container'>"+tail+"</div>");
+							}
+							else
+								a.after("<p>This user hasn't got any rating");
+						}
+						else{
+							noty({text: b[0],type: "error",timeout: 9E3})
+						}
+					}
+				}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3});$(this).removeAttr('disabled');})
+			}
+			else{
+				a.css('display','none');
+			}
+		});	
+		
 		$(document).on('click','.btn_close_form',function(){if(confirm('Do you want to close this edit form?')){$(this).parent().prev().remove();$(this).parent().remove();}return false;});
 		
 	});

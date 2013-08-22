@@ -67,6 +67,5 @@ table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
 .expande{display:none}
 .cif{cursor:pointer}
 
-.overlay{width: 100%;height: 100%;position: fixed;top: 0;left: 0;z-index: 1000;display: none;}
-.modal{display: none;background:#eee;padding:0 20px 20px;overflow:auto;z-index:1001;position:absolute;}
-.modal h1 {background: none repeat scroll 0 0 #EB5A3D;border: 1px solid #DE3817;border-radius: 10px 10px 0 0;box-shadow: 0 1px 1px #F9D0C8 inset;color: #FFFCEB;font-size: 20px;font-weight: 500;margin: 0 0 20px;padding: 12px 10px 10px;text-align: center;}
+.rate_container{height:250px;overflow:auto}
+.info_rate{border-bottom:1px solid #222}
