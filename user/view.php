@@ -93,9 +93,10 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$_GET['id'],PDO::PARAM_STR);
 		$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
-				while ($a = $STH->fetch()){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$tkid=$a['id'];
 					$refid=$a['ref_id'];
 					$title=$a['title'];
@@ -111,7 +112,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					$note=$a['note'];
 					$reason=$a['reason'];
 					$_SESSION[$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
-				}
+				}while ($a = $STH->fetch());
 				unset($a);
 				$rate=($rate!=NULL)? $rate:'';
 				if($conpass!='' && $conpass!=null){
@@ -127,53 +128,47 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 				}
 				$query = "SELECT 
 								a.id,
-								a.user_id,
 								b.name,
 								a.message,
 								a.created_time,
-								a.attachment 
+								a.attachment
 							FROM ".$SupportMessagesTable." a
 							LEFT JOIN ".$SupportUserTable." b
 								ON b.id=a.user_id
-							WHERE a.ticket_id=? ORDER BY created_time DESC LIMIT 10";
+							WHERE a.ticket_id=? ORDER BY a.created_time DESC LIMIT 10";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_SESSION[$_GET['id']]['id'],PDO::PARAM_STR);
 				$STH->execute();
-				$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-				if(!empty($r)){
+				$STH->setFetchMode(PDO::FETCH_ASSOC);
+				$a = $STH->fetch();
+				if(!empty($a)){
 					$list=array();
 					$messageid=array();
 					$count=0;
-					while ($a = $STH->fetch()){
-						$msid=$a['id'];
-						$shelby=$a['user_id'];
-						$usrn=$a['name'];
-						$message=$a['message'];
-						$time=$a['created_time'];
-						$attch=$a['attachment'];
-						$list[$msid]=array(0=>$usrn,1=>$message,2=>$time);
-						if($attch==1)
-							$messageid[]=$msid;
+					do{
+						$list[$a['id']]=array(0=>$a['name'],1=>$a['message'],2=>$a['created_time']);
+						if($a['attachment']==1)
+							$messageid[]=$a['id'];
 						$count++;
-					}
+					}while ($a = $STH->fetch());
 					unset($a);
-					
+
 					if(count($messageid)>0){
 						$messageid=implode(',',$messageid);
 						$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
 						$STH = $DBH->prepare($query);
 						$STH->execute();
-						if(!empty($r)){
-							$list=array();
-							$messageid=array();
-							$count=0;
-							while ($a = $STH->fetch()){
+						$STH->setFetchMode(PDO::FETCH_ASSOC);
+						$a = $STH->fetch();
+						if(!empty($a)){
+							do{
 								$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.$a['name'].'"></form>';
-							}
+							}while ($a = $STH->fetch());
 						}
 						unset($a);
 					}
 					$list=array_values($list);
+					
 				}
 				else{
 					header("location: index.php");
@@ -199,11 +194,13 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 			$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable;
 			$STH = $DBH->prepare($query);
 			$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$b=array();
-			if(!empty($r)){
-				while ($a = $STH->fetch())
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$b[$a['id']]=$a['department_name'];
+				}while ($a = $STH->fetch());
 			}
 			return json_encode($b);
 		}
@@ -232,11 +229,13 @@ function retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, 
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$departmentid,PDO::PARAM_INT);
 			$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$b=array();
-			if(!empty($r)){
-				while ($a = $STH->fetch())
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$b[$a['id']]=$a['name'];
+				}while ($a = $STH->fetch());
 			}
 			$DBH=null;
 			return json_encode($b);
@@ -399,13 +398,13 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 								<div class='span1'><input type='submit' class='btn btn-success' id='updtdpop' onclick='javascript:return false;' value='Update'/></div>
 							</div>
 						</div>
-					<?php } if($_SESSION['status']==2){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable));retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid);?>
+					<?php } if($_SESSION['status']==2){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable));$c=json_decode(retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid));?>
 						<hr>
 						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department and Operator</p>
 						<div class='expande'>
 							<div class='row-fluid'>
 								<div class='span2'>Change Departement</div>
-								<div class='span3'><select id='departments'><?php foreach($b as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; ?></select></div>
+								<div class='span3'><select id='departments'><?php if($b!=false){foreach($b as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; }?></select></div>
 							</div>
 							<div class='row-fluid'>
 								<div class='span2'>Change Operator</div>.
@@ -413,7 +412,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							</div>
 							<div class='row-fluid'>
 								<div class='span2'></div>
-								<div class='span3'><select id='operat'><option value="0">---</option><?php foreach($_SESSION['depa_ope'] as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; ?></select></div>
+								<div class='span3'><select id='operat'><option value="0">---</option><?php if($c!=false){foreach($c as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>';} ?></select></div>
 								<div class='span1'><input type='submit' class='btn btn-success' id='updtdpadmin' onclick='javascript:return false;' value='Update'/></div>
 							</div>
 						</div>
