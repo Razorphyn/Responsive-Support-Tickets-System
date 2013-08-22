@@ -73,11 +73,15 @@ else{
 					ON b.id=a.usr_id";
 			$STH = $DBH->prepare($query);
 			$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$list=array('response'=>'ret','ticket'=>array());
-			if(!empty($r)){
-				while ($a = $STH->fetch())
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'encid'=>$a['enc_id'],'role'=>$a['urole'],'reason'=>$a['reason'],'mail'=>$a['mail']);
+				}
+				while ($a = $STH->fetch());
+					
 			}
 			echo json_encode($list);
 		}
@@ -186,12 +190,15 @@ else{
 				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
 				$STH->execute();
 				
-				$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-				if(!empty($r)){
+				$STH->setFetchMode(PDO::FETCH_ASSOC);
+				$a = $STH->fetch();
+				if(!empty($a)){
 					$list=array();
-					while ($a = $STH->fetch()){
+					do{
 						$list[]=$a['id'];
 					}
+					while ($a = $STH->fetch());
+					
 					$list=implode(',',$list);
 					
 					$STH = $DBH->prepare($deltk);
@@ -206,13 +213,14 @@ else{
 					$STH = $DBH->prepare($selupl);
 					$STH->execute();
 					
-					$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-					if(!empty($r)){
+					$STH->setFetchMode(PDO::FETCH_ASSOC);
+					$a = $STH->fetch();
+					if(!empty($a)){
 						$path='../upload/';
-						while ($a = $STH->fetch()){
+						do{
 							file_put_contents($path.$enc,'');
 							unlink($path.$enc);
-						}
+						}while ($a = $STH->fetch());
 						
 						$delup="DELETE FROM ".$SupportUploadTable." WHERE `num_id` IN (".$list.")";
 						$STH = $DBH->prepare($delup);
@@ -221,7 +229,6 @@ else{
 					}
 					else
 						echo json_encode(array(0=>'Deleted'));
-			
 				}
 				else
 					echo json_encode(array(0=>'Deleted'));
@@ -236,7 +243,7 @@ else{
 	exit();
 }
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_options'){//check
+	else if(isset($_POST['act'])  && $_POST['act']=='save_options'){
 		$senreply=(is_numeric($_POST['senrep'])) ? $_POST['senrep']:exit();
 		$senope=(is_numeric($_POST['senope'])) ? $_POST['senope']:exit();
 		$upload=(is_numeric($_POST['upload'])) ? $_POST['upload']:exit();
@@ -253,7 +260,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_stmp'){//check
+	else if(isset($_POST['act'])  && $_POST['act']=='save_stmp'){
 		
 		$serv=(is_numeric($_POST['serv'])) ? $_POST['serv']:exit();
 		$mustang=(string)$_POST['name'];
@@ -282,7 +289,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_mail_body'){//check
+	else if(isset($_POST['act'])  && $_POST['act']=='save_mail_body'){
 		$sub=(preg_replace('/\s+/','',$_POST['sub'])!='')? preg_replace('/\s+/',' ',$_POST['sub']):exit();
 		$mess=(preg_replace('/\s+/','',$_POST['message'])!='')? preg_replace('/\s+/',' ',$_POST['message']):exit();
 		$act=(int)$_POST['sec'];
@@ -333,12 +340,14 @@ else{
 			$STH = $DBH->prepare($query);
 			$STH->execute();
 			
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
 				$users=array('response'=>'ret','information'=>array());
-				while ($a = $STH->fetch()){
+				do{
 					$users['information'][]=array('num'=>$a['id']-54,'name'=>$a['name'],'mail'=>$a['mail'],'status'=>$a['ustat'],'holiday'=>$a['hol'],"rating"=>$a['rt']);
-				}
+				}while ($a = $STH->fetch());
+				
 				echo json_encode($users);
 			}
 			else
@@ -352,167 +361,114 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='update_user_info'){//Add PDO
+	else if(isset($_POST['act']) && $_POST['act']=='update_user_info'){//check
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		$mustang=(string) $_POST['name'];
 		$viper=(string) $_POST['mail'];
 		$charger=(is_numeric($_POST['status'])) ? (string)$_POST['status']:exit();
 		$holiday=(is_numeric($_POST['holiday'])) ? (string)$_POST['holiday']:exit();
 		$seldepa=$_POST['seldepa'];
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
 			$query = "UPDATE ".$SupportUserTable." SET name=?,mail=?,status=?,holiday=?  WHERE id=? LIMIT 1";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('ssssi',$mustang,$viper,$charger,$holiday, $camaro)){
-					if($stmt->execute()){
-						$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=?";
-						$prepared = $stmt->prepare($query);
-						if($prepared){
-							if($stmt->bind_param('i',$camaro)){
-								if($stmt->execute()){
-									if($charger=='1' && count($seldepa)>0){
-										$query = "INSERT INTO ".$SupportUserPerDepaTable." (`department_name`, `department_id` , `user_id`) VALUES ";
-										$count=count($seldepa);
-										for($i=0;$i<$count;$i++){
-											if ($i!=$count-1)
-												$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id='.((int)$seldepa[$i]).'),'.((int)$seldepa[$i]).','.((int)$camaro).'),';
-											else
-												$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id='.((int)$seldepa[$i]).'),'.((int)$seldepa[$i]).','.((int)$camaro).')';
-										}
-										if($stmt->prepare($query)){
-											if($stmt->execute()){
-												$camarolist=join(',',$seldepa);
-												$query="SELECT id,department_id,user_id FROM ".$SupportTicketsTable." WHERE ticket_status='1' AND operator_id=? AND department_id NOT IN (".$camarolist.")";
-												$prepared = $stmt->prepare($query);
-												if($prepared){
-													if($stmt->bind_param('i', $camaro)){
-														if($stmt->execute()){
-															$stmt->store_result();
-															$result = $stmt->bind_result($camaro,$depa,$uid);
-															if($stmt->num_rows>0){
-																$tktoedit=array();
-																while (mysqli_stmt_fetch($stmt))
-																	$tktoedit[]=array($camaro,$depa,$uid);
-																file_put_contents('arr',print_r($tktoedit,true));
-																$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN ticket_status='1' THEN '2' ELSE ticket_status END  WHERE department_id NOT IN (".$camarolist.")";
-																if($stmt->prepare($query)){
-																	if($stmt->execute()){
-																		$sub=$stmt->affected_rows;
-																		$query = "UPDATE ".$SupportUserTable." SET assigned_tickets=(assigned_tickets-?)  WHERE id=?";
-																		if($stmt->prepare($query)){
-																			if($stmt->bind_param('ii', $sub,$camaro)){
-																				if($stmt->execute()){
-																					foreach($tktoedit as $k=>$v){
-																						$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $v[1],$v[2]);
-																						if(is_numeric($selopid)){
-																							$fquery="UPDATE ".$SupportTicketsTable." a SET a.operator_id=IF(a.user_id=?,0,?),
-																										a.ticket_status= CASE WHEN a.ticket_status='2' AND a.user_id!=? THEN '1' WHEN a.user_id=? THEN '2' ELSE a.ticket_status END  WHERE a.id=?";
-																							$lquery="UPDATE ".$SupportUserTable." b SET b.assigned_tickets=IF((SELECT COUNT(*) FROM ".$SupportTicketsTable." WHERE operator_id=? LIMIT 1) IS NOT NULL,(SELECT COUNT(*) FROM ".$SupportTicketsTable." WHERE operator_id=?),0) WHERE b.id=?";
-																							if($stmt->prepare($fquery)){
-																								if($stmt->bind_param('iiiii', $selopid,$selopid,$selopid,$selopid,$v[0])){
-																									if($stmt->execute()){;
-																										if($stmt->prepare($lquery)){
-																											if($stmt->bind_param('iii',$selopid,$selopid,$selopid)){
-																												if(!$stmt->execute()){
-																													echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();
-																												}
-																											}
-																											else
-																												{echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();}
-																										}
-																										else
-																											{echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();}
-																									}
-																									else
-																										{echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();}
-																								}
-																								else
-																									{echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();}
-																							}
-																							else
-																								{echo json_encode(array(0=>mysqli_stmt_error($stmt)));exit();}
-																						}
-																						else if($selopid!='No Operator Available')
-																							{echo json_encode(array(0=>$selopid));exit();}
-																					}
-																					echo json_encode(array(0=>'Updated'));
-																				}
-																				else
-																					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																			}
-																			else
-																				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																		}
-																		else
-																			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																	}
-																	else
-																		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																}
-																else
-																	echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-															}
-															else
-																echo json_encode(array(0=>'Updated'));
-														}
-														else
-															echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-													}
-													else
-														echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-												}
-												else
-													echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-											}
-											else
-												echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-										}
-										else
-											echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-									}
-									else if($charger!=1 && $charger!=2){
-										$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN ticket_status='1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
-										$prepared = $stmt->prepare($query);
-										if($prepared){
-											if($stmt->bind_param('i', $camaro)){
-												if($stmt->execute()){
-													echo json_encode(array(0=>'Updated'));
-												}
-												else
-													echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-											}
-											else
-												echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-										}
-										else
-											echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-									}
-									else
-										echo json_encode(array(0=>'Updated'));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-					}
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
+			$STH->bindParam(2,$viper,PDO::PARAM_STR);
+			$STH->bindParam(3,$charger,PDO::PARAM_STR);
+			$STH->bindParam(4,$holiday,PDO::PARAM_STR);
+			$STH->bindParam(5,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			if($charger=='1' && count($seldepa)>0){
+				$query = "INSERT INTO ".$SupportUserPerDepaTable." (`department_name`, `department_id` , `user_id`) VALUES ";
+				$count=count($seldepa);
+				for($i=0;$i<$count;$i++){
+					if ($i!=$count-1)
+						$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id='.((int)$seldepa[$i]).'),'.((int)$seldepa[$i]).','.((int)$camaro).'),';
 					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+						$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id='.((int)$seldepa[$i]).'),'.((int)$seldepa[$i]).','.((int)$camaro).')';
+				}
+				$STH = $DBH->prepare($query);
+				$STH->execute();
+				$camarolist=join(',',$seldepa);
+				
+				$query="SELECT id,department_id,user_id FROM ".$SupportTicketsTable." WHERE ticket_status='1' AND operator_id=? AND department_id NOT IN (".$camarolist.")";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->execute();
+				
+				$STH->setFetchMode(PDO::FETCH_ASSOC);
+				$a = $STH->fetch();
+				if(!empty($a)){
+					$tktoedit=array();
+					do{
+						$tktoedit[]=array($a['id'],$a['department_id'],$a['user_id']);
+					}while ($a = $STH->fetch());
+					
+					$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN ticket_status='1' THEN '2' ELSE ticket_status END  WHERE department_id NOT IN (".$camarolist.")";
+					$STH = $DBH->prepare($query);
+					$STH->execute();
+					$sub=$STH->rowCount();
+					
+					$query = "UPDATE ".$SupportUserTable." SET assigned_tickets=(assigned_tickets-?)  WHERE id=?";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$sub,PDO::PARAM_INT);
+					$STH->bindParam(2,$camaro,PDO::PARAM_INT);
+					$STH->execute();
+					
+					foreach($tktoedit as $k=>$v){
+						$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $v[1],$v[2]);
+						if(is_numeric($selopid)){
+							$fquery="UPDATE ".$SupportTicketsTable." a 
+										SET a.operator_id=IF(a.user_id=?,0,?),
+											a.ticket_status= CASE WHEN a.ticket_status='2' AND a.user_id!=? THEN '1' WHEN a.user_id=? THEN '2' ELSE a.ticket_status END  
+										WHERE a.id=?";
+							$lquery="UPDATE ".$SupportUserTable." b 
+										SET b.assigned_tickets=IF((SELECT COUNT(*) FROM ".$SupportTicketsTable." WHERE operator_id=? LIMIT 1) IS NOT NULL,(SELECT COUNT(*) FROM ".$SupportTicketsTable." WHERE operator_id=?),0) 
+										WHERE b.id=?";
+							
+							$STH = $DBH->prepare($fquery);
+							$STH->bindParam(1,$selopid,PDO::PARAM_INT);
+							$STH->bindParam(2,$selopid,PDO::PARAM_INT);
+							$STH->bindParam(3,$selopid,PDO::PARAM_INT);
+							$STH->bindParam(4,$selopid,PDO::PARAM_INT);
+							$STH->bindParam(5,$v[0],PDO::PARAM_INT);
+							$STH->execute();
+
+							$STH = $DBH->prepare($lquery);
+							$STH->bindParam(1,$selopid,PDO::PARAM_INT);
+							$STH->bindParam(2,$selopid,PDO::PARAM_INT);
+							$STH->bindParam(3,$selopid,PDO::PARAM_INT);
+							$STH->execute();
+						}
+					}
+						echo json_encode(array(0=>'Updated'));
 				}
 				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+					echo json_encode(array(0=>'Updated'));
+			}
+			else if($charger!=1 && $charger!=2){
+				$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN ticket_status='1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->execute();
+
+				echo json_encode(array(0=>'Updated'));
 			}
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode(array(0=>'Updated'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
@@ -528,7 +484,7 @@ else{
 			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
 			$STH->execute();
 			
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$ret=array('res'=>'ok','depa'=>array(0=>'<div class="user_depa_container">'));
 			$camaros=array();
 			while ($a = $STH->fetch()){
@@ -553,144 +509,84 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='del_usr'){//Add PDO
+	else if(isset($_POST['act']) && $_POST['act']=='del_usr'){//check
 		$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']+54:exit();
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
 			$query = "DELETE FROM ".$SupportMessagesTable." WHERE user_id=? ";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('i', $camaro)){
-					if($stmt->execute()){
-						$query = "DELETE FROM ".$SupportTicketsTable." WHERE user_id=? ";
-						$prepared = $stmt->prepare($query);
-						if($prepared){
-							if($stmt->bind_param('i', $camaro)){
-								if($stmt->execute()){
-									$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `uploader`=?";
-									if($stmt->prepare($query)){
-										if($stmt->bind_param('i', $camaro)){
-											if($stmt->execute()){
-												$stmt->store_result();
-												$result = $stmt->bind_result($mustang);
-												if($stmt->num_rows>0){
-													$path='../upload/';
-													while (mysqli_stmt_fetch($stmt)) {
-														if(file_exists($path.$mustang)){
-															file_put_contents($path.$mustang,'');
-															unlink($path.$mustang);
-														}
-													}
-												}
-												$query = "DELETE FROM ".$SupportUploadTable." WHERE uploader=? ";
-												$prepared = $stmt->prepare($query);
-												if($prepared){
-													if($stmt->bind_param('i', $camaro)){
-														if($stmt->execute()){
-															$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN '1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
-															$prepared = $stmt->prepare($query);
-															if($prepared){
-																if($stmt->bind_param('i', $camaro)){
-																	if($stmt->execute()){
-																		$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=? ";
-																		$prepared = $stmt->prepare($query);
-																		if($prepared){
-																			if($stmt->bind_param('i', $camaro)){
-																				if($stmt->execute()){
-																					$query = "DELETE FROM ".$SupportUserTable." WHERE id=? ";
-																					$prepared = $stmt->prepare($query);
-																					if($prepared){
-																						if($stmt->bind_param('i', $camaro)){
-																							if($stmt->execute()){
-																								echo json_encode(array(0=>'Deleted'));
-																							}
-																							else
-																								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																						}
-																						else
-																							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																					}
-																					else
-																						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																				}
-																				else
-																					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																			}
-																			else
-																				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																		}
-																		else
-																			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																	}
-																	else
-																		echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-																}
-																else
-																	echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-															}
-															else
-																echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-														}
-														else
-															echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-													}
-													else
-														echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-												}
-												else
-													echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-											}
-											else
-												echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-										}
-										else
-											echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-									}
-									else
-										echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+		
+			$query = "DELETE FROM ".$SupportTicketsTable." WHERE user_id=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `uploader`=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				$path='../upload/';
+				do{
+					if(file_exists($path.$a['enc'])){
+						file_put_contents($path.$a['enc'],'');
+						unlink($path.$a['enc']);
 					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				}while ($a = $STH->fetch());
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+
+			$query = "DELETE FROM ".$SupportUploadTable." WHERE uploader=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+															
+			$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN '1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$query = "DELETE FROM ".$SupportUserTable." WHERE id=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			echo json_encode(array(0=>'Deleted'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='automatic_assign_ticket'){//deep check
+	else if(isset($_POST['act']) && $_POST['act']=='automatic_assign_ticket'){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 			$query="SELECT id,department_id,user_id FROM ".$SupportTicketsTable." WHERE ticket_status='2'";
-			$prepared = $stmt->prepare($query);
 			$STH = $DBH->prepare($query);
 			$STH->execute();
 			
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a=$STH->fetch();
+			if(!empty($a)){
 				$tktoedit=array();
-				while ($a = $STH->fetch()){
+				do{
 					$tktoedit[]=array($a['id'],$a['department_id'],$a['user_id']);
-				}
-				
+				}while($a=$STH->fetch());
+
 				foreach($tktoedit as $k=>$v){
 					$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $v[1], $v[2]);
 					if(is_numeric($selopid)){
@@ -735,12 +631,14 @@ else{
 			$STH->bindParam(1,$departmentid,PDO::PARAM_INT);
 			$STH->execute();
 			
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
 				$list=array(0=>'Ex',1=>'<option value="0">---</option>');
-				while ($a = $STH->fetch()){
+				do{
 					$list[]='<option value="'.$a['id'].'">'.$a['name'].'</option>';
-				}
+				}while ($a = $STH->fetch());
+				
 				echo json_encode($list);
 			}
 			else
@@ -801,73 +699,56 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='delete_files'){//Add PDO
+	else if(isset($_POST['act']) && $_POST['act']=='delete_files'){//check
 		$from=$_POST['from']." 00:00:00";
 		$to=$_POST['to']." 23:59:59";
-		$query = "SELECT enc,message_id FROM ".$SupportUploadTable." WHERE `upload_date` BETWEEN ? AND ? ";
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
-			if($prepared = $stmt->prepare($query)){
-				if($stmt->bind_param('ss', $from,$to)){
-					if($stmt->execute()){
-						$stmt->store_result();
-						$result = $stmt->bind_result($mustang,$mush);
-						if($stmt->num_rows>0){
-							$path='../upload/';
-							$list=array();
-							while (mysqli_stmt_fetch($stmt)) {
-								if(file_exists($path.$mustang)){
-									file_put_contents($path.$mustang,'');
-									unlink($path.$mustang);
-									$list[]=$mush;
-								}
-							}
-							$query = "DELETE FROM ".$SupportUploadTable." WHERE `upload_date` BETWEEN ? AND ?";
-							if($stmt->prepare($query)){
-								if($stmt->bind_param('ss', $from,$to)){
-									if($stmt->execute()){
-										$c=count($list);
-										$list=implode(',',$list);
-										$query = "UPDATE ".$SupportMessagesTable." SET attachment='0' WHERE id IN (?) LIMIT ?";
-										if($stmt->prepare($query)){
-											if($stmt->bind_param('si', $list,$c)){
-												if($stmt->execute()){
-													echo json_encode(array(0=>'Deleted'));
-												}
-												else
-													echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-											}
-											else
-												echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-										}
-										else
-											echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-									}
-									else
-										echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						else
-							echo json_encode(array(0=>'There is no Uploaded Files inside this period'));
+		
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			
+			$query = "SELECT enc,message_id FROM ".$SupportUploadTable." WHERE `upload_date` BETWEEN ? AND ? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$from,PDO::PARAM_STR);
+			$STH->bindParam(2,$to,PDO::PARAM_STR);
+			$STH->execute();
+			
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				$path='../upload/';
+				$list=array();
+				do{
+					if(file_exists($path.$a['enc'])){
+						file_put_contents($path.$a['enc'],'');
+						unlink($path.$a['enc']);
+						$list[]=$a['message_id'];
 					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				}while ($a = $STH->fetch());
+				
+				$query = "DELETE FROM ".$SupportUploadTable." WHERE `upload_date` BETWEEN ? AND ?";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$from,PDO::PARAM_STR);
+				$STH->bindParam(2,$to,PDO::PARAM_STR);
+				$STH->execute();
+				
+				$c=count($list);
+				$list=implode(',',$list);
+				
+				$query = "UPDATE ".$SupportMessagesTable." SET attachment='0' WHERE id IN (".$list.") LIMIT ?";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$c,PDO::PARAM_INT);
+				$STH->execute();
+				
+				echo json_encode(array(0=>'Deleted'));
 			}
 			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				echo json_encode(array(0=>'There is no Uploaded Files inside this period'));
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
 		exit();
 	}
 	
@@ -880,12 +761,13 @@ else{
 			$STH = $DBH->prepare($query);
 			$STH->execute();
 			
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$list=array('response'=>'ret','faq'=>array());
-			if(!empty($r)){
-				while ($a = $STH->fetch()){
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$list['faq'][]=array('id'=>$a['id']-14,'question'=>$a['question'],'position'=>$a['position'],'active'=>$a['ac'],'rate'=>$a['rat']);
-				}
+				}while ($a = $STH->fetch());
 			}
 			echo json_encode($list);
 		}
@@ -902,52 +784,46 @@ else{
 		$answer=(preg_replace('/\s+/','',$_POST['answer'])!='')? preg_replace('/\s+/',' ',$_POST['answer']):exit();
 		$pos=(is_numeric($_POST['pos']))? $_POST['pos']:NULL;
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
-		
-		$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-		$stmt = $mysqli->stmt_init();	
-		if($stmt){
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			
 			$query = "INSERT INTO ".$SupportFaqTable." (`question`,`answer`,`active`,`position`) 
 						VALUES (?,?,?,CASE WHEN ? IS NULL THEN (IF ((SELECT MAX(c.position) FROM ".$SupportFaqTable." c ) IS NOT NULL,(SELECT MAX(d.position) FROM ".$SupportFaqTable." d )+1,0)) ELSE ? END)";
-			$prepared = $stmt->prepare($query);
-			if($prepared){
-				if($stmt->bind_param('sssii', $question,$answer,$active,$pos,$pos)){
-					if($stmt->execute()){
-						$data=array();
-						$data['response']='Added';
-						$dpid=$stmt->insert_id;
-						$active=((int)$active==0) ? 'No':'Yes';
-						$data['information']=array('id'=>$dpid,'question'=>$question,'position'=>$pos,'active'=>$active);
-						if($pos==NULL){
-							
-							$query = "SELECT `position` FROM ".$SupportFaqTable." WHERE `id`='".$dpid."' LIMIT 1";
-							$prepared = $stmt->prepare($query);
-							if($prepared){
-								if($stmt->execute()){
-									$stmt->store_result();
-									$result = $stmt->bind_result($p);
-									while (mysqli_stmt_fetch($stmt))
-										$data['information']['position']=$p;
-								}
-								else
-									echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-							}
-							else
-								echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-						}
-						echo json_encode($data);
-					}
-					else
-						echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+				
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$question,PDO::PARAM_STR);
+			$STH->bindParam(2,$answer,PDO::PARAM_STR);
+			$STH->bindParam(3,$active,PDO::PARAM_STR);
+			$STH->bindParam(4,$pos,PDO::PARAM_INT);
+			$STH->bindParam(5,$pos,PDO::PARAM_INT);
+			$STH->execute();
+
+			$data=array('response'=>'Added');
+								
+			$dpid=$DBH->lastInsertId();
+			$active=((int)$active==0) ? 'No':'Yes';
+			$data['information']=array('id'=>$dpid,'question'=>$question,'position'=>$pos,'active'=>$active);
+		
+			if($pos==NULL){
+				$query = "SELECT `position` FROM ".$SupportFaqTable." WHERE `id`='".$dpid."' LIMIT 1";
+				$STH = $DBH->prepare($query);
+				$STH->execute();
+				$STH->setFetchMode(PDO::FETCH_ASSOC);
+				$a = $STH->fetch();
+				if(!empty($a)){
+					do{
+						$data['information']['position']=$a['position'];
+					}while ($a = $STH->fetch());
 				}
-				else
-					echo json_encode(array(0=>mysqli_stmt_error($stmt)));
 			}
-			else
-				echo json_encode(array(0=>mysqli_stmt_error($stmt)));
+			echo json_encode($data);
 		}
-		else
-			echo json_encode(array(0=>mysqli_stmt_error($stmt)));
-		$mysqli->close();
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
+		
 		exit();
 	}
 	
@@ -993,11 +869,12 @@ else{
 					$STH = $DBH->prepare($query);
 					$STH->execute();
 					
-					$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-					if(!empty($r)){
-						while ($a = $STH->fetch()){
+					$STH->setFetchMode(PDO::FETCH_ASSOC);
+					$a = $STH->fetch();
+					if(!empty($a)){
+						do{
 							$pos=$a['rpos'];
-						}
+						}while ($a = $STH->fetch());
 					}
 				}
 				catch(PDOException $e){
@@ -1038,12 +915,13 @@ else{
 			$STH->bindParam(1,$cs,PDO::PARAM_INT);
 			$STH->execute();
 			
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$list=array(0=>'ret');
-			if(!empty($r)){
-				while ($a = $STH->fetch()){
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$list[]=html_entity_decode($a['answer']);
-				}
+				}while ($a = $STH->fetch());
 			}
 			echo json_encode($list);
 		}
@@ -1096,16 +974,17 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-				$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable;
-			$prepared = $stmt->prepare($query);
+			
+			$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable;
 			$STH = $DBH->prepare($query);
 			$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
 				$b=array();
-				while ($a = $STH->fetch()){
+				do{
 					$b[$a['id']]=$a['department_name'];
-				}
+				}while ($a = $STH->fetch());
 				return json_encode($b);
 			}
 		}
@@ -1115,8 +994,9 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 	}
 }
 
-function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){// Add PDO, Switch SESSION with return
-	$query = "SELECT *
+function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable,$dep,$nope){
+	$query = "SELECT 
+				id
 				FROM(
 						(SELECT b.id  
 							FROM ".$SupportUserTable." b
@@ -1131,31 +1011,29 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 						ORDER BY assigned_tickets,solved_tickets ASC LIMIT 1)
 					) tab
 				LIMIT 1";
-
-	$mysqli = new mysqli($Hostname, $Username, $Password, $DatabaseName);
-	$stmt = $mysqli->stmt_init();
-	$prepared = $stmt->prepare($query);
-	if($prepared){
-		if($stmt->bind_param('i', $dep)){
-			if($stmt->execute()){
-				$stmt->store_result();
-				$operator=array();
-				$result = $stmt->bind_result($camaro);
-				if($stmt->num_rows>0){
-					while (mysqli_stmt_fetch($stmt))
-						$selopid=$camaro;
-					return $selopid;
-				}
-				else
-					return 'No Operator Available';
-			}
-			else
-				return mysqli_stmt_error($stmt);
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+	
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$dep,PDO::PARAM_INT);
+		$STH->execute();
+		
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			do{
+				$selopid=$a['id'];
+			}while ($a = $STH->fetch());
+			return $selopid;
 		}
 		else
-			return mysqli_stmt_error($stmt);
+			return 'No Operator Available';
+
 	}
-	else
-		return mysqli_stmt_error($stmt);
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		return 'An Error has occurred, please read the PDOErrors file and contact a programmer';
+	}
 }
 ?>
