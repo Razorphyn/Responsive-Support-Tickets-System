@@ -146,9 +146,10 @@ else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='l
 		$STH->bindParam(1,$viper,PDO::PARAM_STR);
 		$STH->bindParam(2,$pass,PDO::PARAM_STR);
 		$STH->execute();
-		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-		if(!empty($r)){
-			while ($a = $STH->fetch()){
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			do{
 				$_SESSION['time']=time();
 				$_SESSION['id']=$a['id'];
 				$_SESSION['name']=$a['name'];
@@ -156,7 +157,7 @@ else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='l
 				$_SESSION['status']=$a['status'];
 				$_SESSION['mail_alert']=$a['mail_alert'];
 				$_SESSION['ip']=retrive_ip();
-			}
+			}while ($a = $STH->fetch());
 			echo json_encode(array(0=>'Logged'));
 		}
 		else
@@ -195,15 +196,16 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
 		$STH->execute();
-		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-		if(!empty($r)){
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
 			$path='../upload/';
-			while ($a = $STH->fetch()){
+			do{
 				if(file_exists($path.$a['enc'])){
 					file_put_contents($path.$a['enc'],'');
 					unlink($path.$a['enc']);
 				}
-			}
+			}while ($a = $STH->fetch());
 			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
@@ -246,16 +248,17 @@ else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$key,PDO::PARAM_STR,60);
 			$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
 				$path='../upload/';
-				while ($a = $STH->fetch()){
+				do{
 					$_SESSION['id']=$a['id'];
 					$_SESSION['name']=$a['name'];
 					$_SESSION['mail']=$a['mail'];
 					$_SESSION['mail_alert']=$a['mail_alert'];
 					$_SESSION['ip']=retrive_ip();
-				}
+				}while ($a = $STH->fetch());
 
 				$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key='' WHERE `id`=?";
 				$STH = $DBH->prepare($query);
@@ -288,9 +291,10 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(1,$_SESSION['mail'],PDO::PARAM_STR);
 			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
-				while ($a = $STH->fetch()){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					if($st!=$_SESSION['status']){
 						$_SESSION['status']=$st;
 						echo json_encode(array(0=>"Load"));
@@ -299,7 +303,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 						$_SESSION['cktime']=time();
 						echo json_encode(array(0=>'Time'));
 					}
-				}
+				}while ($a = $STH->fetch());
 			}
 			else
 				echo json_encode(array(0=>'Wrong Credentials'));
@@ -325,10 +329,12 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 		$STH->bindParam(1,$viper,PDO::PARAM_STR);
 		$STH->bindParam(2,$mustang,PDO::PARAM_STR);
 		$STH->execute();
-		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-		if(!empty($r)){
-			while ($a = $STH->fetch())
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			do{
 				$camaro=$a['id'];
+			}while ($a = $STH->fetch());
 			$query = "UPDATE ".$SupportUserTable." SET tmp_password=? WHERE id=?";
 			$STH = $DBH->prepare($query);
 			$rands=uniqid(hash('sha256',get_random_string(60)),true);
@@ -634,16 +640,19 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$STH->bindParam(1,$viper,PDO::PARAM_STR);
 		$STH->bindParam(2,$pass,PDO::PARAM_STR);
 		$STH->execute();
-		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-		if(!empty($r)){
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
 			$dn=array('response'=>'ret','information'=>array());
 			if($_POST['sect']=='new'){
-				while ($a = $STH->fetch())
+				do{
 					$dn['information'][]="<option value='".$a['id']."'>".$a['department_name']."</option>";
+				}while ($a = $STH->fetch());
 			}
 			else if($_POST['sect']=='admin' && $_SESSION['status']==2){
-				while ($a = $STH->fetch())
+				do{
 					$dn['information'][]=array('id'=>$$a['id'],'name'=>$a['department_name'],'active'=>$$a['active'],'public'=>$a['public']);
+				}while ($a = $STH->fetch());
 			}
 			echo json_encode($dn);
 		}
@@ -683,10 +692,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			$STH = $DBH->prepare($query);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array()));
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
-				while ($a = $STH->fetch())
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+				}while ($a = $STH->fetch());
 			}
 		}
 		else if($_SESSION['status']==1){
@@ -711,14 +722,15 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			$STH = $DBH->prepare($query);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array()));
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
-				while ($a = $STH->fetch()){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					if($opid==$_SESSION['id'])
 						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else
 						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
-				}
+				}while ($a = $STH->fetch());
 			}
 		}
 		else if($_SESSION['status']==2){
@@ -744,16 +756,17 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			$STH = $DBH->prepare($query);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array(),'admin'=>array()));
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
-				while ($a = $STH->fetch()){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					if($a['operator_id']==$_SESSION['id'])
 						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else if($a['user_id']==$_SESSION['id'])
 						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else
 						$list['tickets']['admin'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
-				}
+				}while ($a = $STH->fetch());
 			}
 		}
 		if(isset($list))
@@ -789,17 +802,18 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_SESSION[$encid]['id'],PDO::PARAM_STR);
 			$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
 				$ret=array('ret'=>'Entry','messages'=>array());
 				$messageid=array();
 				$count=0;
-				while ($a = $STH->fetch()){
+				do{
 					$ret['messages'][$msid]=array($a['name'],$a['message'],$a['created_time']);
 					if($a['attachment']==1)
 						$messageid[]=$a['id'];
 					$count++;
-				}
+				}while ($a = $STH->fetch());
 				if(count($messageid)>0){
 					$messageid=implode(',',$messageid);
 					try{
@@ -808,10 +822,12 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 						$STH->bindParam(1,$viper,PDO::PARAM_STR);
 						$STH->bindParam(2,$pass,PDO::PARAM_STR);
 						$STH->execute();
-						$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-						if(!empty($r)){
-							while ($a = $STH->fetch())
+						$STH->setFetchMode(PDO::FETCH_ASSOC);
+						$a = $STH->fetch();
+						if(!empty($a)){
+							do{
 								$ret['messages'][$a['message_id']][]='<div class="row-fluid"><div class="span2 offset2"><form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.$a['name'].'"></form></div></div>';
+							}while ($a = $STH->fetch());
 						}
 					}
 					catch(PDOException $e){
@@ -851,11 +867,13 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$opass,PDO::PARAM_STR);
 			$STH->execute();	
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-			if(!empty($r)){
-				while ($a = $STH->fetch()){
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$camaroret=$a['id'];
-				}
+				}while ($a = $STH->fetch());
+				
 				if($camaroret==$_SESSION['id']){
 					$pass=hash("whirlpool",crypt($_POST['nldpwd'],'$#%H4!df84a$%#RZ@£'));
 					$query = "UPDATE ".$SupportUserTable." SET `name`=?, `mail`=?, `mail_alert`=?, `password`=? WHERE id=".$_SESSION['id'];
@@ -1141,10 +1159,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
 		$STH->execute();
-		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-		if(!empty($r)){
-			while ($a = $STH->fetch())
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			do{
 				$_SESSION[$encid]['status']=$a['ticket_status'];
+			}while ($a = $STH->fetch());
 		}
 		echo json_encode(array(0=>'Saved'));
 	}
@@ -1273,9 +1293,10 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
 		$STH->bindParam(2,$file,PDO::PARAM_STR);
 		$STH->execute();
-		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-		if(!empty($r)){
-			while($a=$STH->fetch()){
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a=$STH->fetch();
+		if(!empty($a)){
+			do{
 				$enc='../upload/'.$file;
 				if(DecryptFile($enc)){
 					$mime=retrive_mime($enc,$a['name']);
@@ -1292,7 +1313,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 					else
 						echo '<script>parent.noty({text: "Can\'t retrive Content-Type",type:"error",timeout:9000});</script>';
 				}
-			}
+			}while($a=$STH->fetch());
 		}
 		else
 			echo '<script>parent.noty({text: "No matches",type:"error",timeout:9000});</script>';
@@ -1630,11 +1651,13 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 				$STH->bindParam($i+1,$merge[$i]['val'],$merge[$i]['type']);
 			}
 			$STH->execute();
-			$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$list=array('response'=>'ret','search'=>array());
-			if(!empty($r)){
-				while ($a = $STH->fetch())
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
 					$list['search'][]=array('id'=>$a['enc_id'],'dname'=>$a['department_name'],'opname'=>$a['name'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+				}while ($a = $STH->fetch());
 			}
 			echo json_encode($list);
 	}
@@ -1727,18 +1750,21 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$dep,PDO::PARAM_INT);
 		$STH->execute();
-		$r=$STH->setFetchMode(PDO::FETCH_ASSOC);
-		if(!empty($r)){
-			while ($a = $STH->fetch()){
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			do{
 				return $a['id'];
 			}
+			while ($a = $STH->fetch());
 		}
 		else
 			return 'No Operator Available';
 	}
 	catch(PDOException $e){
-		return $e->getMessage();
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
+		return $e->getMessage();
 	}
 }
 
