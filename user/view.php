@@ -573,7 +573,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 	});
 	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	
-	function post_reply(c, a, d, b) { 
+	function post_reply(mess, dat, name, up) {
 		<?php if(!$isMob){ ?> 
 			CKEDITOR.instances.message.setData(''); 
 		<?php } else { ?> 
@@ -584,14 +584,19 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		});
 		$(".attlist").append("<div class='row-fluid uploadfilebox'></div>");
 		tail = [];
-		$("#messages").children(".row-fluid:first").hasClass("oddmessage") ? tail.push('<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + d + '</p><p class="date">' + a + '</p></div><div class="span8 messagecell">' + c + "</div></div>") : tail.push('<div class="row-fluid oddmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + d + '</p><p class="date">' + a + '</p></div><div class="span8 messagecell">' + c + "</div></div>");
-		if (null != b)
-			for (c = b.length, tail.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">'), a = 0; a < c; a++) tail.push("<form class='download_form' method='POST' action='../php/function.php' target='hidden_upload' enctype='multipart/form-data'><input type='hidden' name='ticket_id' value='" + b[a][0] + "'/><input type='hidden' name='file_download' value='" + b[a][1] + "'/><input type='submit' class='btn btn-link download' value='" + b[a][2] + "'></form>"), tail.push("</div></div>");
+		$("#messages").children(".row-fluid:first").hasClass("oddmessage") ? tail.push('<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p></div><div class="span8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row-fluid oddmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p></div><div class="span8 messagecell">' + mess + "</div></div>");
+		if (null != up){
+			tail.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">');
+			var count= up.length;
+			for (i=0; i < count; i++) 
+				tail.push("<form class='download_form' method='POST' action='../php/function.php' target='hidden_upload' enctype='multipart/form-data'><input type='hidden' name='ticket_id' value='" + up[i][0] + "'/><input type='hidden' name='file_download' value='" + up[i][1] + "'/><input type='submit' class='btn btn-link download' value='" + up[i][2] + "'></form>");
+			tail.push("</div></div>");
+		}
 		tail.push("</div>");
 		$(".newest").remove();
 		$("#messages").children(".row-fluid:first").before(tail.join(""));
 		add++
-	};
+	}
 	</script>
   </body>
 </html>
