@@ -171,7 +171,7 @@ if(isset($smailpassword)){
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpsec'>SSL/TLS</label></div>
-								<div class='span4'><select id='stmpsec' ><option value='0'>No</option><option value='1'>Yes</option></select></div>
+								<div class='span4'><select id='stmpsec' ><option value='0'>No</option><option value='1'>SSL</option><option value='2'>TLS</option></select></div>
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpaut'>Authentication</label></div>

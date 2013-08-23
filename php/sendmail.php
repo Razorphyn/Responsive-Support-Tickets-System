@@ -155,6 +155,8 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 									$transport = Swift_SmtpTransport::newInstance($settingmail,$smailport);
 								else if($smailssl==1)
 									$transport = Swift_SmtpTransport::newInstance($settingmail,$smailport,'ssl');
+								else if($smailssl==2)
+									$transport = Swift_SmtpTransport::newInstance($settingmail,$smailport,'tls');
 								else
 									exit();
 								if($smailauth==1){
