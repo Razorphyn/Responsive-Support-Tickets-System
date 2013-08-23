@@ -34,8 +34,16 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']!=2 || !isset($_SESSIO
 include_once '../php/mobileESP.php';
 $uagent_obj = new uagent_info();
 $isMob=$uagent_obj->DetectMobileQuick();
+if(is_file('../php/config/mail/stmp.txt')){
+	$stmp=file('../php/config/mail/stmp.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+	$string='<?php'."\n".'$smailservice='.$stmp[0].";\n".'$smailname=\''.$stmp[1]."';\n".'$settingmail=\''.$stmp[2]."';\n".'$smailhost=\''.$stmp[3]."';\n".'$smailport='.$stmp[4].";\n".'$smailssl='.$stmp[5].";\n".'$smailauth='.$stmp[6].";\n".'$smailuser=\''.$stmp[7]."';\n".'$smailpassword=\''.$stmp[8]."';\n ?>";
+	file_put_contents('../php/config/mail/stmp.php',$string);
+	file_put_contents('../php/config/mail/stmp.txt','');
+	unlink('../php/config/mail/stmp.txt');
+}
+
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
-if(is_file('../php/config/mail/stmp.txt')) $stmp=file('../php/config/mail/stmp.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+if(is_file('../php/config/mail/stmp.php')) include_once('../php/config/mail/stmp.php');
 
 if(is_file('../php/config/mail/newuser.txt')) $nu=file('../php/config/mail/newuser.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 if(is_file('../php/config/mail/newreply.txt')) $nr=file('../php/config/mail/newreply.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -47,15 +55,15 @@ $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 
-if(isset($stmp[8])){
+if(isset($smailpassword)){
 	$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
-	$stmp[8]=str_split($stmp[8]);
-	$c=count($stmp[8]);
+	$smailpassword=str_split($smailpassword);
+	$c=count($smailpassword);
 	for($i=0;$i<$c;$i++){
-		if(array_key_exists($stmp[8][$i],$crypttable))
-			$stmp[8][$i]=$crypttable[$crypttable[$stmp[8][$i]]];
+		if(array_key_exists($smailpassword[$i],$crypttable))
+			$smailpassword[$i]=$crypttable[$crypttable[$smailpassword[$i]]];
 	}
-	$stmp[8]=implode('',$stmp[8]);
+	$smailpassword=implode('',$smailpassword);
 }					
 ?>
 <!DOCTYPE html>
@@ -151,15 +159,15 @@ if(isset($stmp[8])){
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpname'>Name</label></div>
-								<div class='span4'><input id='stmpname' type='text' value='<?php if(isset($stmp[1])) echo $stmp[1];?>' required/></div>
+								<div class='span4'><input id='stmpname' type='text' value='<?php if(isset($smailname)) echo $smailname;?>' required/></div>
 								<div class='span2'><label for='stmpmail'>Mail Address</label></div>
-								<div class='span4'><input id='stmpmail' type='email' value='<?php if(isset($stmp[2])) echo $stmp[2]; ?>' required /></div>
+								<div class='span4'><input id='stmpmail' type='email' value='<?php if(isset($settingmail)) echo $settingmail; ?>' required /></div>
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmphost'>Hostname</label></div>
-								<div class='span4'><input id='stmphost' type='text' value='<?php if(isset($stmp[3])) echo $stmp[3]; ?>' /></div>
+								<div class='span4'><input id='stmphost' type='text' value='<?php if(isset($smailhost)) echo $smailhost; ?>' /></div>
 								<div class='span2'><label for='stmpport'>Port</label></div>
-								<div class='span4'><input id='stmpport' type='text' value='<?php if(isset($stmp[4])) echo $stmp[4]; ?>' /></div>
+								<div class='span4'><input id='stmpport' type='text' value='<?php if(isset($smailport)) echo $smailport; ?>' /></div>
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpsec'>SSL/TLS</label></div>
@@ -171,9 +179,9 @@ if(isset($stmp[8])){
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpusr'>Username</label></div>
-								<div class='span4'><input id='stmpusr' type='text' value='<?php if(isset($stmp[7])) echo $stmp[7]; ?>' /></div>
+								<div class='span4'><input id='stmpusr' type='text' value='<?php if(isset($smailuser)) echo $smailuser; ?>' /></div>
 								<div class='span2'><label for='stmppas'>Password</label></div>
-								<div class='span4'><input id='stmppas' type='password' value='<?php if(isset($stmp[8])) echo $stmp[8]; ?>' /></div>
+								<div class='span4'><input id='stmppas' type='password' value='<?php if(isset($smailpassword)) echo $smailpassword; ?>' /></div>
 						</div>
 						<br/>
 						<input type='submit' id='savestmp' onclick='javascript:return false;' value='Save' class='btn btn-success'/>
@@ -307,7 +315,13 @@ if(isset($stmp[8])){
 			
 			if(""!=subject.replace(/\s+/g,"")&&""!=message.replace(/\s+/g,"")){var request=$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"save_mail_body",sec:sec,sub:subject,message:message},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}});request.fail(function(a,b){noty({text:"Request Error:"+b,type:"error",timeout:9E3})})}else noty({text:"Empty Field",type:"error",timeout:9E3});return !1;
 		});
-		
+		<?php if(isset($stmpserv)){ ?>
+			$('#stmpsec').val(<?php echo $stmpserv; ?>);
+		<?php }if(isset($smailssl)){ ?>
+			$('#stmpsec').val(<?php echo $smailssl; ?>);
+		<?php } if(isset($smailauth)){ ?>
+			$('#stmpaut').val(<?php echo $smailauth; ?>);
+		<?php } ?>
 		$("#savestmp").click(function(){var a=$("#stmpserv").val(),c=$("#stmpname").val(),d=$("#stmphost").val(),e=$("#stmpport").val(),f=$("#stmpsec > option:selected").val(),g=$("#stmpmail").val(),h=$("#stmpaut > option:selected").val(),k=$("#stmpusr").val(),l=$("#stmppas").val();$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"save_stmp",serv:a,name:c,host:d,port:e,ssl:f,mail:g,auth:h,usr:k,pass:l},dataType:"json",success:function(b){"Saved"==b[0]?noty({text:"STMP Information Saved",type:"success", timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})});
 		
 		$(document).on("change","#stmpaut",function(){1==$("#stmpaut > option:checked").val()?($("#stmpusr").attr("required","required"),$("#stmppas").attr("required","required")):($("#stmpusr").removeAttr("required"),$("#stmppas").removeAttr("required"))});

@@ -261,7 +261,10 @@ else{
 	}
 
 	else if(isset($_POST['act'])  && $_POST['act']=='save_stmp'){
-		
+		if(is_file('config/mail/stmp.txt')){
+			file_put_contents('config/mail/stmp.txt','');
+			unlink('config/mail/stmp.txt');
+		}
 		$serv=(is_numeric($_POST['serv'])) ? $_POST['serv']:exit();
 		$mustang=(string)$_POST['name'];
 		$viper=(string)$_POST['mail'];
@@ -282,7 +285,8 @@ else{
 			}
 			$pass=implode('',$pass);
 		}
-		if(file_put_contents('config/mail/stmp.txt',$serv."\n".$mustang."\n".$viper."\n".$host."\n".$port."\n".$ssl."\n".$auth."\n".$usr."\n".$pass))
+		$string='<?php $smailservice='.$serv.";\n".'$smailname=\''.$mustang."';\n".'$settingmail=\''.$viper."';\n".'$smailhost=\''.$host."';\n".'$smailport='.$port.";\n".'$smailssl='.$ssl.";\n".'$smailauth='.$auth.";\n".'$smailuser=\''.$mustang."';\n".'$smailpassword=\''.$mustang."';\n ?>";
+		if(file_put_contents('config/mail/stmp.php',$string))
 			echo json_encode(array(0=>'Saved'));
 		else
 			echo json_encode(array(0=>'Error'));

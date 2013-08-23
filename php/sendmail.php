@@ -17,9 +17,15 @@
 if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 	include_once '../php/config/database.php';
 	require_once '../Swift/lib/swift_required.php';
-	
+	if(is_file('../php/config/mail/stmp.txt')){
+		$stmp=file('../php/config/mail/stmp.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+		$string='<?php'."\n".'$smailservice='.$stmp[0].";\n".'$smailname=\''.$stmp[1]."';\n".'$settingmail=\''.$stmp[2]."';\n".'$smailhost=\''.$stmp[3]."';\n".'$smailport='.$stmp[4].";\n".'$smailssl='.$stmp[5].";\n".'$smailauth='.$stmp[6].";\n".'$smailuser=\''.$stmp[7]."';\n".'$smailpassword=\''.$stmp[8]."';\n ?>";
+		file_put_contents('../php/config/mail/stmp.php',$string);
+		file_put_contents('../php/config/mail/stmp.txt','');
+		unlink('../php/config/mail/stmp.txt');
+	}
 	if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
-	if(is_file('../php/config/mail/stmp.txt')) $stmp=file('../php/config/mail/stmp.txt',FILE_IGNORE_NEW_LINES);else exit();
+	if(is_file('../php/config/mail/stmp.php')) include_once('../php/config/mail/stmp.php');
 	
 	switch ($argv[1]){
 		case 'NewMem':
@@ -133,8 +139,8 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 							$plain=convert_html_to_text(str_replace('&','&amp;',str_replace('&nbsp;',' ',$file[1])));
 							//Send Mail
 							$message = Swift_Message::newInstance();
-							$message->setFrom($stmp[2]);
-							$message->setReplyTo($stmp[2]);
+							$message->setFrom($settingmail);
+							$message->setReplyTo($settingmail);
 							$message->setSubject($file[0]);
 							$message->setContentType("text/plain; charset=UTF-8");
 							$message->setBody($plain,'text/plain');						
@@ -142,27 +148,30 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 							
 							$message->setTo($gnmail);
 
-							if($stmp[0]==0)
+							if($smailservice==0)
 								$transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -t');
-							else if($stmp[0]==1){
-								if($stmp[5]==0)
-									$transport = Swift_SmtpTransport::newInstance($stmp[2],$stmp[4]);
+							else if($smailservice==1){
+								if($smailssl==0)
+									$transport = Swift_SmtpTransport::newInstance($settingmail,$smailport);
+								else if($smailssl==1)
+									$transport = Swift_SmtpTransport::newInstance($settingmail,$smailport,'ssl');
 								else
-									$transport = Swift_SmtpTransport::newInstance($stmp[2],$stmp[4],'ssl');
-
-								if($stmp[6]==1){
-									$transport->setUsername($stmp[7]);
+									exit();
+								if($smailauth==1){
+									$transport->setUsername($smailuser);
 									$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
-									$stmp[8]=str_split(html_entity_decode($stmp[8], ENT_QUOTES, 'UTF-8'));
-									$c=count($stmp[8]);
+									$smailpassword=str_split($smailpassword, ENT_QUOTES, 'UTF-8');
+									$c=count($smailpassword);
 									for($i=0;$i<$c;$i++){
-										if(array_key_exists($stmp[8][$i],$crypttable))
-											$stmp[8][$i]=$crypttable[$crypttable[$stmp[8][$i]]];
+										if(array_key_exists($smailpassword[$i],$crypttable))
+											$smailpassword[$i]=$crypttable[$crypttable[$smailpassword[$i]]];
 									}
-									$stmp[8]=htmlentities(implode('',$stmp[8]),ENT_QUOTES,'UTF-8');
-									$transport->setPassword($stmp[8]);
+									$smailpassword=implode('',$smailpassword);
+									$transport->setPassword($smailpassword);
 								}
 							}
+							else
+								exit();
 
 							$gnmailer = Swift_Mailer::newInstance($transport);
 

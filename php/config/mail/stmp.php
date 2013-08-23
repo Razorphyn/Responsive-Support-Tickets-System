@@ -1,0 +1,11 @@
+<?php
+$smailservice=0;
+$smailname='Primary';
+$settingmail='ukkikku@alice.it';
+$smailhost='google.com';
+$smailport=25;
+$smailssl=0;
+$smailauth=0;
+$smailuser='Pippo';
+$smailpassword='YX93L';
+ ?>
