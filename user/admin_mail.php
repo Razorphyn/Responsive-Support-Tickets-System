@@ -285,7 +285,15 @@ if(isset($smailpassword)){
 		<?php }else { ?>
 			$("#newmememess").wysihtml5(),$("#newreplymess").wysihtml5(),$("#newticketmess").wysihtml5(),$("#assignedmess").wysihtml5(),$("#forgotmess").wysihtml5();
 		<?php } ?>
-
+		
+		<?php if(isset($stmpserv)){ ?>
+			$('#stmpsec').val(<?php echo $stmpserv; ?>);
+		<?php }if(isset($smailssl)){ ?>
+			$('#stmpsec').val(<?php echo $smailssl; ?>);
+		<?php } if(isset($smailauth)){ ?>
+			$('#stmpaut').val(<?php echo $smailauth; ?>);
+		<?php } ?>
+		
 		$(document).on('click','.submailbody',function(){
 			var subject=$(this).parent().find(".mailsubject").val().replace(/\s+/g," ");
 			<?php if(!$isMob) { ?>
@@ -315,13 +323,7 @@ if(isset($smailpassword)){
 			
 			if(""!=subject.replace(/\s+/g,"")&&""!=message.replace(/\s+/g,"")){var request=$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"save_mail_body",sec:sec,sub:subject,message:message},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}});request.fail(function(a,b){noty({text:"Request Error:"+b,type:"error",timeout:9E3})})}else noty({text:"Empty Field",type:"error",timeout:9E3});return !1;
 		});
-		<?php if(isset($stmpserv)){ ?>
-			$('#stmpsec').val(<?php echo $stmpserv; ?>);
-		<?php }if(isset($smailssl)){ ?>
-			$('#stmpsec').val(<?php echo $smailssl; ?>);
-		<?php } if(isset($smailauth)){ ?>
-			$('#stmpaut').val(<?php echo $smailauth; ?>);
-		<?php } ?>
+		
 		$("#savestmp").click(function(){var a=$("#stmpserv").val(),c=$("#stmpname").val(),d=$("#stmphost").val(),e=$("#stmpport").val(),f=$("#stmpsec > option:selected").val(),g=$("#stmpmail").val(),h=$("#stmpaut > option:selected").val(),k=$("#stmpusr").val(),l=$("#stmppas").val();$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"save_stmp",serv:a,name:c,host:d,port:e,ssl:f,mail:g,auth:h,usr:k,pass:l},dataType:"json",success:function(b){"Saved"==b[0]?noty({text:"STMP Information Saved",type:"success", timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})});
 		
 		$(document).on("change","#stmpaut",function(){1==$("#stmpaut > option:checked").val()?($("#stmpusr").attr("required","required"),$("#stmppas").attr("required","required")):($("#stmpusr").removeAttr("required"),$("#stmppas").removeAttr("required"))});

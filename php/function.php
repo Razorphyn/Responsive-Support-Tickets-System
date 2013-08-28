@@ -57,9 +57,11 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 
 if(isset($_POST['act']) && $_POST['act']=='register'){//check
 	if($_POST['pwd']==$_POST['rpwd']){
-		$mustang=(preg_replace('/\s+/','',$_POST['name'])!='') ? (string)$_POST['name']:exit();
-		$viper= preg_replace('/\s+/','',$_POST['mail']);
-		$viper=($viper!='') ? $viper:exit();
+		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='') ? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
+		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
+		$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+		$pass= trim(preg_replace('/\s+/','',$_POST['pwd']));
+		$pass=($pass!='') ? $pass:exit();
 		$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -136,8 +138,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='login'){
-	$viper=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
+	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
+	$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+	$pass= trim(preg_replace('/\s+/','',$_POST['pwd']));
+	$pass=($pass!='') ? $pass:exit();
 	$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
+
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -172,7 +178,7 @@ else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='l
 }
 
 else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_ticket'){
-	$encid=preg_replace('/\s+/','',$_POST['enc']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['enc']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -234,7 +240,7 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 }
 	
 else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate_account'){//check
-	$key=preg_replace('/\s+/','',$_POST['key']);
+	$key=trim(preg_replace('/\s+/','',$_POST['key']));
 	if(60!=strlen($key)){
 		echo json_encode(array(0=>'Invalid Key'));
 		exit();
@@ -318,8 +324,10 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
-	$viper=$_POST['mail'];
-	$mustang=$_POST['name'];
+	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
+	$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+	$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
+
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -365,8 +373,10 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 else if(isset($_POST['act']) && $_POST['act']=='reset_password'){//check
 	$npwd=(string)$_POST['npass'];
 	$rpwd=(string)$_POST['rnpass'];
-	$rmail=(string)$_POST['rmail'];
-	if(preg_replace('/\s+/','',$rpwd)!='' && $rpwd==$npwd){
+	$rmail= trim(preg_replace('/\s+/','',$_POST['rmail']));
+	$rmail=($rmail!='' && filter_var($rmail, FILTER_VALIDATE_EMAIL)) ? $rmail:exit();
+
+	if(trim(preg_replace('/\s+/','',$rpwd))!='' && $rpwd==$npwd){
 		$pass=hash('whirlpool',crypt($rpwd,'$#%H4!df84a$%#RZ@£'));
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -403,31 +413,31 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='lo
 else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['createtk']=='Create New Ticket'){
 	$letarr=array('M','d','C','f','K','w','p','T','B','X');
 	$error=array();
-	if(preg_replace('/\s+/','',strip_tags($_POST['message']))!='')
-		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
+	if(trim(preg_replace('/\s+/','',strip_tags($_POST['message'])))!='')
+		$message=trim(preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message'])));
 	else
 		$error[]='Empty Message';
 
-	if(preg_replace('/\s+/','',$_POST['title'])!='')
-		$tit=preg_replace('/\s+/',' ',$_POST['title']);
+	if(trim(preg_replace('/\s+/','',$_POST['title']))!='')
+		$tit=trim(preg_replace('/\s+/',' ',$_POST['title']));
 	else
 		$error[]='Empty Title';
 		
 	if(is_numeric($_POST['dep']))
-		$dep=(int)$_POST['dep'];
+		$dep=(int)trim($_POST['dep']);
 	else
-		$error[]='Error ';
+		$error[]='Error Department';
 
 	if(is_numeric($_POST['priority']))
-		$prio=$_POST['priority'];
+		$prio=trim($_POST['priority']);
 	else
 		$error[]='Error ';
 
 	if(!isset($error[0])){
-		$wsurl=(preg_replace('/\s+/','',$_POST['wsurl'])!='')? preg_replace('/\s+/',' ',$_POST['wsurl']):'';
-		$contype=(is_numeric($_POST['contype']))? (int)$_POST['contype']:exit();
-		$ftppass=(preg_replace('/\s+/','',$_POST['ftppass'])!='')? $_POST['ftppass']:'';
-		$ftpus=(preg_replace('/\s+/','',$_POST['ftpus'])!='')? preg_replace('/\s+/',' ',$_POST['ftpus']):'';
+		$wsurl=(trim(preg_replace('/\s+/','',$_POST['wsurl'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['wsurl'])):'';
+		$contype=(trim(is_numeric($_POST['contype'])))? (int)$_POST['contype']:exit();
+		$ftppass=(trim(preg_replace('/\s+/','',$_POST['ftppass'])!=''))? $_POST['ftppass']:'';
+		$ftpus=(trim(preg_replace('/\s+/','',$_POST['ftpus'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['ftpus'])):'';
 		$maxsize=covert_size(ini_get('upload_max_filesize'));
 		if($ftppass!=''){
 			$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
@@ -504,7 +514,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 															
 						for($i=0;$i<$count;$i++){
 							if($_FILES['filename']['error'][$i]==0){
-								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0){
+								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 && trim($_FILES['filename']['name'][$i])!=''){
 									if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
 										$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
 										$target_path = "../upload/".$encname;
@@ -761,7 +771,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){//check
 	$offset = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
 	$postnumbers = is_numeric($_POST['number']) ? $_POST['number'] : exit();
-	$encid=preg_replace('/\s+/','',$_POST['id']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:'';
 	if(isset($_SESSION[$encid]['id']) && $encid!='' ){
 		try{
@@ -833,9 +843,9 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='save_setting'){
-	$mustang=(preg_replace('/\s+/','',$_POST['name'])!='') ? (string)$_POST['name']:exit();
+	$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='') ? (string)$_POST['name']:exit();
 	$alert=($_POST['almail']!='no') ? 'yes':'no';
-	$dfmail=(preg_replace('/\s+/','',$_POST['mail'])!='') ? (string)$_POST['mail']:exit();
+	$dfmail=(preg_replace('/\s+/','',$_POST['mail'])!='' && filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)) ? trim(preg_replace('/\s+/','',$_POST['mail'])):exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -906,11 +916,11 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['post_reply']=='Post Reply'){
-	$encid=preg_replace('/\s+/','',$_POST['id']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$error=array();
-	if(preg_replace('/\s+/','',$_POST['message'])!='')
-		$message=preg_replace('/\s+/',' ',$_POST['message']);
+	if(trim(preg_replace('/\s+/','',$_POST['message']))!='')
+		$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
 	else
 		$error[]='Empty Message';
 
@@ -1049,7 +1059,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$charger=($_POST['status']==1 || $_POST['status']==2)? 1:0;
 	else
 		$charger=($_POST['status']==0 || $_POST['status']==1 || $_POST['status']==2)? $_POST['status']:0;
-	$encid=preg_replace('/\s+/','',$_POST['id']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	if($charger==0){
 		$fquery = "UPDATE ".$SupportTicketsTable." a
@@ -1129,7 +1139,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST['act']=='move_opera_ticket'){// deep check
 	$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
-	$encid=preg_replace('/\s+/','',$_POST['id']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1169,8 +1179,8 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_title'){
-	$tit=(preg_replace('/\s+/','',$_POST['tit'])!='')? htmlentities(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
-	$encid=preg_replace('/\s+/','',$_POST['id']);
+	$tit=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? htmlentities(trim(preg_replace('/\s+/',' ',$_POST['tit']))):exit();
+	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1192,12 +1202,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_connection'){
-	$encid=preg_replace('/\s+/','',$_POST['id']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$con=(is_numeric($_POST['contype']))? $_POST['contype']:exit();
-	$web=(preg_replace('/\s+/','',$_POST['website'])!='')? $_POST['website']:'';
-	$usr=(preg_replace('/\s+/','',$_POST['user'])!='')? $_POST['user']:'';
-	$pass=(preg_replace('/\s+/','',$_POST['pass'])!='')? $_POST['pass']:'';
+	$web=(trim(preg_replace('/\s+/','',$_POST['website']))!='')? $_POST['website']:'';
+	$usr=(trim(preg_replace('/\s+/','',$_POST['user'])!=''))? $_POST['user']:'';
+	$pass=(trim(preg_replace('/\s+/','',$_POST['pass'])!=''))? $_POST['pass']:'';
 	if($pass!='' && $pass!=null){
 		$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
 								
@@ -1232,9 +1242,9 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSION['status']<3){
-	$encid=preg_replace('/\s+/','',$_POST['ticket_id']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['ticket_id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$file=preg_replace('/\s+/','',$_POST['file_download']);
+	$file=(trim(preg_replace('/\s+/','',$_POST['file_download']))!='') ? $_POST['file_download']:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -1279,9 +1289,9 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_index'){
-	$encid=preg_replace('/\s+/','',$_POST['id']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$tit=(preg_replace('/\s+/','',$_POST['title'])!='')? preg_replace('/\s+/',' ',$_POST['title']):exit();
+	$tit=(trim(preg_replace('/\s+/','',$_POST['title'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['title'])):exit();
 	$prio = (is_numeric($_POST['priority']))? $_POST['priority']:0;
 
 	if($_SESSION['status']==0)
@@ -1366,9 +1376,9 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='rating'){
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
-	$encid=preg_replace('/\s+/','',$_POST['tkid']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['tkid']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$note=preg_replace('/\s+/',' ',$_POST['comment']);
+	$note=trim(preg_replace('/\s+/',' ',$_POST['comment']));
 	if(isset($_SESSION[$encid]['status']) && $_SESSION[$encid]['status']==0){
 		try{
 			$query = "UPDATE ".$SupportUserTable." a
@@ -1456,12 +1466,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){
-	$enid=preg_replace('/\s+/','',$_POST['enid']);
-	$tit=preg_replace('/\s+/',' ',$_POST['title']);
+	$enid=trim(preg_replace('/\s+/','',$_POST['enid']));
+	$tit=trim(preg_replace('/\s+/',' ',$_POST['title']));
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
 	$statk=(is_numeric($_POST['statk']))? (int)$_POST['statk']:'';
-	$from=preg_replace('/\s+/','',$_POST['from']);
-	$to=preg_replace('/\s+/','',$_POST['to']);
+	$from=trim(preg_replace('/\s+/','',$_POST['from']));
+	$to=ptrim(reg_replace('/\s+/','',$_POST['to']));
 	if($from!=''){
 		list($yyyy,$mm,$dd) = explode('-',$from);
 		if (!checkdate($mm,$dd,$yyyy))
@@ -1477,11 +1487,11 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			$to=$to." 23:59:59";
 	}
 	if($_SESSION['status']==0 || $_SESSION['status']==2)
-		$op=preg_replace('/\s+/',' ',$_POST['op']);
+		$op=trim(preg_replace('/\s+/',' ',$_POST['op']));
 	if($_SESSION['status']==2){
 		$id=(is_numeric($_POST['id']))? (int)$_POST['id']:'';
 		$opid=(is_numeric($_POST['opid']))? (int)$_POST['opid']:'';
-		$usmail=preg_replace('/\s+/','',$_POST['mail']);
+		$usmail=trim(preg_replace('/\s+/','',$_POST['mail']));
 	}
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1622,12 +1632,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='report_ticket'){
 
-	if(preg_replace('/\s+/','',strip_tags($_POST['message']))!='')
+	if(trim(preg_replace('/\s+/','',strip_tags($_POST['message'])))!='')
 		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
 	else
 		$error[]='Empty Message';
 	
-	$encid=preg_replace('/\s+/','',$_POST['id']);
+	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	if($encid=='' && strlen($encid)==87)
 		$error[]='Incorrect ID';
 

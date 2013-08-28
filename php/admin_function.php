@@ -93,7 +93,7 @@ else{
 	}
 
 	else if(isset($_POST['act'])  && $_POST['act']=='add_depart'){//check
-		$mustang=(preg_replace('/\s+/','',$_POST['tit'])!='')? preg_replace('/\s+/',' ',$_POST['tit']):exit();
+		$mustang=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		$public=(is_numeric($_POST['pubdep']))? $_POST['pubdep']:exit();
 		try{
@@ -123,7 +123,7 @@ else{
 
 	else if(isset($_POST['act'])  && $_POST['act']=='edit_depart'){//check
 		$camaro=(is_numeric($_POST['id'])) ? (int)$_POST['id']:exit();
-		$mustang=(preg_replace('/\s+/','',$_POST['name'])!='')? preg_replace('/\s+/',' ',$_POST['name']):exit();
+		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
 		$active=(is_numeric($_POST['active'])) ? $_POST['active']:exit();
 		$public=(is_numeric($_POST['pub'])) ? $_POST['pub']:exit();
 		try{
@@ -147,7 +147,7 @@ else{
 	}
 
 	else if(isset($_POST['act'])  && $_POST['act']=='del_dep'){//check
-	$sub=(preg_replace('/\s+/','',$_POST['sub'])!='')? preg_replace('/\s+/',' ',$_POST['sub']):exit();
+	$sub=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
 	$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']:exit();
 	
 	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -250,9 +250,9 @@ else{
 		$faq=(is_numeric($_POST['faq'])) ? $_POST['faq']:exit();
 		$maxsize=(is_numeric($_POST['maxsize'])) ? ($_POST['maxsize']*1048576 ):null;
 		$enrat=(is_numeric($_POST['enrat'])) ? $_POST['enrat']:exit();
-		$commlop=(preg_replace('/\s+/',' ',$_POST['commlop'])=='php -f')? 'php -f':'php5-cli';
-		$tit=preg_replace('/\s+/',' ',$_POST['tit']);
-		$amail=preg_replace('/\s+/',' ',$_POST['mail']);
+		$commlop=(trim(preg_replace('/\s+/',' ',$_POST['commlop']))=='php -f')? 'php -f':'php5-cli';
+		$tit=trim(preg_replace('/\s+/',' ',$_POST['tit']));
+		$amail=trim(preg_replace('/\s+/',' ',$_POST['mail']));
 		if(file_put_contents('config/setting.txt',$tit."\n".$amail."\n".$senreply."\n".$senope."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$maxsize."\n".$enrat."\n".$commlop."\n".$faq))
 			echo json_encode(array(0=>'Saved'));
 		else
@@ -266,16 +266,16 @@ else{
 			unlink('config/mail/stmp.txt');
 		}
 		$serv=(is_numeric($_POST['serv'])) ? $_POST['serv']:exit();
-		$mustang=(string)$_POST['name'];
-		$viper=(string)$_POST['mail'];
-		$host=(string)$_POST['host'];
+		$mustang=(trim(preg_replace('/\s+/',' ',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
+		$viper=(trim(preg_replace('/\s+/',' ',$_POST['mail']))!='')? trim(preg_replace('/\s+/',' ',$_POST['mail'])):exit();
+		$host=(trim(preg_replace('/\s+/',' ',$_POST['host']))!='')? trim(preg_replace('/\s+/',' ',$_POST['host'])):exit();
 		$port=(is_numeric($_POST['port'])) ? $_POST['port']:exit();
 		$ssl=(is_numeric($_POST['ssl'])) ? $_POST['ssl']:exit();
 		$auth=(is_numeric($_POST['auth'])) ? $_POST['auth']:exit();
 		
 		$usr=(string)$_POST['usr'];
 		$pass=(string)$_POST['pass'];
-		if(preg_replace('/\s+/','',$_POST['pass'])!=''){
+		if(trim(preg_replace('/\s+/','',$_POST['pass']))!=''){
 			$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
 			$pass=str_split($pass);
 			$c=count($pass);
@@ -294,9 +294,9 @@ else{
 	}
 
 	else if(isset($_POST['act'])  && $_POST['act']=='save_mail_body'){
-		$sub=(preg_replace('/\s+/','',$_POST['sub'])!='')? preg_replace('/\s+/',' ',$_POST['sub']):exit();
-		$mess=(preg_replace('/\s+/','',$_POST['message'])!='')? preg_replace('/\s+/',' ',$_POST['message']):exit();
-		$act=(int)$_POST['sec'];
+		$sub=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
+		$mess=(preg_replace('/\s+/','',$_POST['message'])!='')? trim(preg_replace('/\s+/',' ',$_POST['message'])):exit();
+		$act=(is_numeric($_POST['sec']))? $_POST['sec']:exit();
 		if($act==0 && file_put_contents('config/mail/newuser.txt',$sub."\n".$mess))
 			echo json_encode(array(0=>'Saved'));
 		else if($act==1 && file_put_contents('config/mail/newreply.txt',$sub."\n".$mess))
@@ -367,8 +367,9 @@ else{
 
 	else if(isset($_POST['act']) && $_POST['act']=='update_user_info'){//check
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
-		$mustang=(string) $_POST['name'];
-		$viper=(string) $_POST['mail'];
+		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
+		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
+		$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
 		$charger=(is_numeric($_POST['status'])) ? (string)$_POST['status']:exit();
 		$holiday=(is_numeric($_POST['holiday'])) ? (string)$_POST['holiday']:exit();
 		$seldepa=$_POST['seldepa'];
@@ -659,7 +660,7 @@ else{
 	}
 
 	else if(isset($_POST['act']) && $_POST['act']=='retrive_operator_assign'){//check
-		$encid=preg_replace('/\s+/','',$_POST['enc']);
+		$encid=trim(preg_replace('/\s+/','',$_POST['enc']));
 		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 		$departmentid=(is_numeric($_POST['id'])) ? $_POST['id']:exit();
 		try{
@@ -695,7 +696,7 @@ else{
 	else if(isset($_POST['act']) && $_POST['act']=='move_admin_ticket'){//deep check
 		$opid=(is_numeric($_POST['opid'])) ? $_POST['opid']:exit();
 		$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
-		$encid=preg_replace('/\s+/','',$_POST['id']);
+		$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -741,8 +742,9 @@ else{
 	}
 
 	else if(isset($_POST['act']) && $_POST['act']=='delete_files'){//check
-		$from=$_POST['from']." 00:00:00";
-		$to=$_POST['to']." 23:59:59";
+
+		$from=(trim(preg_replace('/\s+/','',$_POST['from']))!='')? trim(preg_replace('/\s+/','',$_POST['from']))." 00:00:00":exit();
+		$to=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 00:00:00":exit();
 		
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -821,8 +823,8 @@ else{
 	
 	else if(isset($_POST['act'])  && $_POST['act']=='add_faq'){//check
 	
-		$question=(preg_replace('/\s+/','',$_POST['question'])!='')? preg_replace('/\s+/',' ',$_POST['question']):exit();
-		$answer=(preg_replace('/\s+/','',$_POST['answer'])!='')? preg_replace('/\s+/',' ',$_POST['answer']):exit();
+		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
+		$answer=(trim(preg_replace('/\s+/','',$_POST['answer']))!='')? trim(preg_replace('/\s+/',' ',$_POST['answer'])):exit();
 		$pos=(is_numeric($_POST['pos']))? $_POST['pos']:NULL;
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		try{
@@ -895,8 +897,8 @@ else{
 	
 	else if(isset($_POST['act'])  && $_POST['act']=='edit_faq'){//check
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
-		$question=(preg_replace('/\s+/','',$_POST['question'])!='')? preg_replace('/\s+/',' ',$_POST['question']):exit();
-		$answer=(preg_replace('/\s+/','',$_POST['answer'])!='')? preg_replace('/\s+/',' ',$_POST['answer']):exit();
+		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
+		$answer=(trim(preg_replace('/\s+/','',$_POST['answer']))!='')? trim(preg_replace('/\s+/',' ',$_POST['answer'])):exit();
 		$pos=(is_numeric($_POST['position']))? $_POST['position']:NULL;
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		try{
@@ -974,7 +976,7 @@ else{
 	}
 	
 	else if(isset($_POST['act'])  && $_POST['act']=='rem_flag'){//check
-		$encid=preg_replace('/\s+/','',$_POST['id']);
+		$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 		
 		try{
