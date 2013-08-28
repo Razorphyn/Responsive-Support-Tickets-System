@@ -42,6 +42,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<meta name="robots" content="noindex,nofollow">
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<title><?php if(isset($setting[0])) echo $setting[0];?> - Ticket Search</title>
 		<meta name="viewport" content="width=device-width">

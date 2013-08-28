@@ -53,6 +53,7 @@ $stmp[8]=implode('',$stmp[8]);
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<meta name="robots" content="noindex,nofollow">
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<title><?php if(isset($setting[0])) echo $setting[0];?> - Admin</title>
 		<meta name="viewport" content="width=device-width">
