@@ -76,7 +76,7 @@ if(isset($_POST['act']) && $_POST['act']=='register'){//check
 			$STH->bindParam(3,$viper,PDO::PARAM_STR);
 			$STH->bindParam(4,$pass,PDO::PARAM_STR);
 			$STH->bindParam(5,$ip,PDO::PARAM_STR);
-			$STH->exec();
+			$STH->execute();
 				$_SESSION['id']=$DBH->lastInsertId();;
 				$_SESSION['name']=$mustang;
 				$_SESSION['mail']=$viper;
@@ -511,7 +511,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 						$uploadarr=array();
 						$movedfiles=array();
 						$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
-															
+
 						for($i=0;$i<$count;$i++){
 							if($_FILES['filename']['error'][$i]==0){
 								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 && trim($_FILES['filename']['name'][$i])!=''){

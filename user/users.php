@@ -115,7 +115,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			<div class='daddy'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Administration Tools</h2>
+					<h2 class='pagefun'>Users Administration Tools</h2>
 				</div>
 				<hr>
 				<h3 class='sectname'>Users</h3>
@@ -125,6 +125,29 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					</table>
 				</div>
 				<br/><br/>
+				<hr>
+				<p class='cif'><i class='icon-plus-sign'></i> Create New User</p>
+				<form style='display:none'>
+					<h3 class='sectname'>New Users</h3>
+					<small><p>Every created user through this function is automatically activated</p></small>
+					<div class='row-fluid'>
+						<div class='span2'><label for='new_rname'>Name</label></div>
+						<div class='span4'><input type="text" id="new_rname" placeholder="Name" required></div>
+					</div>
+					<div class='row-fluid'>
+						<div class='span2'><label for='new_rmail'>Email</label></div>
+						<div class='span4'><input type="email" id="new_rmail" placeholder="Email" required></div>
+					</div>
+					<div class='row-fluid'>
+						<select id='new_usr_role'>
+							<option value='0'>User</option>
+							<option value='1'>Operator</option>
+							<option value='2'>Administrator</option>
+						</select>
+					</div>
+					<input type="submit" id='new_user' onclick='javascript:return !1;' class="btn btn-success" value='Register'/>
+				</form>
+				<br/>
 				<hr>
 			</div>
 		</div>
@@ -136,12 +159,6 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=DataTables/js/jquery.dataTables.min.js,js/jquery-ui-1.10.3.custom.min.js&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
-		<?php if(isset($setting[2])){?>
-		$("#senrep option[value="+<?php echo $setting[2];?>+"]").attr('selected','selected');
-		<?php } if(isset($setting[3])){?>
-		$("#senope option[value="+<?php echo $setting[3];?>+"]").attr('selected','selected');
-		<?php } ?>
-		
 		var table;
 		var request = $.ajax({
 			type: "POST",
@@ -176,7 +193,41 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			}
 		});
 		request.fail(function (a, b) {noty({text: "Ajax Error: " + b,type: "error",timeout: 9E3})});	
-
+		
+		<?php if(isset($setting[2])){?>
+		$("#senrep option[value="+<?php echo $setting[2];?>+"]").attr('selected','selected');
+		<?php } if(isset($setting[3])){?>
+		$("#senope option[value="+<?php echo $setting[3];?>+"]").attr('selected','selected');
+		<?php } ?>
+		
+		$('#new_user').click(function(){
+			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",debug : true,hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
+			var name=$('#new_rname').val();
+			var mail=$('#new_rmail').val();
+			var role=$('#new_usr_role').val();
+			if(name.replace(/\s+/g,'')!='' && mail.replace(/\s+/g,'')!=''){
+				var request= $.ajax({
+					type: 'POST',
+					url: '../php/admin_function.php',
+					data: {act:'admin_user_add',name: name,mail: mail,role:role},
+					dataType : 'json',
+					success : function (a) {
+						$(".main").nimbleLoader("hide");
+						if(a[0]=='Registred'){
+							a.[1].action = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a.[1].num + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + a.[1].num + '"><i class="icon-remove"></i></button></div>';
+							table.fnAddData(a[1]);
+						}
+						else
+							noty({text: data[0],type:'error',timeout:9E3});
+					}
+				});
+				request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+			}
+			else{
+				$(".main").nimbleLoader("hide");
+				noty({text: 'Empty Field or Password mismatch',type:'error',timeout:9E3});
+			}
+		});
 		$("#usertable").on("click", ".edituser", function () {
 			$(this).val();
 			var b = this.parentNode.parentNode.parentNode.parentNode,
@@ -332,7 +383,58 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			else{
 				a.css('display','none');
 			}
+		});
+		
+		$(document).on("click", ".load_usr_rate", function () {
+			var a=$(this),
+				e = a.parent().find('input[name="usr_old_stat"]').val().replace(/\s+/g,"");
+			$(this).attr('disabled','disabled');
+			if(e=='Operator' || e=='Administrator'){
+				$(this).after("<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
+				var c = $(this).val();
+				$.ajax({
+					type: "POST",
+					url: "../php/admin_function.php",
+					data: {act: "select_usr_rate",id: c},
+					dataType: "json",
+					success: function (b) {
+						if(b.res=='ok'){
+							a.parent().find(".loading").remove();
+							var count=b.rate.length;
+							if(count>0){
+								var tail=new Array();
+								for(i=0;i<count;i++)
+									tail.push("<div class='row-fluid'><div class='span3'>"+b.rate[i][3]+"</div><div class='span3'><a href='view?id="+b.rate[i][2]+"'>View Ticket</a></div><div class='span3'>"+b.rate[i][0]+"</div></div><div class='row-fluid info_rate'><div class='span11'>"+b.rate[i][1]+"</div></div>");
+								tail=tail.join("");
+								a.after("<br/><div class='rate_container'>"+tail+"</div>");
+							}
+							else
+								a.after("<br/><p>This user hasn't got any rating");
+						}
+						else{
+							noty({text: b[0],type: "error",timeout: 9E3})
+						}
+					}
+				}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3});$(this).removeAttr('disabled');})
+			}
+			else{
+				a.css('display','none');
+			}
 		});	
+		
+		$('.cif').click(function(){
+			el=$(this).children('i');
+			if(el.hasClass('icon-plus-sign')){
+				el.removeClass('icon-plus-sign');
+				el.addClass('icon-minus-sign');
+				$(this).next('form').slideToggle(800);
+			}
+			else{
+				el.removeClass('icon-minus-sign');
+				el.addClass('icon-plus-sign');
+				$(this).next('form').slideToggle(800);
+			}
+		});
 		
 		$(document).on('click','.btn_close_form',function(){if(confirm('Do you want to close this edit form?')){$(this).parent().prev().remove();$(this).parent().remove();}return false;});
 		

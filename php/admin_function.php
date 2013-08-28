@@ -92,6 +92,69 @@ else{
 		exit();
 	}
 
+	else if(isset($_POST['act']) && $_POST['act']=='admin_user_add'){//check
+		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='') ? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
+		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
+		$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+		$pass=get_random_string(5);
+		$dpass=hash('whirlpool',crypt($pass,'$#%H4!df84a$%#RZ@£'));
+		$staus=(is_numeric($_POST['role']))? $_POST['role']:exit();
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+				
+			$query = "INSERT INTO ".$SupportUserTable." (`name`,`mail`,`password`,`status`,`ip_address`) VALUES (?,?,?,?,?) ";
+			$STH = $DBH->prepare($query);
+			$ip='127.0.0.1';
+			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
+			$STH->bindParam(2,$viper,PDO::PARAM_STR);
+			$STH->bindParam(3,$dpass,PDO::PARAM_STR);
+			$STH->bindParam(4,$staus,PDO::PARAM_STR);
+			$STH->bindParam(5,$ip,PDO::PARAM_STR);
+			$STH->execute();
+			$uid=$DBH->lastInsertId();
+			switch($staus){
+				case 0:
+					$staus='User';
+					break;
+				case 1:
+					$staus='Operator';
+					break;
+				case 2:
+					$staus='Administrator';
+					break;
+				default:
+					$staus='Error';
+			}
+			
+
+			$site=curPageURL();
+			$headers   = array();
+			$headers[] = "MIME-Version: 1.0";
+			$headers[] = "Content-type: text/plain; charset=utf-8";
+			if(isset($setting[1]))
+				$headers[] = "From: ".$setting[1];
+			$headers[] = "X-Mailer: PHP/".phpversion();
+
+			$body="Hi,\r\n\r\nan account has been just created at this site: ".$site." \r\nThese are the information:\r\n Name: ".$mustang."\r\n Mail: ".$viper." \r\n Password: ".$pass." \r\n\r\nBest Regards, \r\n ".$_SESSION['name']." Site Administrator";
+			if(!mail($viper,'Account created by Administrator',$body,implode("\r\n", $headers)))
+				file_put_contents('mailsendadminerror','Couldn\'t send mail to: '.$viper);
+
+			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>$mustang,'mail'=>$viper,'status'=>$staus,'holiday'=>'No','rating'=>'Unrated')));
+		}
+		catch(PDOException $e){
+			if((int)$e->getCode()==1062)
+				echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
+			else{
+				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+			}
+			$DBH=null;
+			exit();
+		}
+		exit();
+	}
+
 	else if(isset($_POST['act'])  && $_POST['act']=='add_depart'){//check
 		$mustang=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
@@ -252,7 +315,8 @@ else{
 		$enrat=(is_numeric($_POST['enrat'])) ? $_POST['enrat']:exit();
 		$commlop=(trim(preg_replace('/\s+/',' ',$_POST['commlop']))=='php -f')? 'php -f':'php5-cli';
 		$tit=trim(preg_replace('/\s+/',' ',$_POST['tit']));
-		$amail=trim(preg_replace('/\s+/',' ',$_POST['mail']));
+		$amail= trim(preg_replace('/\s+/','',$_POST['mail']));
+		$amail=($amail!='' && filter_var($amail, FILTER_VALIDATE_EMAIL)) ? $amail:exit();
 		if(file_put_contents('config/setting.txt',$tit."\n".$amail."\n".$senreply."\n".$senope."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$maxsize."\n".$enrat."\n".$commlop."\n".$faq))
 			echo json_encode(array(0=>'Saved'));
 		else
@@ -1078,4 +1142,9 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 		return 'An Error has occurred, please read the PDOErrors file and contact a programmer';
 	}
 }
+
+function get_random_string($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ0123456789';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+
+function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+
 ?>
