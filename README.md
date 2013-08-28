@@ -10,7 +10,6 @@ ToDo List
 - Check few functions
 - Check switch from mysqli to PDO(missing things, incorrect variable binding or extra wrong echo)
 - Check STMP Connection
-- Add IMAP function to read mails (reply by mail)
 - Add Create User Function
 - Add Create Ticket from Administrator for someone
 
