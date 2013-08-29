@@ -1762,6 +1762,42 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(5,$message,PDO::PARAM_STR);	
 			$STH->bindParam(6,$message,PDO::PARAM_STR);	
 			$STH->execute();
+			
+			$msid=$DBH->lastInsertId();
+			$query = "SELECT `reason` FROM ".$SupportFlagTable." WHERE id=? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$msid,PDO::PARAM_INT);
+			$STH->execute();
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
+					$message=$a['reason'];
+				}while ($a = $STH->fetch());
+				
+				require_once 'htmlpurifier/HTMLPurifier.auto.php';
+				$config = HTMLPurifier_Config::createDefault();
+				$purifier = new HTMLPurifier($config);
+				$message = $purifier->purify($message);
+				if(!empty(trim(strip_tags($message)))){
+					$query="UPDATE ".$SupportFlagTable." SET reason=? WHERE id=?";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$message,PDO::PARAM_STR);
+					$STH->bindParam(2,$msid,PDO::PARAM_INT);
+					$STH->execute();
+				}
+				else{
+					$query = "DELETE FROM ".$SupportFlagTable." WHERE id=? ";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$msid,PDO::PARAM_INT);
+					$STH->execute();
+					echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid Message",type:"error",timeout:9000});</script>';
+					exit();
+				}
+			}
+			else
+				exit();
+					
 			$_SESSION[$_GET['id']]['reason']=$message;
 			echo json_encode(array(0=>'Submitted'));
 		}
