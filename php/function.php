@@ -58,7 +58,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 if(isset($_POST['act']) && $_POST['act']=='register'){//check
 	if($_POST['pwd']==$_POST['rpwd']){
 		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
-			$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']))
+			$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 		else{
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
@@ -339,7 +339,7 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
 	$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
 	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
-		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']))
+		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 	else{
 		echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 		exit();
@@ -865,7 +865,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='save_setting'){
 	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
-		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']))
+		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 	else{
 		echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 		exit();
