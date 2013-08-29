@@ -169,7 +169,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		</div>
 
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=DataTables/js/jquery.dataTables.min.js&amp;5259487' ?>"></script>
+	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
 		var request= $.ajax({type: 'POST',url: '../php/function.php',data: {act:'retrive_tickets'},dataType : 'json',

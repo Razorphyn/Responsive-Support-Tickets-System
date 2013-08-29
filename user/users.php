@@ -140,6 +140,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					</div>
 					<div class='row-fluid'>
 						<select id='new_usr_role'>
+							<div class='span2'><label for='new_rmail'>User Role/Status</label></div>
 							<option value='0'>User</option>
 							<option value='1'>Operator</option>
 							<option value='2'>Administrator</option>
@@ -156,7 +157,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		</div>
 	<iframe name='hidden_frame' style='display:none;width:0;height:0'></iframe>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=DataTables/js/jquery.dataTables.min.js,js/jquery-ui-1.10.3.custom.min.js&amp;5259487' ?>"></script>
+	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js,js/jquery-ui-1.10.3.custom.min.js&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
 		var table;
@@ -214,7 +215,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					success : function (a) {
 						$(".main").nimbleLoader("hide");
 						if(a[0]=='Registred'){
-							a.[1].action = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a.[1].num + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + a.[1].num + '"><i class="icon-remove"></i></button></div>';
+							a[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a[1]['num'] + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + a[1]['num'] + '"><i class="icon-remove"></i></button></div>';
 							table.fnAddData(a[1]);
 						}
 						else
@@ -228,6 +229,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				noty({text: 'Empty Field or Password mismatch',type:'error',timeout:9E3});
 			}
 		});
+		
 		$("#usertable").on("click", ".edituser", function () {
 			$(this).val();
 			var b = this.parentNode.parentNode.parentNode.parentNode,

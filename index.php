@@ -33,6 +33,9 @@ if(is_file('php/config/setting.txt')) $setting=file('php/config/setting.txt',FIL
 $siteurl=explode('?',curPageURL());
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+$_SESSION['token']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -186,6 +189,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 	<script type="text/javascript"  src="<?php echo $siteurl.'min/?g=js_i&amp;5259487' ?>"></script>
 	
 	<script>
+	var token='<?php echo $_SESSION['token']; ?>';
 	$(document).ready(function() {
 		
 		<?php if(isset($_GET['e']) && $_GET['e']=='exipred'){ ?>
