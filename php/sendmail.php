@@ -16,7 +16,7 @@
  */
 if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 	include_once '../php/config/database.php';
-	require_once '../Swift/lib/swift_required.php';
+	require_once '../lib/Swift/lib/swift_required.php';
 	if(is_file('../php/config/mail/stmp.txt')){
 		$stmp=file('../php/config/mail/stmp.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 		$string='<?php'."\n".'$smailservice='.$stmp[0].";\n".'$smailname=\''.$stmp[1]."';\n".'$settingmail=\''.$stmp[2]."';\n".'$smailhost=\''.$stmp[3]."';\n".'$smailport='.$stmp[4].";\n".'$smailssl='.$stmp[5].";\n".'$smailauth='.$stmp[6].";\n".'$smailuser=\''.$stmp[7]."';\n".'$smailpassword=\''.$stmp[8]."';\n ?>";

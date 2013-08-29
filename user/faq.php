@@ -159,7 +159,6 @@ $siteurl=$siteurl[0];
 		</div>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/jRating.jquery.js&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="../ckeditor/ckeditor.js"></script>
 	<script>
 	 $(document).ready(function(){
 		$(".razorate").jRating();

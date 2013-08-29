@@ -117,7 +117,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			<hr>
 			<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
 				<div class='row-fluid main'>
-					<h2 class='titlesec'>Hello <?php echo $_SESSION['name']; ?>!</h2>
+					<h2 class='titlesec'>Hello <?php echo htmlspecialchars(mb_convert_encoding($_SESSION['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'); ?>!</h2>
 					<p>You are already logged in, you can start to ask for support.</p>
 				</div>
 			<?php } else if(isset($_SESSION['status']) && $_SESSION['status']==4){ ?>

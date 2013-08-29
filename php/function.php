@@ -517,9 +517,34 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 			$STH->bindParam(5,$date,PDO::PARAM_STR);
 			$STH->execute();
 			
+			$msid=$DBH->lastInsertId();
+			$query = "SELECT `message` FROM ".$SupportMessagesTable." WHERE id=? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$msid,PDO::PARAM_INT);
+			$STH->execute();
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
+					$message=$a['message'];
+				}while ($a = $STH->fetch());
+				
+				require_once 'htmlpurifier/HTMLPurifier.auto.php';
+				$config = HTMLPurifier_Config::createDefault();
+				$purifier = new HTMLPurifier($config);
+				$message = $purifier->purify($message);
+
+				$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$message,PDO::PARAM_STR);
+				$STH->bindParam(2,$msid,PDO::PARAM_INT);
+				$STH->execute();
+			}
+			else
+				exit();
+
 			//File Upload
 			if(isset($setting[5]) && $setting[5]==1){
-				$msid=$DBH->lastInsertId();
 				if(isset($_FILES['filename'])){
 					$count=count($_FILES['filename']['name']);
 					if($count>0){
@@ -660,7 +685,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			}
 			else if($_POST['sect']=='admin' && $_SESSION['status']==2){
 				do{
-					$dn['information'][]=array('id'=>$$a['id'],'name'=>$a['department_name'],'active'=>$$a['active'],'public'=>$a['public']);
+					$dn['information'][]=array('id'=>$$a['id'],'name'=>htmlspecialchars(mb_convert_encoding($a['department_name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'active'=>$$a['active'],'public'=>$a['public']);
 				}while ($a = $STH->fetch());
 			}
 			echo json_encode($dn);
@@ -705,7 +730,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+					$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars(mb_convert_encoding($a['title'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -736,9 +761,9 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			if(!empty($a)){
 				do{
 					if($opid==$_SESSION['id'])
-						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars(mb_convert_encoding($a['title'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else
-						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars(mb_convert_encoding($a['title'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -770,11 +795,11 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			if(!empty($a)){
 				do{
 					if($a['operator_id']==$_SESSION['id'])
-						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars(mb_convert_encoding($a['title'],"UTF-8","UTF-8"),ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else if($a['user_id']==$_SESSION['id'])
-						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars(mb_convert_encoding($a['title'],"UTF-8","UTF-8"),ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else
-						$list['tickets']['admin'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['admin'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars(mb_convert_encoding($a['title'],"UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -818,7 +843,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 				$messageid=array();
 				$count=0;
 				do{
-					$ret['messages'][$msid]=array($a['name'],$a['message'],$a['created_time']);
+					$ret['messages'][$msid]=array(htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),$a['message'],$a['created_time']);
 					if($a['attachment']==1)
 						$messageid[]=$a['id'];
 					$count++;
@@ -835,7 +860,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 						$a = $STH->fetch();
 						if(!empty($a)){
 							do{
-								$ret['messages'][$a['message_id']][]='<div class="row-fluid"><div class="span2 offset2"><form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.$a['name'].'"></form></div></div>';
+								$ret['messages'][$a['message_id']][]='<div class="row-fluid"><div class="span2 offset2"><form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8').'"></form></div></div>';
 							}while ($a = $STH->fetch());
 						}
 					}
@@ -993,10 +1018,43 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				$STH->bindParam(4,$ip,PDO::PARAM_STR);
 				$STH->bindParam(5,$date,PDO::PARAM_STR);
 				$STH->execute();
-		
-				if(isset($setting[5]) && $setting[5]==1){
-					$msid=$DBH->lastInsertId();
+
+				$msid=$DBH->lastInsertId();
+				$query = "SELECT `message` FROM ".$SupportMessagesTable." WHERE id=? LIMIT 1";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$msid,PDO::PARAM_INT);
+				$STH->execute();
+				$STH->setFetchMode(PDO::FETCH_ASSOC);
+				$a = $STH->fetch();
+				if(!empty($a)){
+					do{
+						$message=$a['message'];
+					}while ($a = $STH->fetch());
 					
+					require_once 'htmlpurifier/HTMLPurifier.auto.php';
+					$config = HTMLPurifier_Config::createDefault();
+					$purifier = new HTMLPurifier($config);
+					$message = $purifier->purify($message);
+					if(!empty($message)){
+						$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
+						$STH = $DBH->prepare($query);
+						$STH->bindParam(1,$message,PDO::PARAM_STR);
+						$STH->bindParam(2,$msid,PDO::PARAM_INT);
+						$STH->execute();
+					}
+					else{
+						$query = "DELETE FROM ".$SupportMessagesTable." WHERE id=? ";
+						$STH = $DBH->prepare($query);
+						$STH->bindParam(2,$msid,PDO::PARAM_INT);
+						$STH->execute();
+						echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid Message",type:"error",timeout:9000});</script>';
+						exit();
+					}
+				}
+				else
+					exit();
+
+				if(isset($setting[5]) && $setting[5]==1){
 					//Upload File
 					if(isset($_FILES['filename'])){
 						$count=count($_FILES['filename']['name']);
@@ -1067,10 +1125,10 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				}
 				if(isset($uploadarr[0])){
 					$json=json_encode($uploadarr);
-					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".$_SESSION['name']."',".$json.");</script>";
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars(mb_convert_encoding($_SESSION['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8')."',".$json.");</script>";
 				}
 				else
-					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".$_SESSION['name']."',null);</script>";
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars(mb_convert_encoding($_SESSION['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8')."',null);</script>";
 			}
 			catch(PDOException $e){
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1210,7 +1268,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_title'){
-	$tit=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? htmlentities(trim(preg_replace('/\s+/',' ',$_POST['tit']))):exit();
+	$tit=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	try{
@@ -1222,7 +1280,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$STH->bindParam(2,$encid,PDO::PARAM_STR);
 		$STH->execute();
 		
-		echo json_encode(array(0=>'Updated',1=>$tit));
+		echo json_encode(array(0=>'Updated',1=>htmlspecialchars(mb_convert_encoding($tit, "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8')));
 	}
 	catch(PDOException $e){  
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1648,7 +1706,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['search'][]=array('id'=>$a['enc_id'],'dname'=>$a['department_name'],'opname'=>$a['name'],'title'=>$a['title'],'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+					$list['search'][]=array('id'=>$a['enc_id'],'dname'=>htmlspecialchars(mb_convert_encoding($a['department_name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars(mb_convert_encoding($a['title'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}while ($a = $STH->fetch());
 			}
 			echo json_encode($list);

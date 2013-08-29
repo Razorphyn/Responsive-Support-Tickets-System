@@ -99,18 +99,18 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 				do{
 					$tkid=$a['id'];
 					$refid=$a['ref_id'];
-					$title=$a['title'];
+					$title=htmlspecialchars(mb_convert_encoding($a['title'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
 					$usrid=$a['user_id'];
 					$opid=$a['operator_id'];
 					$stat=$a['ticket_status'];
 					$departmentid=$a['department_id'];
-					$cweb=$a['website'];
+					$cweb=htmlspecialchars(mb_convert_encoding($a['website'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
 					$connection=$a['contype'];
-					$usercred=$a['ftp_user'];
+					$usercred=htmlspecialchars(mb_convert_encoding($a['ftp_user'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
 					$conpass=$a['ftp_password'];
 					$rate=$a['rate'];
-					$note=$a['note'];
-					$reason=$a['reason'];
+					$note=htmlspecialchars(mb_convert_encoding($a['note'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
+					$reason=htmlspecialchars(mb_convert_encoding($a['reason'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
 					$_SESSION[$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
 				}while ($a = $STH->fetch());
 				unset($a);
@@ -124,7 +124,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 						if(array_key_exists($conpass[$i],$crypttable))
 							$conpass[$i]=$crypttable[$crypttable[$conpass[$i]]];
 					}
-					$conpass=implode('',$conpass);
+					$conpass=htmlspecialchars(mb_convert_encoding(implode('',$conpass), "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
 				}
 				$query = "SELECT 
 								a.id,
@@ -146,7 +146,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					$messageid=array();
 					$count=0;
 					do{
-						$list[$a['id']]=array(0=>$a['name'],1=>$a['message'],2=>$a['created_time']);
+						$list[$a['id']]=array(0=>htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),1=>$a['message'],2=>$a['created_time']);
 						if($a['attachment']==1)
 							$messageid[]=$a['id'];
 						$count++;
@@ -162,13 +162,12 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 						$a = $STH->fetch();
 						if(!empty($a)){
 							do{
-								$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.$a['name'].'"></form>';
+								$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form>';
 							}while ($a = $STH->fetch());
 						}
 						unset($a);
 					}
 					$list=array_values($list);
-					
 				}
 				else{
 					header("location: index.php");
@@ -199,7 +198,7 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$b[$a['id']]=$a['department_name'];
+					$b[$a['id']]=htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8');
 				}while ($a = $STH->fetch());
 			}
 			return json_encode($b);
@@ -234,7 +233,7 @@ function retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, 
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$b[$a['id']]=$a['name'];
+					$b[$a['id']]=htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8');
 				}while ($a = $STH->fetch());
 			}
 			$DBH=null;
@@ -480,7 +479,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/jRating.jquery.js,js/loadmessages.js&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="../ckeditor/ckeditor.js"></script>
+		<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
 	<?php }else { ?>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>

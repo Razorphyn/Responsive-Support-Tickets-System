@@ -145,7 +145,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		</div>
 
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="../ckeditor/ckeditor.js"></script>
+	<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
 	<script>
 	$(document).ready(function() {
 		$('#enablealert option[value="<?php echo $_SESSION['mail_alert'];?>"]').attr('selected','selected');

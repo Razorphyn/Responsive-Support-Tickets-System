@@ -191,7 +191,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		
 		<?php if(!$isMob) { ?>
 			<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-			<script type="text/javascript"  src="../ckeditor/ckeditor.js"></script>
+			<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
 		<?php }else { ?>
 			<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 			<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_m&amp;5259487' ?>"></script>
