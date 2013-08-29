@@ -533,12 +533,26 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 				$config = HTMLPurifier_Config::createDefault();
 				$purifier = new HTMLPurifier($config);
 				$message = $purifier->purify($message);
-
-				$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
-				$STH = $DBH->prepare($query);
-				$STH->bindParam(1,$message,PDO::PARAM_STR);
-				$STH->bindParam(2,$msid,PDO::PARAM_INT);
-				$STH->execute();
+				if(!empty(trim(strip_tags($message)))){
+					$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$message,PDO::PARAM_STR);
+					$STH->bindParam(2,$msid,PDO::PARAM_INT);
+					$STH->execute();
+				}
+				else{
+					$query = "DELETE FROM ".$SupportMessagesTable." WHERE id=? ";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$msid,PDO::PARAM_INT);
+					$STH->execute();
+					
+					$query = "DELETE FROM ".$SupportTicketsTable." WHERE id=? ";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$tkid,PDO::PARAM_INT);
+					$STH->execute();
+					echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid Message",type:"error",timeout:9000});</script>';
+					exit();
+				}
 			}
 			else
 				exit();
@@ -1035,7 +1049,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 					$config = HTMLPurifier_Config::createDefault();
 					$purifier = new HTMLPurifier($config);
 					$message = $purifier->purify($message);
-					if(!empty($message)){
+					if(!empty(trim(strip_tags($message)))){
 						$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
 						$STH = $DBH->prepare($query);
 						$STH->bindParam(1,$message,PDO::PARAM_STR);
@@ -1045,7 +1059,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 					else{
 						$query = "DELETE FROM ".$SupportMessagesTable." WHERE id=? ";
 						$STH = $DBH->prepare($query);
-						$STH->bindParam(2,$msid,PDO::PARAM_INT);
+						$STH->bindParam(1,$msid,PDO::PARAM_INT);
 						$STH->execute();
 						echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid Message",type:"error",timeout:9000});</script>';
 						exit();

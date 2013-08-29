@@ -909,6 +909,39 @@ else{
 			$data=array('response'=>'Added');
 								
 			$dpid=$DBH->lastInsertId();
+			
+			$query = "SELECT `answer` FROM ".$SupportFaqTable." WHERE id=? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$dpid,PDO::PARAM_INT);
+			$STH->execute();
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
+					$answer=$a['answer'];
+				}while ($a = $STH->fetch());
+				
+				require_once 'htmlpurifier/HTMLPurifier.auto.php';
+				$config = HTMLPurifier_Config::createDefault();
+				$purifier = new HTMLPurifier($config);
+				$answer = $purifier->purify($answer);
+				if(!empty(trim(strip_tags($answer)))){
+					$query="UPDATE ".$SupportFaqTable." SET answer=? WHERE id=?";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$answer,PDO::PARAM_STR);
+					$STH->bindParam(2,$dpid,PDO::PARAM_INT);
+					$STH->execute();
+				}
+				else{
+					$query = "DELETE FROM ".$SupportFaqTable." WHERE id=? ";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$dpid,PDO::PARAM_INT);
+					$STH->execute();
+				}
+			}
+			else
+				exit();
+				
 			$active=((int)$active==0) ? 'No':'Yes';
 			$data['information']=array('id'=>$dpid,'question'=>$question,'position'=>$pos,'active'=>$active);
 		
