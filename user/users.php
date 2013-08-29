@@ -139,12 +139,14 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 						<div class='span4'><input type="email" id="new_rmail" placeholder="Email" required></div>
 					</div>
 					<div class='row-fluid'>
-						<select id='new_usr_role'>
-							<div class='span2'><label for='new_rmail'>User Role/Status</label></div>
-							<option value='0'>User</option>
-							<option value='1'>Operator</option>
-							<option value='2'>Administrator</option>
-						</select>
+						<div class='span2'><label for='new_rmail'>User Role/Status</label></div>
+						<div class='span4'>
+							<select id='new_usr_role'>
+								<option value='0'>User</option>
+								<option value='1'>Operator</option>
+								<option value='2'>Administrator</option>
+							</select>
+						</div>
 					</div>
 					<input type="submit" id='new_user' onclick='javascript:return !1;' class="btn btn-success" value='Register'/>
 				</form>
