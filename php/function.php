@@ -57,16 +57,28 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 
 if(isset($_POST['act']) && $_POST['act']=='register'){//check
 	if($_POST['pwd']==$_POST['rpwd']){
-		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='') ? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
+		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
+			$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']))
+		else{
+			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
+			exit();
+		}
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+		if($viper=='' && filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+			echo json_encode(array(0=>'Invalid Mail'));
+			exit();
+		}
 		$pass= trim(preg_replace('/\s+/','',$_POST['pwd']));
-		$pass=($pass!='') ? $pass:exit();
+		if($pass==''){
+			echo json_encode(array(0=>'Invalid Password'));
+			exit();
+		}
 		$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
+
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-			
+
 			$query = "INSERT INTO ".$SupportUserTable." (`name`,`reg_key`,`mail`,`password`,`ip_address`) VALUES (?,?,?,?,?) ";
 			$ip=retrive_ip();
 			$reg=get_random_string(60);
@@ -326,8 +338,13 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
 	$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
-	$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
-
+	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
+		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']))
+	else{
+		echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
+		exit();
+	}
+	
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -510,8 +527,9 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 						if(!is_dir('../upload')) mkdir('../upload');
 						$uploadarr=array();
 						$movedfiles=array();
+						$sqlname=array();
+						
 						$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
-
 						for($i=0;$i<$count;$i++){
 							if($_FILES['filename']['error'][$i]==0){
 								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 && trim($_FILES['filename']['name'][$i])!=''){
@@ -522,23 +540,26 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 											if(CryptFile("../upload/".$encname)){
 												$movedfiles[]=$_FILES['filename']['name'][$i];
 												$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
-												$query.='("'.$_FILES['filename']['name'][$i].'","'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
-												
+												$query.='(?,"'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
+												$sqlname[]=$_FILES['filename']['name'][$i];
 												echo '<script>parent.noty({text: "'.$_FILES['filename']['name'][$i].' has been uploaded",type:"success",timeout:2000});</script>';
 											}
 										}
 									}
 								}
 								else
-									echo '<script>parent.noty({text: "The file '.$_FILES['filename']['name'][$i].' is too big or null. Max file size: '.ini_get('upload_max_filesize').'",type:"error",timeout:9000});</script>';
+									echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i]).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
 							}
 							else if($_FILES['filename']['error'][$i]!=4)
-								echo '<script>parent.noty({text: "File Name:'.$_FILES['filename']['name'][$i].' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
+								echo '<script>parent.noty({text: "File Name:'.json_encode($_FILES['filename']['name'][$i]).' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 						}
 						if(isset($uploadarr[0])){
 							$query=substr_replace($query,'',-1);
 							try{
 								$STH = $DBH->prepare($query);
+								$c=count($sqlname);
+								for($i=0;$i<$c;$i++)
+									$STH->bindParam($i+1,$sqlname[$i],PDO::PARAM_STR);
 								$STH->execute();
 								
 								$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
@@ -843,7 +864,12 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='save_setting'){
-	$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='') ? (string)$_POST['name']:exit();
+	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
+		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']))
+	else{
+		echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
+		exit();
+	}
 	$alert=($_POST['almail']!='no') ? 'yes':'no';
 	$dfmail=(preg_replace('/\s+/','',$_POST['mail'])!='' && filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)) ? trim(preg_replace('/\s+/','',$_POST['mail'])):exit();
 	try{
@@ -983,6 +1009,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 							
 							$uploadarr=array();
 							$movedfiles=array();
+							$sqlname=array();
 							
 							$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
 							for($i=0;$i<$count;$i++){
@@ -994,21 +1021,25 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 												if(CryptFile("../upload/".$encname)){
 													$movedfiles[]=$_FILES['filename']['name'][$i];
 													$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
-													$query.='("'.$_FILES['filename']['name'][$i].'","'.$encname.'","'.$_SESSION['id'].'","'.$_SESSION[$encid]['id'].'","'.$encid.'","'.$msid.'","'.$date.'"),';
+													$query.='(?,"'.$encname.'","'.$_SESSION['id'].'","'.$_SESSION[$encid]['id'].'","'.$encid.'","'.$msid.'","'.$date.'"),';
+													$sqlname[]=$_FILES['filename']['name'][$i];
 													echo '<script>parent.noty({text: "'.$_FILES['filename']['name'][$i].' has been uploaded",type:"success",timeout:2000});</script>';
 												}
 											}
 										}
 									}
 									else
-										echo '<script>parent.noty({text: "The file '.$_FILES['filename']['name'][$i].' is too big or null. Max file size: '.ini_get('upload_max_filesize').'",type:"error",timeout:9000});</script>';
+										echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i]).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
 								}
 								else if($_FILES['filename']['error'][$i]!=4)
-									echo '<script>parent.noty({text: "Error:'.$_FILES['filename']['name'][$i].' Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
+									echo '<script>parent.noty({text: "Error:'.json_encode($_FILES['filename']['name'][$i]).' Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 							}
 							if(isset($uploadarr[0])){
 								$query=substr_replace($query,'',-1);
 								$STH = $DBH->prepare($query);
+								$c=count($sqlname);
+								for($i=0;$i<$c;$i++)
+									$STH->bindParam($i+1,$sqlname[$i],PDO::PARAM_STR);
 								$STH->execute();
 											
 								$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
