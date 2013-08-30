@@ -474,8 +474,8 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='lo
 else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['createtk']=='Create New Ticket'){
 	$letarr=array('M','d','C','f','K','w','p','T','B','X');
 	$error=array();
-	$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
 	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
+		$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
 		require_once 'htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		$purifier = new HTMLPurifier($config);
@@ -1025,8 +1025,8 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$error=array();
-	$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
 	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
+		$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
 		require_once 'htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		$purifier = new HTMLPurifier($config);
@@ -1778,8 +1778,17 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='report_ticket'){
 
-	if(trim(preg_replace('/\s+/','',strip_tags($_POST['message'])))!='')
+	if(trim(preg_replace('/\s+/','',strip_tags($_POST['message'])))!=''){
 		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
+		require_once 'htmlpurifier/HTMLPurifier.auto.php';
+		$config = HTMLPurifier_Config::createDefault();
+		$purifier = new HTMLPurifier($config);
+		$message = $purifier->purify($message);
+		$check=trim(strip_tags($message));
+		if(empty($check)){
+			$error[]='Empty Message';
+		}
+	}
 	else
 		$error[]='Empty Message';
 	
@@ -1805,43 +1814,6 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(5,$message,PDO::PARAM_STR);	
 			$STH->bindParam(6,$message,PDO::PARAM_STR);	
 			$STH->execute();
-			
-			$msid=$DBH->lastInsertId();
-			$query = "SELECT `reason` FROM ".$SupportFlagTable." WHERE id=? LIMIT 1";
-			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$msid,PDO::PARAM_INT);
-			$STH->execute();
-			$STH->setFetchMode(PDO::FETCH_ASSOC);
-			$a = $STH->fetch();
-			if(!empty($a)){
-				do{
-					$message=$a['reason'];
-				}while ($a = $STH->fetch());
-				
-				require_once 'htmlpurifier/HTMLPurifier.auto.php';
-				$config = HTMLPurifier_Config::createDefault();
-				$purifier = new HTMLPurifier($config);
-				$message = $purifier->purify($message);
-				$check=trim(strip_tags($message));
-				if(!empty($check)){
-					$query="UPDATE ".$SupportFlagTable." SET reason=? WHERE id=?";
-					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$message,PDO::PARAM_STR);
-					$STH->bindParam(2,$msid,PDO::PARAM_INT);
-					$STH->execute();
-				}
-				else{
-					$query = "DELETE FROM ".$SupportFlagTable." WHERE id=? ";
-					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$msid,PDO::PARAM_INT);
-					$STH->execute();
-					header('Content-Type: application/json; charset=utf-8');
-					echo json_encode(array(0=>'Invalid Message'));
-					exit();
-				}
-			}
-			else
-				exit();
 					
 			$_SESSION[$_GET['id']]['reason']=$message;
 			header('Content-Type: application/json; charset=utf-8');
