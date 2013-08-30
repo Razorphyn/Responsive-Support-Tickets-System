@@ -925,7 +925,8 @@ else{
 				$config = HTMLPurifier_Config::createDefault();
 				$purifier = new HTMLPurifier($config);
 				$answer = $purifier->purify($answer);
-				if(!empty(trim(strip_tags($answer)))){
+				$check=trim(strip_tags($answer));
+				if(!empty($check)){
 					$query="UPDATE ".$SupportFaqTable." SET answer=? WHERE id=?";
 					$STH = $DBH->prepare($query);
 					$STH->bindParam(1,$answer,PDO::PARAM_STR);

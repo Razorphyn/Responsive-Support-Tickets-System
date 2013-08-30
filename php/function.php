@@ -533,7 +533,8 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 				$config = HTMLPurifier_Config::createDefault();
 				$purifier = new HTMLPurifier($config);
 				$message = $purifier->purify($message);
-				if(!empty(trim(strip_tags($message)))){
+				$check=trim(strip_tags($message));
+				if(!empty($check)){
 					$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
 					$STH = $DBH->prepare($query);
 					$STH->bindParam(1,$message,PDO::PARAM_STR);
@@ -1049,7 +1050,8 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 					$config = HTMLPurifier_Config::createDefault();
 					$purifier = new HTMLPurifier($config);
 					$message = $purifier->purify($message);
-					if(!empty(trim(strip_tags($message)))){
+					$check=trim(strip_tags($message));
+					if(!empty($check)){
 						$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
 						$STH = $DBH->prepare($query);
 						$STH->bindParam(1,$message,PDO::PARAM_STR);
@@ -1779,7 +1781,8 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 				$config = HTMLPurifier_Config::createDefault();
 				$purifier = new HTMLPurifier($config);
 				$message = $purifier->purify($message);
-				if(!empty(trim(strip_tags($message)))){
+				$check=trim(strip_tags($message));
+				if(!empty($check)){
 					$query="UPDATE ".$SupportFlagTable." SET reason=? WHERE id=?";
 					$STH = $DBH->prepare($query);
 					$STH->bindParam(1,$message,PDO::PARAM_STR);
