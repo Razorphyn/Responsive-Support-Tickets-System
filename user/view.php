@@ -99,7 +99,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 				do{
 					$tkid=$a['id'];
 					$refid=$a['ref_id'];
-					$title=htmlspecialchars(mb_convert_encoding($a['title'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
+					$title=htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8');
 					$usrid=$a['user_id'];
 					$opid=$a['operator_id'];
 					$stat=$a['ticket_status'];
@@ -110,7 +110,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					$conpass=$a['ftp_password'];
 					$rate=$a['rate'];
 					$note=htmlspecialchars(mb_convert_encoding($a['note'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
-					$reason=htmlspecialchars(mb_convert_encoding($a['reason'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
+					$reason=htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8');
 					$_SESSION[$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
 				}while ($a = $STH->fetch());
 				unset($a);
@@ -146,7 +146,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					$messageid=array();
 					$count=0;
 					do{
-						$list[$a['id']]=array(0=>htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),1=>$a['message'],2=>$a['created_time']);
+						$list[$a['id']]=array(0=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),1=>$a['message'],2=>$a['created_time']);
 						if($a['attachment']==1)
 							$messageid[]=$a['id'];
 						$count++;
@@ -303,7 +303,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 									</ul>
 								</li>
 								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']==2){?>
+							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
 								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
@@ -327,7 +327,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 										</li>
 									</ul>
 								</li>
-							<?php } if(isset($_SESSION['name'])){ ?>
+							<?php } if(isset($_SESSION['status'])){ ?>
 								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
 							<?php } ?>
 							</ul>

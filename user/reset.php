@@ -13,21 +13,11 @@ ini_set('session.save_path', '../php/config/session');
 session_name("RazorphynSupport");
 session_start();
 //Session Check
-if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
-	$_SESSION['time']=time();
-else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
-	session_unset();
-	session_destroy();
+if(isset($_SESSION['time'])){
 	header("location: ../index.php?e=exipred");
 	exit();
 }
-else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
-	session_unset();
-	session_destroy();
-	header("location: ../index.php?e=local");
-	exit();
-}
-else if(!isset($_GET['act']) || $_GET['act']!='resetpass' || !isset($_GET['key'])){
+else if(!isset($_GET['act']) || $_GET['act']!='resetpass' || !isset($_GET['key']) || strlen($_GET['key'])!=87){
 	header("location: ../index.php"); 
 	exit();
 }
@@ -67,7 +57,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 								<li class="active"><a href="#home"><i class="icon-home"></i>Home</a></li>
 								<?php if(isset($setting[9]) && $setting[9]==1){?>
 									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php } if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){?>
+								<?php } if(isset($_SESSION['status']) && $_SESSION['status']<3){?>
 									<li><a href="user/newticket.php"><i class="icon-file"></i>New Ticket</a></li>
 									<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
@@ -83,7 +73,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 									</ul>
 								</li>
 									<li><a href="user/setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']==2){?>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
 									<li><a href="user/users.php"><i class="icon-user"></i>Users</a></li>
 									<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
@@ -107,7 +97,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 										</li>
 									</ul>
 								</li>
-							<?php }} if(isset($_SESSION['name'])){ ?>
+							<?php }} if(isset($_SESSION['status'])){ ?>
 								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
 								<?php } ?>
 							</ul>
@@ -127,13 +117,13 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 						<h2 class='titlesec'>Reset Password</h2>
 						<div class='row-fluid'>
 							<div class='span1'><label>Your Email</label></div>
-							<div class='span3'><input type="text" id="rmail" placeholder="Email" required></div>
+							<div class='span3'><input type="text" id="rmail" placeholder="Email" autocomplete="off" required></div>
 						</div>
 						<div class='row-fluid'>
 							<div class='span1'><label>New Password</label></div>
-							<div class='span3'><input type="password" id="npwd" placeholder="New Password" required></div>
+							<div class='span3'><input type="password" id="npwd" placeholder="New Password" autocomplete="off" required></div>
 							<div class='span2'><label>Reapeat New Password</label></div>
-							<div class='span3'><input type="password" id="rnpwd" placeholder="Repeat New Password" required></div>
+							<div class='span3'><input type="password" id="rnpwd" placeholder="Repeat New Password" autocomplete="off" required></div>
 						</div>
 						<input type="submit" id='resetpass' onclick='javascript:return false;' class="btn btn-success" value='Update Password'/>
 					</form>
@@ -148,8 +138,21 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 	<script>
 	 $(document).ready(function() {
 	<?php if(isset($_GET['act']) && $_GET['act']=='resetpass' && isset($_GET['key'])){ ?>
-		$("#resetpass").click(function(){var a=$("#npwd").val(),b=$("#rnpwd").val(),c=$("#rmail").val();""!=a.replace(/\s+/g,"")&&a==b?$.ajax({type:"POST",url:"../php/function.php",data:{act:"reset_password",npass:a,rnpass:b,rmail:c,key:"<?php echo $_GET['key']; ?>"},dataType:"json",success:function(a){"Updated"==a[0]?window.location="<?php echo dirname(curPageURL()); ?>":noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})}):noty({text:"The passwords don't match",type:"error",timeout:9E3})});
-	});
+		$("#resetpass").click(function () {
+			var a = $("#npwd").val(),
+				b = $("#rnpwd").val(),
+				c = $("#rmail").val();
+			"" != a.replace(/\s+/g, "") && a == b ? $.ajax({
+				type: "POST",
+				url: "../php/function.php",
+				data: {act: "reset_password",npass: a,rnpass: b,rmail: c,key: "<?php echo htmlspecialchars($_GET['key'],ENT_QUOTES,'UTF-8'); ?>"},
+				dataType: "json",
+				success: function (a) {
+					"Updated" == a[0] ? window.location = "<?php echo dirname(curPageURL()); ?>" : noty({text: a[0],type: "error",timeout: 9E3})
+				}
+			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "The passwords don't match",type: "error",timeout: 9E3})
+		});	
+});
 	<?php } ?>
 	
 	function logout(){var request= $.ajax({type: 'POST',url: '../php/function.php',data: {act:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}

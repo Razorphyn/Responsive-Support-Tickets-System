@@ -96,7 +96,7 @@ $siteurl=$siteurl[0];
 							<ul class="nav">
 								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
 									<li class="active"><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
 									<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
 									<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
@@ -112,7 +112,7 @@ $siteurl=$siteurl[0];
 									</ul>
 								</li>
 									<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
 									<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
 									<li class="dropdown" role='button'>
 										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
@@ -136,7 +136,7 @@ $siteurl=$siteurl[0];
 											</li>
 										</ul>
 									</li>
-							<?php }} if(isset($_SESSION['name'])){ ?>
+							<?php }} if(isset($_SESSION['status'])){ ?>
 								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
 							<?php } ?>
 							</ul>

@@ -28,7 +28,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	header("location: ../index.php?e=local");
 	exit();
 }
-else if(!isset($_SESSION['status']) || $_SESSION['status']!=2 || !isset($_SESSION['name'])){
+else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 	 header("location: ../index.php");
 	 exit();
 }

@@ -79,7 +79,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									</ul>
 								</li>
 									<li><a href="user/setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
 									<li><a href="user/users.php"><i class="icon-user"></i>Users</a></li>
 									<li class="dropdown" role='button'>
 										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
@@ -120,7 +120,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			<hr>
 			<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
 				<div class='row-fluid main'>
-					<h2 class='titlesec'>Hello <?php echo htmlspecialchars(mb_convert_encoding($_SESSION['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'); ?>!</h2>
+					<h2 class='titlesec'>Hello <?php echo htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8'); ?>!</h2>
 					<p>You are already logged in, you can start to ask for support.</p>
 				</div>
 			<?php } else if(isset($_SESSION['status']) && $_SESSION['status']==4){ ?>
@@ -145,7 +145,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						</div>
 						<div class='row-fluid'>
 							<div class='span2'><label for='pwd'>Password</label></div>
-							<div class='span3'><input type="password" id="pwd" placeholder="Password" required></div>
+							<div class='span3'><input type="password" id="pwd" placeholder="Password" autocomplete="off" required></div>
 						</div>
 						<input type="submit" onclick='javascript:login();return false;' class="btn btn-success" value='Login'/>
 					</form>
@@ -153,16 +153,16 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						<h2 class='titlesec'>New User</h2>
 						<div class='row-fluid'>
 							<div class='span2'><label for='rname'>Name</label></div>
-							<div class='span4'><input type="text" id="rname" placeholder="Name" required></div>
+							<div class='span4'><input type="text" id="rname" placeholder="Name" autocomplete="off" required></div>
 						</div>
 						<div class='row-fluid'>
 							<div class='span2'><label for='rmail'>Email</label></div>
-							<div class='span4'><input type="email" id="rmail" placeholder="Email" required></div>
+							<div class='span4'><input type="email" id="rmail" placeholder="Email" autocomplete="off" required></div>
 						</div><div class='row-fluid'>
 							<div class='span2'><label for='rpwd'>Password</label></div>
-							<div class='span4'><input type="password" id="rpwd" placeholder="Password" required></div>
+							<div class='span4'><input type="password" id="rpwd" placeholder="Password" autocomplete="off" required></div>
 							<div class='span2'><label for='rrpwd'>Repeat Password</label></div>
-							<div class='span4'><input type="password" id="rrpwd" placeholder="Repeat Password" required></div>
+							<div class='span4'><input type="password" id="rrpwd" placeholder="Repeat Password" autocomplete="off" required></div>
 						</div>
 						<input type="submit" onclick='javascript:register();return false;' class="btn btn-success" value='Register'/>
 					</form>
@@ -170,10 +170,10 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						<h2 class='titlesec'>Reset Password</h2>
 						<div class='row-fluid'>
 							<div class='span2'><label for='fname'>Name</label></div>
-							<div class='span3'><input type="text" id="fname" placeholder="Name" required></div>
+							<div class='span3'><input type="text" id="fname" placeholder="Name" autocomplete="off" required></div>
 						</div><div class='row-fluid'>
 							<div class='span2'><label for='fmail'>Email</label></div>
-							<div class='span3'><input type="email" id="fmail" placeholder="Email" required></div>
+							<div class='span3'><input type="email" id="fmail" placeholder="Email" autocomplete="off" required></div>
 						</div>
 						<input type="submit" id='resetpwd' onclick='javascript:return false;' class="btn btn-success" value='Reset Password'/>
 					</form>

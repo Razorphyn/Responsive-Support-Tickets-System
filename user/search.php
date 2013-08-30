@@ -85,7 +85,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 									</ul>
 								</li>
 								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']==2){?>
+							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
 								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">

@@ -27,7 +27,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	header("location: ../index.php?e=local");
 	exit();
 }
-else if(!isset($_SESSION['status']) || $_SESSION['status']>2 || !isset($_SESSION['name'])){
+else if(!isset($_SESSION['status']) || $_SESSION['status']>2){
 	 header("location: ../index.php");
 	 exit();
 }
@@ -53,7 +53,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		
 	</head>
 	<body>
-		<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){?>
+		<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){?>
 		<div class="container">
 			<div class="navbar navbar-fixed-top">
 				<div class="navbar-inner">
@@ -85,7 +85,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 									</ul>
 								</li>
 								<li class="active"><a href="#"><i class="icon-edit"></i>Settings</a></li>
-							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']==2){?>
+							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
 								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
@@ -100,7 +100,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 										</li>
 									</ul>
 								</li>
-							<?php } if(isset($_SESSION['name'])){ ?>
+							<?php } if(isset($_SESSION['status'])){ ?>
 								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
 							<?php } ?>
 							</ul>
@@ -118,7 +118,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					<h3 class='sectname'>Main Information</h3>
 					<div class='row-fluid'>
 						<div class='span2'><label for='usrname'>Name</label></div>
-						<div class='span4'><input type="text" name='usrname' id="usrname" value='<?php echo $_SESSION['name']; ?>' placeholder="Name" required/></div>
+						<div class='span4'><input type="text" name='usrname' id="usrname" value='<?php echo htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8'); ?>' placeholder="Name" required/></div>
 					</div>
 					<div class='row-fluid'>
 						<div class='span2'><label for='usrname'>Mail</label></div>
@@ -133,9 +133,9 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					</div>
 					<div class='row-fluid'>
 						<div class='span2'><label for='npass'>New Password</label></div>
-						<div class='span4'><input type="password" name='npass' id="npass" placeholder="New Password"/></div>
+						<div class='span4'><input type="password" name='npass' id="npass" placeholder="New Password" autocomplete="off" /></div>
 						<div class='span2'><label for='ckpass'>Repeat New Password</label></div>
-						<div class='span4'><input type="password" name='ckpass' id="ckpass" placeholder="Repeat New Password"/></div>
+						<div class='span4'><input type="password" name='ckpass' id="ckpass" placeholder="Repeat New Password" autocomplete="off" /></div>
 					</div>
 					<br/><br/>
 					<input type='submit' onclick='javascript:return false;' class='btn btn-success' id='savesett' value='Save'/>

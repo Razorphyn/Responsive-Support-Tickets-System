@@ -81,7 +81,7 @@ else{
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'encid'=>$a['enc_id'],'role'=>$a['urole'],'reason'=>htmlspecialchars(mb_convert_encoding($a['reason'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'mail'=>$a['mail']);
+					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'encid'=>$a['enc_id'],'role'=>$a['urole'],'reason'=>htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8'),'mail'=>$a['mail']);
 				}
 				while ($a = $STH->fetch());
 					
@@ -454,7 +454,7 @@ else{
 			if(!empty($a)){
 				$users=array('response'=>'ret','information'=>array());
 				do{
-					$users['information'][]=array('num'=>$a['id']-54,'name'=>htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'mail'=>$a['mail'],'status'=>$a['ustat'],'holiday'=>$a['hol'],"rating"=>$a['rt']);
+					$users['information'][]=array('num'=>$a['id']-54,'name'=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),'mail'=>$a['mail'],'status'=>$a['ustat'],'holiday'=>$a['hol'],"rating"=>$a['rt']);
 				}while ($a = $STH->fetch());
 				
 				header('Content-Type: application/json; charset=utf-8');
@@ -803,7 +803,7 @@ else{
 			if(!empty($a)){
 				$list=array(0=>'Ex',1=>'<option value="0">---</option>');
 				do{
-					$list[]='<option value="'.$a['id'].'">'.htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8').'</option>';
+					$list[]='<option value="'.$a['id'].'">'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'</option>';
 				}while ($a = $STH->fetch());
 				
 				header('Content-Type: application/json; charset=utf-8');
@@ -946,7 +946,7 @@ else{
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['faq'][]=array('id'=>$a['id']-14,'question'=>htmlspecialchars(mb_convert_encoding($a['question'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'position'=>$a['position'],'active'=>$a['ac'],'rate'=>$a['rat']);
+					$list['faq'][]=array('id'=>$a['id']-14,'question'=>htmlspecialchars($a['question'],ENT_QUOTES,'UTF-8'),'position'=>$a['position'],'active'=>$a['ac'],'rate'=>$a['rat']);
 				}while ($a = $STH->fetch());
 			}
 			header('Content-Type: application/json; charset=utf-8');
@@ -1142,7 +1142,7 @@ else{
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list[]=htmlspecialchars(mb_convert_encoding($a['answer'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
+					$list[]=htmlspecialchars($a['answer'],ENT_QUOTES,'UTF-8');
 				}while ($a = $STH->fetch());
 			}
 			header('Content-Type: application/json; charset=utf-8');
