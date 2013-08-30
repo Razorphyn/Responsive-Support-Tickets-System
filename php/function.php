@@ -36,8 +36,10 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Your Session has Expired, please reload the page and log in again'));
+	}
 	else
 		echo '<script>alert("Your Session has Expired, please reload the page and log in again");</script>';
 	exit();
@@ -46,8 +48,10 @@ else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
-	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Session, please reload the page and log in again'));
+	}
 	else
 		echo '<script>alert("Invalid Session, please reload the page and log in again");</script>';
 	exit();
@@ -60,16 +64,19 @@ if(isset($_POST['act']) && $_POST['act']=='register'){//check
 		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
 			$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
 		if($viper=='' && filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
 		}
 		$pass= trim(preg_replace('/\s+/','',$_POST['pwd']));
 		if($pass==''){
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Password'));
 			exit();
 		}
@@ -101,12 +108,17 @@ if(isset($_POST['act']) && $_POST['act']=='register'){//check
 					pclose(popen("start /B ".$ex,"r")); 
 				else
 					shell_exec($ex." > /dev/null 2>/dev/null &");
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Registred'));
 		}
 		catch(PDOException $e){
-			if((int)$e->getCode()==1062)
+			
+			if((int)$e->getCode()==1062){
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
+			}
 			else{
+				header('Content-Type: application/json; charset=utf-8');
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 				echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			}
@@ -114,8 +126,10 @@ if(isset($_POST['act']) && $_POST['act']=='register'){//check
 			exit();
 		}
 	}
-	else
+	else{
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Password Mismatch'));
+	}
 	exit();
 }
 
@@ -139,10 +153,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 				pclose(popen("start /B ".$ex,"r")); 
 			else
 				shell_exec($ex." > /dev/null 2>/dev/null &");
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Sent'));
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	$DBH=null;
@@ -176,13 +192,17 @@ else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='l
 				$_SESSION['mail_alert']=$a['mail_alert'];
 				$_SESSION['ip']=retrive_ip();
 			}while ($a = $STH->fetch());
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Logged'));
 		}
-		else
+		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Wrong Credentials'));
+		}
 	}
 	catch(PDOException $e){  
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	$DBH=null;
@@ -240,11 +260,13 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
 		$STH->execute();
 		
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Deleted'));
 	}
 	catch(PDOException $e){  
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		exit();
 	}
@@ -254,6 +276,7 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate_account'){//check
 	$key=trim(preg_replace('/\s+/','',$_POST['key']));
 	if(60!=strlen($key)){
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Key'));
 		exit();
 	}
@@ -284,13 +307,17 @@ else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate
 				$STH->execute();
 				$_SESSION['status']=0;
 				$_SESSION['time']=time();
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Activated'));
 			}
-			else
+			else{
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'No Key Match'));
+			}
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
@@ -315,19 +342,24 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 				do{
 					if($st!=$_SESSION['status']){
 						$_SESSION['status']=$st;
+						header('Content-Type: application/json; charset=utf-8');
 						echo json_encode(array(0=>"Load"));
 					}
 					else{
 						$_SESSION['cktime']=time();
+						header('Content-Type: application/json; charset=utf-8');
 						echo json_encode(array(0=>'Time'));
 					}
 				}while ($a = $STH->fetch());
 			}
-			else
+			else{
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Wrong Credentials'));
+			}
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
@@ -341,6 +373,7 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
 		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 	else{
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 		exit();
 	}
@@ -373,14 +406,17 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 				pclose(popen("start /B ".$ex,"r")); 
 			else
 				shell_exec($ex." > /dev/null 2>/dev/null &");
-			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Reset'));
 		}
-		else
+		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Wrong Credentials'));
+		}
 	}
 	catch(PDOException $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	$DBH=null;
@@ -407,15 +443,19 @@ else if(isset($_POST['act']) && $_POST['act']=='reset_password'){//check
 			$STH->bindParam(3,$_POST['key'],PDO::PARAM_STR);
 			$STH->execute();
 			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Updated'));
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
-	else
+	else{
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Password Mismatch'));
+	}
 	$DBH=null;
 	exit();
 }
@@ -423,6 +463,7 @@ else if(isset($_POST['act']) && $_POST['act']=='reset_password'){//check
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='logout'){
 	session_unset();
 	session_destroy();
+	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode(array(0=>'logout'));
 	exit();
 }
@@ -703,14 +744,18 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 					$dn['information'][]=array('id'=>$$a['id'],'name'=>htmlspecialchars(mb_convert_encoding($a['department_name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'active'=>$$a['active'],'public'=>$a['public']);
 				}while ($a = $STH->fetch());
 			}
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($dn);
 		}
-		else
+		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array('response'=>array('empty'),'information'=>array()));
+		}
 	}
-	catch(PDOException $e){  
+	catch(PDOException $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	exit();
@@ -818,11 +863,14 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 				}while ($a = $STH->fetch());
 			}
 		}
-		if(isset($list))
+		if(isset($list)){
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($list);
+		}
 	}
 	catch(PDOException $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	$DBH=null;
@@ -885,6 +933,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 					
 				}
 				$ret['messages']=array_values($ret['messages']);
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode($ret);
 			}
 			else
@@ -892,13 +941,16 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 		}
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 		$DBH=null;
 		exit();
 	}
-	else
+	else{
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array('Error'=>'FATAL ERROR'));
+	}
 	unset($_POST['action']);
 	exit();
 }
@@ -907,11 +959,18 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
 		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 	else{
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 		exit();
 	}
 	$alert=($_POST['almail']!='no') ? 'yes':'no';
-	$dfmail=(preg_replace('/\s+/','',$_POST['mail'])!='' && filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)) ? trim(preg_replace('/\s+/','',$_POST['mail'])):exit();
+	$dfmail=trim(preg_replace('/\s+/','',$_POST['mail']));
+	if(empty($dfmail) || !filter_var($dfmail, FILTER_VALIDATE_EMAIL)){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid Mail: empty mail or not allowed characters'));
+		exit();
+	}
+		
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -962,18 +1021,27 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$_SESSION['name']=$mustang;
 			$_SESSION['mail_alert']=$alert;
 			$_SESSION['mail']=$dfmail;
+			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
 		}
-		else if(isset($wrongpass) && $wrongpass==true)
+		else if(isset($wrongpass) && $wrongpass==true){
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Wrong Old Password'));
-		else
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'New Passwords Mismatch'));
+		}
 	}
 	catch(PDOException $e){
-		if((int)$e->getCode()==1062)
-			echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
+		if((int)$e->getCode()==1062){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>"User with mail: ".$dfmail." is already registred"));
+		}
 		else{
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
@@ -1232,11 +1300,13 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 				$_SESSION[$encid]['status']=$a['ticket_status'];
 			}while ($a = $STH->fetch());
 		}
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Saved'));
 	}
 	catch(PDOException $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	exit();
@@ -1273,11 +1343,13 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$STH->bindParam(5,$encid,PDO::PARAM_STR);
 		$STH->execute();
 		
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Moved'));
 	}
 	catch(PDOException $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	exit();
@@ -1296,11 +1368,13 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$STH->bindParam(2,$encid,PDO::PARAM_STR);
 		$STH->execute();
 		
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Updated',1=>htmlspecialchars(mb_convert_encoding($tit, "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8')));
 	}
 	catch(PDOException $e){  
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	exit();
@@ -1336,11 +1410,13 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$STH->bindParam(5,$encid,PDO::PARAM_STR,87);
 		$STH->execute();
 
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Updated'));
 	}
 	catch(PDOException $e){  
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	exit();
@@ -1381,13 +1457,13 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 				}
 			}while($a=$STH->fetch());
 		}
-		else
+		else{
 			echo '<script>parent.noty({text: "No matches",type:"error",timeout:9000});</script>';
+		}
 	}
 	catch(PDOException $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
-		echo json_encode(array(0=>''));
 		echo '<script>parent.noty({text: "We are sorry, but an error has occurred, please contact the administrator if it persist",type:"error",timeout:9000});</script>';
 	}
 	exit();
@@ -1467,12 +1543,14 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		$STH->bindParam(3,$charger,PDO::PARAM_STR);
 		$STH->bindParam(4,$encid,PDO::PARAM_STR);
 		$STH->execute();
-	
+		
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Saved'));
 	}
 	catch(Exception $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	exit();
@@ -1513,15 +1591,19 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(7,$note,PDO::PARAM_STR);
 			$STH->execute();
 			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Voted'));
 		}
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
 	}
-	else
+	else{
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'You must close the ticket before rate the operator!'));
+	}
 	$DBH=null;
 	exit();
 }
@@ -1556,17 +1638,23 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH->bindParam(4,$rate,PDO::PARAM_INT);
 			$STH->bindParam(5,$GT86,PDO::PARAM_INT);
 			$STH->execute();
+			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Voted'));
 		}
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 			$DBH=null;
+			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			exit();
 		}
 	}
-	else
+	else{
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Information'));
+	}
 	exit();
 }
 
@@ -1725,10 +1813,12 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 					$list['search'][]=array('id'=>$a['enc_id'],'dname'=>htmlspecialchars(mb_convert_encoding($a['department_name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars(mb_convert_encoding($a['title'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}while ($a = $STH->fetch());
 			}
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($list);
 	}
 	catch(PDOException $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
 	$DBH=null;
@@ -1794,7 +1884,8 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 					$STH = $DBH->prepare($query);
 					$STH->bindParam(1,$msid,PDO::PARAM_INT);
 					$STH->execute();
-					echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid Message",type:"error",timeout:9000});</script>';
+					header('Content-Type: application/json; charset=utf-8');
+					echo json_encode(array(0=>'Invalid Message'));
 					exit();
 				}
 			}
@@ -1802,17 +1893,21 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 				exit();
 					
 			$_SESSION[$_GET['id']]['reason']=$message;
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Submitted'));
 		}
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			$DBH=null;
 			exit();
 		}
 	}
-	else
+	else{
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Error/s: '.implode(', ',$error)));
+	}
 	exit();
 }
 
@@ -1879,7 +1974,7 @@ function retrive_mime($encname,$mustang){
 		'php' => 'text/html',
 		'css' => 'text/css',
 		'js' => 'application/javascript',
-		'json' => 'application/json',
+		'json' => 'application/json; charset=utf-8',
 		'xml' => 'application/xml',
 		'swf' => 'application/x-shockwave-flash',
 		'flv' => 'video/x-flv',

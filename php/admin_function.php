@@ -39,9 +39,10 @@ else{
 	else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 		session_unset();
 		session_destroy();
-		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Your Session has Expired, please reload the page and log in again'));
-		else
+		}else
 			echo '<script>alert("Your Session has Expired, please reload the page and log in again");</script>';
 		exit();
 	}
@@ -49,8 +50,10 @@ else{
 	else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 		session_unset();
 		session_destroy();
-		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Session, please reload the page and log in again'));
+		}
 		else
 			echo '<script>alert("Invalid Session, please reload the page and log in again");</script>';
 		exit();
@@ -83,10 +86,12 @@ else{
 				while ($a = $STH->fetch());
 					
 			}
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($list);
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -139,14 +144,18 @@ else{
 			$body="Hi,\r\n\r\nan account has been just created at this site: ".$site." \r\nThese are the information:\r\n Name: ".$mustang."\r\n Mail: ".$viper." \r\n Password: ".$pass." \r\n\r\nBest Regards, \r\n ".$_SESSION['name']." Site Administrator";
 			if(!mail($viper,'Account created by Administrator',$body,implode("\r\n", $headers)))
 				file_put_contents('mailsendadminerror','Couldn\'t send mail to: '.$viper);
-
+			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>$mustang,'mail'=>$viper,'status'=>$staus,'holiday'=>'No','rating'=>'Unrated')));
 		}
 		catch(PDOException $e){
-			if((int)$e->getCode()==1062)
+			if((int)$e->getCode()==1062){
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
+			}
 			else{
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			}
 			$DBH=null;
@@ -175,10 +184,12 @@ else{
 			$active=((int)$active==0) ? 'No':'Yes';
 			$public=((int)$public==0) ? 'No':'Yes';
 			$data['information']=array('id'=>$dpid,'name'=>$mustang,'active'=>$active,'public'=>$public);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($data);
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -200,10 +211,12 @@ else{
 			$STH->bindParam(3,$public,PDO::PARAM_STR);
 			$STH->bindParam(4,$camaro,PDO::PARAM_INT);
 			$STH->execute();
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Succeed'));
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -228,10 +241,12 @@ else{
 				$STH = $DBH->prepare($delquery);
 				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
 				$STH->execute();
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Deleted'));
 			}
 			catch(PDOException $e){  
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
 		}
@@ -288,21 +303,29 @@ else{
 						$delup="DELETE FROM ".$SupportUploadTable." WHERE `num_id` IN (".$list.")";
 						$STH = $DBH->prepare($delup);
 						$STH->execute();
+						header('Content-Type: application/json; charset=utf-8');
 						echo json_encode(array(0=>'Deleted'));
 					}
-					else
+					else{
+						header('Content-Type: application/json; charset=utf-8');
 						echo json_encode(array(0=>'Deleted'));
+					}
 				}
-				else
+				else{
+					header('Content-Type: application/json; charset=utf-8');
 					echo json_encode(array(0=>'Deleted'));
+				}
 			}
 			catch(PDOException $e){  
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
 		}
-		else
+		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Cannot select sub process'));
+		}
 	exit();
 }
 
@@ -317,10 +340,14 @@ else{
 		$tit=trim(preg_replace('/\s+/',' ',$_POST['tit']));
 		$amail= trim(preg_replace('/\s+/','',$_POST['mail']));
 		$amail=($amail!='' && filter_var($amail, FILTER_VALIDATE_EMAIL)) ? $amail:exit();
-		if(file_put_contents('config/setting.txt',$tit."\n".$amail."\n".$senreply."\n".$senope."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$maxsize."\n".$enrat."\n".$commlop."\n".$faq))
+		if(file_put_contents('config/setting.txt',$tit."\n".$amail."\n".$senreply."\n".$senope."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$maxsize."\n".$enrat."\n".$commlop."\n".$faq)){
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
-		else
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Error'));
+		}
 		exit();
 	}
 
@@ -350,10 +377,14 @@ else{
 			$pass=implode('',$pass);
 		}
 		$string='<?php $smailservice='.$serv.";\n".'$smailname=\''.$mustang."';\n".'$settingmail=\''.$viper."';\n".'$smailhost=\''.$host."';\n".'$smailport='.$port.";\n".'$smailssl='.$ssl.";\n".'$smailauth='.$auth.";\n".'$smailuser=\''.$mustang."';\n".'$smailpassword=\''.$mustang."';\n ?>";
-		if(file_put_contents('config/mail/stmp.php',$string))
+		if(file_put_contents('config/mail/stmp.php',$string)){
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
-		else
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Error'));
+		}
 		exit();
 	}
 
@@ -362,17 +393,27 @@ else{
 		$mess=(preg_replace('/\s+/','',$_POST['message'])!='')? trim(preg_replace('/\s+/',' ',$_POST['message'])):exit();
 		$act=(is_numeric($_POST['sec']))? $_POST['sec']:exit();
 		if($act==0 && file_put_contents('config/mail/newuser.txt',$sub."\n".$mess))
-			echo json_encode(array(0=>'Saved'));
+			$saved=true;
 		else if($act==1 && file_put_contents('config/mail/newreply.txt',$sub."\n".$mess))
-			echo json_encode(array(0=>'Saved'));
+			$saved=true;
 		else if($act==2 && file_put_contents('config/mail/newticket.txt',$sub."\n".$mess))
-			echo json_encode(array(0=>'Saved'));
+			$saved=true;
 		else if($act==3 && file_put_contents('config/mail/assigned.txt',$sub."\n".$mess))
-			echo json_encode(array(0=>'Saved'));
+			$saved=true;
 		else if($act==4 && file_put_contents('config/mail/forgotten.txt',$sub."\n".$mess))
-			echo json_encode(array(0=>'Saved'));
+			$saved=true;
 		else
+			$saved=false;
+
+		if(isset($saved) && $saved==true){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Saved'));
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Error'));
+		}
+
 		exit();
 	}
 
@@ -416,14 +457,18 @@ else{
 					$users['information'][]=array('num'=>$a['id']-54,'name'=>htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'mail'=>$a['mail'],'status'=>$a['ustat'],'holiday'=>$a['hol'],"rating"=>$a['rt']);
 				}while ($a = $STH->fetch());
 				
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode($users);
 			}
-			else
+			else{
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array('response'=>array('empty'),'information'=>array()));
+			}
 							
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -518,24 +563,31 @@ else{
 							$STH->execute();
 						}
 					}
-						echo json_encode(array(0=>'Updated'));
-				}
-				else
+					header('Content-Type: application/json; charset=utf-8');
 					echo json_encode(array(0=>'Updated'));
+				}
+				else{
+					header('Content-Type: application/json; charset=utf-8');
+					echo json_encode(array(0=>'Updated'));
+				}
 			}
 			else if($charger!=1 && $charger!=2){
 				$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN ticket_status='1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
 				$STH->execute();
-
+				
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Updated'));
 			}
-			else
+			else{
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Updated'));
+			}
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -569,10 +621,12 @@ else{
 				}
 			}
 			$ret['depa'][]='</div>';
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($ret);
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -606,10 +660,12 @@ else{
 			while ($a = $STH->fetch()){
 				$ret['rate'][]=array($a['rate'],$a['note'],$a['enc_id'],$a['mail']);
 			}
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($ret);
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -667,10 +723,12 @@ else{
 			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
 			$STH->execute();
 			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -711,10 +769,13 @@ else{
 						$STH->execute();
 					}
 				}
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Assigned'));
 			}
-			else
+			else{
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'No Ticket to Assign'));
+			}
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -745,13 +806,17 @@ else{
 					$list[]='<option value="'.$a['id'].'">'.htmlspecialchars(mb_convert_encoding($a['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8').'</option>';
 				}while ($a = $STH->fetch());
 				
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode($list);
 			}
-			else
+			else{
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Unavailable'));
+			}
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -793,13 +858,18 @@ else{
 			$STH->bindParam(7,$encid,PDO::PARAM_INT);
 			$STH->execute();
 			
-			if($opid>0)
+			if($opid>0){
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'AMoved'));
-			else
+			}
+			else{
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'No Operator Available'));
+			}
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -846,11 +916,14 @@ else{
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$c,PDO::PARAM_INT);
 				$STH->execute();
-				
+
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Deleted'));
 			}
-			else
+			else{
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'There is no Uploaded Files inside this period'));
+			}
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -876,10 +949,12 @@ else{
 					$list['faq'][]=array('id'=>$a['id']-14,'question'=>htmlspecialchars(mb_convert_encoding($a['question'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8'),'position'=>$a['position'],'active'=>$a['ac'],'rate'=>$a['rat']);
 				}while ($a = $STH->fetch());
 			}
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($list);
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -942,7 +1017,7 @@ else{
 			}
 			else
 				exit();
-				
+
 			$active=((int)$active==0) ? 'No':'Yes';
 			$data['information']=array('id'=>$dpid,'question'=>$question,'position'=>$pos,'active'=>$active);
 		
@@ -958,10 +1033,12 @@ else{
 					}while ($a = $STH->fetch());
 				}
 			}
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($data);
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		
@@ -984,10 +1061,12 @@ else{
 			$STH->bindParam(PARAM_INT);
 			$STH->execute();
 			
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -1035,10 +1114,12 @@ else{
 			$STH->bindParam(4,$active,PDO::PARAM_STR);
 			$STH->bindParam(5,$camaro,PDO::PARAM_INT);
 			$STH->execute();
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Succeed',1=>$pos));
 		}
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -1064,10 +1145,12 @@ else{
 					$list[]=htmlspecialchars(mb_convert_encoding($a['answer'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
 				}while ($a = $STH->fetch());
 			}
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($list);
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -1085,10 +1168,12 @@ else{
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$encid,PDO::PARAM_STR);
 			$STH->execute();
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		
