@@ -261,7 +261,7 @@ $stmp[8]=implode('',$stmp[8]);
 				}
 			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "Form Error - Empty Fields",type: "error",timeout: 9E3})
 		});
-		
+
 		$("#btnadddep").click(function () {
 			var b = $("#depname").val().replace(/\s+/g, " "),
 				c = $("#activedep").val(),

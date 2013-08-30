@@ -632,10 +632,10 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 									}
 								}
 								else
-									echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i]).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
+									echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
 							}
 							else if($_FILES['filename']['error'][$i]!=4)
-								echo '<script>parent.noty({text: "File Name:'.json_encode($_FILES['filename']['name'][$i]).' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
+								echo '<script>parent.noty({text: "File Name:'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 						}
 						if(isset($uploadarr[0])){
 							$query=substr_replace($query,'',-1);
@@ -1174,10 +1174,10 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 										}
 									}
 									else
-										echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i]).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
+										echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
 								}
 								else if($_FILES['filename']['error'][$i]!=4)
-									echo '<script>parent.noty({text: "Error:'.json_encode($_FILES['filename']['name'][$i]).' Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
+									echo '<script>parent.noty({text: "Error:'.json_encode($_FILES['filename']['name'][$i], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 							}
 							if(isset($uploadarr[0])){
 								$query=substr_replace($query,'',-1);

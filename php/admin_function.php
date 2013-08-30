@@ -225,7 +225,7 @@ else{
 		catch(PDOException $e){
 			if((int)$e->getCode()==1062){
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($mustang,ENT_QUOTES,'UTF-8')." already exist"));
+				echo json_encode(array(0=>"Department name: ".json_encode($mustang, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS)." already exist"));
 			}
 			else{
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
