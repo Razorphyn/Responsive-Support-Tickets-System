@@ -1193,20 +1193,25 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 						}
 					}
 				}
-				if($_SESSION['id']==$_SESSION[$encid]['usr_id']){
-					$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-					$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 0";
+				//Send Mail
+				if($_SESSION[$encid]['status']!=2){
+					if($_SESSION['id']==$_SESSION[$encid]['usr_id']){
+						$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 0";
+					}
+					else if($_SESSION[$encid]['status']==1){
+						$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
+						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 1";
+					}
+					
+					if(isset($ex)){
+						if(substr(php_uname(), 0, 7) == "Windows")
+							pclose(popen("start /B ".$ex,"r")); 
+						else
+							shell_exec($ex." > /dev/null 2>/dev/null &");
+					}
 				}
-				else if($_SESSION[$encid]['status']==1){
-					$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-					$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 1";
-				}
-				if(isset($ex)){
-					if(substr(php_uname(), 0, 7) == "Windows")
-						pclose(popen("start /B ".$ex,"r")); 
-					else
-						shell_exec($ex." > /dev/null 2>/dev/null &");
-				}
+				//Post Reply
 				if(isset($uploadarr[0])){
 					$json=json_encode($uploadarr);
 					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars(mb_convert_encoding($_SESSION['name'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8')."',".$json.");</script>";
