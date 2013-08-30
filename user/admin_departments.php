@@ -237,7 +237,51 @@ $stmp[8]=implode('',$stmp[8]);
 		
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($(this).parent().prev().remove(),$(this).parent().remove());return!1});
 		
-		$(document).on("click", ".submit_changes", function() { var a = $(this).parent(), b = a.children('input[name="depa_edit_id"]').val(), g = parseInt(a.children('input[name="depa_edit_pos"]').val()), f = a.find('input[name="edit_depa_name"]').val().replace(/\s+/g, " "), c = a.find('select[name="edit_depa_active"]').val(), d = a.find('select[name="edit_depa_public"]').val(); "" != f.replace(/\s+/g, "") ? $.ajax({type:"POST", url:"../php/admin_function.php", data:{act:"edit_depart", id:b, name:f, active:c, pub:d}, dataType:"json", success:function(e) { "Succeed" == e[0] ? (e = '<div class="btn-group"><button class="btn btn-info editdep" value="' + b + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + b + '"><i class="icon-remove"></i></button></div>', c = 1 == c ? "Yes" : "No", d = 1 == d ? "Yes" : "No", info = {id:b, name:f, active:c, public:d, action:e}, table.fnDeleteRow(g, function(){table.fnAddData(info)}), a.prev().remove(), a.remove()) : noty({text:e[0], type:"error", timeout:9E3}) }}).fail(function(a, b) { noty({text:b, type:"error", timeout:9E3}) }) : noty({text:"Form Error - Empty Fields", type:"error", timeout:9E3}) });
+		$(document).on("click", ".submit_changes",function (){
+			var a = $(this).parent(),
+				b = a.children('input[name="depa_edit_id"]').val(),
+				g = parseInt(a.children('input[name="depa_edit_pos"]').val()),
+				f = a.find('input[name="edit_depa_name"]').val().replace(/\s+/g, " "),
+				c = a.find('select[name="edit_depa_active"]').val(),
+				d = a.find('select[name="edit_depa_public"]').val();
+			"" != f.replace(/\s+/g, "") ? $.ajax({
+				type: "POST",
+				url: "../php/admin_function.php",
+				data: {act: "edit_depart",id: b,name: f,active: c,pub: d},
+				dataType: "json",
+				success: function (e) {
+					if("Succeed" == e[0]){
+						e[1]['action'] = '<div class="btn-group"><button class="btn btn-info editdep" value="' + e[1]['id'] + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + e[1]['id'] + '"><i class="icon-remove"></i></button></div>', 
+						table.fnDeleteRow(g, function () {table.fnAddData(e[1])}), 
+						a.prev().remove(), 
+						a.remove())
+					}
+					else
+						noty({text: e[0],type: "error",timeout: 9E3})
+				}
+			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "Form Error - Empty Fields",type: "error",timeout: 9E3})
+		});
+		
+		$("#btnadddep").click(function () {
+			var b = $("#depname").val().replace(/\s+/g, " "),
+				c = $("#activedep").val(),
+				d = $("#publicdep").val();
+			"" != b.replace(/\s+/g, "") ? $.ajax({
+				type: "POST",
+				url: "../php/admin_function.php",
+				data: {act: "add_depart",tit: b,active: c,pubdep: d},
+				dataType: "json",
+				success: function (a) {
+					if("Added" == a.response){
+						a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>',
+						table.fnAddData(a.information),
+						$("#depname").val(""))
+					}
+					else
+						noty({text: a[0],type: "error",timeout: 9E3})
+				}
+			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "Form Error - Empty Field",type: "error",timeout: 9E3})
+		});
 	});
 
 	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};

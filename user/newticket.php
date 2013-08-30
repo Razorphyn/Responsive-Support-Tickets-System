@@ -164,7 +164,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 								<div class='span2'><label for='ftpus'>FTP Username</label></div>
 								<div class='span4'><input type="text" name='ftpus' id="ftpus" placeholder="FTP Username"/></div>
 								<div class='span2'><label for='ftppass'>FTP Password</label></div>
-								<div class='span4'><input type="password" name='ftppass' id="ftppass" placeholder="FTP Password"/></div>
+								<div class='span4'><input type="password" name='ftppass' id="ftppass" placeholder="FTP Password" autocomplete="off"/></div>
 							</div>
 							<br/><br/>
 							<h3 class='sectname'>Message</h3>

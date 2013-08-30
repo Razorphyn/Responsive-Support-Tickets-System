@@ -129,7 +129,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					<h3 class='sectname'>Change Password</h3>
 					<div class='row-fluid'>
 						<div class='span2'><label for='npass'>Old Password</label></div>
-						<div class='span4'><input type="password" name='opass' id="opass" placeholder="Old Password"/></div>
+						<div class='span4'><input type="password" name='opass' id="opass" placeholder="Old Password" autocomplete="off" /></div>
 					</div>
 					<div class='row-fluid'>
 						<div class='span2'><label for='npass'>New Password</label></div>

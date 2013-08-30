@@ -183,14 +183,20 @@ else{
 			$dpid=$DBH->lastInsertId();
 			$active=((int)$active==0) ? 'No':'Yes';
 			$public=((int)$public==0) ? 'No':'Yes';
-			$data['information']=array('id'=>$dpid,'name'=>$mustang,'active'=>$active,'public'=>$public);
+			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'active'=>$active,'public'=>$public);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($data);
 		}
-		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
-			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		catch(PDOException $e){
+			if((int)$e->getCode()==1062){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($mustang,ENT_QUOTES,'UTF-8')." already exist"));
+			}
+			else{
+				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+			}
 		}
 		exit();
 	}
@@ -211,13 +217,21 @@ else{
 			$STH->bindParam(3,$public,PDO::PARAM_STR);
 			$STH->bindParam(4,$camaro,PDO::PARAM_INT);
 			$STH->execute();
+			$active=((int)$active==0) ? 'No':'Yes';
+			$public=((int)$public==0) ? 'No':'Yes';
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Succeed'));
+			echo json_encode(array(0=>'Succeed',1=>array('id'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'active'=>$active,'public'=>$public));
 		}
-		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
-			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		catch(PDOException $e){
+			if((int)$e->getCode()==1062){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($mustang,ENT_QUOTES,'UTF-8')." already exist"));
+			}
+			else{
+				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+			}
 		}
 		exit();
 	}

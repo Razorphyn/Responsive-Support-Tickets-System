@@ -355,7 +355,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 						<div class='span2'><strong>Username</strong></div>
 						<div class='span4'><input type='text' id='conuser' value="<?php echo addslashes($usercred); ?>"/></div>
 						<div class='span2'><div class='span7'><strong>Password</strong></div><div class='span5'><button id='showhide' class='btn btn-info'>Show</button></div></div>
-						<div class='span4' id='passcont'><input type='password' id='conpass' value="<?php echo $conpass; ?>" /></div>
+						<div class='span4' id='passcont'><input type='password' id='conpass' value="<?php echo addslashes($conpass); ?>" autocomplete="off" /></div>
 					</div>
 					<input type='submit' class='btn btn-success' id='updtconn' onclick='javascript:return false;' value='Update'/>
 					<hr>
@@ -509,25 +509,52 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$(".razorate").jRating();
 		<?php } ?>
 		
+		$('#messages').scrollPagination({scroll:false,id:'<?php echo $_GET['id'];?>',add:add});
 				
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",debug:!0,hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 
 		$("#subrepo").click(function(){var a=$("#problem").val();""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{act:"report_ticket",message:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Submitted"==b[0]?noty({text:"Your complaint has been submitted",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"The message cannot be empty",type:"error",timeout:9E3})});
 		
-		$("#showhide").click(function(){var a=$("#conpass").val()+"";$("#conpass").is(":password")?($("#passcont").html('<input type="text" id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Hide")):($("#passcont").html('<input type="password" id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Show"))});
+		$("#showhide").click(function(){var a=$("#conpass").val()+"";$("#conpass").is(":password")?($("#passcont").html('<input type="text" id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Hide")):($("#passcont").html('<input type="password" id="conpass" autocomplete="off" />'),$("#conpass").val(a),$("#showhide").text("Show"))});
 		
 		$("#add_upload").click(function(){$(".uploadfilebox:last").after('<div class="row-fluid uploadfilebox"><div class="span4"><div class="span9"><input type="file" name="filename[]" /></div><div class="span1"> <i class="icon-remove remupbox"></i></div></div></div>')});
 		
 		$(document).on("click",".remupbox",function(){$(this).parent().parent().remove()});
 
 		$("#updstatus").click(function() { var a = $("#statustk").val(); $.ajax({type:"POST", url:"../php/function.php", data:{act:"update_status", status:a, id:"<?php echo $_GET['id'];?>"}, dataType:"json", success:function(b) { "Saved" == b[0] ? (0 == a ? $(".ratingsect").slideToggle(800) : $(".ratingsect").slideToggle(800), noty({text:"Updated", type:"success", timeout:9E3})) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
+
+		//Update Ticket Title
+		$("#updtitle").click(function () {
+			var a = $("#nwtittk").val().replace(/\s+/g, " ");
+			"" != a.replace(/\s+/g, "") ? $.ajax({
+				type: "POST",
+				url: "../php/function.php",
+				data: {act: "update_ticket_title",tit: a,id: "<?php echo $_GET['id'];?>"},
+				dataType: "json",
+				success: function (b) {
+					"Updated" == b[0] ? $(".pagefun").html(b[1]) : noty({text: b[0],type: "error",timeout: 9E3})
+				}
+			}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})}) : noty({text: "Empty Title",type: "error",timeout: 9E3})
+		});	
 		
-		$('#messages').scrollPagination({scroll:false,id:'<?php echo $_GET['id'];?>',add:add});
+		//Update Ticket Connection
+		$("#updtconn").click(function () {
+			var a = $("#contype > option:checked").val(),
+				web = $('#webs').val(),
+				c = $("#conuser").val(),
+				d = $("#conpass").val();
+			$.ajax({
+				type: "POST",
+				url: "../php/function.php",
+				data: {act: "update_ticket_connection",website: web,contype: a,user: c,pass: d,id: "<?php echo $_GET['id'];?>"},
+				dataType: "json",
+				success: function (b) {
+					"Updated" == b[0] ? noty({text: "Updated",type: "success",timeout: 9E3}) : noty({text: b[0],type: "error",timeout: 9E3})
+				}
+			}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})})
+		});
 		
-		$("#updtitle").click(function(){var a=$("#nwtittk").val().replace(/\s+/g," ");""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{act:"update_ticket_title",tit:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Updated"==b[0]?$(".pagefun").html(b[1]):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"Empty Title",type:"error",timeout:9E3})});
-		
-		$("#updtconn").click(function(){var a=$("#contype > option:checked").val(),web=$('#webs').val(),c=$("#conuser").val(),d=$("#conpass").val();$.ajax({type:"POST",url:"../php/function.php",data:{act:"update_ticket_connection",website:web,contype:a,user:c,pass:d,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Updated"==b[0]?noty({text:"Updated",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})});
-		
+		//Show Hidden Form
 		$('.cif').click(function(){
 			el=$(this).children('i');
 			if(el.hasClass('icon-plus-sign')){
@@ -545,18 +572,12 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		<?php if($_SESSION['status']==1) { ?>
 			$('#updtdpop').click(function(){
 				var dpid=$('#departments').val();
-				var request= $.ajax({
+				$.ajax({
 					type: 'POST',url: '../php/function.php',data: {act:'move_opera_ticket',dpid:dpid,id:'<?php echo $_GET['id'];?>'},dataType : 'json',
 					success : function (data) {
-						if(data[0]=='Moved'){
-							noty({text: 'Moved',type:'success',timeout:9000});
-						}
-						else{
-							noty({text: data[0],type:'error',timeout:9000});
-						}
+						(data[0]=='Moved')? noty({text: 'Moved',type:'success',timeout:9000}):noty({text: data[0],type:'error',timeout:9000});
 					}
-				});
-				request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			});
 		<?php } ?>
 		

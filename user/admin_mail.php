@@ -160,13 +160,13 @@ if(isset($smailpassword)){
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpname'>Name</label></div>
-								<div class='span4'><input id='stmpname' type='text' value='<?php if(isset($smailname)) echo $smailname;?>' required/></div>
+								<div class='span4'><input id='stmpname' type='text' value='<?php if(isset($smailname)) echo addslashes($smailname);?>' required/></div>
 								<div class='span2'><label for='stmpmail'>Mail Address</label></div>
-								<div class='span4'><input id='stmpmail' type='email' value='<?php if(isset($settingmail)) echo $settingmail; ?>' required /></div>
+								<div class='span4'><input id='stmpmail' type='email' value='<?php if(isset($settingmail)) echo addslashes($settingmail); ?>' required /></div>
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmphost'>Hostname</label></div>
-								<div class='span4'><input id='stmphost' type='text' value='<?php if(isset($smailhost)) echo $smailhost; ?>' /></div>
+								<div class='span4'><input id='stmphost' type='text' value='<?php if(isset($smailhost)) echo addslashes($smailhost); ?>' /></div>
 								<div class='span2'><label for='stmpport'>Port</label></div>
 								<div class='span4'><input id='stmpport' type='text' value='<?php if(isset($smailport)) echo $smailport; ?>' /></div>
 						</div>
@@ -180,9 +180,9 @@ if(isset($smailpassword)){
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpusr'>Username</label></div>
-								<div class='span4'><input id='stmpusr' type='text' value='<?php if(isset($smailuser)) echo $smailuser; ?>' /></div>
+								<div class='span4'><input id='stmpusr' type='text' value='<?php if(isset($smailuser)) echo addslashes($smailuser); ?>' /></div>
 								<div class='span2'><label for='stmppas'>Password</label></div>
-								<div class='span4'><input id='stmppas' type='password' value='<?php if(isset($smailpassword)) echo $smailpassword; ?>' /></div>
+								<div class='span4'><input id='stmppas' type='password' value='<?php if(isset($smailpassword)) echo addslashes($smailpassword); ?>' autocomplete="off" /></div>
 						</div>
 						<br/>
 						<input type='submit' id='savestmp' onclick='javascript:return false;' value='Save' class='btn btn-success'/>
