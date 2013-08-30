@@ -977,7 +977,26 @@ else{
 	else if(isset($_POST['act'])  && $_POST['act']=='add_faq'){//check
 	
 		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
-		$answer=(trim(preg_replace('/\s+/','',$_POST['answer']))!='')? trim(preg_replace('/\s+/',' ',$_POST['answer'])):exit();
+		
+		$answer=trim(preg_replace('/\s+/',' ',$_POST['answer']));
+		if(trim(preg_replace('/\s+/','',$_POST['answer']))!=''){
+			require_once 'htmlpurifier/HTMLPurifier.auto.php';
+			$config = HTMLPurifier_Config::createDefault();
+			$purifier = new HTMLPurifier($config);
+			$answer = $purifier->purify($answer);
+			$check=trim(strip_tags($answer));
+			if(empty($check)){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Empty Answer'));
+				exit();
+			}
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Empty Answer'));
+			exit();
+		}
+
 		$pos=(is_numeric($_POST['pos']))? $_POST['pos']:NULL;
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		try{
@@ -998,39 +1017,6 @@ else{
 			$data=array('response'=>'Added');
 								
 			$dpid=$DBH->lastInsertId();
-			
-			$query = "SELECT `answer` FROM ".$SupportFaqTable." WHERE id=? LIMIT 1";
-			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$dpid,PDO::PARAM_INT);
-			$STH->execute();
-			$STH->setFetchMode(PDO::FETCH_ASSOC);
-			$a = $STH->fetch();
-			if(!empty($a)){
-				do{
-					$answer=$a['answer'];
-				}while ($a = $STH->fetch());
-				
-				require_once 'htmlpurifier/HTMLPurifier.auto.php';
-				$config = HTMLPurifier_Config::createDefault();
-				$purifier = new HTMLPurifier($config);
-				$answer = $purifier->purify($answer);
-				$check=trim(strip_tags($answer));
-				if(!empty($check)){
-					$query="UPDATE ".$SupportFaqTable." SET answer=? WHERE id=?";
-					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$answer,PDO::PARAM_STR);
-					$STH->bindParam(2,$dpid,PDO::PARAM_INT);
-					$STH->execute();
-				}
-				else{
-					$query = "DELETE FROM ".$SupportFaqTable." WHERE id=? ";
-					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$dpid,PDO::PARAM_INT);
-					$STH->execute();
-				}
-			}
-			else
-				exit();
 
 			$active=((int)$active==0) ? 'No':'Yes';
 			$data['information']=array('id'=>$dpid,'question'=>$question,'position'=>$pos,'active'=>$active);

@@ -474,11 +474,20 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='lo
 else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['createtk']=='Create New Ticket'){
 	$letarr=array('M','d','C','f','K','w','p','T','B','X');
 	$error=array();
-	if(trim(preg_replace('/\s+/','',strip_tags($_POST['message'])))!='')
-		$message=trim(preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message'])));
+	$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
+	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
+		require_once 'htmlpurifier/HTMLPurifier.auto.php';
+		$config = HTMLPurifier_Config::createDefault();
+		$purifier = new HTMLPurifier($config);
+		$message = $purifier->purify($message);
+		$check=trim(strip_tags($message));
+		if(empty($check)){
+			$error[]='Empty Message';
+		}
+	}
 	else
 		$error[]='Empty Message';
-
+	
 	if(trim(preg_replace('/\s+/','',$_POST['title']))!='')
 		$tit=trim(preg_replace('/\s+/',' ',$_POST['title']));
 	else
@@ -560,51 +569,11 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 			$STH->bindParam(4,$ip,PDO::PARAM_STR);
 			$STH->bindParam(5,$date,PDO::PARAM_STR);
 			$STH->execute();
-			
-			$msid=$DBH->lastInsertId();
-			$query = "SELECT `message` FROM ".$SupportMessagesTable." WHERE id=? LIMIT 1";
-			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$msid,PDO::PARAM_INT);
-			$STH->execute();
-			$STH->setFetchMode(PDO::FETCH_ASSOC);
-			$a = $STH->fetch();
-			if(!empty($a)){
-				do{
-					$message=$a['message'];
-				}while ($a = $STH->fetch());
-				
-				require_once 'htmlpurifier/HTMLPurifier.auto.php';
-				$config = HTMLPurifier_Config::createDefault();
-				$purifier = new HTMLPurifier($config);
-				$message = $purifier->purify($message);
-				$check=trim(strip_tags($message));
-				if(!empty($check)){
-					$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
-					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$message,PDO::PARAM_STR);
-					$STH->bindParam(2,$msid,PDO::PARAM_INT);
-					$STH->execute();
-				}
-				else{
-					$query = "DELETE FROM ".$SupportMessagesTable." WHERE id=? ";
-					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$msid,PDO::PARAM_INT);
-					$STH->execute();
-					
-					$query = "DELETE FROM ".$SupportTicketsTable." WHERE id=? ";
-					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$tkid,PDO::PARAM_INT);
-					$STH->execute();
-					echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid Message",type:"error",timeout:9000});</script>';
-					exit();
-				}
-			}
-			else
-				exit();
 
 			//File Upload
 			if(isset($setting[5]) && $setting[5]==1){
 				if(isset($_FILES['filename'])){
+					$msid=$DBH->lastInsertId();
 					$count=count($_FILES['filename']['name']);
 					if($count>0){
 						echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
@@ -1056,11 +1025,20 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$error=array();
-	if(trim(preg_replace('/\s+/','',$_POST['message']))!='')
-		$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
+	$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
+	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
+		require_once 'htmlpurifier/HTMLPurifier.auto.php';
+		$config = HTMLPurifier_Config::createDefault();
+		$purifier = new HTMLPurifier($config);
+		$message = $purifier->purify($message);
+		$check=trim(strip_tags($message));
+		if(empty($check)){
+			$error[]='Empty Message';
+		}
+	}
 	else
 		$error[]='Empty Message';
-
+	
 	if(!isset($error[0])){
 		if(isset($_SESSION[$encid]['id'])){
 			try{
@@ -1105,45 +1083,10 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				$STH->bindParam(5,$date,PDO::PARAM_STR);
 				$STH->execute();
 
-				$msid=$DBH->lastInsertId();
-				$query = "SELECT `message` FROM ".$SupportMessagesTable." WHERE id=? LIMIT 1";
-				$STH = $DBH->prepare($query);
-				$STH->bindParam(1,$msid,PDO::PARAM_INT);
-				$STH->execute();
-				$STH->setFetchMode(PDO::FETCH_ASSOC);
-				$a = $STH->fetch();
-				if(!empty($a)){
-					do{
-						$message=$a['message'];
-					}while ($a = $STH->fetch());
-					
-					require_once 'htmlpurifier/HTMLPurifier.auto.php';
-					$config = HTMLPurifier_Config::createDefault();
-					$purifier = new HTMLPurifier($config);
-					$message = $purifier->purify($message);
-					$check=trim(strip_tags($message));
-					if(!empty($check)){
-						$query="UPDATE ".$SupportMessagesTable." SET message=? WHERE id=?";
-						$STH = $DBH->prepare($query);
-						$STH->bindParam(1,$message,PDO::PARAM_STR);
-						$STH->bindParam(2,$msid,PDO::PARAM_INT);
-						$STH->execute();
-					}
-					else{
-						$query = "DELETE FROM ".$SupportMessagesTable." WHERE id=? ";
-						$STH = $DBH->prepare($query);
-						$STH->bindParam(1,$msid,PDO::PARAM_INT);
-						$STH->execute();
-						echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid Message",type:"error",timeout:9000});</script>';
-						exit();
-					}
-				}
-				else
-					exit();
-
 				if(isset($setting[5]) && $setting[5]==1){
 					//Upload File
 					if(isset($_FILES['filename'])){
+						$msid=$DBH->lastInsertId();
 						$count=count($_FILES['filename']['name']);
 						if($count>0){
 							echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
