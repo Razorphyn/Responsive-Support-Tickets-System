@@ -33,8 +33,8 @@ if(is_file('php/config/setting.txt')) $setting=file('php/config/setting.txt',FIL
 $siteurl=explode('?',curPageURL());
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
-$_SESSION['token']=random_token(7);
-function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 
 ?>
 <!DOCTYPE html>
@@ -189,33 +189,51 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script type="text/javascript"  src="<?php echo $siteurl.'min/?g=js_i&amp;5259487' ?>"></script>
 	
 	<script>
-	var token='<?php echo $_SESSION['token']; ?>';
 	$(document).ready(function() {
+		
 		
 		<?php if(isset($_GET['e']) && $_GET['e']=='exipred'){ ?>
 			noty({text: 'Your Session has Expired, please log in again',type:'error',timeout:9E3});
 		<?php } else if(isset($_GET['e']) && $_GET['e']=='local'){ ?>
 			noty({text: 'Your ip is different from the one where you have logged in, please log in again',type:'error',timeout:9E3});
+		<?php }  if(isset($_GET['act']) && $_GET['act']=='activate'){ ?>
+			$(".main").nimbleLoader("show", {
+				position             : "fixed",
+				loaderClass          : "loading_bar_body",
+				
+				hasBackground        : true,
+				zIndex               : 999,
+				backgroundColor      : "#fff",
+				backgroundOpacity    : 0.9
+			});
+			var request= $.ajax({
+				type: 'POST',
+				url: 'php/function.php',
+				data: {<?php echo $_SESSION['token']['act']; ?>:'activate_account',<?php echo $_SESSION['token']['activate']['key']; ?>:'<?php echo $_GET['reg']; ?>'},
+				dataType : 'json',
+				success : function (data) {
+					$(".main").nimbleLoader("hide");
+					if(data[0]=='Activated'){
+						window.location = '<?php echo $siteurl; ?>';
+					}
+					else
+						noty({text: data[0],type:'error',timeout:9E3});
+				}
+			});
+			request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+	
 		<?php } ?>
 		$(".opthome").on("click", function() { $(".activesec").removeClass("activesec").slideToggle(800); $('form[class*="' + $(this).attr("name") + '"]').slideToggle(800).addClass("activesec") });
 		
 		$(document).on('click','#resetpwd', function(){
-			$(".main").nimbleLoader("show", {
-			  position             : "fixed",
-			  loaderClass          : "loading_bar_body",
-			  debug                : true,
-			  hasBackground        : true,
-			  zIndex               : 999,
-			  backgroundColor      : "#fff",
-			  backgroundOpacity    : 0.9
-			});
+			$(".main").nimbleLoader("show", {position:"fixed",loaderClass:"loading_bar_body",hasBackground:true,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});
 			var mail=$('#fmail').val();
 			var name=$('#fname').val();
 			if(mail.replace(/\s+/g,'')!='' && name.replace(/\s+/g,'')!=''){
 				var request= $.ajax({
 					type: 'POST',
 					url: 'php/function.php',
-					data: {act:'forgot',mail: mail,name:name},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'forgot',mail: mail,name:name},
 					dataType : 'json',
 					success : function (data) {
 						$(".main").nimbleLoader("hide");
@@ -232,39 +250,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		});
 	
 	});
-	<?php if(isset($_GET['act']) && $_GET['act']=='activate'){ ?>
-		$(".main").nimbleLoader("show", {
-			position             : "fixed",
-			loaderClass          : "loading_bar_body",
-			debug                : true,
-			hasBackground        : true,
-			zIndex               : 999,
-			backgroundColor      : "#fff",
-			backgroundOpacity    : 0.9
-		});
-		var request= $.ajax({
-			type: 'POST',
-			url: 'php/function.php',
-			data: {act:'activate_account',key:'<?php echo $_GET['reg']; ?>'},
-			dataType : 'json',
-			success : function (data) {
-				$(".main").nimbleLoader("hide");
-				if(data[0]=='Activated'){
-					window.location = '<?php echo $siteurl; ?>';
-				}
-				else
-					noty({text: data[0],type:'error',timeout:9E3});
-			}
-		});
-		request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
-	
-	<?php } if(isset($_SESSION['status']) && $_SESSION['status']==3){ ?>
+	<?php if(isset($_SESSION['status']) && $_SESSION['status']==3){ ?>
 		function veirfy(){
-			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",debug : true,hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
+			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
 			var request= $.ajax({
 				type: 'POST',
 				url: 'php/function.php',
-				data: {act:'verify'},
+				data: {<?php echo $_SESSION['token']['act']; ?>:'verify'},
 				dataType : 'json',
 				success : function (data) {
 					$(".main").nimbleLoader("hide");
@@ -281,11 +273,11 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 		}
 		function resend(){
-			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",debug : true,hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
+			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
 			var request= $.ajax({
 				type: 'POST',
 				url: 'php/function.php',
-				data: {act:'send_again'},
+				data: {<?php echo $_SESSION['token']['act']; ?>:'send_again'},
 				dataType : 'json',
 				success : function (data) {
 					$(".main").nimbleLoader("hide");
@@ -300,7 +292,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		}
 	<?php } ?>
 	function register(){
-		$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",debug : true,hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
+		$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
 		var name=$('#rname').val();
 		var mail=$('#rmail').val();
 		var pwd=$('#rpwd').val();
@@ -309,7 +301,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			var request= $.ajax({
 				type: 'POST',
 				url: 'php/function.php',
-				data: {act:'register',name: name,mail: mail,pwd:pwd,rpwd:rpwd},
+				data: {<?php echo $_SESSION['token']['act'];?>:'register',name: name,mail: mail,pwd:pwd,rpwd:rpwd},
 				dataType : 'json',
 				success : function (data) {
 					$(".main").nimbleLoader("hide");
@@ -329,10 +321,11 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		}
 	}
 	
-	function login(){$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",debug:!0,hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});$.ajax({type:"POST",url:"php/function.php",data:{act:"login",mail:$("#mail").val(),pwd:$("#pwd").val()},dataType:"json",success:function(a){$(".main").nimbleLoader("hide");"Logged"==a[0]? (window.location = '<?php echo $siteurl; ?>'):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){$(".main").nimbleLoader("hide");noty({text:b, type:"error",timeout:9E3})})};
+	function login(){$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",debug:!0,hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});$.ajax({type:"POST",url:"php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"login",mail:$("#mail").val(),pwd:$("#pwd").val()},dataType:"json",success:function(a){$(".main").nimbleLoader("hide");"Logged"==a[0]? (window.location = '<?php echo $siteurl; ?>'):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){$(".main").nimbleLoader("hide");noty({text:b, type:"error",timeout:9E3})})};
 
-	function logout(){var request= $.ajax({type: 'POST',url: 'php/function.php',data: {act:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}
+	function logout(){var request= $.ajax({type: 'POST',url: 'php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}
 	
 	</script>
   </body>
 </html>
+<?php function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}?>

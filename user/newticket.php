@@ -40,6 +40,8 @@ $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
 ?>
 <!DOCTYPE html>
@@ -130,6 +132,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			<hr>
 			<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
 			<form style='display:none' id='createticket' method="POST" action="../php/function.php" target='hidden_upload' enctype="multipart/form-data">
+				<input type='hidden' value='Dream' name='<?php echo $_SESSION['token']['act']; ?>' />
 				<div class='row-fluid main'>
 					<div class='sect login activesec'>
 							<h3 class='sectname'>Ticket Information</h3>
@@ -201,7 +204,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				var request = $.ajax({
 					type: "POST",
 					url: "../php/function.php",
-					data: {act: "retrive_depart",sect: "new"},
+					data: {<?php echo $_SESSION['token']['act']; ?>: "retrive_depart",sect: "new"},
 					dataType: "json",
 					success: function (a) {
 						if("ret" == a.response){
@@ -232,7 +235,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			});
 			
 			function created(){window.location = "<?php echo dirname(curPageURL()); ?>";}
-			function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+			function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 			
 		</script>
 	</body>

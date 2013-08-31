@@ -26,7 +26,7 @@ $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
-
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -145,7 +145,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 			"" != a.replace(/\s+/g, "") && a == b ? $.ajax({
 				type: "POST",
 				url: "../php/function.php",
-				data: {act: "reset_password",npass: a,rnpass: b,rmail: c,key: "<?php echo htmlspecialchars($_GET['key'],ENT_QUOTES,'UTF-8'); ?>"},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "reset_password",npass: a,rnpass: b,rmail: c,key: "<?php echo htmlspecialchars($_GET['key'],ENT_QUOTES,'UTF-8'); ?>"},
 				dataType: "json",
 				success: function (a) {
 					"Updated" == a[0] ? window.location = "<?php echo dirname(curPageURL()); ?>" : noty({text: a[0],type: "error",timeout: 9E3})
@@ -155,11 +155,13 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 });
 	<?php } ?>
 	
-	function logout(){var request= $.ajax({type: 'POST',url: '../php/function.php',data: {act:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}
+	function logout(){var request= $.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}
 	</script>
   </body>
 </html>
 <?php 
 }
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+
 ?>

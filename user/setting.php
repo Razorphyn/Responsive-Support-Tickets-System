@@ -36,6 +36,8 @@ $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
 ?>
 <!DOCTYPE html>
@@ -149,9 +151,9 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 	<script>
 	$(document).ready(function() {
 		$('#enablealert option[value="<?php echo $_SESSION['mail_alert'];?>"]').attr('selected','selected');
-		$("#savesett").click(function(){var a=$("#usrname").val(),b=$("#gna").val(),e=$("#enablealert").val(),f=$("#opass").val(),c=$("#npass").val(),d=$("#ckpass").val();""!=a.replace(/\s+/g,"")&&""!=b.replace(/\s+/g,"")?""!=f.replace(/\s+/g,"")&&""!=c.replace(/\s+/g,"")&&""!=d.replace(/\s+/g,"")?c==d?(a=$.ajax({type:"POST",url:"../php/function.php",data:{act:"save_setting",name:a,mail:b,almail:e,oldpwd:f,nldpwd:c,rpwd:d},dataType:"json",success:function(a){"Saved"==a[0]?($('#opass').val(''),$('#npass').val(''),$('#ckpass').val(''),noty({text:"Saved",type:"success", timeout:9E3})):noty({text:a[0],type:"error",timeout:9E3})}}),a.fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})):noty({text:"New Passwords Mismatch",type:"error",timeout:9E3}):(a=$.ajax({type:"POST",url:"../php/function.php",data:{act:"save_setting",name:a,mail:b,almail:e},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}}),a.fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})):noty({text:"Empty Field", type:"error",timeout:9E3})});
+		$("#savesett").click(function(){var a=$("#usrname").val(),b=$("#gna").val(),e=$("#enablealert").val(),f=$("#opass").val(),c=$("#npass").val(),d=$("#ckpass").val();""!=a.replace(/\s+/g,"")&&""!=b.replace(/\s+/g,"")?""!=f.replace(/\s+/g,"")&&""!=c.replace(/\s+/g,"")&&""!=d.replace(/\s+/g,"")?c==d?(a=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_setting",name:a,mail:b,almail:e,oldpwd:f,nldpwd:c,rpwd:d},dataType:"json",success:function(a){"Saved"==a[0]?($('#opass').val(''),$('#npass').val(''),$('#ckpass').val(''),noty({text:"Saved",type:"success", timeout:9E3})):noty({text:a[0],type:"error",timeout:9E3})}}),a.fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})):noty({text:"New Passwords Mismatch",type:"error",timeout:9E3}):(a=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_setting",name:a,mail:b,almail:e},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}}),a.fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})):noty({text:"Empty Field", type:"error",timeout:9E3})});
 	});
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
 	<?php } else { ?>
 		<script>window.location = "<?php echo dirname(dirname(curPageURL())).'/index.php'; ?>";</script>

@@ -44,7 +44,6 @@ else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['
 		echo '<script>alert("Your Session has Expired, please reload the page and log in again");</script>';
 	exit();
 }
-
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
@@ -56,10 +55,21 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 		echo '<script>alert("Invalid Session, please reload the page and log in again");</script>';
 	exit();
 }
+else if(!isset($_POST[$_SESSION['token']['act']])){
+	session_unset();
+	session_destroy();
+	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid Token, for security reason you will be logged out'));
+	}
+	else
+		echo '<script>alert("Invalid Token, for security reason you will be logged out");</script>';
+	exit();
+}
 
 //Function
 
-if(isset($_POST['act']) && $_POST['act']=='register'){//check
+if($_POST[$_SESSION['token']['act']]=='register'){//check
 	if($_POST['pwd']==$_POST['rpwd']){
 		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
 			$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
@@ -133,7 +143,7 @@ if(isset($_POST['act']) && $_POST['act']=='register'){//check
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST['act']=='send_again'){//check
+else if(isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST[$_SESSION['token']['act']]=='send_again'){//check
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -165,7 +175,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='login'){
+else if(!isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='login'){
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
 	$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
 	$pass= trim(preg_replace('/\s+/','',$_POST['pwd']));
@@ -209,7 +219,7 @@ else if(isset($_POST['act']) && !isset($_SESSION['status']) && $_POST['act']=='l
 	exit();
 }
 
-else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_ticket'){
+else if($_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='delete_ticket'){
 	$encid=trim(preg_replace('/\s+/','',$_POST['enc']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	try{
@@ -273,7 +283,7 @@ else if(isset($_POST['act']) && $_SESSION['status']<3 && $_POST['act']=='delete_
 	exit();
 }
 	
-else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate_account'){//check
+else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_account'){//check
 	$key=trim(preg_replace('/\s+/','',$_POST['key']));
 	if(60!=strlen($key)){
 		header('Content-Type: application/json; charset=utf-8');
@@ -325,7 +335,7 @@ else if(isset($_POST['act']) && isset($_POST['key']) && $_POST['act']=='activate
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST['act']=='verify'){//check
+else if(isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST[$_SESSION['token']['act']]=='verify'){//check
 	if(!isset($_SESSION['cktime']) || ($_SESSION['cktime']-time())>300){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -367,7 +377,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
+else if($_POST[$_SESSION['token']['act']]=='forgot'){//check
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
 	$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
 	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
@@ -423,7 +433,7 @@ else if(isset($_POST['act']) && $_POST['act']=='forgot'){//check
 	exit();
 }
 
-else if(isset($_POST['act']) && $_POST['act']=='reset_password'){//check
+else if($_POST[$_SESSION['token']['act']]=='reset_password'){//check
 	$npwd=(string)$_POST['npass'];
 	$rpwd=(string)$_POST['rnpass'];
 	$rmail= trim(preg_replace('/\s+/','',$_POST['rmail']));
@@ -463,7 +473,7 @@ else if(isset($_POST['act']) && $_POST['act']=='reset_password'){//check
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_POST['act']=='logout'){
+else if(isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='logout'){
 	session_unset();
 	session_destroy();
 	header('Content-Type: application/json; charset=utf-8');
@@ -541,7 +551,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 			$STH->bindParam(10,$date,PDO::PARAM_STR);
 			$STH->execute();
 
-			echo '<script>parent.$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",debug : true,hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});</script>';
+			echo '<script>parent.$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});</script>';
 			//Assign Reference Number
 			
 			$tkid=$DBH->lastInsertId();
@@ -683,7 +693,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='retrive_depart'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='retrive_depart'){
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -733,7 +743,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='retrive_tickets'){
+else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='retrive_tickets'){
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -927,7 +937,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='save_setting'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='save_setting'){
 	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
 		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 	else{
@@ -1178,7 +1188,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_status'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='update_status'){
 	if($_SESSION['status']==0)
 		$charger=($_POST['status']==1 || $_POST['status']==2)? 1:0;
 	else
@@ -1263,7 +1273,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST['act']=='move_opera_ticket'){// deep check
+else if(isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST[$_SESSION['token']['act']]=='move_opera_ticket'){// deep check
 	$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
@@ -1306,7 +1316,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_title'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='update_ticket_title'){
 	$tit=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
@@ -1331,7 +1341,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_connection'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='update_ticket_connection'){
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$con=(is_numeric($_POST['contype']))? $_POST['contype']:exit();
@@ -1420,7 +1430,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='update_ticket_index'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='update_ticket_index'){
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$tit=(trim(preg_replace('/\s+/','',$_POST['title'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['title'])):exit();
@@ -1507,7 +1517,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='rating'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='rating'){
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	$encid=trim(preg_replace('/\s+/','',$_POST['tkid']));
@@ -1559,7 +1569,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='faq_rating'){
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	if($GT86>10 && $rate>0){
@@ -1609,7 +1619,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST['act']=='search_ticket'){
+else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='search_ticket'){
 	$enid=trim(preg_replace('/\s+/','',$_POST['enid']));
 	$tit=trim(preg_replace('/\s+/',' ',$_POST['title']));
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
@@ -1776,7 +1786,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status'])  && $_SESSION['status
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='report_ticket'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='report_ticket'){
 
 	if(trim(preg_replace('/\s+/','',strip_tags($_POST['message'])))!=''){
 		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));

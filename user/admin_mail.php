@@ -64,7 +64,10 @@ if(isset($smailpassword)){
 			$smailpassword[$i]=$crypttable[$crypttable[$smailpassword[$i]]];
 	}
 	$smailpassword=implode('',$smailpassword);
-}					
+}
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+					
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -195,7 +198,7 @@ if(isset($smailpassword)){
 						<div class='span12'><label><strong>New Member</strong></label></div>
 						<div class='row-fluid'>
 								<div class='span2'><label  for='nmsub'>Subject</label></div>
-								<div class='span4'><input id='nmsub' class='mailsubject' type='text' value='<?php if(isset($nu[0])) echo $nu[0];?>' required /></div>
+								<div class='span4'><input id='nmsub' class='mailsubject' type='text' value='<?php if(isset($nu[0])) echo htmlspecialchars($nu[0],ENT_QUOTES,'UTF-8');?>' required /></div>
 						</div>
 						<div class='row-fluid'>
 							<div class='span12'><textarea class='mailmessage' id='newmememess' rows="5" placeholder='Welcome Message' required><?php if(isset($nu[1])) echo $nu[1];?></textarea></div>	
@@ -210,7 +213,7 @@ if(isset($smailpassword)){
 						<div class='span12'><label><strong>New Reply</strong></label></div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='nrsub'>Subject</label></div>
-								<div class='span4'><input id='nrsub' class='mailsubject' type='text' value='<?php if(isset($nr[0])) echo $nr[0];?>' required/></div>
+								<div class='span4'><input id='nrsub' class='mailsubject' type='text' value='<?php if(isset($nr[0])) echo  htmlspecialchars($nr[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
 						<div class='row-fluid'>
 							<div class='span12'><textarea class='mailmessage' id='newreplymess' rows="5" placeholder='New Reply Message' required><?php if(isset($nr[1])) echo $nr[1];?></textarea></div>	
@@ -225,7 +228,7 @@ if(isset($smailpassword)){
 						<div class='span12'><label><strong>New Ticket</strong></label></div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='ntsub'>Subject</label></div>
-								<div class='span4'><input id='ntsub' class='mailsubject' type='text' value='<?php if(isset($nt[0])) echo $nt[0];?>' required/></div>
+								<div class='span4'><input id='ntsub' class='mailsubject' type='text' value='<?php if(isset($nt[0])) echo  htmlspecialchars($nt[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
 						<div class='row-fluid'>
 							<div class='span12'><textarea class='mailmessage' id='newticketmess' rows="5" placeholder='New Ticket Message' required><?php if(isset($nt[1])) echo $nt[1];?></textarea></div>	
@@ -241,7 +244,7 @@ if(isset($smailpassword)){
 						<div class='span12'><label><strong>Assigned Ticket</strong></label></div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='atsub'>Subject</label></div>
-								<div class='span4'><input id='atsub' class='mailsubject' type='text' value='<?php if(isset($as[0])) echo $as[0];?>' required/></div>
+								<div class='span4'><input id='atsub' class='mailsubject' type='text' value='<?php if(isset($as[0])) echo  htmlspecialchars($as[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
 						<div class='row-fluid'>
 							<div class='span12'><textarea class='mailmessage' id='assignedmess' rows="5" placeholder='Assigned Ticket Message' required><?php if(isset($as[1])) echo $as[1];?></textarea></div>	
@@ -255,7 +258,7 @@ if(isset($smailpassword)){
 						<div class='span12'><label><strong>Password Forgot</strong></label></div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='pfsub'>Subject</label></div>
-								<div class='span4'><input id='pfsub' class='mailsubject' type='text' value='<?php if(isset($fo[0])) echo $fo[0];?>' required/></div>
+								<div class='span4'><input id='pfsub' class='mailsubject' type='text' value='<?php if(isset($fo[0])) echo  htmlspecialchars($fo[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
 						<div class='row-fluid'>
 							<div class='span12'><textarea class='mailmessage' id='forgotmess' rows="5" placeholder='Assigned Ticket Message' required><?php if(isset($fo[1])) echo $fo[1];?></textarea></div>	
@@ -322,17 +325,17 @@ if(isset($smailpassword)){
 				}			
 			<?php } ?>
 			
-			if(""!=subject.replace(/\s+/g,"")&&""!=message.replace(/\s+/g,"")){var request=$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"save_mail_body",sec:sec,sub:subject,message:message},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}});request.fail(function(a,b){noty({text:"Request Error:"+b,type:"error",timeout:9E3})})}else noty({text:"Empty Field",type:"error",timeout:9E3});return !1;
+			if(""!=subject.replace(/\s+/g,"")&&""!=message.replace(/\s+/g,"")){var request=$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_mail_body",sec:sec,sub:subject,message:message},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}});request.fail(function(a,b){noty({text:"Request Error:"+b,type:"error",timeout:9E3})})}else noty({text:"Empty Field",type:"error",timeout:9E3});return !1;
 		});
 		
-		$("#savestmp").click(function(){var a=$("#stmpserv").val(),c=$("#stmpname").val(),d=$("#stmphost").val(),e=$("#stmpport").val(),f=$("#stmpsec > option:selected").val(),g=$("#stmpmail").val(),h=$("#stmpaut > option:selected").val(),k=$("#stmpusr").val(),l=$("#stmppas").val();$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"save_stmp",serv:a,name:c,host:d,port:e,ssl:f,mail:g,auth:h,usr:k,pass:l},dataType:"json",success:function(b){"Saved"==b[0]?noty({text:"STMP Information Saved",type:"success", timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})});
+		$("#savestmp").click(function(){var a=$("#stmpserv").val(),c=$("#stmpname").val(),d=$("#stmphost").val(),e=$("#stmpport").val(),f=$("#stmpsec > option:selected").val(),g=$("#stmpmail").val(),h=$("#stmpaut > option:selected").val(),k=$("#stmpusr").val(),l=$("#stmppas").val();$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_stmp",serv:a,name:c,host:d,port:e,ssl:f,mail:g,auth:h,usr:k,pass:l},dataType:"json",success:function(b){"Saved"==b[0]?noty({text:"STMP Information Saved",type:"success", timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})});
 		
 		$(document).on("change","#stmpaut",function(){1==$("#stmpaut > option:checked").val()?($("#stmpusr").attr("required","required"),$("#stmppas").attr("required","required")):($("#stmpusr").removeAttr("required"),$("#stmppas").removeAttr("required"))});
 
 		$(document).on("change","#stmpserv",function(){1==$("#stmpserv > option:checked").val()?($("#stmphost").attr("required","required"),$("#stmpport").attr("required","required")):($("#stmphost").removeAttr("required"),$("#stmpport").removeAttr("required"))});
 	});
 
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
   </body>
 </html>

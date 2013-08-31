@@ -58,9 +58,20 @@ else{
 			echo '<script>alert("Invalid Session, please reload the page and log in again");</script>';
 		exit();
 	}
+	else if(!isset($_POST[$_SESSION['token']['act']])){
+		session_unset();
+		session_destroy();
+		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Token, for security reason you will be logged out'));
+		}
+		else
+			echo '<script>alert("Invalid Token, for security reason you will be logged out");</script>';
+		exit();
+	}
 
 	//Functions
-	if(isset($_POST['act']) && $_POST['act']=='retrive_reported_ticket'){  //check
+	if($_POST[$_SESSION['token']['act']]=='retrive_reported_ticket'){  //check
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -97,7 +108,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='admin_user_add'){//check
+	else if($_POST[$_SESSION['token']['act']]=='admin_user_add'){//check
 		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='') ? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
 		$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
@@ -164,7 +175,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='add_depart'){//check
+	else if($_POST[$_SESSION['token']['act']]=='add_depart'){//check
 		$mustang=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		$public=(is_numeric($_POST['pubdep']))? $_POST['pubdep']:exit();
@@ -201,7 +212,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='edit_depart'){//check
+	else if($_POST[$_SESSION['token']['act']]=='edit_depart'){//check
 		$camaro=(is_numeric($_POST['id'])) ? (int)$_POST['id']:exit();
 		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
 		$active=(is_numeric($_POST['active'])) ? $_POST['active']:exit();
@@ -220,7 +231,7 @@ else{
 			$active=((int)$active==0) ? 'No':'Yes';
 			$public=((int)$public==0) ? 'No':'Yes';
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Succeed',1=>array('id'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'active'=>$active,'public'=>$public));
+			echo json_encode(array(0=>'Succeed',1=>array('id'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'active'=>$active,'public'=>$public)));
 		}
 		catch(PDOException $e){
 			if((int)$e->getCode()==1062){
@@ -236,7 +247,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='del_dep'){//check
+	else if($_POST[$_SESSION['token']['act']]=='del_dep'){//check
 	$sub=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
 	$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']:exit();
 	
@@ -343,7 +354,7 @@ else{
 	exit();
 }
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_options'){
+	else if($_POST[$_SESSION['token']['act']]=='save_options'){
 		$senreply=(is_numeric($_POST['senrep'])) ? $_POST['senrep']:exit();
 		$senope=(is_numeric($_POST['senope'])) ? $_POST['senope']:exit();
 		$upload=(is_numeric($_POST['upload'])) ? $_POST['upload']:exit();
@@ -365,7 +376,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_stmp'){
+	else if($_POST[$_SESSION['token']['act']]=='save_stmp'){
 		if(is_file('config/mail/stmp.txt')){
 			file_put_contents('config/mail/stmp.txt','');
 			unlink('config/mail/stmp.txt');
@@ -402,9 +413,21 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act'])  && $_POST['act']=='save_mail_body'){
+	else if($_POST[$_SESSION['token']['act']]=='save_mail_body'){
 		$sub=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
-		$mess=(preg_replace('/\s+/','',$_POST['message'])!='')? trim(preg_replace('/\s+/',' ',$_POST['message'])):exit();
+		if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
+			$mess=trim(preg_replace('/\s+/',' ',$_POST['message']));
+			require_once 'htmlpurifier/HTMLPurifier.auto.php';
+			$config = HTMLPurifier_Config::createDefault();
+			$purifier = new HTMLPurifier($config);
+			$mess = $purifier->purify($mess);
+			$check=trim(strip_tags($mess));
+			if(empty($check)){
+				$error[]='Empty Message';
+			}
+		}
+		else
+			$error[]='Empty Message';
 		$act=(is_numeric($_POST['sec']))? $_POST['sec']:exit();
 		if($act==0 && file_put_contents('config/mail/newuser.txt',$sub."\n".$mess))
 			$saved=true;
@@ -436,7 +459,7 @@ else{
 		if($_FILES['new_logo']['type']=='image/gif' || $_FILES['new_logo']['type']=='image/jpeg' || $_FILES['new_logo']['type']=='image/png' || $_FILES['new_logo']['type']=='image/pjpeg'){
 				if(move_uploaded_file($_FILES['new_logo']['tmp_name'], $target_path)) {
 					$dir=(dirname(dirname($_SERVER['REQUEST_URI']))!=rtrim('\ ')) ? dirname(dirname($_SERVER['REQUEST_URI'])):'';
-					$image='//'.$_SERVER['SERVER_NAME'].$dir.'/php/config/logo/'.$_FILES['new_logo']['name'];
+					$image='//'.$_SERVER['SERVER_NAME'].$dir.'/css/logo/'.basename($_FILES['new_logo']['name']);
 					file_put_contents('config/logo.txt',$image);
 					echo '<script>parent.$("#cur_logo").attr("src","'.$image.'");</script>';
 				}
@@ -446,7 +469,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='retrive_users'){
+	else if($_POST[$_SESSION['token']['act']]=='retrive_users'){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -488,7 +511,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='update_user_info'){//check
+	else if($_POST[$_SESSION['token']['act']]=='update_user_info'){//check
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
@@ -607,7 +630,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='select_depa_usr'){//check
+	else if($_POST[$_SESSION['token']['act']]=='select_depa_usr'){//check
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -646,7 +669,7 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act']) && $_POST['act']=='select_usr_rate'){
+	else if($_POST[$_SESSION['token']['act']]=='select_usr_rate'){
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -685,7 +708,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='del_usr'){//check
+	else if($_POST[$_SESSION['token']['act']]=='del_usr'){//check
 		$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']+54:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -748,7 +771,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='automatic_assign_ticket'){
+	else if($_POST[$_SESSION['token']['act']]=='automatic_assign_ticket'){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -798,7 +821,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='retrive_operator_assign'){//check
+	else if($_POST[$_SESSION['token']['act']]=='retrive_operator_assign'){//check
 		$encid=trim(preg_replace('/\s+/','',$_POST['enc']));
 		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 		$departmentid=(is_numeric($_POST['id'])) ? $_POST['id']:exit();
@@ -836,7 +859,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='move_admin_ticket'){//deep check
+	else if($_POST[$_SESSION['token']['act']]=='move_admin_ticket'){//deep check
 		$opid=(is_numeric($_POST['opid'])) ? $_POST['opid']:exit();
 		$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 		$encid=trim(preg_replace('/\s+/','',$_POST['id']));
@@ -889,7 +912,7 @@ else{
 		exit();
 	}
 
-	else if(isset($_POST['act']) && $_POST['act']=='delete_files'){//check
+	else if($_POST[$_SESSION['token']['act']]=='delete_files'){//check
 
 		$from=(trim(preg_replace('/\s+/','',$_POST['from']))!='')? trim(preg_replace('/\s+/','',$_POST['from']))." 00:00:00":exit();
 		$to=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 00:00:00":exit();
@@ -946,7 +969,7 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act']) && $_POST['act']=='retrive_faq'){//check
+	else if($_POST[$_SESSION['token']['act']]=='retrive_faq'){//check
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -974,7 +997,7 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act'])  && $_POST['act']=='add_faq'){//check
+	else if($_POST[$_SESSION['token']['act']]=='add_faq'){//check
 	
 		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
 		
@@ -1045,7 +1068,7 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act'])  && $_POST['act']=='del_faq'){//check
+	else if($_POST[$_SESSION['token']['act']]=='del_faq'){//check
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1072,7 +1095,7 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act'])  && $_POST['act']=='edit_faq'){//check
+	else if($_POST[$_SESSION['token']['act']]=='edit_faq'){//check
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
 		$answer=(trim(preg_replace('/\s+/','',$_POST['answer']))!='')? trim(preg_replace('/\s+/',' ',$_POST['answer'])):exit();
@@ -1125,7 +1148,7 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act']) && $_POST['act']=='retrive_faq_answer'){//check
+	else if($_POST[$_SESSION['token']['act']]=='retrive_faq_answer'){//check
 		$cs=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1156,7 +1179,7 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['act'])  && $_POST['act']=='rem_flag'){//check
+	else if($_POST[$_SESSION['token']['act']]=='rem_flag'){//check
 		$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 		

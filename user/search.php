@@ -37,6 +37,8 @@ $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
 ?>
 <!DOCTYPE html>
@@ -257,7 +259,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$("#to").datepicker("option","maxDate",dateObject);
 		
 		var table;
-		var request=$.ajax({type:"POST",url:"../php/function.php",data:{act:"retrive_depart",sect:"new"},dataType:"json",success:function(a){"ret"==a.response?($("#loading").remove(),$("#dep").append(a.information)):"empty"==a.response?($("#loading").remove(),$("#searchform").html("<p>Sorry, no ticket could exists</p>")):($("#loading").remove(),$("#searchform").html("<h4>Error: "+a[0]+" <br/>Please contact the administrator.</h4>"));$("#searchform").slideToggle(1500)}});
+		var request=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_depart",sect:"new"},dataType:"json",success:function(a){"ret"==a.response?($("#loading").remove(),$("#dep").append(a.information)):"empty"==a.response?($("#loading").remove(),$("#searchform").html("<p>Sorry, no ticket could exists</p>")):($("#loading").remove(),$("#searchform").html("<h4>Error: "+a[0]+" <br/>Please contact the administrator.</h4>"));$("#searchform").slideToggle(1500)}});
 
 		$('#searchtk').click(function(){
 			$(".formcontainer").html('<form></form>');
@@ -283,11 +285,11 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					type: 'POST',
 					url: '../php/function.php',
 					<?php if($_SESSION['status']==1){ ?>
-					data: {act:'search_ticket',enid:enid,title:title,dep:dep,from:from,to:to,statk:statk},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',enid:enid,title:title,dep:dep,from:from,to:to,statk:statk},
 					<?php } if($_SESSION['status']==0){ ?>
-					data: {act:'search_ticket',enid:enid,title:title,dep:dep,from:from,to:to,op:operator,statk:statk},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',enid:enid,title:title,dep:dep,from:from,to:to,op:operator,statk:statk},
 					<?php } if($_SESSION['status']==2){ ?>
-					data: {act:'search_ticket',id:id,mail:mail,opid:opid,enid:enid,title:title,dep:dep,from:from,to:to,op:operator,statk:statk},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',id:id,mail:mail,opid:opid,enid:enid,title:title,dep:dep,from:from,to:to,op:operator,statk:statk},
 					<?php } ?>
 					dataType : 'json',
 					success : function (data) {
@@ -310,7 +312,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				var request= $.ajax({
 					type: 'POST',
 					url: '../php/function.php',
-					data: {act:'delete_ticket',enc:enc},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'delete_ticket',enc:enc},
 					dataType : 'json',
 					success : function (data){
 						if(data[0]=='Deleted'){
@@ -388,7 +390,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				var request= $.ajax({
 					type: 'POST',
 					url: '../php/function.php',
-					data: {act:'update_ticket_index',id:id,title:tit,status:stat,priority:prio},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'update_ticket_index',id:id,title:tit,status:stat,priority:prio},
 					dataType : 'json',
 					success : function (data){
 						tit='<a href="view.php?id='+id+'" alt="View Ticket" title="View Ticket">'+tit+'</a>';
@@ -426,7 +428,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		});
 		
 	});
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
   </body>
 </html>

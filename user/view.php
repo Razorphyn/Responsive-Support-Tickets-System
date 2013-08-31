@@ -31,6 +31,8 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']>2){
 	 header("location: ../index.php");
 	 exit();
 }
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
 include_once '../php/config/database.php';
 
@@ -432,6 +434,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					if(!isset($error)){?>
 						<form id='formreply' method="POST" action="../php/function.php" target='hidden_upload' enctype="multipart/form-data">
 							<input type='hidden' name='id' value='<?php echo $_GET['id']; ?>' />
+							<input type='hidden' name='<?php echo $_SESSION['token']['act']; ?>' value='Night' />
 							<h3 class='sectname'>Reply</h3>
 							<div class='row-fluid'>
 								<div class='span12'><textarea name='message' id='message' rows="5" placeholder='Your Reply'> </textarea></div>
@@ -513,7 +516,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",debug:!0,hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 
-		$("#subrepo").click(function(){var a=$("#problem").val();""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{act:"report_ticket",message:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Submitted"==b[0]?noty({text:"Your complaint has been submitted",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"The message cannot be empty",type:"error",timeout:9E3})});
+		$("#subrepo").click(function(){var a=$("#problem").val();""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"report_ticket",message:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Submitted"==b[0]?noty({text:"Your complaint has been submitted",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"The message cannot be empty",type:"error",timeout:9E3})});
 		
 		$("#showhide").click(function(){var a=$("#conpass").val()+"";$("#conpass").is(":password")?($("#passcont").html('<input type="text" id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Hide")):($("#passcont").html('<input type="password" id="conpass" autocomplete="off" />'),$("#conpass").val(a),$("#showhide").text("Show"))});
 		
@@ -521,7 +524,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		
 		$(document).on("click",".remupbox",function(){$(this).parent().parent().remove()});
 
-		$("#updstatus").click(function() { var a = $("#statustk").val(); $.ajax({type:"POST", url:"../php/function.php", data:{act:"update_status", status:a, id:"<?php echo $_GET['id'];?>"}, dataType:"json", success:function(b) { "Saved" == b[0] ? (0 == a ? $(".ratingsect").slideToggle(800) : $(".ratingsect").slideToggle(800), noty({text:"Updated", type:"success", timeout:9E3})) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
+		$("#updstatus").click(function() { var a = $("#statustk").val(); $.ajax({type:"POST", url:"../php/function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"update_status", status:a, id:"<?php echo $_GET['id'];?>"}, dataType:"json", success:function(b) { "Saved" == b[0] ? (0 == a ? $(".ratingsect").slideToggle(800) : $(".ratingsect").slideToggle(800), noty({text:"Updated", type:"success", timeout:9E3})) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
 
 		//Update Ticket Title
 		$("#updtitle").click(function () {
@@ -529,7 +532,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			"" != a.replace(/\s+/g, "") ? $.ajax({
 				type: "POST",
 				url: "../php/function.php",
-				data: {act: "update_ticket_title",tit: a,id: "<?php echo $_GET['id'];?>"},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "update_ticket_title",tit: a,id: "<?php echo $_GET['id'];?>"},
 				dataType: "json",
 				success: function (b) {
 					"Updated" == b[0] ? $(".pagefun").html(b[1]) : noty({text: b[0],type: "error",timeout: 9E3})
@@ -546,7 +549,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			$.ajax({
 				type: "POST",
 				url: "../php/function.php",
-				data: {act: "update_ticket_connection",website: web,contype: a,user: c,pass: d,id: "<?php echo $_GET['id'];?>"},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "update_ticket_connection",website: web,contype: a,user: c,pass: d,id: "<?php echo $_GET['id'];?>"},
 				dataType: "json",
 				success: function (b) {
 					"Updated" == b[0] ? noty({text: "Updated",type: "success",timeout: 9E3}) : noty({text: b[0],type: "error",timeout: 9E3})
@@ -573,7 +576,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			$('#updtdpop').click(function(){
 				var dpid=$('#departments').val();
 				$.ajax({
-					type: 'POST',url: '../php/function.php',data: {act:'move_opera_ticket',dpid:dpid,id:'<?php echo $_GET['id'];?>'},dataType : 'json',
+					type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'move_opera_ticket',dpid:dpid,id:'<?php echo $_GET['id'];?>'},dataType : 'json',
 					success : function (data) {
 						(data[0]=='Moved')? noty({text: 'Moved',type:'success',timeout:9000}):noty({text: data[0],type:'error',timeout:9000});
 					}
@@ -584,14 +587,14 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		<?php if($_SESSION['status']==2) { ?>
 			$("#autass").on("click", function() { 1 == $("#autass:checked").length ? $("#operat").attr("disabled", "disabled") : $("#operat").removeAttr("disabled") });
 			
-			$(document).on("change", "#departments", function() { $("#departments").attr("disabled", "disabled"); var b = $("#departments > option:checked").val(); $.ajax({type:"POST", url:"../php/admin_function.php", data:{act:"retrive_operator_assign", id:b,enc:'<?php echo $_GET['id'];?>'}, dataType:"json", success:function(a) { "Ex" == a[0] ? (a[0] = "", $("#operat").html(a.join(""))) : noty({text:a[0], type:"error", timeout:9E3}); $("#departments").removeAttr("disabled") }}).fail(function(a, b) { noty({text:b, type:"error", timeout:9E3}) }) });
+			$(document).on("change", "#departments", function() { $("#departments").attr("disabled", "disabled"); var b = $("#departments > option:checked").val(); $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_operator_assign", id:b,enc:'<?php echo $_GET['id'];?>'}, dataType:"json", success:function(a) { "Ex" == a[0] ? (a[0] = "", $("#operat").html(a.join(""))) : noty({text:a[0], type:"error", timeout:9E3}); $("#departments").removeAttr("disabled") }}).fail(function(a, b) { noty({text:b, type:"error", timeout:9E3}) }) });
 			
-			$("#updtdpadmin").click(function() { var a = $("#departments").val(), c = 1 == $("#autass:checked").length ? -1 : $("#operat").val(); $.ajax({type:"POST", url:"../php/admin_function.php", data:{act:"move_admin_ticket", dpid:a, opid:c, id:"<?php echo $_GET['id'];?>"}, dataType:"json", success:function(b) { "AMoved" == b[0] ? noty({text:"Moved", type:"success", timeout:9E3}) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
+			$("#updtdpadmin").click(function() { var a = $("#departments").val(), c = 1 == $("#autass:checked").length ? -1 : $("#operat").val(); $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"move_admin_ticket", dpid:a, opid:c, id:"<?php echo $_GET['id'];?>"}, dataType:"json", success:function(b) { "AMoved" == b[0] ? noty({text:"Moved", type:"success", timeout:9E3}) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
 
 		<?php } ?>
 		
 	});
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	
 	function post_reply(mess, dat, name, up) {
 		<?php if(!$isMob){ ?> 

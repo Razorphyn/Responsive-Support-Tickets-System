@@ -48,7 +48,7 @@ if($stmt){
 						$list[]="<hr><div class='row-fluid'><div class='row-fluid'><div class='span9 question'>".$q."</div></div><div class='row-fluid'><div class='span9'>".html_entity_decode($a)."</div></div><div class='row-fluid'><div class='offset7 span3'><div class='razorate' data-average='".$r."' data-id='".($id*3823)."'></div></div><div class='span2'><input type='submit' class='btn btn-success faqrate' onclick='javascript:return false;' value='Rate'/></div></div></div>";
 				else
 					while (mysqli_stmt_fetch($stmt))
-						$list[]="<hr><div class='row-fluid'><div class='row-fluid'><div class='span9 question'>".$q."</div></div><div class='row-fluid'><div class='span9'>".html_entity_decode($a)."</div></div><div class='row-fluid'><div class='offset7 span4 reqlogin'><p>To rate this answer, please <a href='../index.php'>Log In or Register</a></div></div>";
+						$list[]="<hr><div class='row-fluid'><div class='row-fluid'><div class='span9 question'>".$q."</div></div><div class='row-fluid'><div class='span9'>".html_entity_decode($a)."</div></div><div class='row-fluid'><div class='offset7 span4 reqlogin'><p>To rate this answer, please <a href='../index.php'>Log In or Register</a></div></div></div>";
 
 			}
 		}
@@ -66,6 +66,7 @@ $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -163,11 +164,12 @@ $siteurl=$siteurl[0];
 	 $(document).ready(function(){
 		$(".razorate").jRating();
 	});
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text: a[0],type:'error',timeout:9000});}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text: a[0],type:'error',timeout:9000});}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
   </body>
 </html>
 <?php } else {header("location: ../index.php");exit();} 
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
 ?>

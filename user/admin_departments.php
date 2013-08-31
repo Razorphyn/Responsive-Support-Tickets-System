@@ -178,7 +178,7 @@ $stmp[8]=implode('',$stmp[8]);
 	<script>
 	 $(document).ready(function() {
 		var table;
-		var request=$.ajax({type:"POST",url:"../php/function.php",data:{act:"retrive_depart",sect:"admin"},dataType:"json",success:function(a){if("ret"==a.response||"empty"==a.response){if("ret"==a.response){var b=a.information.length;for(i=0;i<b;i++)a.information[i].action='<div class="btn-group"><button class="btn btn-info editdep" value="'+a.information[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+a.information[i].id+'"><i class="icon-remove"></i></button></div>'}$("#loading").remove(); table=$("#deptable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaData:a.information,oLanguage:{sEmptyTable:"No Departments"},aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]})}else noty({text:a[0], type:"error",timeout:9E3})}});request.fail(function(a,b){alert("Ajax Error: "+b)});		
+		var request=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_depart",sect:"admin"},dataType:"json",success:function(a){if("ret"==a.response||"empty"==a.response){if("ret"==a.response){var b=a.information.length;for(i=0;i<b;i++)a.information[i].action='<div class="btn-group"><button class="btn btn-info editdep" value="'+a.information[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+a.information[i].id+'"><i class="icon-remove"></i></button></div>'}$("#loading").remove(); table=$("#deptable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaData:a.information,oLanguage:{sEmptyTable:"No Departments"},aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]})}else noty({text:a[0], type:"error",timeout:9E3})}});request.fail(function(a,b){alert("Ajax Error: "+b)});		
 				
 		$("#deptable").on("click", ".editdep", function() { $(this).val(); var a = this.parentNode.parentNode.parentNode.parentNode, b = table.fnGetPosition(a, null, !0), a = table.fnGetData(a); 0 < $("#" + a.id).length ? $("html,body").animate({scrollTop:$("#" + a.id).offset().top}, 1500) : (b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row-fluid'><div class='span2'><label>Is Active?</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='span2'><label>Is Public?</label></div><div class='span4'><select name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>", $("#deplist").after(b), b = "Yes" == a["public"] ? 1 : 0, $('select[name="edit_depa_active"]:first option[value=' + ("Yes" == a.active ? 1 : 0) + "]").attr("selected", "selected"), $('select[name="edit_depa_public"]:first option[value=' + b + "]").attr("selected", "selected")) });
 		
@@ -194,7 +194,7 @@ $stmp[8]=implode('',$stmp[8]);
 						var request= $.ajax({
 							type: 'POST',
 							url: '../php/admin_function.php',
-							data: {act:'del_dep',sub:'del_name',id:id},
+							data: {<?php echo $_SESSION['token']['act']; ?>:'del_dep',sub:'del_name',id:id},
 							dataType : 'json',
 							success : function (data) {
 								if(data[0]=='Deleted')
@@ -210,7 +210,7 @@ $stmp[8]=implode('',$stmp[8]);
 						var request= $.ajax({
 							type: 'POST',
 							url: '../php/admin_function.php',
-							data: {act:'del_dep',sub:'del_every',id:id},
+							data: {<?php echo $_SESSION['token']['act']; ?>:'del_dep',sub:'del_every',id:id},
 							dataType : 'json',
 							success : function (data) {
 								if(data[0]=='Deleted')
@@ -233,7 +233,7 @@ $stmp[8]=implode('',$stmp[8]);
 			});
 		});
 		
-		$("#btnadddep").click(function(){var b=$("#depname").val().replace(/\s+/g," "),c=$("#activedep").val(),d=$("#publicdep").val();""!=b.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"add_depart",tit:b,active:c,pubdep:d},dataType:"json",success:function(a){"Added"==a.response?(a.information.action='<div class="btn-group"><button class="btn btn-info editdep" value="'+a.information.id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+ a.information.id+'"><i class="icon-remove"></i></button></div>',table.fnAddData(a.information),$("#depname").val("")):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})}):noty({text:"Form Error - Empty Field",type:"error",timeout:9E3})});
+		$("#btnadddep").click(function(){var b=$("#depname").val().replace(/\s+/g," "),c=$("#activedep").val(),d=$("#publicdep").val();""!=b.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"add_depart",tit:b,active:c,pubdep:d},dataType:"json",success:function(a){"Added"==a.response?(a.information.action='<div class="btn-group"><button class="btn btn-info editdep" value="'+a.information.id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+ a.information.id+'"><i class="icon-remove"></i></button></div>',table.fnAddData(a.information),$("#depname").val("")):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})}):noty({text:"Form Error - Empty Field",type:"error",timeout:9E3})});
 		
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($(this).parent().prev().remove(),$(this).parent().remove());return!1});
 		
@@ -247,14 +247,14 @@ $stmp[8]=implode('',$stmp[8]);
 			"" != f.replace(/\s+/g, "") ? $.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {act: "edit_depart",id: b,name: f,active: c,pub: d},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "edit_depart",id: b,name: f,active: c,pub: d},
 				dataType: "json",
 				success: function (e) {
 					if("Succeed" == e[0]){
 						e[1]['action'] = '<div class="btn-group"><button class="btn btn-info editdep" value="' + e[1]['id'] + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + e[1]['id'] + '"><i class="icon-remove"></i></button></div>', 
 						table.fnDeleteRow(g, function () {table.fnAddData(e[1])}), 
 						a.prev().remove(), 
-						a.remove())
+						a.remove()
 					}
 					else
 						noty({text: e[0],type: "error",timeout: 9E3})
@@ -269,13 +269,13 @@ $stmp[8]=implode('',$stmp[8]);
 			"" != b.replace(/\s+/g, "") ? $.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {act: "add_depart",tit: b,active: c,pubdep: d},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "add_depart",tit: b,active: c,pubdep: d},
 				dataType: "json",
 				success: function (a) {
 					if("Added" == a.response){
 						a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>',
 						table.fnAddData(a.information),
-						$("#depname").val(""))
+						$("#depname").val("")
 					}
 					else
 						noty({text: a[0],type: "error",timeout: 9E3})
@@ -284,7 +284,7 @@ $stmp[8]=implode('',$stmp[8]);
 		});
 	});
 
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
   </body>
 </html>

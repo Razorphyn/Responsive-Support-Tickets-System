@@ -49,7 +49,10 @@ for($i=0;$i<$c;$i++){
 		$stmp[8][$i]=$crypttable[$crypttable[$stmp[8][$i]]];
 }
 $stmp[8]=implode('',$stmp[8]);
-							
+
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+					
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -210,6 +213,7 @@ $stmp[8]=implode('',$stmp[8]);
 				<br/><br/>
 				<hr>
 				<form action='../php/admin_function.php' method='POST' target='hidden_frame' enctype="multipart/form-data">
+					<input type='hidden' name='<?php echo $_SESSION['token']['act']; ?>' value='Doom' />
 					<h3 class='sectname'>Logo</h3>
 					<div class='row-fluid'>
 						<div class='span2'><label>Current Logo</label></div>
@@ -263,12 +267,12 @@ $stmp[8]=implode('',$stmp[8]);
 			$("#allfaq > option[value='<?php echo $setting[8];?>']").attr('selected','selected');
 		<?php } ?>
 		
-		$("#deleteupload").click(function() { if(confirm("Do you want to delete all the files inside this period?")) { var a = $("#delfromdate").val(), c = $("#todeldate").val(); "" != a.replace(/\s+/g, "") && "" != c.replace(/\s+/g, "") ? $.ajax({type:"POST", url:"../php/admin_function.php", data:{act:"delete_files", from:a, to:c}, dataType:"json", success:function(b) { "Deleted" == b[0] ? ($("#delfromdate").val(""), $("#todeldate").val("")) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:"Request Error:" + a, type:"error", timeout:9E3}) }) : noty({text:"Complete both the date", type:"error", timeout:9E3}) } return!1 });
+		$("#deleteupload").click(function() { if(confirm("Do you want to delete all the files inside this period?")) { var a = $("#delfromdate").val(), c = $("#todeldate").val(); "" != a.replace(/\s+/g, "") && "" != c.replace(/\s+/g, "") ? $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"delete_files", from:a, to:c}, dataType:"json", success:function(b) { "Deleted" == b[0] ? ($("#delfromdate").val(""), $("#todeldate").val("")) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:"Request Error:" + a, type:"error", timeout:9E3}) }) : noty({text:"Complete both the date", type:"error", timeout:9E3}) } return!1 });
 		
-		$("#saveopt").click(function(){var a=$("#titsite").val().replace(/\s+/g," "),c=$("#notmail").val(),d=$("#senrep").val(),e=$("#senope").val(),f=$("#timezone").val(),g=$("#maxsize").val(),h=$("#allup > option:checked").val(),k=$("#allrat").val(),q=$("#commlop").val(),r=$("#allfaq").val();$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"save_options",tit:a,mail:c,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r},dataType:"json",success:function(b){"Saved"==b[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:"Options cannot be saved. Error: "+ b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});return!1});		
+		$("#saveopt").click(function(){var a=$("#titsite").val().replace(/\s+/g," "),c=$("#notmail").val(),d=$("#senrep").val(),e=$("#senope").val(),f=$("#timezone").val(),g=$("#maxsize").val(),h=$("#allup > option:checked").val(),k=$("#allrat").val(),q=$("#commlop").val(),r=$("#allfaq").val();$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r},dataType:"json",success:function(b){"Saved"==b[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:"Options cannot be saved. Error: "+ b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});return!1});		
 	});
 
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text: a[0],type:'error',timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text: a[0],type:'error',timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
   </body>
 </html>

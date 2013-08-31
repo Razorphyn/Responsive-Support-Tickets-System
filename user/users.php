@@ -36,6 +36,8 @@ $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
 ?>
 <!DOCTYPE html>
@@ -166,7 +168,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		var request = $.ajax({
 			type: "POST",
 			url: "../php/admin_function.php",
-			data: {act: "retrive_users"},
+			data: {<?php echo $_SESSION['token']['act']; ?>: "retrive_users"},
 			dataType: "json",
 			success: function (a) {
 				if ("ret" == a.response || "empty" == a.response) {
@@ -204,7 +206,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		<?php } ?>
 		
 		$('#new_user').click(function(){
-			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",debug : true,hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
+			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
 			var name=$('#new_rname').val();
 			var mail=$('#new_rmail').val();
 			var role=$('#new_usr_role').val();
@@ -212,7 +214,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				var request= $.ajax({
 					type: 'POST',
 					url: '../php/admin_function.php',
-					data: {act:'admin_user_add',name: name,mail: mail,role:role},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'admin_user_add',name: name,mail: mail,role:role},
 					dataType : 'json',
 					success : function (a) {
 						$(".main").nimbleLoader("hide");
@@ -271,7 +273,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			"" != e.replace(/\s+/g, "") && "" != f.replace(/\s+/g, "") ? ($.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {act: "update_user_info",id: b,name: e,mail: f,status: g,holiday: c,seldepa: h},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "update_user_info",id: b,name: e,mail: f,status: g,holiday: c,seldepa: h},
 				dataType: "json",
 				success: function (d) {
 					"Updated" == d[0] ? (
@@ -309,7 +311,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 						var request= $.ajax({
 							type: 'POST',
 							url: '../php/admin_function.php',
-							data: {act:'del_usr',id:id},
+							data: {<?php echo $_SESSION['token']['act']; ?>:'del_usr',id:id},
 							dataType : 'json',
 							success : function (data) {
 								if(data[0]=='Deleted')
@@ -342,7 +344,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			$.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {act: "select_depa_usr",id: c},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "select_depa_usr",id: c},
 				dataType: "json",
 				success: function (b) {
 					"ok" == b.res ? (a.parent().find(".loading").remove(), a.after(b.depa.join(""))) : noty({text: b[0],type: "error",timeout: 9E3})
@@ -362,7 +364,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				$.ajax({
 					type: "POST",
 					url: "../php/admin_function.php",
-					data: {act: "select_usr_rate",id: c},
+					data: {<?php echo $_SESSION['token']['act']; ?>: "select_usr_rate",id: c},
 					dataType: "json",
 					success: function (b) {
 						if(b.res=='ok'){
@@ -399,7 +401,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				$.ajax({
 					type: "POST",
 					url: "../php/admin_function.php",
-					data: {act: "select_usr_rate",id: c},
+					data: {<?php echo $_SESSION['token']['act']; ?>: "select_usr_rate",id: c},
 					dataType: "json",
 					success: function (b) {
 						if(b.res=='ok'){
@@ -443,7 +445,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$(document).on('click','.btn_close_form',function(){if(confirm('Do you want to close this edit form?')){$(this).parent().prev().remove();$(this).parent().remove();}return false;});
 		
 	});
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
   </body>
 </html>

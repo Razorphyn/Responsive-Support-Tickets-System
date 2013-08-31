@@ -37,6 +37,9 @@ $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 
+if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -172,7 +175,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
-		var request= $.ajax({type: 'POST',url: '../php/function.php',data: {act:'retrive_tickets'},dataType : 'json',
+		var request= $.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets'},dataType : 'json',
 			success : function (a) {
 				$('.loading').remove();
 				if(a.response=='ret'){
@@ -194,7 +197,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		request.fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});
 		
 		<?php if($_SESSION['status']==2){ ?>
-			$(document).on("click","#aut_ass_tk",function(){$.ajax({type:"POST",url:"../php/admin_function.php",data:{act:"automatic_assign_ticket"},dataType:"json",success:function(a){"Assigned"==a[0]?confirm("Do you want to refresh the page to see the changes?")&&(window.location="<?php echo curPageURL(); ?>"):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})});
+			$(document).on("click","#aut_ass_tk",function(){$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"automatic_assign_ticket"},dataType:"json",success:function(a){"Assigned"==a[0]?confirm("Do you want to refresh the page to see the changes?")&&(window.location="<?php echo curPageURL(); ?>"):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})});
 		<?php } ?>
 		$(document).on('click','.remusr',function(){
 			var enc=$(this).val();
@@ -204,7 +207,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				var request= $.ajax({
 					type: 'POST',
 					url: '../php/function.php',
-					data: {act:'delete_ticket',enc:enc},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'delete_ticket',enc:enc},
 					dataType : 'json',
 					success : function (data){
 						if(data[0]=='Deleted'){
@@ -282,7 +285,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				var request= $.ajax({
 					type: 'POST',
 					url: '../php/function.php',
-					data: {act:'update_ticket_index',id:id,title:tit,status:stat,priority:prio},
+					data: {<?php echo $_SESSION['token']['act']; ?>:'update_ticket_index',id:id,title:tit,status:stat,priority:prio},
 					dataType : 'json',
 					success : function (data){
 						tit='<a href="view.php?id='+id+'" alt="View Ticket" title="View Ticket">'+tit+'</a>';
@@ -319,7 +322,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				noty({text: 'Form Error - Empty Title',type:'error',timeout:9000});
 		});
 	});
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{act:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	
 	</script>
 	<?php } else { ?>
