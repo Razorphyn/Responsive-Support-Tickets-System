@@ -12,6 +12,8 @@ ini_set('session.use_trans_sid', '0');
 ini_set('session.save_path', '../php/config/session');
 session_name("RazorphynSupport");
 session_start();
+session_regenerate_id(true);
+
 //Session Check
 if(isset($_SESSION['time'])){
 	header("location: ../index.php?e=exipred");

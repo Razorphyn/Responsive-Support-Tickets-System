@@ -26,6 +26,7 @@ ini_set('session.use_trans_sid', '0');
 ini_set('session.save_path', 'config/session');
 session_name("RazorphynSupport");
 session_start();
+
 include_once 'config/database.php';
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 if(isset($setting[4])) date_default_timezone_set($setting[4]);
@@ -71,6 +72,7 @@ else if(!isset($_POST[$_SESSION['token']['act']])){
 
 if($_POST[$_SESSION['token']['act']]=='register'){//check
 	if($_POST['pwd']==$_POST['rpwd']){
+		
 		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
 			$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 		else{
@@ -79,7 +81,7 @@ if($_POST[$_SESSION['token']['act']]=='register'){//check
 			exit();
 		}
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		if($viper=='' && filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+		if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
@@ -177,7 +179,11 @@ else if(isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST[$_SESSION
 
 else if(!isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='login'){
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-	$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+	if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid Mail'));
+		exit();
+	}
 	$pass= trim(preg_replace('/\s+/','',$_POST['pwd']));
 	$pass=($pass!='') ? $pass:exit();
 	$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
@@ -379,7 +385,11 @@ else if(isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST[$_SESSION[
 
 else if($_POST[$_SESSION['token']['act']]=='forgot'){//check
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-	$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+	if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid Mail'));
+		exit();
+	}
 	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
 		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
 	else{
@@ -436,8 +446,13 @@ else if($_POST[$_SESSION['token']['act']]=='forgot'){//check
 else if($_POST[$_SESSION['token']['act']]=='reset_password'){//check
 	$npwd=(string)$_POST['npass'];
 	$rpwd=(string)$_POST['rnpass'];
-	$rmail= trim(preg_replace('/\s+/','',$_POST['rmail']));
-	$rmail=($rmail!='' && filter_var($rmail, FILTER_VALIDATE_EMAIL)) ? $rmail:exit();
+	
+	$rmail= trim(preg_replace('/\s+/','',$_POST['mail']));
+	if(empty($rmail) || filter_var($rmail, FILTER_VALIDATE_EMAIL)!=true){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid Mail'));
+		exit();
+	}
 	
 	$reskey=trim(preg_replace('/\s+/','',$_POST['key']));
 	$reskey=($encid!='' && strlen($encid)==87) ? $encid:exit();

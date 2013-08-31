@@ -12,6 +12,8 @@ ini_set('session.use_only_cookies', '1');
 ini_set('session.use_trans_sid', '0');
 session_name("RazorphynSupport");
 session_start();
+session_regenerate_id(true);
+
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
@@ -214,7 +216,6 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($('#faq_div').slideToggle(600),$('#edit_faq').removeClass('open'));return!1});
 
-		//fare
 		$(document).on('click','.submit_changes',function(){
 			var dom=$(this).parent();
 			var id= $("#faq_edit_id").val();
@@ -234,13 +235,10 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					data: {<?php echo $_SESSION['token']['act']; ?>:'edit_faq',id:id,question:q,answer:a,active:ac,position:p},
 					dataType : 'json',
 					success : function (data){
-						if(data[0]=='Succeed'){
-							var action='<div class="btn-group"><button class="btn btn-info editdep" value="'+id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+id+'"><i class="icon-remove"></i></button></div>';
-							ac=(ac==1)? 'Yes':'No';
-							var mu={id:id,question:q,position:data[1],active:ac,rate:'Unrated',action:action};
-							table.fnDeleteRow(pos, function(){
-								table.fnAddData(mu)
-							});
+						if(a[0]=='Succeed'){
+							a[1]['action']='<div class="btn-group"><button class="btn btn-info editdep" value="'+a[1]['id']+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+a[1]['id']+'"><i class="icon-remove"></i></button></div>';
+
+							table.fnDeleteRow(pos, function(){table.fnAddData(a[1])});
 							<?php if(!$isMob) { ?>
 								CKEDITOR.instances.edit_faq_answer.setData("")
 							<?php }else { ?>

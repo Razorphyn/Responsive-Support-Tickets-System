@@ -13,6 +13,8 @@ ini_set('session.use_only_cookies', '1');
 ini_set('session.use_trans_sid', '0');
 session_name("RazorphynSupport");
 session_start(); 
+session_regenerate_id(true);
+
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();

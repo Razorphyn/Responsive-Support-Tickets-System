@@ -26,6 +26,7 @@ ini_set('session.use_trans_sid', '0');
 ini_set('session.save_path', 'config/session');
 session_name("RazorphynSupport");
 session_start();
+
 if(!isset($_SESSION['status'])  || 2!=$_SESSION['status'])
 	exit();
 else{
@@ -109,7 +110,12 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='admin_user_add'){//check
-		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='') ? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
+		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['name'])),FILTER_SANITIZE_STRING);
+		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
+			exit();
+		}
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
 		$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
 		$pass=get_random_string(5);
@@ -157,7 +163,7 @@ else{
 				file_put_contents('mailsendadminerror','Couldn\'t send mail to: '.$viper);
 			
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>$mustang,'mail'=>$viper,'status'=>$staus,'holiday'=>'No','rating'=>'Unrated')));
+			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$staus,'holiday'=>'No','rating'=>'Unrated')));
 		}
 		catch(PDOException $e){
 			if((int)$e->getCode()==1062){
@@ -176,7 +182,12 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='add_depart'){//check
-		$mustang=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
+		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['tit'])),FILTER_SANITIZE_STRING);
+		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
+			exit();
+		}
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		$public=(is_numeric($_POST['pubdep']))? $_POST['pubdep']:exit();
 		try{
@@ -214,7 +225,12 @@ else{
 
 	else if($_POST[$_SESSION['token']['act']]=='edit_depart'){//check
 		$camaro=(is_numeric($_POST['id'])) ? (int)$_POST['id']:exit();
-		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
+		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['name'])),FILTER_SANITIZE_STRING);
+		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
+			exit();
+		}
 		$active=(is_numeric($_POST['active'])) ? $_POST['active']:exit();
 		$public=(is_numeric($_POST['pub'])) ? $_POST['pub']:exit();
 		try{
@@ -381,13 +397,23 @@ else{
 			file_put_contents('config/mail/stmp.txt','');
 			unlink('config/mail/stmp.txt');
 		}
-		$serv=(is_int($_POST['serv'])) ? $_POST['serv']:exit();
-		$mustang=(trim(preg_replace('/\s+/',' ',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
-		$viper=(trim(preg_replace('/\s+/',' ',$_POST['mail']))!='')? trim(preg_replace('/\s+/',' ',$_POST['mail'])):exit();
+		$serv=(is_numeric($_POST['serv'])) ? $_POST['serv']:exit();
+		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['name'])),FILTER_SANITIZE_STRING);
+		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
+			exit();
+		}
+		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
+		if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Mail'));
+			exit();
+		}
 		$host=(trim(preg_replace('/\s+/',' ',$_POST['host']))!='')? trim(preg_replace('/\s+/',' ',$_POST['host'])):exit();
-		$port=(is_int($_POST['port'])) ? $_POST['port']:exit();
-		$ssl=(is_int($_POST['ssl'])) ? $_POST['ssl']:exit();
-		$auth=(is_int($_POST['auth'])) ? $_POST['auth']:exit();
+		$port=(is_numeric($_POST['port'])) ? $_POST['port']:exit();
+		$ssl=(is_numeric($_POST['ssl'])) ? $_POST['ssl']:exit();
+		$auth=(is_numeric($_POST['auth'])) ? $_POST['auth']:exit();
 		
 		$usr=(string)$_POST['usr'];
 		$pass=(string)$_POST['pass'];
@@ -513,9 +539,18 @@ else{
 
 	else if($_POST[$_SESSION['token']['act']]=='update_user_info'){//check
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
-		$mustang=(trim(preg_replace('/\s+/','',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
+		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['name'])),FILTER_SANITIZE_STRING);
+		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
+			exit();
+		}
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+		if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Mail'));
+			exit();
+		}
 		$charger=(is_numeric($_POST['status'])) ? (string)$_POST['status']:exit();
 		$holiday=(is_numeric($_POST['holiday'])) ? (string)$_POST['holiday']:exit();
 		$seldepa=$_POST['seldepa'];
@@ -600,12 +635,53 @@ else{
 							$STH->execute();
 						}
 					}
+					$holiday=($holiday==1)? 'Yes':'No';
+					switch($charger){
+						case 0:
+							$charger='User';
+							break;
+						case 1:
+							$charger='Operator';
+							break;
+						case 2:
+							$charger='Administrator';
+							break;
+						case 3:
+							$charger='Activation';
+							break;
+						case 4:
+							$charger='Banned';
+							break;
+						default:
+							$charger='Error';
+					}
 					header('Content-Type: application/json; charset=utf-8');
-					echo json_encode(array(0=>'Updated'));
+					echo json_encode(array(0=>'Updated',1=>array('num'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
 				}
 				else{
+					
+					$holiday=($holiday==1)? 'Yes':'No';
+					switch($charger){
+						case 0:
+							$charger='User';
+							break;
+						case 1:
+							$charger='Operator';
+							break;
+						case 2:
+							$charger='Administrator';
+							break;
+						case 3:
+							$charger='Activation';
+							break;
+						case 4:
+							$charger='Banned';
+							break;
+						default:
+							$charger='Error';
+					}
 					header('Content-Type: application/json; charset=utf-8');
-					echo json_encode(array(0=>'Updated'));
+					echo json_encode(array(0=>'Updated',1=>array('num'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
 				}
 			}
 			else if($charger!=1 && $charger!=2){
@@ -613,13 +689,53 @@ else{
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
 				$STH->execute();
-				
+
+				$holiday=($holiday==1)? 'Yes':'No';
+				switch($charger){
+					case 0:
+						$charger='User';
+						break;
+					case 1:
+						$charger='Operator';
+						break;
+					case 2:
+						$charger='Administrator';
+						break;
+					case 3:
+						$charger='Activation';
+						break;
+					case 4:
+						$charger='Banned';
+						break;
+					default:
+						$charger='Error';
+				}
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>'Updated'));
+				echo json_encode(array(0=>'Updated',1=>array('num'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
 			}
 			else{
+				$holiday=($holiday==1)? 'Yes':'No';
+				switch($charger){
+					case 0:
+						$charger='User';
+						break;
+					case 1:
+						$charger='Operator';
+						break;
+					case 2:
+						$charger='Administrator';
+						break;
+					case 3:
+						$charger='Activation';
+						break;
+					case 4:
+						$charger='Banned';
+						break;
+					default:
+						$charger='Error';
+				}
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>'Updated'));
+				echo json_encode(array(0=>'Updated',1=>array('num'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
 			}
 		}
 		catch(PDOException $e){  
@@ -913,7 +1029,6 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='delete_files'){//check
-
 		$from=(trim(preg_replace('/\s+/','',$_POST['from']))!='')? trim(preg_replace('/\s+/','',$_POST['from']))." 00:00:00":exit();
 		$to=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 00:00:00":exit();
 		
@@ -1000,7 +1115,7 @@ else{
 	else if($_POST[$_SESSION['token']['act']]=='add_faq'){//check
 	
 		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
-		
+
 		$answer=trim(preg_replace('/\s+/',' ',$_POST['answer']));
 		if(trim(preg_replace('/\s+/','',$_POST['answer']))!=''){
 			require_once 'htmlpurifier/HTMLPurifier.auto.php';
@@ -1042,7 +1157,7 @@ else{
 			$dpid=$DBH->lastInsertId();
 
 			$active=((int)$active==0) ? 'No':'Yes';
-			$data['information']=array('id'=>$dpid,'question'=>$question,'position'=>$pos,'active'=>$active);
+			$data['information']=array('id'=>$dpid,'question'=>htmlspecialchars($question,ENT_QUOTES,'UTF-8'),'position'=>$pos,'active'=>$active);
 		
 			if($pos==NULL){
 				$query = "SELECT `position` FROM ".$SupportFaqTable." WHERE `id`='".$dpid."' LIMIT 1";
@@ -1098,7 +1213,25 @@ else{
 	else if($_POST[$_SESSION['token']['act']]=='edit_faq'){//check
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
-		$answer=(trim(preg_replace('/\s+/','',$_POST['answer']))!='')? trim(preg_replace('/\s+/',' ',$_POST['answer'])):exit();
+		$answer=trim(preg_replace('/\s+/',' ',$_POST['answer']));
+		if(trim(preg_replace('/\s+/','',$_POST['answer']))!=''){
+			require_once 'htmlpurifier/HTMLPurifier.auto.php';
+			$config = HTMLPurifier_Config::createDefault();
+			$purifier = new HTMLPurifier($config);
+			$answer = $purifier->purify($answer);
+			$check=trim(strip_tags($answer));
+			if(empty($check)){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Empty Answer'));
+				exit();
+			}
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Empty Answer'));
+			exit();
+		}
+		
 		$pos=(is_numeric($_POST['position']))? $_POST['position']:NULL;
 		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		try{
@@ -1137,8 +1270,10 @@ else{
 			$STH->bindParam(4,$active,PDO::PARAM_STR);
 			$STH->bindParam(5,$camaro,PDO::PARAM_INT);
 			$STH->execute();
+			
+			$active=($active==0)?'No':'Yes';
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Succeed',1=>$pos));
+			echo json_encode(array(0=>'Succeed',1=>array('id'=>$camaro,'question'=>htmlspecialchars($question,ENT_QUOTES,'UTF-8'),'position'=>$pos,'active'=>$active,'rate'=>'Unrated')));
 		}
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);

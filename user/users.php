@@ -12,6 +12,8 @@ ini_set('session.use_only_cookies', '1');
 ini_set('session.use_trans_sid', '0');
 session_name("RazorphynSupport");
 session_start(); 
+session_regenerate_id(true);
+
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
@@ -277,18 +279,12 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				dataType: "json",
 				success: function (d) {
 					"Updated" == d[0] ? (
-					d = '<div class="btn-group"><button class="btn btn-info edituser" value="' + b + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + b + '"><i class="icon-remove"></i></button></div>', 
-					c = 1 == c ? "Yes" : "No", 
-					info = {
-						num: b,
-						name: e,
-						mail: f,
-						status: a.find('select[name="usr_role"] option:selected').text(),
-						holiday: c,
-						rating: l,
-						action: d
-					}, table.fnDeleteRow(k, function(){table.fnAddData(info)}), a.prev().remove(), a.remove()
-				) : (a.children("input").each(function () {
+						d[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + b + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + b + '"><i class="icon-remove"></i></button></div>', 
+						d[1]['rating']=($.isNumeric(l))? l:'Unrated';
+						table.fnDeleteRow(k, function(){table.fnAddData(d[1])}),
+						a.prev().remove(),
+						a.remove()
+					) : (a.children("input").each(function () {
 						$(this).removeAttr("disabled", "disabled")
 					}), a.children("select").each(function () {
 						$(this).removeAttr("disabled", "disabled")
