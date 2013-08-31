@@ -110,7 +110,7 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='admin_user_add'){//check
-		$mustang=trim(filter_var((preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
 		if(empty($mustang)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
