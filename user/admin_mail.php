@@ -1,19 +1,26 @@
 <?php
 
 ini_set('session.auto_start', '0');
+ini_set('session.save_path', '../php/config/session');
 ini_set('session.hash_function', 'sha512');
 ini_set('session.gc_maxlifetime', '1800');
 ini_set('session.entropy_file', '/dev/urandom');
 ini_set('session.entropy_length', '512');
-ini_set('session.save_path', '../php/config/session');
 ini_set('session.gc_probability', '20');
 ini_set('session.gc_divisor', '100');
 ini_set('session.cookie_httponly', '1');
 ini_set('session.use_only_cookies', '1');
 ini_set('session.use_trans_sid', '0');
 session_name("RazorphynSupport");
-session_start();
-session_regenerate_id(true);
+if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+	ini_set('session.cookie_secure', '1');
+}
+if(isset($_COOKIE['RazorphynSupport']) && !empty($_COOKIE['RazorphynSupport']) && !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+	unset($_COOKIE['RazorphynSupport']);
+}
+session_start(); 
+
+
 
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)

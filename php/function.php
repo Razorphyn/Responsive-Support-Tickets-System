@@ -13,9 +13,10 @@ Tickets
 2	assignment
 */
 
+ini_set('session.auto_start', '0');
+ini_set('session.save_path', 'config/session');
 ini_set('session.hash_function', 'sha512');
 ini_set('session.gc_maxlifetime', '1800');
-ini_set('session.hash_bits_per_character', '5');
 ini_set('session.entropy_file', '/dev/urandom');
 ini_set('session.entropy_length', '512');
 ini_set('session.gc_probability', '20');
@@ -23,9 +24,14 @@ ini_set('session.gc_divisor', '100');
 ini_set('session.cookie_httponly', '1');
 ini_set('session.use_only_cookies', '1');
 ini_set('session.use_trans_sid', '0');
-ini_set('session.save_path', 'config/session');
 session_name("RazorphynSupport");
-session_start();
+if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+	ini_set('session.cookie_secure', '1');
+}
+if(isset($_COOKIE['RazorphynSupport']) && !empty($_COOKIE['RazorphynSupport']) && !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+	unset($_COOKIE['RazorphynSupport']);
+}
+session_start(); 
 
 include_once 'config/database.php';
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
@@ -61,10 +67,10 @@ else if(!isset($_POST[$_SESSION['token']['act']])){
 	session_destroy();
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'Invalid Token, for security reason you will be logged out'));
+		echo json_encode(array(0=>'Invalid Token, for security reason you will be logged out, please reload the page'));
 	}
 	else
-		echo '<script>alert("Invalid Token, for security reason you will be logged out");</script>';
+		echo '<script>alert("Invalid Token, for security reason you will be logged out, please reload the page");</script>';
 	exit();
 }
 
