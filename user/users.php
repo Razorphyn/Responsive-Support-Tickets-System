@@ -280,7 +280,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				success: function (d) {
 					"Updated" == d[0] ? (
 						d[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + b + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + b + '"><i class="icon-remove"></i></button></div>', 
-						d[1]['rating']=($.isNumeric(l))? l:'Unrated';
+						d[1]['rating']=($.isNumeric(l))? l:'Unrated',
 						table.fnDeleteRow(k, function(){table.fnAddData(d[1])}),
 						a.prev().remove(),
 						a.remove()

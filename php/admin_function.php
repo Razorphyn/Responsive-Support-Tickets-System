@@ -110,8 +110,8 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='admin_user_add'){//check
-		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['name'])),FILTER_SANITIZE_STRING);
-		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+		$mustang=trim(filter_var((preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		if(empty($mustang)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
@@ -182,8 +182,8 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='add_depart'){//check
-		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['tit'])),FILTER_SANITIZE_STRING);
-		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
+		if(empty($mustang)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
@@ -225,8 +225,8 @@ else{
 
 	else if($_POST[$_SESSION['token']['act']]=='edit_depart'){//check
 		$camaro=(is_numeric($_POST['id'])) ? (int)$_POST['id']:exit();
-		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['name'])),FILTER_SANITIZE_STRING);
-		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		if(empty($mustang)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
@@ -398,8 +398,8 @@ else{
 			unlink('config/mail/stmp.txt');
 		}
 		$serv=(is_numeric($_POST['serv'])) ? $_POST['serv']:exit();
-		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['name'])),FILTER_SANITIZE_STRING);
-		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		if(empty($mustang)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
@@ -539,8 +539,8 @@ else{
 
 	else if($_POST[$_SESSION['token']['act']]=='update_user_info'){//check
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
-		$mustang=filter_var(trim(preg_replace('/\s+/',' ',$_POST['name'])),FILTER_SANITIZE_STRING);
-		if(empty(trim(preg_replace('/\s+/','',$mustang))){
+		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		if(empty($mustang)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
