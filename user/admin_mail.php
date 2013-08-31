@@ -163,15 +163,15 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpname'>Name</label></div>
-								<div class='span4'><input id='stmpname' type='text' value='<?php if(isset($smailname)) echo addslashes($smailname);?>' required/></div>
+								<div class='span4'><input id='stmpname' type='text' value='<?php if(isset($smailname)) echo htmlspecialchars($smailname,ENT_QUOTES,'UTF-8');?>' required/></div>
 								<div class='span2'><label for='stmpmail'>Mail Address</label></div>
-								<div class='span4'><input id='stmpmail' type='email' value='<?php if(isset($settingmail)) echo addslashes($settingmail); ?>' required /></div>
+								<div class='span4'><input id='stmpmail' type='email' value='<?php if(isset($settingmail)) echo htmlspecialchars($settingmail,ENT_QUOTES,'UTF-8'); ?>' required /></div>
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmphost'>Hostname</label></div>
-								<div class='span4'><input id='stmphost' type='text' value='<?php if(isset($smailhost)) echo addslashes($smailhost); ?>' /></div>
+								<div class='span4'><input id='stmphost' type='text' value='<?php if(isset($smailhost)) echo htmlspecialchars($smailhost,ENT_QUOTES,'UTF-8'); ?>' /></div>
 								<div class='span2'><label for='stmpport'>Port</label></div>
-								<div class='span4'><input id='stmpport' type='text' value='<?php if(isset($smailport)) echo $smailport; ?>' /></div>
+								<div class='span4'><input id='stmpport' type='number' value='<?php if(isset($smailport)) echo $smailport; ?>' required/></div>
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpsec'>SSL/TLS</label></div>
@@ -183,9 +183,9 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						</div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='stmpusr'>Username</label></div>
-								<div class='span4'><input id='stmpusr' type='text' value='<?php if(isset($smailuser)) echo addslashes($smailuser); ?>' /></div>
+								<div class='span4'><input id='stmpusr' type='text' value='<?php if(isset($smailuser)) echo htmlspecialchars($smailuser,ENT_QUOTES,'UTF-8'); ?>' /></div>
 								<div class='span2'><label for='stmppas'>Password</label></div>
-								<div class='span4'><input id='stmppas' type='password' value='<?php if(isset($smailpassword)) echo addslashes($smailpassword); ?>' autocomplete="off" /></div>
+								<div class='span4'><input id='stmppas' type='password' value='<?php if(isset($smailpassword)) echo htmlspecialchars($smailpassword,ENT_QUOTES,'UTF-8'); ?>' autocomplete="off" /></div>
 						</div>
 						<br/>
 						<input type='submit' id='savestmp' onclick='javascript:return false;' value='Save' class='btn btn-success'/>
@@ -213,7 +213,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						<div class='span12'><label><strong>New Reply</strong></label></div>
 						<div class='row-fluid'>
 								<div class='span2'><label for='nrsub'>Subject</label></div>
-								<div class='span4'><input id='nrsub' class='mailsubject' type='text' value='<?php if(isset($nr[0])) echo  htmlspecialchars($nr[0],ENT_QUOTES,'UTF-8');?>' required/></div>
+								<div class='span4'><input id='nrsub' class='mailsubject' type='text' value='<?php if(isset($nr[0])) echo htmlspecialchars($nr[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
 						<div class='row-fluid'>
 							<div class='span12'><textarea class='mailmessage' id='newreplymess' rows="5" placeholder='New Reply Message' required><?php if(isset($nr[1])) echo $nr[1];?></textarea></div>	

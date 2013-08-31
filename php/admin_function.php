@@ -381,13 +381,13 @@ else{
 			file_put_contents('config/mail/stmp.txt','');
 			unlink('config/mail/stmp.txt');
 		}
-		$serv=(is_numeric($_POST['serv'])) ? $_POST['serv']:exit();
+		$serv=(is_int($_POST['serv'])) ? $_POST['serv']:exit();
 		$mustang=(trim(preg_replace('/\s+/',' ',$_POST['name']))!='')? trim(preg_replace('/\s+/',' ',$_POST['name'])):exit();
 		$viper=(trim(preg_replace('/\s+/',' ',$_POST['mail']))!='')? trim(preg_replace('/\s+/',' ',$_POST['mail'])):exit();
 		$host=(trim(preg_replace('/\s+/',' ',$_POST['host']))!='')? trim(preg_replace('/\s+/',' ',$_POST['host'])):exit();
-		$port=(is_numeric($_POST['port'])) ? $_POST['port']:exit();
-		$ssl=(is_numeric($_POST['ssl'])) ? $_POST['ssl']:exit();
-		$auth=(is_numeric($_POST['auth'])) ? $_POST['auth']:exit();
+		$port=(is_int($_POST['port'])) ? $_POST['port']:exit();
+		$ssl=(is_int($_POST['ssl'])) ? $_POST['ssl']:exit();
+		$auth=(is_int($_POST['auth'])) ? $_POST['auth']:exit();
 		
 		$usr=(string)$_POST['usr'];
 		$pass=(string)$_POST['pass'];
