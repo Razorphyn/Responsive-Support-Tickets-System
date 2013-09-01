@@ -209,7 +209,6 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			$(".main").nimbleLoader("show", {
 				position             : "fixed",
 				loaderClass          : "loading_bar_body",
-				
 				hasBackground        : true,
 				zIndex               : 999,
 				backgroundColor      : "#fff",
@@ -218,7 +217,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			var request= $.ajax({
 				type: 'POST',
 				url: 'php/function.php',
-				data: {<?php echo $_SESSION['token']['act']; ?>:'activate_account',<?php echo $_SESSION['token']['activate']['key']; ?>:'<?php echo $_GET['reg']; ?>'},
+				data: {<?php echo $_SESSION['token']['act']; ?>:'activate_account',key:'<?php echo $_GET['reg']; ?>'},
 				dataType : 'json',
 				success : function (data) {
 					$(".main").nimbleLoader("hide");
@@ -273,7 +272,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 						window.location.reload();
 					}
 					else if(data[0]=='Time'){
-						noty({text: 'No changes has been made, please wait 5 minutes from your last check',type:'success',timeout:9E3});
+						noty({text: 'No changes has been made, please wait 5 minutes from your last check',type:'information',timeout:9E3});
 					}
 					else
 						noty({text: data[0],type:'error',timeout:9E3});
@@ -281,6 +280,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			});
 			request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 		}
+
 		function resend(){
 			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
 			var request= $.ajax({

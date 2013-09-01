@@ -41,6 +41,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	header("location: ../index.php?e=local");
 	exit();
 }
+$_SESSION['token']['faq']=random_token(7);
 
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 if(isset($setting[9]) && $setting[9]==1){
@@ -159,10 +160,11 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			</div>
 			<div class='daddy'>
 				<hr>
-				<div class="jumbotron" >
+				<div class="jumbotron">
 					<h2 class='pagefun'>Frequently Asked Questions</h2>
 				</div>
 				<br/>
+				<input id='tok' type='hidden' value='<?php echo $_SESSION['token']['faq']; ?>' />
 				<?php if(!isset($error)){if(count($list)>0) echo implode(' ',$list); else echo '<hr><p>There is no FAQ</p>'?>
 				<?php } else { ?>
 					<p style='text-align:center'><?php echo $error; ?></p>

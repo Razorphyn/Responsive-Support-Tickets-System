@@ -65,7 +65,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 		echo '<script>alert("Invalid Session, please reload the page and log in again");</script>';
 	exit();
 }
-else if(!isset($_POST[$_SESSION['token']['act']])){
+else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
 	session_unset();
 	session_destroy();
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
@@ -79,7 +79,7 @@ else if(!isset($_POST[$_SESSION['token']['act']])){
 
 //Function
 
-if($_POST[$_SESSION['token']['act']]=='register'){//check
+if($_POST[$_SESSION['token']['act']]=='register'){
 	if($_POST['pwd']==$_POST['rpwd']){
 		
 		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
@@ -350,7 +350,7 @@ else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_acc
 	exit();
 }
 
-else if(isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST[$_SESSION['token']['act']]=='verify'){//check
+else if(isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST[$_SESSION['token']['act']]=='verify'){
 	if(!isset($_SESSION['cktime']) || ($_SESSION['cktime']-time())>300){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -365,8 +365,8 @@ else if(isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST[$_SESSION[
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					if($st!=$_SESSION['status']){
-						$_SESSION['status']=$st;
+					if($a['status']!=$_SESSION['status']){
+						$_SESSION['status']=$a['status'];
 						header('Content-Type: application/json; charset=utf-8');
 						echo json_encode(array(0=>"Load"));
 					}
@@ -624,13 +624,11 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 										$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
 										$target_path = "../upload/".$encname;
 										if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
-											if(CryptFile("../upload/".$encname)){
 												$movedfiles[]=realpath($_FILES['filename']['name'][$i]);
 												$uploadarr[]=array($encid,$encname,realpath($_FILES['filename']['name'][$i]));
 												$query.='(?,"'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
 												$sqlname[]=realpath($_FILES['filename']['name'][$i]);
 												echo '<script>parent.noty({text: "'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' has been uploaded",type:"success",timeout:2000});</script>';
-											}
 										}
 									}
 								}
@@ -775,7 +773,7 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 			$query = "SELECT 
 						a.enc_id,
 						IF(b.department_name IS NOT NULL, b.department_name,'Unknown'),
-						IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown'),
+						IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')),
 						a.title,
 						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
 						a.created_time,
@@ -1141,13 +1139,11 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 											$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
 											$target_path = "../upload/".$encname;
 											if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
-												if(CryptFile("../upload/".$encname)){
 													$movedfiles[]=realpath($_FILES['filename']['name'][$i]);
 													$uploadarr[]=array($encid,$encname,realpath($_FILES['filename']['name'][$i]));
 													$query.='(?,"'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
 													$sqlname[]=realpath($_FILES['filename']['name'][$i]);
 													echo '<script>parent.noty({text: "'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' has been uploaded",type:"success",timeout:2000});</script>';
-												}
 											}
 										}
 									}
@@ -1426,7 +1422,6 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 		if(!empty($a)){
 			do{
 				$enc='../upload/'.$file;
-				if(DecryptFile($enc)){
 					$mime=retrive_mime($enc,$a['name']);
 					if($mime!='Error'){
 						header("Content-Type: ".$mime);
@@ -1435,12 +1430,10 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 						header("Content-Disposition: attachment;filename=".$a['name']);
 						header("Content-Transfer-Encoding: binary");
 						readfile($enc);
-						CryptFile($enc);
 						echo '<script>parent.noty({text: "Your download will start soon",type:"information",timeout:9000});</script>';
 					}
 					else
 						echo '<script>parent.noty({text: "Can\'t retrive Content-Type",type:"error",timeout:9000});</script>';
-				}
 			}while($a=$STH->fetch());
 		}
 		else{
@@ -1594,7 +1587,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	exit();
 }
 
-else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='faq_rating'){
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){//wrong result
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	if($GT86>10 && $rate>0){
@@ -1612,7 +1605,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 						INNER JOIN ".$SupportRateFaqTable." b 
 							ON b.faq_id=a.id AND b.usr_id=?
 						SET 
-							a.rate=CASE WHEN b.updated='1' THEN ROUND(((a.num_rate * a.rate - b.rate) + ?)/(a.num_rate),2) ELSE ROUND ((a.rate + ?)/(a.num_rate+1),2) END,
+							a.rate=CASE WHEN b.updated='1' THEN ROUND((((a.num_rate * a.rate) - b.rate) + ?)/(a.num_rate),2) ELSE ROUND ((a.rate + ?)/(a.num_rate),2) END,
 							a.num_rate=CASE WHEN b.updated='1' THEN a.num_rate ELSE a.num_rate+1 END,
 							b.updated='0',
 							b.rate=?
@@ -1624,7 +1617,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 			$STH->bindParam(4,$rate,PDO::PARAM_INT);
 			$STH->bindParam(5,$GT86,PDO::PARAM_INT);
 			$STH->execute();
-			
+
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Voted'));
 		}
@@ -1663,7 +1656,7 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
 	$statk=(is_numeric($_POST['statk']))? (int)$_POST['statk']:'';
 	$from=trim(preg_replace('/\s+/','',$_POST['from']));
-	$to=ptrim(reg_replace('/\s+/','',$_POST['to']));
+	$to=trim(preg_replace('/\s+/','',$_POST['to']));
 	if($from!=''){
 		list($yyyy,$mm,$dd) = explode('-',$from);
 		if (!checkdate($mm,$dd,$yyyy))
@@ -2063,43 +2056,6 @@ function retrive_mime($encname,$mustang){
 		return 'Error';
 }
 
-function CryptFile($InFileName){
-	$password='!5s[}du#iwfg8sus6';
-	if (file_exists($InFileName)){
-		$InFile = file_get_contents($InFileName);
-		$StrLen = strlen($InFile);
-		for ($i = 0; $i < $StrLen ; $i++){
-			$chr = substr($InFile,$i,1);
-			$modulus = $i % strlen($password);
-			$passwordchr = substr($password,$modulus, 1);
-			$OutFile .= chr(ord($chr)+ord($passwordchr));
-		}
-		$OutFile = base64_encode($OutFile);
-		file_put_contents($InFileName,$OutFile);
-		return true;
-	}
-	else
-		return false;
-}
-
-function DecryptFile($InFileName){
-	$password='!5s[}du#iwfg8sus6';
-	if (file_exists($InFileName)){
-		$InFile = file_get_contents($InFileName);
-		$InFile = base64_decode($InFile);
-		$StrLen = strlen($InFile);
-		for ($i = 0; $i < $StrLen ; $i++){
-			$chr = substr($InFile,$i,1);
-			$modulus = $i % strlen($password);
-			$passwordchr = substr($password,$modulus, 1);
-			$OutFile .= chr(ord($chr)-ord($passwordchr));
-		}
-		file_put_contents($InFileName,$OutFile);
-		return true;
-	}
-	else
-		return false;
-}
 
 function covert_size($val){if(empty($val))return 0;$val = trim($val);preg_match('#([0-9]+)[\s]*([a-z]+)#i', $val, $matches);$last = '';if(isset($matches[2]))$last = $matches[2];if(isset($matches[1]))$val = (int) $matches[1];switch (strtolower($last)){case 'g':case 'gb':$val *= 1024;case 'm':case 'mb':$val *= 1024;case 'k':case 'kb':$val *= 1024;}return (int) $val;}
 function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])){$ip=$_SERVER['HTTP_CLIENT_IP'];}elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])){$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];}else{$ip=$_SERVER['REMOTE_ADDR'];}return $ip;}
