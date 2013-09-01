@@ -28,8 +28,11 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !empty($_COOKIE['RazorphynSupport']) && !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
-	unset($_COOKIE['RazorphynSupport']);
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+	setcookie(session_name(),'invalid',time()-3600);
+	header('Content-Type: application/json; charset=utf-8');
+	echo json_encode(array(0=>'Invalid Session ID, please reload the page'));
+	exit();
 }
 session_start(); 
 
@@ -99,10 +102,9 @@ else{
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'encid'=>$a['enc_id'],'role'=>$a['urole'],'reason'=>htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8'),'mail'=>$a['mail']);
+					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'encid'=>$a['enc_id'],'role'=>$a['urole'],'reason'=>htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
 				}
 				while ($a = $STH->fetch());
-					
 			}
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($list);
@@ -169,12 +171,12 @@ else{
 				file_put_contents('mailsendadminerror','Couldn\'t send mail to: '.$viper);
 			
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$staus,'holiday'=>'No','rating'=>'Unrated')));
+			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($viper,ENT_QUOTES,'UTF-8'),'status'=>$staus,'holiday'=>'No','rating'=>'Unrated')));
 		}
 		catch(PDOException $e){
 			if((int)$e->getCode()==1062){
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
+				echo json_encode(array(0=>"User with mail: ".htmlspecialchars($viper,ENT_QUOTES,'UTF-8')." is already registred"));
 			}
 			else{
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -377,16 +379,25 @@ else{
 }
 
 	else if($_POST[$_SESSION['token']['act']]=='save_options'){
-		$senreply=(is_numeric($_POST['senrep'])) ? $_POST['senrep']:exit();
-		$senope=(is_numeric($_POST['senope'])) ? $_POST['senope']:exit();
-		$upload=(is_numeric($_POST['upload'])) ? $_POST['upload']:exit();
-		$faq=(is_numeric($_POST['faq'])) ? $_POST['faq']:exit();
+		$senreply=(is_numeric($_POST['senrep'])) ? (int)$_POST['senrep']:exit();
+		$senope=(is_numeric($_POST['senope'])) ? (int)$_POST['senope']:exit();
+		$upload=(is_numeric($_POST['upload'])) ? (int)$_POST['upload']:exit();
+		$faq=(is_numeric($_POST['faq'])) ? (int)$_POST['faq']:exit();
 		$maxsize=(is_numeric($_POST['maxsize'])) ? ($_POST['maxsize']*1048576 ):null;
 		$enrat=(is_numeric($_POST['enrat'])) ? $_POST['enrat']:exit();
 		$commlop=(trim(preg_replace('/\s+/',' ',$_POST['commlop']))=='php -f')? 'php -f':'php5-cli';
-		$tit=trim(preg_replace('/\s+/',' ',$_POST['tit']));
+		$tit=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
+		if(empty($tit)){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Title'));
+			exit();
+		}
 		$amail= trim(preg_replace('/\s+/','',$_POST['mail']));
-		$amail=($amail!='' && filter_var($amail, FILTER_VALIDATE_EMAIL)) ? $amail:exit();
+		if(empty($amail) || !filter_var($amail, FILTER_VALIDATE_EMAIL)){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Mail'));
+			exit();
+		}
 		if(file_put_contents('config/setting.txt',$tit."\n".$amail."\n".$senreply."\n".$senope."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$maxsize."\n".$enrat."\n".$commlop."\n".$faq)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
@@ -403,7 +414,7 @@ else{
 			file_put_contents('config/mail/stmp.txt','');
 			unlink('config/mail/stmp.txt');
 		}
-		$serv=(is_numeric($_POST['serv'])) ? $_POST['serv']:exit();
+		$serv=(is_numeric($_POST['serv'])) ? (int)$_POST['serv']:exit();
 		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
 		if(empty($mustang)){
 			header('Content-Type: application/json; charset=utf-8');
@@ -411,13 +422,13 @@ else{
 			exit();
 		}
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+		if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
 		}
-		$host=(trim(preg_replace('/\s+/',' ',$_POST['host']))!='')? trim(preg_replace('/\s+/',' ',$_POST['host'])):exit();
-		$port=(is_numeric($_POST['port'])) ? $_POST['port']:exit();
+		$host=(trim(preg_replace('/\s+/','',$_POST['host']))!='')? trim(preg_replace('/\s+/','',$_POST['host'])):exit();
+		$port=(is_numeric(filter_var($_POST['port'], FILTER_SANITIZE_NUMBER_INT))) ? filter_var($_POST['port'], FILTER_SANITIZE_NUMBER_INT):exit();
 		$ssl=(is_numeric($_POST['ssl'])) ? $_POST['ssl']:exit();
 		$auth=(is_numeric($_POST['auth'])) ? $_POST['auth']:exit();
 		
@@ -487,11 +498,11 @@ else{
 	}
 
 	else if(isset($_POST['upload_logo'])  && isset($_FILES['new_logo'])){//check
-		$target_path = "../css/logo/".basename($_FILES['new_logo']['name']);
+		$target_path = "../css/logo/".realpath(basename($_FILES['new_logo']['name']));
 		if($_FILES['new_logo']['type']=='image/gif' || $_FILES['new_logo']['type']=='image/jpeg' || $_FILES['new_logo']['type']=='image/png' || $_FILES['new_logo']['type']=='image/pjpeg'){
 				if(move_uploaded_file($_FILES['new_logo']['tmp_name'], $target_path)) {
 					$dir=(dirname(dirname($_SERVER['REQUEST_URI']))!=rtrim('\ ')) ? dirname(dirname($_SERVER['REQUEST_URI'])):'';
-					$image='//'.$_SERVER['SERVER_NAME'].$dir.'/css/logo/'.basename($_FILES['new_logo']['name']);
+					$image='//'.$_SERVER['SERVER_NAME'].$dir.'/css/logo/'.realpath(basename($_FILES['new_logo']['name']));
 					file_put_contents('config/logo.txt',$image);
 					echo '<script>parent.$("#cur_logo").attr("src","'.$image.'");</script>';
 				}
@@ -523,7 +534,7 @@ else{
 			if(!empty($a)){
 				$users=array('response'=>'ret','information'=>array());
 				do{
-					$users['information'][]=array('num'=>$a['id']-54,'name'=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),'mail'=>$a['mail'],'status'=>$a['ustat'],'holiday'=>$a['hol'],"rating"=>$a['rt']);
+					$users['information'][]=array('num'=>$a['id']-54,'name'=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'),'status'=>$a['ustat'],'holiday'=>$a['hol'],"rating"=>$a['rt']);
 				}while ($a = $STH->fetch());
 				
 				header('Content-Type: application/json; charset=utf-8');
@@ -552,7 +563,7 @@ else{
 			exit();
 		}
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+		if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
@@ -817,7 +828,7 @@ else{
 			$ret=array('res'=>'ok','rate'=>array());
 			$camaros=array();
 			while ($a = $STH->fetch()){
-				$ret['rate'][]=array($a['rate'],$a['note'],$a['enc_id'],$a['mail']);
+				$ret['rate'][]=array($a['rate'],$a['note'],$a['enc_id'],htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
 			}
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($ret);

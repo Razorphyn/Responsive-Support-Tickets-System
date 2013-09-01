@@ -12,14 +12,13 @@ ini_set('session.cookie_httponly', '1');
 ini_set('session.use_only_cookies', '1');
 ini_set('session.use_trans_sid', '0');
 session_name("RazorphynSupport");
-if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off'){
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !empty($_COOKIE['RazorphynSupport']) && !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
 	unset($_COOKIE['RazorphynSupport']);
 }
 session_start(); 
-
 
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
@@ -200,11 +199,12 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 	<script>
 	$(document).ready(function() {
 		
-		
 		<?php if(isset($_GET['e']) && $_GET['e']=='exipred'){ ?>
 			noty({text: 'Your Session has Expired, please log in again',type:'error',timeout:9E3});
 		<?php } else if(isset($_GET['e']) && $_GET['e']=='local'){ ?>
 			noty({text: 'Your ip is different from the one where you have logged in, please log in again',type:'error',timeout:9E3});
+		<?php } else if(isset($_GET['e']) && $_GET['e']=='invalid'){ ?>
+			noty({text: 'Invalid Session ID, please log in again',type:'error',timeout:9E3});
 		<?php }  if(isset($_GET['act']) && $_GET['act']=='activate'){ ?>
 			$(".main").nimbleLoader("show", {
 				position             : "fixed",
@@ -330,7 +330,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 		}
 	}
 	
-	function login(){$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",debug:!0,hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});$.ajax({type:"POST",url:"php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"login",mail:$("#mail").val(),pwd:$("#pwd").val()},dataType:"json",success:function(a){$(".main").nimbleLoader("hide");"Logged"==a[0]? (window.location = '<?php echo $siteurl; ?>'):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){$(".main").nimbleLoader("hide");noty({text:b, type:"error",timeout:9E3})})};
+	function login(){$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});$.ajax({type:"POST",url:"php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"login",mail:$("#mail").val(),pwd:$("#pwd").val()},dataType:"json",success:function(a){$(".main").nimbleLoader("hide");"Logged"==a[0]? (window.location = '<?php echo $siteurl; ?>'):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){$(".main").nimbleLoader("hide");noty({text:b, type:"error",timeout:9E3})})};
 
 	function logout(){var request= $.ajax({type: 'POST',url: 'php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}
 	

@@ -15,12 +15,12 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !empty($_COOKIE['RazorphynSupport']) && !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
-	unset($_COOKIE['RazorphynSupport']);
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+	setcookie(session_name(),'invalid',time()-3600);
+	header("location: ../index.php?e=invalid");
+	exit();
 }
 session_start(); 
-
-
 
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
@@ -41,6 +41,7 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 	 header("location: ../index.php");
 	 exit();
 }
+
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);

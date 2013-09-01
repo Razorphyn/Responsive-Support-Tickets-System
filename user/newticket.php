@@ -15,8 +15,10 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !empty($_COOKIE['RazorphynSupport']) && !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
-	unset($_COOKIE['RazorphynSupport']);
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+	setcookie(session_name(),'invalid',time()-3600);
+	header("location: ../index.php?e=invalid");
+	exit();
 }
 session_start(); 
 
@@ -235,7 +237,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				});
 				request.fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})});	
 				
-				$("#createticket").submit(function(){<?php if(!$isMob){ ?>if(""==CKEDITOR.instances.message.getData().replace(/\s+/g,"")||""==$("#title").val().replace(/\s+/g,""))<?php }else { ?>if($("#message").val().replace(/\s+/g,'') == '' || $('#title').val().replace(/\s+/g,'')=='')<?php } ?>return noty({text:"Empty Fields. PLeasy check the title and the message",type:"error",timeout:9E3}),!1;$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",debug:!0,hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
+				$("#createticket").submit(function(){<?php if(!$isMob){ ?>if(""==CKEDITOR.instances.message.getData().replace(/\s+/g,"")||""==$("#title").val().replace(/\s+/g,""))<?php }else { ?>if($("#message").val().replace(/\s+/g,'') == '' || $('#title').val().replace(/\s+/g,'')=='')<?php } ?>return noty({text:"Empty Fields. PLeasy check the title and the message",type:"error",timeout:9E3}),!1;$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 				
 				$("#add_upload").click(function(){$(".uploadfilebox:last").after('<div class="row-fluid uploadfilebox"><div class="span4"><div class="span9"><input type="file" name="filename[]" /></div><div class="span1"> <i class="icon-remove remupbox"></i></div></div></div>')});
 

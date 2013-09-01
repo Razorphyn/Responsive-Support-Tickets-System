@@ -28,8 +28,11 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !empty($_COOKIE['RazorphynSupport']) && !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
-	unset($_COOKIE['RazorphynSupport']);
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+	setcookie(session_name(),'invalid',time()-3600);
+	header('Content-Type: application/json; charset=utf-8');
+	echo json_encode(array(0=>'Invalid Session ID, please reload the page'));
+	exit();
 }
 session_start(); 
 
@@ -87,7 +90,7 @@ if($_POST[$_SESSION['token']['act']]=='register'){//check
 			exit();
 		}
 		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+		if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
@@ -185,7 +188,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST[$_SESSION
 
 else if(!isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='login'){
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-	if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+	if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Mail'));
 		exit();
@@ -209,7 +212,7 @@ else if(!isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='login
 				$_SESSION['time']=time();
 				$_SESSION['id']=$a['id'];
 				$_SESSION['name']=$a['name'];
-				$_SESSION['mail']=$a['mail'];
+				$_SESSION['mail']=htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8');
 				$_SESSION['status']=$a['status'];
 				$_SESSION['mail_alert']=$a['mail_alert'];
 				$_SESSION['ip']=retrive_ip();
@@ -318,7 +321,7 @@ else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_acc
 				do{
 					$_SESSION['id']=$a['id'];
 					$_SESSION['name']=$a['name'];
-					$_SESSION['mail']=$a['mail'];
+					$_SESSION['mail']=htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8');
 					$_SESSION['mail_alert']=$a['mail_alert'];
 					$_SESSION['ip']=retrive_ip();
 				}while ($a = $STH->fetch());
@@ -391,7 +394,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST[$_SESSION[
 
 else if($_POST[$_SESSION['token']['act']]=='forgot'){//check
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-	if(empty($viper) || filter_var($viper, FILTER_VALIDATE_EMAIL)!=true){
+	if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Mail'));
 		exit();
@@ -538,7 +541,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 		$wsurl=(trim(preg_replace('/\s+/','',$_POST['wsurl'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['wsurl'])):'';
 		$contype=(trim(is_numeric($_POST['contype'])))? (int)$_POST['contype']:exit();
 		$ftppass=(trim(preg_replace('/\s+/','',$_POST['ftppass'])!=''))? $_POST['ftppass']:'';
-		$ftpus=(trim(preg_replace('/\s+/','',$_POST['ftpus'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['ftpus'])):'';
+		$ftpus=(trim(preg_replace('/\s+/','',$_POST['ftpus'])!=''))? trim($_POST['ftpus']):'';
 		$maxsize=covert_size(ini_get('upload_max_filesize'));
 		if($ftppass!=''){
 			$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
@@ -616,17 +619,17 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 						$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
 						for($i=0;$i<$count;$i++){
 							if($_FILES['filename']['error'][$i]==0){
-								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 && trim($_FILES['filename']['name'][$i])!=''){
-									if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
+								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 && trim(realpath($_FILES['filename']['name'][$i]))!=''){
+									if(count(array_keys($movedfiles,realpath($_FILES['filename']['name'][$i])))==0){
 										$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
 										$target_path = "../upload/".$encname;
 										if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
 											if(CryptFile("../upload/".$encname)){
-												$movedfiles[]=$_FILES['filename']['name'][$i];
-												$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
+												$movedfiles[]=realpath($_FILES['filename']['name'][$i]);
+												$uploadarr[]=array($encid,$encname,realpath($_FILES['filename']['name'][$i]));
 												$query.='(?,"'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
-												$sqlname[]=$_FILES['filename']['name'][$i];
-												echo '<script>parent.noty({text: "'.$_FILES['filename']['name'][$i].' has been uploaded",type:"success",timeout:2000});</script>';
+												$sqlname[]=realpath($_FILES['filename']['name'][$i]);
+												echo '<script>parent.noty({text: "'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' has been uploaded",type:"success",timeout:2000});</script>';
 											}
 										}
 									}
@@ -744,7 +747,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 			}
 			else if($_POST['sect']=='admin' && $_SESSION['status']==2){
 				do{
-					$dn['information'][]=array('id'=>$$a['id'],'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),'active'=>$$a['active'],'public'=>$a['public']);
+					$dn['information'][]=array('id'=>$$a['id'],'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),'active'=>$a['active'],'public'=>$a['public']);
 				}while ($a = $STH->fetch());
 			}
 			header('Content-Type: application/json; charset=utf-8');
@@ -793,7 +796,7 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+					$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -824,9 +827,9 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 			if(!empty($a)){
 				do{
 					if($opid==$_SESSION['id'])
-						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else
-						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -858,11 +861,11 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 			if(!empty($a)){
 				do{
 					if($a['operator_id']==$_SESSION['id'])
-						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['op'][]=array('id'=>$a['enc_id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else if($a['user_id']==$_SESSION['id'])
-						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['user'][]=array('id'=>$a['enc_id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 					else
-						$list['tickets']['admin'][]=array('id'=>$a['enc_id'],'dname'=>$a['dname'],'opname'=>$a['opname'],'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['admin'][]=array('id'=>$a['enc_id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -880,7 +883,7 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 	exit();
 }
 
-else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){//check
+else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){
 	$offset = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
 	$postnumbers = is_numeric($_POST['number']) ? $_POST['number'] : exit();
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
@@ -1133,25 +1136,26 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 							$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
 							for($i=0;$i<$count;$i++){
 								if($_FILES['filename']['error'][$i]==0){
-									if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0){
-										if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
+									if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 && trim(realpath($_FILES['filename']['name'][$i]))!=''){
+										if(count(array_keys($movedfiles,realpath($_FILES['filename']['name'][$i])))==0){
 											$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
-											if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], "../upload/".$encname)){
+											$target_path = "../upload/".$encname;
+											if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
 												if(CryptFile("../upload/".$encname)){
-													$movedfiles[]=$_FILES['filename']['name'][$i];
-													$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
-													$query.='(?,"'.$encname.'","'.$_SESSION['id'].'","'.$_SESSION[$encid]['id'].'","'.$encid.'","'.$msid.'","'.$date.'"),';
-													$sqlname[]=$_FILES['filename']['name'][$i];
-													echo '<script>parent.noty({text: "'.$_FILES['filename']['name'][$i].' has been uploaded",type:"success",timeout:2000});</script>';
+													$movedfiles[]=realpath($_FILES['filename']['name'][$i]);
+													$uploadarr[]=array($encid,$encname,realpath($_FILES['filename']['name'][$i]));
+													$query.='(?,"'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
+													$sqlname[]=realpath($_FILES['filename']['name'][$i]);
+													echo '<script>parent.noty({text: "'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' has been uploaded",type:"success",timeout:2000});</script>';
 												}
 											}
 										}
 									}
 									else
-										echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
+										echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
 								}
 								else if($_FILES['filename']['error'][$i]!=4)
-									echo '<script>parent.noty({text: "Error:'.json_encode($_FILES['filename']['name'][$i], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
+									echo '<script>parent.noty({text: "File Name:'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 							}
 							if(isset($uploadarr[0])){
 								$query=substr_replace($query,'',-1);
@@ -1366,8 +1370,8 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$con=(is_numeric($_POST['contype']))? $_POST['contype']:exit();
-	$web=(trim(preg_replace('/\s+/','',$_POST['website']))!='')? $_POST['website']:'';
-	$usr=(trim(preg_replace('/\s+/','',$_POST['user'])!=''))? $_POST['user']:'';
+	$web=(trim(preg_replace('/\s+/','',$_POST['website']))!='')?trim(preg_replace('/\s+/','',$_POST['website'])):'';
+	$usr=(trim(preg_replace('/\s+/','',$_POST['user'])!=''))? trim($_POST['user']):'';
 	$pass=(trim(preg_replace('/\s+/','',$_POST['pass'])!=''))? $_POST['pass']:'';
 	if($pass!='' && $pass!=null){
 		$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
@@ -1455,7 +1459,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$tit=(trim(preg_replace('/\s+/','',$_POST['title'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['title'])):exit();
-	$prio = (is_numeric($_POST['priority']))? $_POST['priority']:0;
+	$prio = (is_numeric($_POST['priority']))? (int)$_POST['priority']:0;
 
 	if($_SESSION['status']==0)
 		$charger=($_POST['status']==1 || $_POST['status']==2)? 1:0;
@@ -1527,7 +1531,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 		$STH->execute();
 		
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'Saved'));
+		echo json_encode(array(0=>'Saved',1=>array($encid,htmlspecialchars($tit,ENT_QUOTES,'UTF-8'),$prio,$charger)));
 	}
 	catch(Exception $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1643,6 +1647,19 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='search_ticket'){
 	$enid=trim(preg_replace('/\s+/','',$_POST['enid']));
 	$tit=trim(preg_replace('/\s+/',' ',$_POST['title']));
+	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
+		$tit=trim(preg_replace('/\s+/',' ',$_POST['message']));
+		require_once 'htmlpurifier/HTMLPurifier.auto.php';
+		$config = HTMLPurifier_Config::createDefault();
+		$purifier = new HTMLPurifier($config);
+		$tit = $purifier->purify($tit);
+		$check=trim(strip_tags($tit));
+		if(empty($check)){
+			$error[]='Empty Title';
+		}
+	}
+	else
+		$error[]='Empty Title';
 	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
 	$statk=(is_numeric($_POST['statk']))? (int)$_POST['statk']:'';
 	$from=trim(preg_replace('/\s+/','',$_POST['from']));

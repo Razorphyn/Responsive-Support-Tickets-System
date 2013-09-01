@@ -15,8 +15,10 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !empty($_COOKIE['RazorphynSupport']) && !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
-	unset($_COOKIE['RazorphynSupport']);
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+	setcookie(session_name(),'invalid',time()-3600);
+	header("location: ../index.php?e=invalid");
+	exit();
 }
 session_start(); 
 
@@ -234,13 +236,16 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				});
 				request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			}
-		
 		});
 		
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($(this).parent().prev().remove(),$(this).parent().remove());return!1});
 		
 		<?php if($_SESSION['status']==2 || $_SESSION['status']==1){ ?>
 			$(document).on("click", ".editusr", function () {
+				if(!$(this).val().match(/[a-z0-9.]{87}/g)){
+					noty({text: 'Invalid ID',type:'error',timeout:9000});
+					return;
+				}
 				var d = $(this).val(),
 					b = $(this).val().replace(/\./g, "_"),
 					e = $(this).parent().parent().parent().parent().parent().parent().attr("id");
@@ -248,45 +253,57 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				var a = this.parentNode.parentNode.parentNode.parentNode,
 					g = oTable.fnGetPosition(a, null, !0),
 					a = oTable.fnGetData(a);
-				if ($("#" + b).length) $("html,body").animate({
-					scrollTop: $("#" + b).offset().top
-				}, 1500);
+				if ($("#" + b).length) 
+					$("html,body").animate({scrollTop: $("#" + b).offset().top}, 1500);
 				else {
 					var f = $(a.title).text(),
-						d = "<hr><form action='' method='post' class='submit_changes_depa' id='" + b + "'><span>Edit " + f + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + d + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><input type='hidden' id='tablename' value='" + e + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + f + "' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assign</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
+						d = "<hr><form action='' method='post' class='submit_changes_depa' id='"+b+"'><span>Edit " + encodeHTML(f) + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + encodeHTML(d) + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><input type='hidden' id='tablename' value='" + encodeHTML(e) + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + encodeHTML(f) + "' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assign</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 					$("table:last").parent().parent().after(d);
 					if (-1 < a.status.search("Closed")) var c = 0;
 					else -1 < a.status.search("Open") ? c = 1 : -1 < a.status.search("Assign") && (c = 2);
-					switch (a.priority) {
-						case "Low":
-							prio = 0;
-							break;
-						case "Medium":
-							prio = 1;
-							break;
-						case "High":
-							prio = 2;
-							break;
-						case "Urgent":
-							prio = 3;
-							break;
-						case "Critical":
-							prio = 4
-					}
+					
+					switch (a.priority) {case "Low":prio = 0;break;case "Medium":prio = 1;break;case "High":prio = 2;break;case "Urgent":prio = 3;break;case "Critical":prio = 4}
+					
 					$('select[name="edit_depa_active"]:first option[value=' + c + "]").attr("selected", "selected");
 					$('select[name="edit_depa_public"]:first option[value=' + prio + "]").attr("selected", "selected");
 					2 == c && $('select[name="edit_depa_active"]:first option[value=1]').remove();
-					$("html,body").animate({
-						scrollTop: $("#" + b).offset().top
-					}, 500)
+					$("html,body").animate({scrollTop: $("#" + b).offset().top}, 500)
 				}
 			});
 		<?php } else { ?>
-			$(document).on("click",".editusr",function(){var d=$(this).val(),c=$(this).val().replace(/\./g,"_"),f=$(this).parent().parent().parent().parent().parent().parent().attr("id");oTable=$("#"+f).dataTable();var a=this.parentNode.parentNode.parentNode.parentNode,g=oTable.fnGetPosition(a,null,!0),a=oTable.fnGetData(a);if(0<$("#"+c).length)$("html,body").animate({scrollTop:$("#"+c).offset().top},500);else{var f=$(a.title).text(),d="<hr><form action='' method='post' class='submit_changes_depa' id='"+c+"'><span>Edit "+f+"</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='"+ d+"'/><input type='hidden' id='tablename' value='"+f+"'/><input type='hidden' name='depa_edit_pos' value='"+g+"'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='"+f+"' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; $("table:last").parent().parent().after(d);if(-1<a.status.search("Closed"))var e=0;else-1<a.status.search("Open")&&(e=1);switch(a.priority){case "Low":var b=0;break;case "Medium":b=1;break;case "High":b=2;break;case "Urgent":b=3;break;case "Critical":b=4}$('select[name="edit_depa_active"]:first option[value='+e+"]").attr("selected","selected");$('select[name="edit_depa_public"]:first option[value='+b+"]").attr("selected","selected");2==e&&$('select[name="edit_depa_active"]:first option[value=1]').remove(); $("html,body").animate({scrollTop:$("#"+c).offset().top},1500)}});
-		<?php } ?>
+			$(document).on("click", ".editusr", function () {
+				if(!$(this).val().match(/[a-z0-9.]{87}/g)){
+					noty({text: 'Invalid ID',type:'error',timeout:9000});
+					return;
+				}
+				var d = $(this).val(),
+					c = $(this).val().replace(/\./g, "_"),
+					f = $(this).parent().parent().parent().parent().parent().parent().attr("id");
+				oTable = $("#" + f).dataTable();
+				var a = this.parentNode.parentNode.parentNode.parentNode,
+					g = oTable.fnGetPosition(a, null, !0),
+					a = oTable.fnGetData(a);
+				if (0 < $("#" + c).length) 
+					$("html,body").animate({scrollTop: $("#" + c).offset().top}, 500);
+				else {
+					var f = $(a.title).text(),
+						d = "<hr><form action='' method='post' class='submit_changes_depa' id='" + c + "'><span>Edit " + encodeHTML(f) + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + encodeHTML(d) + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + encodeHTML(f) + "' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
+					$("table:last").parent().parent().after(d);
+					if (-1 < a.status.search("Closed")) var e = 0;
+					else -1 < a.status.search("Open") && (e = 1);
+					
+					switch (a.priority) {case "Low":var b = 0;break;case "Medium":b = 1;break;case "High":b = 2;break;case "Urgent":b = 3;break;case "Critical":b = 4}
+					$('select[name="edit_depa_active"]:first option[value=' + e + "]").attr("selected", "selected");
+					$('select[name="edit_depa_public"]:first option[value=' + b + "]").attr("selected", "selected");
+					2 == e && $('select[name="edit_depa_active"]:first option[value=1]').remove();
+					$("html,body").animate({scrollTop: $("#" + c).offset().top}, 1500)
+				}
+			});		
+<?php } ?>
+
 		$(document).on('click','.submit_changes',function(){
 			var dom=$(this).parent();
-			var id= dom.children('input[name="depa_edit_id"]').val();
+			var id= encodeHTML(dom.children('input[name="depa_edit_id"]').val());
 			
 			var tit= dom.find('input[name="edit_depa_name"]').val().replace(/\s+/g,' ');
 			var stat= dom.find('select[name="edit_depa_active"]').val();
@@ -298,26 +315,27 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					data: {<?php echo $_SESSION['token']['act']; ?>:'update_ticket_index',id:id,title:tit,status:stat,priority:prio},
 					dataType : 'json',
 					success : function (data){
-						tit='<a href="view.php?id='+id+'" alt="View Ticket" title="View Ticket">'+tit+'</a>';
 						if(data[0]=='Saved'){
-							switch(prio){case "0":prio="Low";break;case "1":prio="Medium";break;case "2":prio="High";break;case "3":prio="Urgent";break;case "4":prio="Critical"}switch(stat){case "0":stat='<span class="label label-success">Closed</span>';break;case "1":stat='<span class="label label-important">Open</span>';break;case "2":stat='<span class="label label-warning">To Assign</span>';break;case "3":stat='<span class="label label-info">Flagged</span>'};
-							$('button.editusr[value="'+id+'"]').each(function(){
+							tit='<a href="view.php?id='+data[1][0]+'" alt="View Ticket" title="View Ticket">'+data[1][1]+'</a>';
+							switch(data[1][2]){case "0":prio="Low";break;case "1":prio="Medium";break;case "2":prio="High";break;case "3":prio="Urgent";break;case "4":prio="Critical";default:prio='Error'}
+							switch(data[1][3]){case "0":stat='<span class="label label-success">Closed</span>';break;case "1":stat='<span class="label label-important">Open</span>';break;case "2":stat='<span class="label label-warning">To Assign</span>';break;case "3":stat='<span class="label label-info">Flagged</span>';default:stat='Error'};
+							var action='<div class="btn-group"><button class="btn btn-warning editusr" value="'+data[1][0]+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+data[1][0]+'"><i class="icon-remove"></i></button></div>';
+							$('button.editusr[value="'+data[1][0]+'"]').each(function(){
 								var table=$(this).parent().parent().parent().parent().parent().parent().attr('id');
 								table=$('#'+table).dataTable();
-								var node=this.parentNode.parentNode.parentNode.parentNode;
-								var pos=table.fnGetPosition(node,null,true);
-								var info = table.fnGetData(node);
-								info.title=tit;
-								info.priority=prio;
+								var node=this.parentNode.parentNode.parentNode.parentNode,
+									pos=table.fnGetPosition(node,null,true),
+									info = table.fnGetData(node);
+
+								info={title:tit , date:encodeHTML(info.date),reply:encodeHTML(info.reply),dname:encodeHTML(info.dname),opname:encodeHTML(info.opname), priority:encodeHTML(prio), action:action};
+
 								if(info['opname']=='Not Assigned' && stat!='<span class="label label-success">Closed</span>')
 									info.status='<span class="label label-warning">To Assign</span>';
 								else
 									info.status=stat;
 								if(stat=='<span class="label label-warning">To Assign</span>')
 									info.opname='Not Assigned';
-								table.fnDeleteRow(pos, function(){
-									table.fnAddData(info);
-								});
+								table.fnDeleteRow(pos, function(){table.fnAddData(info);});
 							});
 							dom.prev().remove();
 							dom.remove();
@@ -334,6 +352,9 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	});
 	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	
+	function encodeHTML(s) {
+		return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g, '&#x2F;');
+	}
 	</script>
 	<?php } else { ?>
 		<script>window.location = "<?php echo dirname(dirname(curPageURL())).'/index.php'; ?>";</script>
