@@ -8,11 +8,10 @@ The package is under beta test.
 ToDo List
 -
 - Check few functions
-- Check switch from mysqli to PDO(missing things, incorrect variable binding or extra wrong echo)
+- Check switch from mysqli to PDO
 - Check STMP Connection
 - Add Create Ticket from Administrator for someone
-- Better Sanitize Input
-- CSRF Fix
+
 
 Demo
 -
