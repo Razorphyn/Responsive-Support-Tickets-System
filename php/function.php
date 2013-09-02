@@ -154,7 +154,7 @@ if($_POST[$_SESSION['token']['act']]=='register'){
 	exit();
 }
 
-else if(isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST[$_SESSION['token']['act']]=='send_again'){//check
+else if(isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST[$_SESSION['token']['act']]=='send_again'){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -298,7 +298,7 @@ else if($_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='delete_tick
 	exit();
 }
 	
-else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_account'){//check
+else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_account'){
 	$key=trim(preg_replace('/\s+/','',$_POST['key']));
 	if(60!=strlen($key)){
 		header('Content-Type: application/json; charset=utf-8');
@@ -326,7 +326,7 @@ else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_acc
 					$_SESSION['ip']=retrive_ip();
 				}while ($a = $STH->fetch());
 
-				$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key='' WHERE `id`=?";
+				$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key=NULL WHERE `id`=?";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT,87);
 				$STH->execute();
@@ -392,7 +392,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST[$_SESSION[
 	exit();
 }
 
-else if($_POST[$_SESSION['token']['act']]=='forgot'){//check
+else if($_POST[$_SESSION['token']['act']]=='forgot'){
 	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
 	if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
 		header('Content-Type: application/json; charset=utf-8');
@@ -452,11 +452,11 @@ else if($_POST[$_SESSION['token']['act']]=='forgot'){//check
 	exit();
 }
 
-else if($_POST[$_SESSION['token']['act']]=='reset_password'){//check
+else if($_POST[$_SESSION['token']['act']]=='reset_password'){
 	$npwd=(string)$_POST['npass'];
 	$rpwd=(string)$_POST['rnpass'];
 	
-	$rmail= trim(preg_replace('/\s+/','',$_POST['mail']));
+	$rmail= trim(preg_replace('/\s+/','',$_POST['rmail']));
 	if(empty($rmail) || filter_var($rmail, FILTER_VALIDATE_EMAIL)!=true){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Mail'));
@@ -464,7 +464,11 @@ else if($_POST[$_SESSION['token']['act']]=='reset_password'){//check
 	}
 	
 	$reskey=trim(preg_replace('/\s+/','',$_POST['key']));
-	$reskey=($encid!='' && strlen($encid)==87) ? $encid:exit();
+	if(empty($reskey) && strlen($encid)!=87){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid Key'));
+		exit();
+	}
 	
 	if(trim(preg_replace('/\s+/','',$rpwd))!='' && $rpwd==$npwd){
 		$pass=hash('whirlpool',crypt($rpwd,'$#%H4!df84a$%#RZ@£'));
@@ -1535,7 +1539,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	exit();
 }
 
-else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='rating'){
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='rating'){//deep check
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	$encid=trim(preg_replace('/\s+/','',$_POST['tkid']));
@@ -2055,7 +2059,6 @@ function retrive_mime($encname,$mustang){
 	else
 		return 'Error';
 }
-
 
 function covert_size($val){if(empty($val))return 0;$val = trim($val);preg_match('#([0-9]+)[\s]*([a-z]+)#i', $val, $matches);$last = '';if(isset($matches[2]))$last = $matches[2];if(isset($matches[1]))$val = (int) $matches[1];switch (strtolower($last)){case 'g':case 'gb':$val *= 1024;case 'm':case 'mb':$val *= 1024;case 'k':case 'kb':$val *= 1024;}return (int) $val;}
 function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])){$ip=$_SERVER['HTTP_CLIENT_IP'];}elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])){$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];}else{$ip=$_SERVER['REMOTE_ADDR'];}return $ip;}

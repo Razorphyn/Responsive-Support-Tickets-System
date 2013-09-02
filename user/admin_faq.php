@@ -244,7 +244,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					url: '../php/admin_function.php',
 					data: {<?php echo $_SESSION['token']['act']; ?>:'edit_faq',id:id,question:q,answer:a,active:ac,position:p},
 					dataType : 'json',
-					success : function (data){
+					success : function (a){
 						if(a[0]=='Succeed'){
 							a[1]['action']='<div class="btn-group"><button class="btn btn-info editdep" value="'+a[1]['id']+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+a[1]['id']+'"><i class="icon-remove"></i></button></div>';
 
@@ -258,7 +258,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							$('#edit_faq').removeClass('open');
 						}
 						else
-							noty({text: data[0],type:'error',timeout:9000});
+							noty({text: a[0],type:'error',timeout:9000});
 					}
 				});
 				request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});

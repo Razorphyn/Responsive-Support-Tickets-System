@@ -81,7 +81,7 @@ else{
 	}
 
 	//Functions
-	if($_POST[$_SESSION['token']['act']]=='retrive_reported_ticket'){  //check
+	if($_POST[$_SESSION['token']['act']]=='retrive_reported_ticket'){//check
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -117,7 +117,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='admin_user_add'){//check
+	else if($_POST[$_SESSION['token']['act']]=='admin_user_add'){
 		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
 		if(empty($mustang)){
 			header('Content-Type: application/json; charset=utf-8');
@@ -554,7 +554,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='update_user_info'){//check
+	else if($_POST[$_SESSION['token']['act']]=='update_user_info'){
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
 		if(empty($mustang)){
@@ -673,7 +673,7 @@ else{
 							$charger='Error';
 					}
 					header('Content-Type: application/json; charset=utf-8');
-					echo json_encode(array(0=>'Updated',1=>array('num'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
+					echo json_encode(array(0=>'Updated',1=>array('num'=>($camaro-54),'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
 				}
 				else{
 					
@@ -698,7 +698,7 @@ else{
 							$charger='Error';
 					}
 					header('Content-Type: application/json; charset=utf-8');
-					echo json_encode(array(0=>'Updated',1=>array('num'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
+					echo json_encode(array(0=>'Updated',1=>array('num'=>($camaro-54),'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
 				}
 			}
 			else if($charger!=1 && $charger!=2){
@@ -728,7 +728,7 @@ else{
 						$charger='Error';
 				}
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>'Updated',1=>array('num'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
+				echo json_encode(array(0=>'Updated',1=>array('num'=>($camaro-54),'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
 			}
 			else{
 				$holiday=($holiday==1)? 'Yes':'No';
@@ -752,7 +752,7 @@ else{
 						$charger='Error';
 				}
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>'Updated',1=>array('num'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
+				echo json_encode(array(0=>'Updated',1=>array('num'=>($camaro-54),'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
 			}
 		}
 		catch(PDOException $e){  
@@ -1101,12 +1101,12 @@ else{
 		exit();
 	}
 	
-	else if($_POST[$_SESSION['token']['act']]=='retrive_faq'){//check
+	else if($_POST[$_SESSION['token']['act']]=='retrive_faq'){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			$query = "SELECT id,question,position,CASE active WHEN 0 THEN 'No' ELSE 'Yes' END AS ac,CASE rate WHEN 0 THEN 'Unrated' ELSE rate END AS rat FROM ".$SupportFaqTable;
+			$query = "SELECT id,question,position,CASE active WHEN '0' THEN 'No' ELSE 'Yes' END AS ac,CASE rate WHEN 0 THEN 'Unrated' ELSE rate END AS rat FROM ".$SupportFaqTable;
 			$STH = $DBH->prepare($query);
 			$STH->execute();
 			
@@ -1115,7 +1115,7 @@ else{
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['faq'][]=array('id'=>$a['id']-14,'question'=>htmlspecialchars($a['question'],ENT_QUOTES,'UTF-8'),'position'=>$a['position'],'active'=>$a['ac'],'rate'=>$a['rat']);
+					$list['faq'][]=array('id'=>($a['id']-14),'question'=>htmlspecialchars($a['question'],ENT_QUOTES,'UTF-8'),'position'=>$a['position'],'active'=>$a['ac'],'rate'=>$a['rat']);
 				}while ($a = $STH->fetch());
 			}
 			header('Content-Type: application/json; charset=utf-8');
@@ -1129,7 +1129,7 @@ else{
 		exit();
 	}
 	
-	else if($_POST[$_SESSION['token']['act']]=='add_faq'){//check
+	else if($_POST[$_SESSION['token']['act']]=='add_faq'){
 	
 		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
 
@@ -1200,7 +1200,7 @@ else{
 		exit();
 	}
 	
-	else if($_POST[$_SESSION['token']['act']]=='del_faq'){//check
+	else if($_POST[$_SESSION['token']['act']]=='del_faq'){
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1213,7 +1213,7 @@ else{
 			
 			$query="DELETE FROM ".$SupportFaqTable." WHERE `id`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(PARAM_INT);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
 			$STH->execute();
 			
 			header('Content-Type: application/json; charset=utf-8');
@@ -1227,7 +1227,7 @@ else{
 		exit();
 	}
 	
-	else if($_POST[$_SESSION['token']['act']]=='edit_faq'){//check
+	else if($_POST[$_SESSION['token']['act']]=='edit_faq'){
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
 		$answer=trim(preg_replace('/\s+/',' ',$_POST['answer']));
@@ -1257,7 +1257,7 @@ else{
 
 			if($pos==NULL){
 				try{
-					$query = "SELECT (IF ((SELECT c.id FROM ".$SupportFaqTable." c LIMIT 1) IS NOT NULL,(SELECT MAX(d.position) FROM ".$SupportFaqTable." d )+1,0)) AS rpos FROM ".$SupportFaqTable;
+					$query = "SELECT (IF ((SELECT c.id FROM ".$SupportFaqTable." c LIMIT 1) IS NOT NULL AND (SELECT COUNT(*) FROM ".$SupportFaqTable." LIMIT 3) > 1,(SELECT MAX(d.position) FROM ".$SupportFaqTable." d )+1,0)) AS rpos FROM ".$SupportFaqTable;
 					
 					$STH = $DBH->prepare($query);
 					$STH->execute();
@@ -1290,7 +1290,7 @@ else{
 			
 			$active=($active==0)?'No':'Yes';
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Succeed',1=>array('id'=>$camaro,'question'=>htmlspecialchars($question,ENT_QUOTES,'UTF-8'),'position'=>$pos,'active'=>$active,'rate'=>'Unrated')));
+			echo json_encode(array(0=>'Succeed',1=>array('id'=>($camaro-14),'question'=>htmlspecialchars($question,ENT_QUOTES,'UTF-8'),'position'=>$pos,'active'=>$active,'rate'=>'Unrated')));
 		}
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1300,7 +1300,7 @@ else{
 		exit();
 	}
 	
-	else if($_POST[$_SESSION['token']['act']]=='retrive_faq_answer'){//check
+	else if($_POST[$_SESSION['token']['act']]=='retrive_faq_answer'){
 		$cs=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1317,7 +1317,7 @@ else{
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list[]=htmlspecialchars($a['answer'],ENT_QUOTES,'UTF-8');
+					$list[]=$a['answer'];
 				}while ($a = $STH->fetch());
 			}
 			header('Content-Type: application/json; charset=utf-8');

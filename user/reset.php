@@ -22,18 +22,17 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 }
 session_start(); 
 
-
-
 //Session Check
 if(isset($_SESSION['time'])){
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php");
 	exit();
 }
-else if(!isset($_GET['act']) || $_GET['act']!='resetpass' || !isset($_GET['key']) || strlen($_GET['key'])!=87){
+else if(!isset($_GET['act']) || $_GET['act']!='resetpass' || !isset($_GET['key']) || strlen(trim(preg_replace('/\s+/','',$_GET['key'])))!=87){
 	header("location: ../index.php"); 
 	exit();
 }
 else{
+$key=trim(preg_replace('/\s+/','',$_GET['key']));
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
@@ -69,49 +68,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 								<li class="active"><a href="#home"><i class="icon-home"></i>Home</a></li>
 								<?php if(isset($setting[9]) && $setting[9]==1){?>
 									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php } if(isset($_SESSION['status']) && $_SESSION['status']<3){?>
-									<li><a href="user/newticket.php"><i class="icon-file"></i>New Ticket</a></li>
-									<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation" >
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
-										</li>
-										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
-										</li>
-									</ul>
-								</li>
-									<li><a href="user/setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
-									<li><a href="user/users.php"><i class="icon-user"></i>Users</a></li>
-									<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="flag.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-							<?php }} if(isset($_SESSION['status'])){ ?>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-								<?php } ?>
+								<?php }?>
 							</ul>
 						</div>
 					</div>
@@ -123,51 +80,45 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 				<h3 class='pagefun'>Welcome to the support center</h3>
 			</div>
 			<hr>
-			<?php if(isset($_GET['key'])){?>
-				<div class='row-fluid main'>
-					<form id='passwordform' class='login activesec'>
-						<h2 class='titlesec'>Reset Password</h2>
-						<div class='row-fluid'>
-							<div class='span1'><label>Your Email</label></div>
-							<div class='span3'><input type="text" id="rmail" placeholder="Email" autocomplete="off" required></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span1'><label>New Password</label></div>
-							<div class='span3'><input type="password" id="npwd" placeholder="New Password" autocomplete="off" required></div>
-							<div class='span2'><label>Reapeat New Password</label></div>
-							<div class='span3'><input type="password" id="rnpwd" placeholder="Repeat New Password" autocomplete="off" required></div>
-						</div>
-						<input type="submit" id='resetpass' onclick='javascript:return false;' class="btn btn-success" value='Update Password'/>
-					</form>
-				</div>
-			<?php } else {?>
-				
-			<?php } ?>
+			<div class='row-fluid main'>
+				<form id='passwordform' class='login activesec'>
+					<h2 class='titlesec'>Reset Password</h2>
+					<div class='row-fluid'>
+						<div class='span2'><label>Your Email</label></div>
+						<div class='span3'><input type="text" id="rmail" placeholder="Email" autocomplete="off" required></div>
+					</div>
+					<div class='row-fluid'>
+						<div class='span2'><label>New Password</label></div>
+						<div class='span4'><input type="password" id="npwd" placeholder="New Password" autocomplete="off" required></div>
+						<div class='span2'><label>Reapeat New Password</label></div>
+						<div class='span4'><input type="password" id="rnpwd" placeholder="Repeat New Password" autocomplete="off" required></div>
+					</div>
+					<input type="submit" id='resetpass' onclick='javascript:return false;' class="btn btn-success" value='Update Password'/>
+				</form>
+			</div>
 			<hr>
 		</div>
 	</div>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script>
-	 $(document).ready(function() {
-	<?php if(isset($_GET['act']) && $_GET['act']=='resetpass' && isset($_GET['key'])){ ?>
-		$("#resetpass").click(function () {
-			var a = $("#npwd").val(),
-				b = $("#rnpwd").val(),
-				c = $("#rmail").val();
-			"" != a.replace(/\s+/g, "") && a == b ? $.ajax({
-				type: "POST",
-				url: "../php/function.php",
-				data: {<?php echo $_SESSION['token']['act']; ?>: "reset_password",npass: a,rnpass: b,rmail: c,key: "<?php echo htmlspecialchars($_GET['key'],ENT_QUOTES,'UTF-8'); ?>"},
-				dataType: "json",
-				success: function (a) {
-					"Updated" == a[0] ? window.location = "<?php echo dirname(curPageURL()); ?>" : noty({text: a[0],type: "error",timeout: 9E3})
-				}
-			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "The passwords don't match",type: "error",timeout: 9E3})
-		});	
-});
-	<?php } ?>
+		$(document).ready(function() {
+			$("#resetpass").click(function () {
+				var a = $("#npwd").val(),
+					b = $("#rnpwd").val(),
+					c = $("#rmail").val();
+				"" != a.replace(/\s+/g, "") && a == b ? $.ajax({
+					type: "POST",
+					url: "../php/function.php",
+					data: {<?php echo $_SESSION['token']['act']; ?>: "reset_password",npass: a,rnpass: b,rmail: c,key: "<?php echo $key; ?>"},
+					dataType: "json",
+					success: function (a) {
+						"Updated" == a[0] ? window.location = "<?php echo dirname(curPageURL()); ?>" : noty({text: a[0],type: "error",timeout: 9E3})
+					}
+				}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "The passwords don't match",type: "error",timeout: 9E3})
+			});	
+		});
 	
-	function logout(){var request= $.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}
+		function logout(){var request= $.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}
 	</script>
   </body>
 </html>
