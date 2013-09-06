@@ -396,43 +396,6 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			}
 		});
 		
-		$(document).on("click", ".load_usr_rate", function () {
-			var a=$(this),
-				e = a.parent().find('input[name="usr_old_stat"]').val().replace(/\s+/g,"");
-			$(this).attr('disabled','disabled');
-			if(e=='Operator' || e=='Administrator'){
-				$(this).after("<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
-				var c = $(this).val();
-				$.ajax({
-					type: "POST",
-					url: "../php/admin_function.php",
-					data: {<?php echo $_SESSION['token']['act']; ?>: "select_usr_rate",id: c},
-					dataType: "json",
-					success: function (b) {
-						if(b.res=='ok'){
-							a.parent().find(".loading").remove();
-							var count=b.rate.length;
-							if(count>0){
-								var tail=new Array();
-								for(i=0;i<count;i++)
-									tail.push("<div class='row-fluid'><div class='span3'>"+b.rate[i][3]+"</div><div class='span3'><a href='view?id="+b.rate[i][2]+"'>View Ticket</a></div><div class='span3'>"+b.rate[i][0]+"</div></div><div class='row-fluid info_rate'><div class='span11'>"+b.rate[i][1]+"</div></div>");
-								tail=tail.join("");
-								a.after("<br/><div class='rate_container'>"+tail+"</div>");
-							}
-							else
-								a.after("<br/><p>This user hasn't got any rating");
-						}
-						else{
-							noty({text: b[0],type: "error",timeout: 9E3})
-						}
-					}
-				}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3});$(this).removeAttr('disabled');})
-			}
-			else{
-				a.css('display','none');
-			}
-		});	
-		
 		$('.cif').click(function(){
 			el=$(this).children('i');
 			if(el.hasClass('icon-plus-sign')){
