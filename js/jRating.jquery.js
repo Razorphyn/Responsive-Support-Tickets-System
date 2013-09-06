@@ -160,25 +160,24 @@
 					if(submitted==false){
 						//submitted = true;
 						var comment=$('#rcomment').val().replace(/\s+/g," ");
-						var request= $.ajax({
+						$.ajax({
 							type: 'POST',url: opts.phpPath,data:{act:'rating',idBox:idBox,rate:rate,tkid:$('#tkid').val(),comment:comment},dataType : 'json',
 							success : function (data) {
 								$('.loading:first').remove();
 								if(data[0]=='Voted'){
-									noty({text: 'Thanks for voting!',type:'success',timeout:4000});
+									noty({text: 'Thanks for voting!',type:'success',timeout:4E3});
 								}
 								else{
-									noty({text: data[0],type:'error',timeout:9000});
+									noty({text: data[0],type:'error',timeout:9E3});
 								}
 							}
-						});
-						request.fail(function(jqXHR, textStatus){alert('Ajax Error: '+ textStatus);});
+						}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9E3});});
 					}
 					else
-						noty({text: 'You have already rated this operator',type:'error',timeout:9000});
+						noty({text: 'You have already rated this operator',type:'error',timeout:9E3});
 				}
 				else
-					noty({text: 'Please assign at least one star',type:'error',timeout:9000});
+					noty({text: 'Please assign at least one star',type:'error',timeout:9E3});
 			});
 			
 			$(this).parent().parent().find('.faqrate').click(function(){
@@ -189,28 +188,27 @@
 						//submitted = true;
 						var idBox=$(this).parent().parent().find('.razorate').attr('data-id');
 						if(idBox!=undefined && rate!=undefined){
-							var request= $.ajax({
+							$.ajax({
 								type: 'POST',url: opts.phpPath,data:{act:'faq_rating',idBox:idBox,rate:rate,token:token},dataType : 'json',
 								success : function (data) {
 									$('.loading:first').remove();
 									if(data[0]=='Voted'){
-										noty({text: 'Thanks for voting!',type:'success',timeout:4000});
+										noty({text: 'Thanks for voting!',type:'success',timeout:4E3});
 									}
 									else{
-										noty({text: data[0],type:'error',timeout:9000});
+										noty({text: data[0],type:'error',timeout:9E3});
 									}
 								}
-							});
-							request.fail(function(jqXHR, textStatus){alert('Ajax Error: '+ textStatus);});
+							}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9E3});});
 						}
 						else
-							noty({text: 'Cannot Retrieve Data',type:'error',timeout:9000});
+							noty({text: 'Cannot Retrieve Data',type:'error',timeout:9E3});
 					}
 					else
-						noty({text: 'You have already rated this FAQ',type:'error',timeout:9000});
+						noty({text: 'You have already rated this FAQ',type:'error',timeout:9E3});
 				}
 				else
-					noty({text: 'Please assign at least one star',type:'error',timeout:9000});
+					noty({text: 'Please assign at least one star',type:'error',timeout:9E3});
 			});
 			
 			function getNote(a) {

@@ -763,7 +763,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='select_depa_usr'){//check
+	else if($_POST[$_SESSION['token']['act']]=='select_depa_usr'){
 		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1231,6 +1231,7 @@ else{
 		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
 		$answer=trim(preg_replace('/\s+/',' ',$_POST['answer']));
+		$rate=(is_numeric($_POST['rate']))? $_POST['id']+14:exit();
 		if(trim(preg_replace('/\s+/','',$_POST['answer']))!=''){
 			require_once 'htmlpurifier/HTMLPurifier.auto.php';
 			$config = HTMLPurifier_Config::createDefault();

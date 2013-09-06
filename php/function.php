@@ -1598,28 +1598,43 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-			$query = "INSERT INTO ".$SupportRateFaqTable." (`faq_id`,`usr_id`,`rate`) VALUES (?,?,?) ON DUPLICATE KEY UPDATE `updated`='1'";
+			
+			$query = "SELECT `rate` FROM ".$SupportRateFaqTable." WHERE `faq_id`=?  AND `usr_id`= ? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$GT86,PDO::PARAM_INT);
+			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->execute();
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				do{
+					$orate=$a['rate'];
+				}while ($a = $STH->fetch());
+			}
+			
+			$orate=(is_numeric($orate) && !empty($orate))? $orate:0;
+			$query = "INSERT INTO ".$SupportRateFaqTable." (`faq_id`,`usr_id`,`rate`) VALUES (?,?,?) ON DUPLICATE KEY UPDATE updated='1',`rate`=?";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$GT86,PDO::PARAM_INT);
 			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->bindParam(3,$rate,PDO::PARAM_INT);
+			$STH->bindParam(4,$rate,PDO::PARAM_INT);
 			$STH->execute();
-
+			
 			$query = "UPDATE ".$SupportFaqTable." a
 						INNER JOIN ".$SupportRateFaqTable." b 
 							ON b.faq_id=a.id AND b.usr_id=?
 						SET 
-							a.rate=CASE WHEN b.updated='1' THEN ROUND((((a.num_rate * a.rate) - b.rate) + ?)/(a.num_rate),2) ELSE ROUND ((a.rate + ?)/(a.num_rate),2) END,
+							a.rate=ROUND((((a.num_rate * a.rate) - ?) + ?)/(CASE WHEN b.updated='1' THEN a.num_rate ELSE a.num_rate+1 END),2),
 							a.num_rate=CASE WHEN b.updated='1' THEN a.num_rate ELSE a.num_rate+1 END,
-							b.updated='0',
-							b.rate=?
+							b.updated='0'
 						WHERE  a.id=?";
+
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
-			$STH->bindParam(2,$rate,PDO::PARAM_INT);
+			$STH->bindParam(2,$orate,PDO::PARAM_INT);
 			$STH->bindParam(3,$rate,PDO::PARAM_INT);
-			$STH->bindParam(4,$rate,PDO::PARAM_INT);
-			$STH->bindParam(5,$GT86,PDO::PARAM_INT);
+			$STH->bindParam(4,$GT86,PDO::PARAM_INT);
 			$STH->execute();
 
 			header('Content-Type: application/json; charset=utf-8');
