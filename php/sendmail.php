@@ -47,13 +47,14 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 									CASE a.ticket_status WHEN '0' THEN 'Closed' WHEN '1' THEN 'Open' WHEN '2' THEN 'To Assign' ELSE 'Error' END ,
 									a.title,
 									b.name ,
+									b.mail_alert,
 									c.department_name,
 									tu.mail,
 									tu.name 
-								FROM ".$SupportTicketsTable." a,
-								LEFT JOIN ".$SupportUserTable." b, 
+								FROM ".$SupportTicketsTable." a
+								LEFT JOIN ".$SupportUserTable." b
 									ON	b.id=a.user_id
-								LEFT JOIN ".$SupportDepaTable." c,
+								LEFT JOIN ".$SupportDepaTable." c
 									ON c.id=a.department_id
 								LEFT JOIN ".$SupportUserTable." tu
 									ON tu.id=a.operator_id
@@ -65,15 +66,14 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 									CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE 'Error' END, 
 									CASE a.ticket_status WHEN '0' THEN 'Closed' WHEN '1' THEN 'Open' WHEN '2' THEN 'To Assign' ELSE 'Error' END ,
 									a.title, 
-									b.name , 
-									b.mail_alert,
+									b.name ,
 									c.department_name, 
 									b.mail,
 									tu.name 
-								FROM ".$SupportTicketsTable." a,
-								LEFT JOIN ".$SupportUserTable." b, 
+								FROM ".$SupportTicketsTable." a
+								LEFT JOIN ".$SupportUserTable." b
 									ON	b.id=a.user_id
-								LEFT JOIN ".$SupportDepaTable." c,
+								LEFT JOIN ".$SupportDepaTable." c
 									ON c.id=a.department_id
 								LEFT JOIN ".$SupportUserTable." tu
 									ON tu.id=a.operator_id
@@ -95,10 +95,10 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 							c.department_name, 
 							b.mail,
 							tu.name 
-							FROM ".$SupportTicketsTable." a,
-							LEFT JOIN ".$SupportUserTable." b, 
+							FROM ".$SupportTicketsTable." a
+							LEFT JOIN ".$SupportUserTable." b
 								ON	b.id=a.user_id
-							LEFT JOIN ".$SupportDepaTable." c,
+							LEFT JOIN ".$SupportDepaTable." c
 								ON c.id=a.department_id
 							LEFT JOIN ".$SupportUserTable." tu
 								ON tu.id=a.operator_id
@@ -120,10 +120,10 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 								c.department_name,
 								tu.mail,
 								tu.name 
-							FROM ".$SupportTicketsTable." a,
-							LEFT JOIN ".$SupportUserTable." b, 
+							FROM ".$SupportTicketsTable." a
+							LEFT JOIN ".$SupportUserTable." b
 								ON	b.id=a.user_id
-							LEFT JOIN ".$SupportDepaTable." c,
+							LEFT JOIN ".$SupportDepaTable." c
 								ON c.id=a.department_id
 							LEFT JOIN ".$SupportUserTable." tu
 								ON tu.id=a.operator_id
@@ -165,7 +165,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 						$result = $stmt->bind_result($tomail, $gmane, $reg_key);
 					else if($argv[1]=='Forgot')
 						$result = $stmt->bind_result($tomail, $gmane);
-					else if($argv[1]=='NewRep' && $argv[2]==0)
+					else if($argv[1]=='NewRep' && $argv[2]==1)
 						$result = $stmt->bind_result($refid,$prio, $stat, $tit, $gmane, $allow, $dpname, $tomail, $opname);
 					else
 						$result = $stmt->bind_result($refid,$prio, $stat, $tit, $gmane, $dpname, $tomail, $opname);

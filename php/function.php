@@ -546,7 +546,6 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 		$contype=(trim(is_numeric($_POST['contype'])))? (int)$_POST['contype']:exit();
 		$ftppass=(trim(preg_replace('/\s+/','',$_POST['ftppass'])!=''))? $_POST['ftppass']:'';
 		$ftpus=(trim(preg_replace('/\s+/','',$_POST['ftpus'])!=''))? trim($_POST['ftpus']):'';
-		$maxsize=covert_size(ini_get('upload_max_filesize'));
 		if($ftppass!=''){
 			$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
 			$ftppass=str_split($ftppass);
@@ -557,8 +556,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 			}
 			$ftppass=implode('',$ftppass);
 		}
-		if(isset($setting[6]) && $setting[6]!=null && $setting[6]!='')
-			$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
+
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -614,48 +612,48 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 					$msid=$DBH->lastInsertId();
 					$count=count($_FILES['filename']['name']);
 					if($count>0){
+						$maxsize=covert_size(ini_get('upload_max_filesize'));
+						if(isset($setting[6]) && $setting[6]!=null && $setting[6]!='')
+							$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
 						echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
 						if(!is_dir('../upload')) mkdir('../upload');
 						$uploadarr=array();
 						$movedfiles=array();
-						$sqlname=array();
 						
-						$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
+						$query="INSERT INTO ".$SupportUploadTable." (`name`,`uploader`,`enc`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
 						for($i=0;$i<$count;$i++){
 							if($_FILES['filename']['error'][$i]==0){
-								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 && trim(realpath($_FILES['filename']['name'][$i]))!=''){
-									if(count(array_keys($movedfiles,realpath($_FILES['filename']['name'][$i])))==0){
+								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0){
+									if(!in_array($_FILES['filename']['name'][$i],$movedfiles)){
 										$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
 										$target_path = "../upload/".$encname;
 										if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
-												$movedfiles[]=realpath($_FILES['filename']['name'][$i]);
-												$uploadarr[]=array($encid,$encname,realpath($_FILES['filename']['name'][$i]));
-												$query.='(?,"'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
-												$sqlname[]=realpath($_FILES['filename']['name'][$i]);
-												echo '<script>parent.noty({text: "'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' has been uploaded",type:"success",timeout:2000});</script>';
+												$movedfiles[]=$_FILES['filename']['name'][$i];
+												$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
+												$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
+												echo "<script>parent.noty({text: '".htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8')."' has been uploaded',type:'success',timeout:2000});</script>";
 										}
 									}
 								}
 								else
-									echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
+									echo '<script>parent.noty({text: "The file '.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
 							}
 							else if($_FILES['filename']['error'][$i]!=4)
-								echo '<script>parent.noty({text: "File Name:'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
+								echo '<script>parent.noty({text: "File Name:'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 						}
-						if(isset($uploadarr[0])){
+						if(count($uploadarr)>0){
 							$query=substr_replace($query,'',-1);
 							try{
 								$STH = $DBH->prepare($query);
-								$c=count($sqlname);
+								$c=count($movedfiles);
 								for($i=0;$i<$c;$i++)
-									$STH->bindParam($i+1,$sqlname[$i],PDO::PARAM_STR);
+									$STH->bindParam($i+1,$movedfiles[$i],PDO::PARAM_STR);
 								$STH->execute();
 								
 								$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
 								$STH = $DBH->prepare($query);
 								$STH->bindParam(1,$msid,PDO::PARAM_INT);
 								$STH->execute();
-								
 							}
 							catch(PDOException $e){
 								file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1125,51 +1123,56 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 						$msid=$DBH->lastInsertId();
 						$count=count($_FILES['filename']['name']);
 						if($count>0){
-							echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
-							if(!is_dir('../upload')) mkdir('../upload');
 							$maxsize=covert_size(ini_get('upload_max_filesize'));
-							if(isset($setting[6]) && $setting[6]!=null)
+							if(isset($setting[6]) && $setting[6]!=null && $setting[6]!='')
 								$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
 							
+							echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
+							if(!is_dir('../upload')) mkdir('../upload');
 							$uploadarr=array();
 							$movedfiles=array();
-							$sqlname=array();
 							
-							$query="INSERT INTO ".$SupportUploadTable." (`name`,`enc`,`uploader`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
+							$query="INSERT INTO ".$SupportUploadTable." (`name`,`uploader`,`enc`,`num_id`,`ticket_id`,`message_id`,`upload_date`) VALUES ";
 							for($i=0;$i<$count;$i++){
 								if($_FILES['filename']['error'][$i]==0){
-									if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 && trim(realpath($_FILES['filename']['name'][$i]))!=''){
-										if(count(array_keys($movedfiles,realpath($_FILES['filename']['name'][$i])))==0){
+									if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 ){
+										if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
 											$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i]),true);
 											$target_path = "../upload/".$encname;
 											if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
-													$movedfiles[]=realpath($_FILES['filename']['name'][$i]);
-													$uploadarr[]=array($encid,$encname,realpath($_FILES['filename']['name'][$i]));
-													$query.='(?,"'.$encname.'","'.$_SESSION['id'].'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
-													$sqlname[]=realpath($_FILES['filename']['name'][$i]);
-													echo '<script>parent.noty({text: "'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' has been uploaded",type:"success",timeout:2000});</script>';
+												$movedfiles[]=$_FILES['filename']['name'][$i];
+												$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
+												$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$_SESSION[$encid]['id'].',"'.$encid.'","'.$msid.'","'.$date.'"),';
+												echo "<script>parent.noty({text: '".htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8')."' has been uploaded',type:'success',timeout:2000});</script>";
 											}
 										}
 									}
 									else
-										echo '<script>parent.noty({text: "The file '.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' is too big or null. Max file size: '.$maxsize.'",type:"error",timeout:9000});</script>';
+										echo '<script>parent.noty({text: "The file '.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' is too big or null. Max file size: '.$maxsize.' bytes",type:"error",timeout:9000});</script>';
 								}
 								else if($_FILES['filename']['error'][$i]!=4)
-									echo '<script>parent.noty({text: "File Name:'.json_encode($_FILES['filename']['name'][$i],JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS).' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
+									echo '<script>parent.noty({text: "File Name:'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' Error Code:'.$_FILES['filename']['error'][$i].'",type:"error",timeout:9000});</script>';
 							}
-							if(isset($uploadarr[0])){
+							if(count($uploadarr)>0){
 								$query=substr_replace($query,'',-1);
-								$STH = $DBH->prepare($query);
-								$c=count($sqlname);
-								for($i=0;$i<$c;$i++)
-									$STH->bindParam($i+1,$sqlname[$i],PDO::PARAM_STR);
-								$STH->execute();
-											
-								$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
-								$STH = $DBH->prepare($query);
-								$STH->bindParam(1,$msid,PDO::PARAM_INT);
-								$STH->execute();
-							}	
+								try{
+									$STH = $DBH->prepare($query);
+									$c=count($movedfiles);
+									for($i=0;$i<$c;$i++)
+										$STH->bindParam($i+1,$movedfiles[$i],PDO::PARAM_STR);
+									$STH->execute();
+									
+									$query="UPDATE ".$SupportMessagesTable." SET attachment='1' WHERE id=?";
+									$STH = $DBH->prepare($query);
+									$STH->bindParam(1,$msid,PDO::PARAM_INT);
+									$STH->execute();
+									
+								}
+								catch(PDOException $e){
+									file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+									echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "An error has occurred, please contact the administrator.",type:"error",timeout:9000});</script>';
+								}
+							}
 							echo '<script>parent.noty({text: "File Upload Finished",type:"information",timeout:2000});</script>';
 						}
 					}
@@ -1591,7 +1594,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	exit();
 }
 
-else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){//wrong result
+else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){
 	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	if($GT86>10 && $rate>0){
