@@ -32,7 +32,7 @@
 			else $initmessage = 'Click for More Messages';
 			
 			// Append custom messages and extra UI
-			$this.append('<div class="row-fluid"><div class="span12"><div class="loading-bar">'+$initmessage+'</div></div></div>');
+			$this.append('<hr><div class="loading-bar">'+$initmessage+'</div>');
 			
 			function getData() {
 				var request= $.ajax({
