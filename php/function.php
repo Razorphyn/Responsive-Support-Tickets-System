@@ -966,7 +966,7 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 	exit();
 }
 
-else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){
+else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){//check
 	$offset = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
 	$postnumbers = is_numeric($_POST['number']) ? $_POST['number'] : exit();
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
@@ -1003,7 +1003,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 				if(count($messageid)>0){
 					$messageid=implode(',',$messageid);
 					try{
-						$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
+						$query = "SELECT `uploader`,`name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
 						$STH = $DBH->prepare($query);
 						$STH->bindParam(1,$viper,PDO::PARAM_STR);
 						$STH->bindParam(2,$pass,PDO::PARAM_STR);
@@ -1012,7 +1012,10 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 						$a = $STH->fetch();
 						if(!empty($a)){
 							do{
-								$ret['messages'][$a['message_id']][]='<div class="row-fluid"><div class="span2 offset2"><form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form></div></div>';
+								if($_SESSION['id']==$a['uploader'])
+									$ret['messages'][$a['message_id']][]='<form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"> &nbsp;&nbsp; <i class="icon-remove-sign remfile" title="Delete File" alt="Delete File"></i></form>';
+								else
+									$ret['messages'][$a['message_id']][]='<form method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$encid.'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form>';
 							}while ($a = $STH->fetch());
 						}
 					}
@@ -1978,6 +1981,70 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 		echo json_encode(array(0=>'Error/s: '.implode(', ',$error)));
 	}
 	exit();
+}
+
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='del_post_file'){//check
+	
+	$tk_id=trim(preg_replace('/\s+/','',$_POST['id']));
+	$tk_id=($tk_id!='' && strlen($tk_id)==87) ? $tk_id:exit();
+	
+	$file_id=trim(preg_replace('/\s+/','',$_POST['file_id']));
+	$file_id=($file_id!='' && strlen($file_id)==87) ? $file_id:exit();
+	
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		
+		$query = "SELECT message_id FROM ".$SupportUploadTable." WHERE `ticket_id`=? AND `enc`=? LIMIT 1";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$tk_id,PDO::PARAM_STR);
+		$STH->bindParam(2,$file_id,PDO::PARAM_STR);
+		$STH->execute();
+
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+
+			$msid=$a['message_id'];
+			$path='../upload/'.$file_id;
+			file_put_contents($path,'');
+			unlink($path);
+			
+			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=? AND `enc`=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$tk_id,PDO::PARAM_STR);
+			$STH->bindParam(2,$file_id,PDO::PARAM_STR);
+			$STH->execute();
+			if($STH->rowCount()>0){
+				$query = "SELECT COUNT(*) AS qta FROM ".$SupportUploadTable." WHERE `message_id`=?";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$msid,PDO::PARAM_INT);
+				$STH->execute();
+				$STH->setFetchMode(PDO::FETCH_ASSOC);
+				
+				$a = $STH->fetch();
+				if(!empty($a) || $a['qta']<0){
+					$query = "UPDATE ".$SupportMessagesTable." SET attachment='0' WHERE id=? LIMIT 1";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$msid,PDO::PARAM_INT);
+					$STH->execute();
+				}
+			}
+
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Deleted'));
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'An error has occured'));
+		}
+	}
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+	}
+	exit();
+
 }
 
 else{

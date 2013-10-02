@@ -177,7 +177,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 						if(!empty($a)){
 							do{
 								if($_SESSION['id']==$a['uploader'])
-									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"> &nbsp;&nbsp; <i class="icon-remove-sign" title="Delete File" alt="Delete File"></i></form>';
+									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"> &nbsp;&nbsp; <i class="icon-remove-sign remfile" title="Delete File" alt="Delete File"></i></form>';
 								else
 									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form>';
 							}while ($a = $STH->fetch());
@@ -587,13 +587,35 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			}
 		});
 		
+		//Remove Uploaded File
+		$('.remfile').click(function(){
+			if(confim('Do you really want to delete this file?')){
+				var dom=$(this), file_id=dom.parent().children('input[name="file_download"]').val();
+				$.ajax({
+					type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'del_post_file',file_id:file_id,id:'<?php echo $_GET['id'];?>'},dataType : 'json',
+					success : function (a) {
+						if(a[0]=='Deleted'){
+							var par=dom.parent().parent();
+							dom.parent().remove();
+							if(par.children('form').length==0)
+								par.parent().remove();
+							noty({text: 'The file has been deleted',type:'success',timeout:9000});
+						}
+						else
+							noty({text: a[0],type:'error',timeout:9000});
+					}
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+			}
+		});
+		
+		
 		<?php if($_SESSION['status']==1) { ?>
 			$('#updtdpop').click(function(){
 				var dpid=$('#departments').val();
 				$.ajax({
 					type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'move_opera_ticket',dpid:dpid,id:'<?php echo $_GET['id'];?>'},dataType : 'json',
-					success : function (data) {
-						(data[0]=='Moved')? noty({text: 'Moved',type:'success',timeout:9000}):noty({text: data[0],type:'error',timeout:9000});
+					success : function (a) {
+						(a[0]=='Moved')? noty({text: 'Moved',type:'success',timeout:9000}):noty({text: a[0],type:'error',timeout:9000});
 					}
 				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			});

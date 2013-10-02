@@ -51,14 +51,15 @@
 							var count= data['messages'].length;
 							for(var i=0; i<count;i++){
 								if(i%2==0)
-									mess.push('<div class="row-fluid evenmessage"><div class="span2"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span10">'+data['messages'][i][1]+'</div>');
+									mess.push('<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
 								else
-									mess.push('<div class="row-fluid oddmessage"><div class="span2 presentation"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span10 messagecell">'+data['messages'][i][1]+'</div>');
+									mess.push('<div class="row-fluid oddmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
 								var upcount=data['messages'][i].length;
 								if(upcount>3){
-									mess.push('<div class="row-fluid attachment"><div class="span2 attachmentsec">Attachment</div></div>');
+									mess.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">');
 									for(var j=3;j<upcount;j++)
 										mess.push(data['messages'][i][j]);
+									mess.push('</div></div>');
 								}
 								mess.push('</div>');
 							}
