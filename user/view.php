@@ -169,14 +169,17 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 
 					if(count($messageid)>0){
 						$messageid=implode(',',$messageid);
-						$query = "SELECT `name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
+						$query = "SELECT `uploader`,`name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
 						$STH = $DBH->prepare($query);
 						$STH->execute();
 						$STH->setFetchMode(PDO::FETCH_ASSOC);
 						$a = $STH->fetch();
 						if(!empty($a)){
 							do{
-								$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form>';
+								if($_SESSION['id']==$a['uploader'])
+									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"> &nbsp;&nbsp; <i class="icon-remove-sign" title="Delete File" alt="Delete File"></i></form>';
+								else
+									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form>';
 							}while ($a = $STH->fetch());
 						}
 						unset($a);

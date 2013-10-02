@@ -995,7 +995,7 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 				$messageid=array();
 				$count=0;
 				do{
-					$ret['messages'][$msid]=array(htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),$a['message'],$a['created_time']);
+					$ret['messages'][$a['id']]=array(htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),$a['message'],$a['created_time']);
 					if($a['attachment']==1)
 						$messageid[]=$a['id'];
 					$count++;

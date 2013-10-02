@@ -3,14 +3,13 @@
 	$.fn.scrollPagination = function(options) {
 		
 		var settings = { 
-			nop     :	10, 					// The number of posts per scroll to be loaded
-			offset  :	10, 					// Initial offset, begins at 0 in this case
-			error   :	'No More Messages', 	// When the user reaches the end this is the message that is
-			delay   :	900, 					// When you scroll down the posts will load after a delayed amount of time.
-												// This is mainly for usability concerns. You can alter this as you see fit
-			scroll  :	true, 					// The main bit, if set to false posts will not load as the user scrolls. 
-												// but will still load if the user clicks.
-			id		:	0
+			nop		:	10,
+			offset	:	10,
+			error	:	'No More Messages', 	
+			delay	:	900,
+			scroll	:	true,
+			id		:	'',
+			add		:	0
 		}
 		
 		// Extend the options so they work with the plugin
@@ -37,7 +36,7 @@
 			
 			function getData() {
 				var request= $.ajax({
-					type: 'POST',url: '../php/function.php',data: {action:'scrollpagination',number:$settings.nop,offset:offset+add,id:id},dataType : 'json',
+					type: 'POST',url: '../php/function.php',data: {action:'scrollpagination',number:$settings.nop,offset:offset+$settings.add,id:id},dataType : 'json',
 					success : function (data) {
 						$this.find('.loading-bar').html($initmessage);
 						if(data['ret'] == "End") {
