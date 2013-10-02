@@ -498,11 +498,11 @@ else{
 	}
 
 	else if(isset($_POST['upload_logo'])  && isset($_FILES['new_logo'])){//check
-		$target_path = "../css/logo/".realpath(basename($_FILES['new_logo']['name']));
+		$target_path = "../css/logo/".$_FILES['new_logo']['name'];
 		if($_FILES['new_logo']['type']=='image/gif' || $_FILES['new_logo']['type']=='image/jpeg' || $_FILES['new_logo']['type']=='image/png' || $_FILES['new_logo']['type']=='image/pjpeg'){
 				if(move_uploaded_file($_FILES['new_logo']['tmp_name'], $target_path)) {
 					$dir=(dirname(dirname($_SERVER['REQUEST_URI']))!=rtrim('\ ')) ? dirname(dirname($_SERVER['REQUEST_URI'])):'';
-					$image='//'.$_SERVER['SERVER_NAME'].$dir.'/css/logo/'.realpath(basename($_FILES['new_logo']['name']));
+					$image='//'.$_SERVER['SERVER_NAME'].$dir.'/css/logo/'.$_FILES['new_logo']['name'];
 					file_put_contents('config/logo.txt',$image);
 					echo '<script>parent.$("#cur_logo").attr("src","'.$image.'");</script>';
 				}
