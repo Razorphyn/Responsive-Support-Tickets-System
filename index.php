@@ -238,7 +238,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			var mail=$('#fmail').val();
 			var name=$('#fname').val();
 			if(mail.replace(/\s+/g,'')!='' && name.replace(/\s+/g,'')!=''){
-				var request= $.ajax({
+				$.ajax({
 					type: 'POST',
 					url: 'php/function.php',
 					data: {<?php echo $_SESSION['token']['act']; ?>:'forgot',mail: mail,name:name},
@@ -250,8 +250,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 						else
 							noty({text: data[0],type:'error',timeout:9E3});
 					}
-				});
-				request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+				}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 			}
 			else
 				noty({text: 'Please complete all the fields.',type:'error',timeout:9E3});
@@ -306,7 +305,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 		var mail=$('#rmail').val();
 		var pwd=$('#rpwd').val();
 		var rpwd=$('#rrpwd').val();
-		if(name.replace(/\s+/g,'')!='' && mail.replace(/\s+/g,'')!='' && pwd===rpwd){
+		if(name.replace(/\s+/g,'')!='' && mail.replace(/\s+/g,'')!='' && pwd.replace(/\s+/g,'')!='' && pwd===rpwd){
 			var request= $.ajax({
 				type: 'POST',
 				url: 'php/function.php',

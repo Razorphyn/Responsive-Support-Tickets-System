@@ -65,8 +65,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 	</head>
 	<body>
-		<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){?>
-		<div class="container">
+	<div class="container">
 			<div class="navbar navbar-fixed-top">
 				<div class="navbar-inner">
 					<div class="container">
@@ -152,9 +151,19 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<br/><br/>
 					<input type='submit' onclick='javascript:return false;' class='btn btn-success' id='savesett' value='Save'/>
 				</form>
-			<hr>
+			<hr><br/>
+			<div class='row-fluid'>
+				<div class='span12'><button id='dela' class='btn btn-danger' >Delete Account</button></div>
+			</div>
+			<div id='delaccform' style='display:none'>
+				<div class='row-fluid'>
+					<div class='span2'><label for='delpass'>Password</label></div>
+					<div class='span4'><input type="password" name='delpass' id="delpass" placeholder="Password" autocomplete="off" required/></div>
+					<input type='submit' onclick='javascript:return false;' class='btn btn-danger' id='delacc' value='Delete Account'/>
+				</div>
+			</div>
 		</div>
-		</div>
+	</div>
 
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
@@ -162,11 +171,38 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	$(document).ready(function() {
 		$('#enablealert option[value="<?php echo $_SESSION['mail_alert'];?>"]').attr('selected','selected');
 		$("#savesett").click(function(){var a=$("#usrname").val(),b=$("#gna").val(),e=$("#enablealert").val(),f=$("#opass").val(),c=$("#npass").val(),d=$("#ckpass").val();""!=a.replace(/\s+/g,"")&&""!=b.replace(/\s+/g,"")?""!=f.replace(/\s+/g,"")&&""!=c.replace(/\s+/g,"")&&""!=d.replace(/\s+/g,"")?c==d?(a=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_setting",name:a,mail:b,almail:e,oldpwd:f,nldpwd:c,rpwd:d},dataType:"json",success:function(a){"Saved"==a[0]?($('#opass').val(''),$('#npass').val(''),$('#ckpass').val(''),noty({text:"Saved",type:"success", timeout:9E3})):noty({text:a[0],type:"error",timeout:9E3})}}),a.fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})):noty({text:"New Passwords Mismatch",type:"error",timeout:9E3}):(a=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_setting",name:a,mail:b,almail:e},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}}),a.fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})):noty({text:"Empty Field", type:"error",timeout:9E3})});
+		$('#dela').click(function(){$("#delaccform").slideToggle(800)});
+		
+		$('#delacc').click(function(){
+			if(confirm('Do oyu really want to delete all your information?')){
+				var pas=$("#delpass").val();
+				if(pas.replace(/\s+/g,'')!=''){
+					$.ajax({
+						type: 'POST',
+						url: 'php/function.php',
+						data: {<?php echo $_SESSION['token']['act']; ?>:'del_account',pas: pas},
+						dataType : 'json',
+						success : function (a) {
+							if(a[0]=='Deleted'){
+								noty({text: 'The account has been deleted, bye bye',type:'success',timeout:3E3});
+								setTimeout(function() {
+									 location.reload();
+								}, 2500);
+							}
+							else
+								noty({text: a[0],type:'error',timeout:9E3});
+						}
+					}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+				}
+				else
+					noty({text: 'Empty password',type:'error',timeout:9E3});
+			}
+			else{
+				$("#delaccform").slideToggle(800),$("#delpass").val('');
+			}
+		});
 	});
 	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
-	<?php } else { ?>
-		<script>window.location = "<?php echo dirname(dirname(curPageURL())).'/index.php'; ?>";</script>
-	<?php } ?>
   </body>
 </html>

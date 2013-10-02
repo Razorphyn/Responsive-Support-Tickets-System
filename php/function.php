@@ -501,6 +501,89 @@ else if($_POST[$_SESSION['token']['act']]=='reset_password'){
 	exit();
 }
 
+else if($_POST[$_SESSION['token']['act']]=='del_account'){//check
+
+	$pass= trim(preg_replace('/\s+/','',$_POST['pas']));
+	$pass=($pass!='') ? $pass:exit();
+	$pass=hash('whirlpool',crypt($_POST['pas'],'$#%H4!df84a$%#RZ@£'));
+
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+	
+		$query = "SELECT `id` FROM ".$SupportUserTable." WHERE `mail`=?  AND `password`= ? LIMIT 1";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$_SESSION['mail'],PDO::PARAM_STR);
+		$STH->bindParam(2,$pass,PDO::PARAM_STR);
+		$STH->execute();
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			$camaro=(is_numeric($_SESSION['id']) && $a['id']==$_SESSION['id'])? (int)$_SESSION['id']:exit();
+			$query = "DELETE FROM ".$SupportMessagesTable." WHERE user_id=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+		
+			$query = "DELETE FROM ".$SupportTicketsTable." WHERE user_id=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+				
+			$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `uploader`=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				$path='../upload/';
+				do{
+					if(file_exists($path.$a['enc'])){
+						file_put_contents($path.$a['enc'],'');
+						unlink($path.$a['enc']);
+					}
+				}while ($a = $STH->fetch());
+			}
+			$query = "DELETE FROM ".$SupportUploadTable." WHERE uploader=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+															
+			$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN '1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			$query = "DELETE FROM ".$SupportUserTable." WHERE id=? ";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->execute();
+			
+			session_unset();
+			session_destroy();
+	
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Deleted'));
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Wrong Credentials'));
+		}
+	}
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+	}
+	exit();
+}
+	
 else if(isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='logout'){
 	session_unset();
 	session_destroy();
@@ -1957,7 +2040,7 @@ function retrive_mime($encname,$mustang){
 		'txt' => 'text/plain',
 		'htm' => 'text/html',
 		'html' => 'text/html',
-		'php' => 'text/html',
+		'php' => 'text/php',
 		'css' => 'text/css',
 		'js' => 'application/javascript',
 		'json' => 'application/json; charset=utf-8',
