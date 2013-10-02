@@ -151,10 +151,11 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<br/><br/>
 					<input type='submit' onclick='javascript:return false;' class='btn btn-success' id='savesett' value='Save'/>
 				</form>
-			<hr><br/>
+			<hr><br/><br/>
 			<div class='row-fluid'>
-				<div class='span12'><button id='dela' class='btn btn-danger' >Delete Account</button></div>
+				<div class='span2 offset5'><button id='dela' class='btn btn-danger' >Delete Account</button></div>
 			</div>
+			<br/>
 			<div id='delaccform' style='display:none'>
 				<div class='row-fluid'>
 					<div class='span2'><label for='delpass'>Password</label></div>
