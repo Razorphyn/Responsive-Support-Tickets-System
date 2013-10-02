@@ -619,7 +619,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		});
 		$(".attlist").append("<div class='row-fluid uploadfilebox'></div>");
 		tail = [];
-		$("#messages").children(".row-fluid:first").hasClass("oddmessage") ? tail.push('<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p></div><div class="span8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row-fluid oddmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p></div><div class="span8 messagecell">' + mess + "</div></div>");
+		$("#messages").children(".row-fluid:first").hasClass("oddmessage") ? tail.push('<div class="row-fluid evenmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p></div><div class="span8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row-fluid oddmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p></div><div class="span8 messagecell">' + mess + "</div></div>");
 		if (null != up){
 			tail.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">');
 			var count= up.length;
@@ -630,6 +630,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		tail.push("</div>");
 		$(".newest").remove();
 		$("#messages").children(".row-fluid:first").before(tail.join(""));
+		$("#messages").children(".row-fluid:first").delay(300).show('scale');
 		add++
 	}
 	</script>
