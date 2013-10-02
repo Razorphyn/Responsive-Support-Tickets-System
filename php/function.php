@@ -966,7 +966,7 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 	exit();
 }
 
-else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){//check
+else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){
 	$offset = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
 	$postnumbers = is_numeric($_POST['number']) ? $_POST['number'] : exit();
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
@@ -2023,7 +2023,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 				$STH->setFetchMode(PDO::FETCH_ASSOC);
 				
 				$a = $STH->fetch();
-				if(!empty($a) || $a['qta']<0){
+				if(!empty($a) || $a['qta']<1){
 					$query = "UPDATE ".$SupportMessagesTable." SET attachment='0' WHERE id=? LIMIT 1";
 					$STH = $DBH->prepare($query);
 					$STH->bindParam(1,$msid,PDO::PARAM_INT);

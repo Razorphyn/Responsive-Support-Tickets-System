@@ -489,7 +489,6 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					<?php } else { ?>
 						<p><?php echo $error; ?></p>
 					<?php } ?>
-				<hr>
 			</div>
 		</div>
 	<iframe style='display:none' name='hidden_upload' id='hidden_upload'></iframe>
@@ -528,7 +527,9 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		<?php } ?>
 		
 		$('#messages').scrollPagination({scroll:false,id:'<?php echo $_GET['id'];?>',add:add});
-				
+		
+		$('.loading-bar').delay(300).show('explode',null,400);
+		
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 
 		$("#subrepo").click(function(){var a=$("#problem").val();""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"report_ticket",message:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Submitted"==b[0]?noty({text:"Your complaint has been submitted",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"The message cannot be empty",type:"error",timeout:9E3})});
@@ -588,8 +589,8 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		});
 		
 		//Remove Uploaded File
-		$('.remfile').click(function(){
-			if(confim('Do you really want to delete this file?')){
+		$(document).on('click','.remfile',function(){
+			if(confirm('Do you really want to delete this file?')){
 				var dom=$(this), file_id=dom.parent().children('input[name="file_download"]').val();
 				$.ajax({
 					type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'del_post_file',file_id:file_id,id:'<?php echo $_GET['id'];?>'},dataType : 'json',
