@@ -36,8 +36,8 @@ table tr{text-align:center!important}
 #deptable {text-align:center}
 #adddep{display:none}
 
-.loading-bar {padding: 0.93% 1.05%;display: block;clear:both;text-align: center;box-shadow: inset 0px -45px 30px -40px rgba(0, 0, 0, 0.05);border-radius: 5px;-webkit-border-radius: 5px;margin: 20px 0;font-size: 1.1em;font-family: "museo-sans", sans-serif;border: 1px solid #ddd;margin-right: 1px;font-weight: bold;cursor: pointer;position: relative;behavior: url(../css/PIE.htc)}
-.loading-bar:hover {box-shadow: inset 0px 45px 30px -40px rgba(0, 0, 0, 0.05);behavior: url(../css/PIE.htc)}
+.loading-bar {padding: 0.93% 1.05%;display: none;clear:both;text-align: center;box-shadow: inset 0px -45px 30px -40px rgba(0, 0, 0, 0.05);border-radius: 5px;-webkit-border-radius: 5px;margin: 20px 0;font-size: 1.1em;font-family: "museo-sans", sans-serif;border: 1px solid #ddd;margin-right: 1px;font-weight: bold;cursor: pointer;position: relative;transition:none!important;-webkit-transition: none!important;behavior: url(../css/PIE.htc)}
+.loading-bar:hover {box-shadow: inset 0px 45px 30px -40px rgba(0, 0, 0, 0.05);transition: all 400ms ease!important;-webkit-transition: all 400ms ease!important;behavior: url(../css/PIE.htc)}
 
 .evenmessage{width:92%!important;-webkit-box-shadow:  0px 0px 0px 5px #1840b2;box-shadow:  0px 0px 0px 5px #1840b2;margin:2.8% 0;padding:3.4%;position:relative!important;display:block;clear:both;-webkit-border-radius: 10px;border-radius: 10px;transition: none !important;-webkit-transition: none !important;behavior: url(../css/PIE.htc)}
 .oddmessage{width:92%!important;-webkit-box-shadow:  0px 0px 0px 5px #197909;box-shadow:  0px 0px 0px 5px #197909;margin:2.8% 0;padding:3.4%;position:relative!important;display:block;clear:both;-webkit-border-radius: 10px;border-radius: 10px;transition: none !important;-webkit-transition: none !important;behavior: url(../css/PIE.htc)}
@@ -69,3 +69,5 @@ table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
 
 .rate_container{height:250px;overflow:auto}
 .info_rate{border-bottom:1px solid #222}
+
+.remfile{cursor:pointer}
