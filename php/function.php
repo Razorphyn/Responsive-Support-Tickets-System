@@ -1281,10 +1281,10 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				//Post Reply
 				if(isset($uploadarr[0])){
 					$json=json_encode($uploadarr);
-					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8')."',".$json.");</script>";
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',".$json.");</script>";
 				}
 				else
-					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8')."',null);</script>";
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',null);</script>";
 			}
 			catch(PDOException $e){
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
