@@ -1,6 +1,6 @@
 /* ---------- Frontend ---------- */
 
-body {margin:0;padding:0 20px 20px!important;background:#f2f2f2 url('images/bk.jpg')!important}
+body {margin:0;padding:0 20px 20px!important;background:#f2f2f2 url('images/bk.jpg')!important;transition: all 400ms ease;-webkit-transition: all 400ms ease}
 
 textarea{width:100% !important;max-width:100%;display:block;word-wrap: break-word!important}
 table{text-align:center!important;position:relaitve!important}
