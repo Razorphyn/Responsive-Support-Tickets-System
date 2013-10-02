@@ -714,7 +714,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 												$movedfiles[]=$_FILES['filename']['name'][$i];
 												$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
 												$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$tkid.',"'.$refid.'","'.$msid.'","'.$date.'"),';
-												echo "<script>parent.noty({text: '".htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8')."' has been uploaded',type:'success',timeout:2000});</script>";
+												echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' has been uploaded",type:"success",timeout:2000});</script>';
 										}
 									}
 								}
@@ -1229,7 +1229,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 												$movedfiles[]=$_FILES['filename']['name'][$i];
 												$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
 												$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$_SESSION[$encid]['id'].',"'.$encid.'","'.$msid.'","'.$date.'"),';
-												echo "<script>parent.noty({text: '".htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8')."' has been uploaded',type:'success',timeout:2000});</script>";
+												echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' has been uploaded",type:"success",timeout:2000});</script>';
 											}
 										}
 									}
@@ -2021,7 +2021,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 				$STH->bindParam(1,$msid,PDO::PARAM_INT);
 				$STH->execute();
 				$STH->setFetchMode(PDO::FETCH_ASSOC);
-				
+
 				$a = $STH->fetch();
 				if(!empty($a) || $a['qta']<1){
 					$query = "UPDATE ".$SupportMessagesTable." SET attachment='0' WHERE id=? LIMIT 1";
