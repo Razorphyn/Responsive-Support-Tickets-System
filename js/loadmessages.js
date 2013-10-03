@@ -63,7 +63,7 @@
 								}
 								mess.push('</div>');
 							}
-							$this.children('.row-fluid').last().before(mess.join(''));
+							$this.children('.row-fluid:last').after(mess.join(''));
 							busy = false;
 						}
 						else
