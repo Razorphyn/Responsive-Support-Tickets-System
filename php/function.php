@@ -1141,7 +1141,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	exit();
 }
 
-else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['post_reply']=='Post Reply'){
+else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['post_reply']=='Post Reply'){//check
 	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
 	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
 	$error=array();
@@ -1165,9 +1165,16 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 				$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-				if($_SESSION[$encid]['status']==0 && $_SESSION['id']==$_SESSION[$encid]['usr_id']){
+				if($_SESSION[$encid]['status']==0 && $_SESSION['id']==$_SESSION[$encid]['usr_id']){//check
 					try{
-					$query = "UPDATE ".$SupportTicketsTable." a ,".$SupportUserTable." b SET a.ticket_status= CASE WHEN a.operator_id=0 THEN '2' ELSE '1' END, b.assigned_tickets= CASE WHEN a.ticket_status='0' THEN (b.assigned_tickets+1) ELSE b.assigned_tickets END,b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END,a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END WHERE a.enc_id=? OR b.id=a.operator_id";
+					$query = "UPDATE ".$SupportTicketsTable." a 
+								LEFT OUTER JOIN ".$SupportUserTable." b 
+									ON b.id=a.operator_id
+								SET a.ticket_status= CASE WHEN a.operator_id=0 THEN '2' ELSE '1' END, 
+									b.assigned_tickets= CASE WHEN a.ticket_status='0' THEN (b.assigned_tickets+1) ELSE b.assigned_tickets END,
+									b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END,
+									a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END 
+								WHERE a.enc_id=?";
 					$STH = $DBH->prepare($query);
 					$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
 					$STH->execute();
@@ -1194,6 +1201,13 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				}
 				$ip=retrive_ip();
 				$date=date("Y-m-d H:i:s");
+				
+				$query = "UPDATE ".$SupportTicketsTable." SET last_reply=? WHERE enc_id=?";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$date,PDO::PARAM_STR);
+				$STH->bindParam(2,$encid,PDO::PARAM_STR,87);
+				$STH->execute();
+					
 				$query = "INSERT INTO ".$SupportMessagesTable."(`user_id`,`message`,`ticket_id`,`ip_address`,`created_time`) VALUES (?,?,?,?,?);";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
@@ -1202,7 +1216,8 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				$STH->bindParam(4,$ip,PDO::PARAM_STR);
 				$STH->bindParam(5,$date,PDO::PARAM_STR);
 				$STH->execute();
-
+				
+				
 				if(isset($setting[5]) && $setting[5]==1){
 					//Upload File
 					if(isset($_FILES['filename'])){
@@ -1212,8 +1227,7 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 							$maxsize=covert_size(ini_get('upload_max_filesize'));
 							if(isset($setting[6]) && $setting[6]!=null && $setting[6]!='')
 								$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
-							
-							echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
+
 							if(!is_dir('../upload')) mkdir('../upload');
 							$uploadarr=array();
 							$movedfiles=array();
@@ -1259,7 +1273,6 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 									echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "An error has occurred, please contact the administrator.",type:"error",timeout:9000});</script>';
 								}
 							}
-							echo '<script>parent.noty({text: "File Upload Finished",type:"information",timeout:2000});</script>';
 						}
 					}
 				}
@@ -1983,7 +1996,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	exit();
 }
 
-else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='del_post_file'){//check
+else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='del_post_file'){
 	
 	$tk_id=trim(preg_replace('/\s+/','',$_POST['id']));
 	$tk_id=($tk_id!='' && strlen($tk_id)==87) ? $tk_id:exit();
@@ -2009,7 +2022,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 			$path='../upload/'.$file_id;
 			file_put_contents($path,'');
 			unlink($path);
-			
+
 			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=? AND `enc`=?";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$tk_id,PDO::PARAM_STR);
@@ -2023,7 +2036,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 				$STH->setFetchMode(PDO::FETCH_ASSOC);
 
 				$a = $STH->fetch();
-				if(!empty($a) || $a['qta']<1){
+				if(empty($a) || $a['qta']<1){
 					$query = "UPDATE ".$SupportMessagesTable." SET attachment='0' WHERE id=? LIMIT 1";
 					$STH = $DBH->prepare($query);
 					$STH->bindParam(1,$msid,PDO::PARAM_INT);
