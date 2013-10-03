@@ -459,7 +459,9 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							<span class='attlist'></span>
 							<div class='row-fluid uploadfilebox'></div>
 							<br/>
-							<span id='add_upload' class='btn btn-primary'>Add File Field</span>
+							<p>To select multiple files: press ctrl+click on the chosen file</p>
+							<div class="row-fluid uploadfilebox"><div class="span4"><input type="file" name="filename[]" multiple /></div></div>
+							<!--<span id='add_upload' class='btn btn-primary'>Add File Field</span>-->
 							<?php } ?>
 							<br/><br/>
 							<input type='submit' name='post_reply' id='post_reply' value='Post Reply' class='btn btn-success'/>
