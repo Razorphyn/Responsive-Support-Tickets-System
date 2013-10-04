@@ -506,9 +506,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/jRating.jquery.js,js/loadmessages.js&amp;5259487' ?>"></script>
 	<?php } ?>
 	<script>
-	var add=0;
-	var editor;
-	
+	var add=0,editor, writing=false;
 	 $(document).ready(function(){
 	 
 		$('#statustk').val("<?php echo ($stat==2 || $stat==1) ?  1:0; ?>").change();
@@ -610,6 +608,18 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			}
 		});
 		
+		//Check if writing
+		<?php if(!$isMob) { ?>
+			CKEDITOR.instances.message.on('key', function(event) {
+				var m=CKEDITOR.instances.message.getData().replace(/\s+/g,"");
+				writing=(m=="")? false:true;
+			});
+		<?php }else { ?>
+		$(document).on('change','#message',function(){
+			var m=$("#message").val().replace(/\s+/g,'');
+			writing=(m=='')? false:true;
+		});
+		<?php } ?>
 		
 		<?php if($_SESSION['status']==1) { ?>
 			$('#updtdpop').click(function(){
@@ -658,8 +668,15 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$(".newest").remove();
 		$("#messages").children(".row-fluid:first").before(tail.join(""));
 		$("#messages").children(".row-fluid:first").delay(300).show('scale');
-		add++
+		add++;
+		writing=false;
 	}
+	
+	$(window).bind('beforeunload', function(){
+		if(writing==true){
+			return 'Do you want to leave the page and discard the post?';
+		}
+	});
 	</script>
   </body>
 </html>
