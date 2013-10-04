@@ -1164,7 +1164,8 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 			try{
 				$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 				$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-
+				
+				//User open ticket on reply
 				if($_SESSION[$encid]['status']==0 && $_SESSION['id']==$_SESSION[$encid]['usr_id']){//check
 					try{
 					$query = "UPDATE ".$SupportTicketsTable." a 
@@ -1201,13 +1202,14 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				}
 				$ip=retrive_ip();
 				$date=date("Y-m-d H:i:s");
-				
+				//Update last reply
 				$query = "UPDATE ".$SupportTicketsTable." SET last_reply=? WHERE enc_id=?";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$date,PDO::PARAM_STR);
 				$STH->bindParam(2,$encid,PDO::PARAM_STR,87);
 				$STH->execute();
-					
+				
+				//Insert new message
 				$query = "INSERT INTO ".$SupportMessagesTable."(`user_id`,`message`,`ticket_id`,`ip_address`,`created_time`) VALUES (?,?,?,?,?);";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
@@ -1276,6 +1278,8 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 						}
 					}
 				}
+				//End Upload
+				
 				//Send Mail
 				if($_SESSION[$encid]['status']!=2){
 					if($_SESSION['id']==$_SESSION[$encid]['usr_id']){
@@ -1294,13 +1298,16 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 							shell_exec($ex." > /dev/null 2>/dev/null &");
 					}
 				}
-				//Post Reply
+				//End Mail
+				
+				//Post Reply(send to javascript)
 				if(isset($uploadarr[0])){
 					$json=json_encode($uploadarr);
 					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',".$json.");</script>";
 				}
 				else
 					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',null);</script>";
+				//end
 			}
 			catch(PDOException $e){
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);

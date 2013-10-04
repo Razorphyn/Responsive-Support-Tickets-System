@@ -51,9 +51,9 @@
 							var count= data['messages'].length;
 							for(var i=0; i<count;i++){
 								if(i%2==0)
-									mess.push('<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
+									mess.push('<div class="row-fluid evenmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
 								else
-									mess.push('<div class="row-fluid oddmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
+									mess.push('<div class="row-fluid oddmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
 								var upcount=data['messages'][i].length;
 								if(upcount>3){
 									mess.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">');
@@ -64,6 +64,10 @@
 								mess.push('</div>');
 							}
 							$this.children('.row-fluid:last').after(mess.join(''));
+							$this.children('.row-fluid:hidden').each(function(){
+								$(this).delay(150).show('scale',null,400);
+							
+							});
 							busy = false;
 						}
 						else

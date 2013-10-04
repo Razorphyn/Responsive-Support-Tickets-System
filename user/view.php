@@ -457,11 +457,18 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							<?php if(isset($setting[5]) && $setting[5]==1){ ?>
 							<h3 class='sectname'>Attachments</h3>
 							<span class='attlist'></span>
-							<div class='row-fluid uploadfilebox'></div>
+							<!--<div class='row-fluid uploadfilebox'></div>-->
 							<br/>
+							<!--<div id="drop">
+								Drop Here
+								<a>Browse</a>
+								<input type="file" name="filename[]" multiple />
+							</div>
+							<ul>
+							</ul>-->
 							<p>To select multiple files: press ctrl+click on the chosen file</p>
 							<div class="row-fluid uploadfilebox"><div class="span4"><input type="file" name="filename[]" multiple /></div></div>
-							<!--<span id='add_upload' class='btn btn-primary'>Add File Field</span>-->
+						<!--<span id='add_upload' class='btn btn-primary'>Add File Field</span>-->
 							<?php } ?>
 							<br/><br/>
 							<input type='submit' name='post_reply' id='post_reply' value='Post Reply' class='btn btn-success'/>
@@ -528,7 +535,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		
 		$('#messages').scrollPagination({scroll:false,id:'<?php echo $_GET['id'];?>',add:add});
 		
-		$('.loading-bar').delay(300).show('explode',null,400);
+		$('.loading-bar').delay(300).show('scale',null,400);
 		
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 
