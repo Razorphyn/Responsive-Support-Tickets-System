@@ -188,9 +188,9 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							<?php if(isset($setting[5]) && $setting[5]==1){ ?>
 								<h3 class='sectname'>Attachments</h3>
 								<span class='attlist'></span>
+								<br/>
 								<p>To select multiple files: press ctrl+click on the chosen file</p>
-								<div class="row-fluid uploadfilebox"><div class="span4"><input type="file" name="filename[]" multiple /></div></div>
-								<!--<br/><span id='add_upload' class='btn btn-primary'>Add File Field</span>-->
+								<input id='fielduploadinput' type="file" name="filename[]" multiple /> <span id='resetfile' class='btn btn-danger'>Reset</span>
 							<?php } ?>
 							<br/><br/>
 							<input type="submit" class="btn btn-success" name='createtk' value='Create New Ticket' id='createtk'/>
@@ -239,8 +239,10 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				
 				$("#createticket").submit(function(){<?php if(!$isMob){ ?>if(""==CKEDITOR.instances.message.getData().replace(/\s+/g,"")||""==$("#title").val().replace(/\s+/g,""))<?php }else { ?>if($("#message").val().replace(/\s+/g,'') == '' || $('#title').val().replace(/\s+/g,'')=='')<?php } ?>return noty({text:"Empty Fields. PLeasy check the title and the message",type:"error",timeout:9E3}),!1;$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 
-				//$("#add_upload").click(function(){$(".uploadfilebox:last").after('<div class="row-fluid uploadfilebox"><div class="span4"><div class="span9"><input type="file" name="filename[]" /></div><div class="span1"> <i class="icon-remove remupbox"></i></div></div></div>')});
-				//$(document).on('click','.remupbox',function(){ $(this).parent().parent().remove();});
+				$(document).on('click','#resetfile',function(){
+					$('#fielduploadinput').wrap('<form>').closest('form').get(0).reset();
+					$('#fielduploadinput').unwrap();
+				});
 			});
 			
 			function created(){window.location = "<?php echo dirname(curPageURL()); ?>";}

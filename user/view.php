@@ -458,18 +458,10 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							<?php if(isset($setting[5]) && $setting[5]==1){ ?>
 							<h3 class='sectname'>Attachments</h3>
 							<span class='attlist'></span>
-							<!--<div class='row-fluid uploadfilebox'></div>-->
 							<br/>
-							<!--<div id="drop">
-								Drop Here
-								<a>Browse</a>
-								<input type="file" name="filename[]" multiple />
-							</div>
-							<ul>
-							</ul>-->
 							<p>To select multiple files: press ctrl+click on the chosen file</p>
-							<div class="row-fluid uploadfilebox"><div class="span4"><input type="file" name="filename[]" multiple /></div></div>
-						<!--<span id='add_upload' class='btn btn-primary'>Add File Field</span>-->
+							<!--<div class="row-fluid uploadfilebox"><div class="span4"><input id='fielduploadinput' type="file" name="filename[]" multiple /></div></div>-->
+							<input id='fielduploadinput' type="file" name="filename[]" multiple /> <span id='resetfile' class='btn btn-danger'>Reset</span>
 							<?php } ?>
 							<br/><br/>
 							<input type='submit' name='post_reply' id='post_reply' value='Post Reply' class='btn btn-success'/>
@@ -611,6 +603,11 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					}
 				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			}
+		});
+		
+		$(document).on('click','#resetfile',function(){
+			$('#fielduploadinput').wrap('<form>').closest('form').get(0).reset();
+			$('#fielduploadinput').unwrap();
 		});
 		
 		//Check if writing
