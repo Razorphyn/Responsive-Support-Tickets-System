@@ -75,7 +75,7 @@
 				});
 				request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});
 			}
-			
+
 			// If scrolling is enabled
 			if($settings.scroll == true) {
 				// .. and the user is scrolling
