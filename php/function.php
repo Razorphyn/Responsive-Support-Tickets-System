@@ -851,10 +851,19 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 }
 
 else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='retrive_tickets'){
+	if(!is_numeric($_POST['stat']) || $_POST['stat']>2 || $_POST['stat']<0){
+		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Wrong Status Code'));
+		exit();
+	}
+
 	try{
+		
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		if($_SESSION['status']==0){
+			$_POST['stat']=($_POST['stat']==0)? 0:1;
 			$query = "SELECT 
 						a.enc_id,
 						IF(b.department_name IS NOT NULL, b.department_name,'Unknown'),
@@ -862,17 +871,17 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 						a.title,
 						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
 						a.created_time,
-						a.last_reply,
-						CASE a.ticket_status WHEN '0' THEN '<span class=\'label label-success\'>Closed</span>' WHEN '1' THEN '<span class=\'label label-important\'>Open</span>' WHEN '2' THEN '<span class=\'label label-warning\'>To Assign</span>' WHEN '3' THEN '<span class=\'label label-important\'>Reported</span>' ELSE 'Error' END 
+						a.last_reply
 					FROM ".$SupportTicketsTable." a
 					LEFT JOIN ".$SupportDepaTable." b
 						ON	b.id=a.department_id
 					LEFT JOIN ".$SupportUserTable." c
 						ON c.id=a.operator_id
-					WHERE a.user_id=".$_SESSION['id']." 
+					WHERE a.user_id=".$_SESSION['id']."  AND a.ticket_status=?
 					ORDER BY a.last_reply DESC 
 					LIMIT 350";
 			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_INT);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array()));
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -884,6 +893,7 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 			}
 		}
 		else if($_SESSION['status']==1){
+			$_POST['stat']=($_POST['stat']==0)? 0:1;
 			$query = "SELECT 
 						a.enc_id,
 						IF(b.department_name IS NOT NULL, b.department_name,'Unknown'),
@@ -892,17 +902,17 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 						a.title,
 						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
 						a.created_time,
-						a.last_reply,
-						CASE a.ticket_status WHEN '0' THEN '<span class=\'label label-success\'>Closed</span>' WHEN '1' THEN '<span class=\'label label-important\'>Open</span>' WHEN '2' THEN '<span class=\'label label-warning\'>To Assign</span>' WHEN '3' THEN '<span class=\'label label-important\'>Reported</span>' ELSE 'Error' END 
+						a.last_reply
 					FROM ".$SupportTicketsTable." a
 					JOIN ".$SupportDepaTable." b
 						ON	b.id=a.department_id
 					JOIN ".$SupportUserTable." c
 						ON c.id=a.operator_id
-					WHERE a.ticket_status='1' AND a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."' 
+					WHERE a.ticket_status='1' AND a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."' AND a.ticket_status=?
 					ORDER BY a.last_reply DESC 
 					LIMIT 350" ;
 			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_INT);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array()));
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -926,17 +936,17 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 							a.title,
 							CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
 							a.created_time,
-							a.last_reply,
-							CASE a.ticket_status WHEN '0' THEN '<span class=\'label label-success\'>Closed</span>' WHEN '1' THEN '<span class=\'label label-important\'>Open</span>' WHEN '2' THEN '<span class=\'label label-warning\'>To Assign</span>' WHEN '3' THEN '<span class=\'label label-important\'>Reported</span>' ELSE 'Error' END AS stat
-						
+							a.last_reply
 						FROM ".$SupportTicketsTable." a
 						LEFT JOIN ".$SupportDepaTable." b
 							ON	b.id=a.department_id
 						LEFT JOIN ".$SupportUserTable." c
 							ON c.id=a.operator_id
+						WHERE a.ticket_status=?
 						ORDER BY a.last_reply DESC 
 						LIMIT 350";
 			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_INT);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array(),'admin'=>array()));
 			$STH->setFetchMode(PDO::FETCH_ASSOC);

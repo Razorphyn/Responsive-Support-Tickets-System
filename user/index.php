@@ -140,12 +140,19 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			</div>
 			<hr>
 				<div class='row-fluid main'>
-					<div class='row-fluid'>
-						<div class='span2' id='nwtk'><a href='newticket.php' class='btn btn-warning' >New Ticket</a></div>
-						<?php if(isset($_SESSION['status']) && $_SESSION['status']==2) { ?>
-							<div class='span3'><button id='aut_ass_tk' class='btn btn-primary' onclick='javascript:return false;'>Automatic Tickets Assigment</button></div>
+
+					<ul id='tkstatnav' class="nav nav-tabs">
+						<li class="active" id='tkopen' value='1' ><a href="#">Open</a></li>
+						<li id='tkclosed' value='0'><a href="#">Closed</a></li>
+						<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+							<li id='tkassi' value='2'><a href="#">To Assign</a></li>
 						<?php } ?>
-					</div>
+							<li><a href="newticket.php">New Ticket</a></li>
+						<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+							<li id='aut_ass_tk' onclick='javascript:return false;'><a href="#">Automatic Tickets Assigment</a></li>
+						<?php } ?>
+					</ul>
+
 					<h3 class='sectname'>Your Tickets</h3>
 					<div class='row-fluid'>
 						<div class='span12'>
@@ -187,29 +194,185 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
-		
-		var request= $.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets'},dataType : 'json',
+		var utab,otab,atab;
+		$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:1},dataType : 'json',
 			success : function (a) {
 				$('.loading').remove();
 				if(a.response=='ret'){
 					<?php if($_SESSION['status']==0){ ?>
-						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaSorting:[[2,"desc"]],aaData:a.tickets.user,oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title:</strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
+					
+						utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
+						
+						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+						utab.fnAddData(a.tickets.user);
+						
 					<?php } else if($_SESSION['status']==1){ ?>
-						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaSorting:[[2,"desc"]],aaData:a.tickets.user,oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
-						var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} $("#operatortable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaSorting:[[2,"desc"]],aaData:a.tickets.op,oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
+					
+						utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
+						otab=$("#operatortable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
+						
+						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+						utab.fnAddData(a.tickets.user);
+						
+						var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+						otab.fnAddData(a.tickets.op);
+						
 					<?php } else if($_SESSION['status']==2){ ?>
-						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaSorting:[[2,"desc"]],aaData:a.tickets.user,oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
-						var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} $("#operatortable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaSorting:[[2,"desc"]],aaData:a.tickets.op,oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
-						var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} $("#admintable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,aaSorting:[[2,"desc"]],bProcessing:!0,aaData:a.tickets.admin,oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
+
+						utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
+						otab=$("#operatortable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
+						atab=$("#admintable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
+
+						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+						utab.fnAddData(a.tickets.user);
+						
+						var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+						otab.fnAddData(a.tickets.op);
+						
+						var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+						atab.fnAddData(a.tickets.admin);
+						
 					<?php } ?>
 				}
 				else
 					noty({text:a[0],type:"error",timeout:9E3});
 			}
-		});
-		request.fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});
+		}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});
 		
+		$(document).on('click','#tkopen', function(){
+			$('#tkstatnav > li.active').removeClass('active');
+			$(this).addClass('active');
+			$('.dataTables_wrapper').each(function(){
+				$(this).hide(400);
+				$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
+			});
+			setTimeout(function(){
+				$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:1},dataType : 'json',
+					success : function (a) {
+						if(a.response=='ret'){
+							<?php if($_SESSION['status']==0){ ?>
+					
+								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+									
+							<?php } else if($_SESSION['status']==1){ ?>								
+							
+								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+								var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
+							
+							<?php } else if($_SESSION['status']==2){ ?>
+
+								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+								var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
+								var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									$.when(atab.fnClearTable()).then(atab.fnAddData(a.tickets.admin));
+								
+							<?php } ?>
+						}
+						else
+							noty({text: 'Ticket cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
+					}
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+				
+				$.when($('.loading').remove()).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
+			},800);
+		});
+		
+		$(document).on('click','#tkclosed', function(){
+			$('#tkstatnav > li.active').removeClass('active');
+			$(this).addClass('active');
+			$('.dataTables_wrapper').each(function(){
+				$(this).hide(400);
+				$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
+			});
+			setTimeout(function(){
+				$.when(
+					$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:0},dataType : 'json',
+						success : function (a) {
+							if(a.response=='ret'){
+								<?php if($_SESSION['status']==0){ ?>
+					
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+									
+								<?php } else if($_SESSION['status']==1){ ?>
+								
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
+									
+								<?php } else if($_SESSION['status']==2){ ?>
+								
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
+									var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(atab.fnClearTable()).then(atab.fnAddData(a.tickets.admin));
+								
+								<?php } ?>
+							}
+							else
+								noty({text: 'Ticket cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
+						}
+					}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});}),
+
+					$('.loading').remove()
+				).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
+			},800);
+		});
+
 		<?php if($_SESSION['status']==2){ ?>
+		
+			$(document).on('click','#tkassi', function(){
+				$('#tkstatnav > li.active').removeClass('active');
+				$(this).addClass('active');
+				$('.dataTables_wrapper').each(function(){
+					$(this).hide(400);
+					$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
+				});
+				
+				setTimeout(function(){
+					$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:2},dataType : 'json',
+						success : function (a) {
+							if(a.response=='ret'){
+								<?php if($_SESSION['status']==0){ ?>
+								
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+								
+								<?php } else if($_SESSION['status']==1){ ?>
+									
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
+								
+								<?php } else if($_SESSION['status']==2){ ?>
+									
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
+									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
+									var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+										$.when(atab.fnClearTable()).then(atab.fnAddData(a.tickets.admin));
+								
+								<?php } ?>
+							}
+							else
+							noty({text: 'Ticket cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
+						}
+					}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+					
+					$.when($('.loading').remove()).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
+				},800);
+			});
+		
 			$(document).on("click", "#aut_ass_tk", function () {
 				$.ajax({
 					type: "POST",
@@ -222,6 +385,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})})
 			});		
 		<?php } ?>
+		
 		$(document).on('click','.remusr',function(){
 			var enc=$(this).val();
 			if(!enc.match(/[a-z0-9.]{87}/g)){
@@ -274,8 +438,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					var f = $(a.title).text(),
 						d = "<hr><form action='' method='post' class='submit_changes_depa' id='"+b+"'><span>Edit " + encodeHTML(f) + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + encodeHTML(d) + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><input type='hidden' id='tablename' value='" + encodeHTML(e) + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + encodeHTML(f) + "' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assign</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 					$("table:last").parent().parent().after(d);
-					if (-1 < a.status.search("Closed")) var c = 0;
-					else -1 < a.status.search("Open") ? c = 1 : -1 < a.status.search("Assign") && (c = 2);
+					c=parseInt($('#tkstatnav > li.active').val());
 					
 					switch (a.priority) {case "Low":prio = 0;break;case "Medium":prio = 1;break;case "High":prio = 2;break;case "Urgent":prio = 3;break;case "Critical":prio = 4}
 					
@@ -304,8 +467,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					var f = $(a.title).text(),
 						d = "<hr><form action='' method='post' class='submit_changes_depa' id='" + c + "'><span>Edit " + encodeHTML(f) + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + encodeHTML(d) + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + encodeHTML(f) + "' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 					$("table:last").parent().parent().after(d);
-					if (-1 < a.status.search("Closed")) var e = 0;
-					else -1 < a.status.search("Open") && (e = 1);
+					e=parseInt($('#tkstatnav > li.active').val());
+					e=(e==0)?0:1;
 
 					switch (a.priority) {case "Low":var b = 0;break;case "Medium":b = 1;break;case "High":b = 2;break;case "Urgent":b = 3;break;case "Critical":b = 4}
 					$('select[name="edit_depa_active"]:first option[value=' + e + "]").attr("selected", "selected");
@@ -331,29 +494,38 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					dataType : 'json',
 					success : function (data){
 						if(data[0]=='Saved'){
-							tit='<button class="btn btn-link viewtk" value="'+data[1][0]+'">'+data[1][1]+"</button>";
-							switch(data[1][2]){case "0":prio="Low";break;case "1":prio="Medium";break;case "2":prio="High";break;case "3":prio="Urgent";break;case "4":prio="Critical";default:prio='Error'}
-							switch(data[1][3]){case "0":stat='<span class="label label-success">Closed</span>';break;case "1":stat='<span class="label label-important">Open</span>';break;case "2":stat='<span class="label label-warning">To Assign</span>';break;case "3":stat='<span class="label label-info">Flagged</span>';default:stat='Error'};
-							var action='<div class="btn-group"><button class="btn btn-warning editusr" value="'+data[1][0]+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+data[1][0]+'"><i class="icon-remove"></i></button></div>';
-							$('button.editusr[value="'+data[1][0]+'"]').each(function(){
-								var table=$(this).parent().parent().parent().parent().parent().parent().attr('id');
-								table=$('#'+table).dataTable();
-								var node=this.parentNode.parentNode.parentNode.parentNode,
-									pos=table.fnGetPosition(node,null,true),
-									info = table.fnGetData(node);
+							if(parseInt($('#tkstatnav > li.active').val())==data[1][3]){
+								tit='<button class="btn btn-link viewtk" value="'+data[1][0]+'">'+data[1][1]+"</button>";
+								switch(data[1][2]){case "0":prio="Low";break;case "1":prio="Medium";break;case "2":prio="High";break;case "3":prio="Urgent";break;case "4":prio="Critical";default:prio='Error'}
+								var action='<div class="btn-group"><button class="btn btn-warning editusr" value="'+data[1][0]+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+data[1][0]+'"><i class="icon-remove"></i></button></div>';
+								$('button.editusr[value="'+data[1][0]+'"]').each(function(){
+									var table=$(this).parent().parent().parent().parent().parent().parent().attr('id');
+									table=$('#'+table).dataTable();
+									var node=this.parentNode.parentNode.parentNode.parentNode,
+										pos=table.fnGetPosition(node,null,true),
+										info = table.fnGetData(node);
 
-								info={title:tit , date:encodeHTML(info.date),reply:encodeHTML(info.reply),dname:encodeHTML(info.dname),opname:encodeHTML(info.opname), priority:encodeHTML(prio), action:action};
+									info={title:tit,date:encodeHTML(info.date),reply:encodeHTML(info.reply),dname:encodeHTML(info.dname),opname:encodeHTML(info.opname),priority:encodeHTML(prio),action:action};
 
-								if(info['opname']=='Not Assigned' && stat!='<span class="label label-success">Closed</span>')
-									info.status='<span class="label label-warning">To Assign</span>';
-								else
-									info.status=stat;
-								if(stat=='<span class="label label-warning">To Assign</span>')
-									info.opname='Not Assigned';
-								table.fnDeleteRow(pos, function(){table.fnAddData(info);});
-							});
-							dom.prev().remove();
-							dom.remove();
+									if(stat==2)
+										info.opname='Not Assigned';
+									table.fnDeleteRow(pos, function(){table.fnAddData(info);});
+								});
+								dom.prev().remove();
+								dom.remove();
+							}
+							else{
+								$('button.editusr[value="'+data[1][0]+'"]').each(function(){
+									var table=$(this).parent().parent().parent().parent().parent().parent().attr('id');
+									table=$('#'+table).dataTable();
+									var node=this.parentNode.parentNode.parentNode.parentNode,
+										pos=table.fnGetPosition(node,null,true);
+									table.fnDeleteRow(pos);
+								});
+								dom.prev().remove();
+								dom.remove();
+							}
+								
 						}
 						else
 							noty({text: data[0],type:'error',timeout:9000});
