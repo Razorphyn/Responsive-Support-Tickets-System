@@ -22,8 +22,6 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 }
 session_start(); 
 
-
-
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
@@ -542,9 +540,6 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$("#subrepo").click(function(){var a=$("#problem").val();""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"report_ticket",message:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Submitted"==b[0]?noty({text:"Your complaint has been submitted",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"The message cannot be empty",type:"error",timeout:9E3})});
 		
 		$("#showhide").click(function(){var a=$("#conpass").val()+"";$("#conpass").is(":password")?($("#passcont").html('<input type="text" id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Hide")):($("#passcont").html('<input type="password" id="conpass" autocomplete="off" />'),$("#conpass").val(a),$("#showhide").text("Show"))});
-		
-		//$("#add_upload").click(function(){$(".uploadfilebox:last").after('<div class="row-fluid uploadfilebox"><div class="span4"><div class="span9"><input type="file" name="filename[]" /></div><div class="span1"> <i class="icon-remove remupbox"></i></div></div></div>')});
-		//$(document).on("click",".remupbox",function(){$(this).parent().parent().remove()});
 
 		$("#updstatus").click(function() { var a = $("#statustk").val(); $.ajax({type:"POST", url:"../php/function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"update_status", status:a, id:"<?php echo $_GET['id'];?>"}, dataType:"json", success:function(b) { "Saved" == b[0] ? (0 == a ? $(".ratingsect").slideToggle(800) : $(".ratingsect").slideToggle(800), noty({text:"Updated", type:"success", timeout:9E3})) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
 
