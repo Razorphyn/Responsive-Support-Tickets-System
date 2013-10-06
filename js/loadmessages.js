@@ -8,8 +8,7 @@
 			error	:	'No More Messages', 	
 			delay	:	900,
 			scroll	:	true,
-			id		:	'',
-			add		:	0
+			id		:	''
 		}
 		
 		// Extend the options so they work with the plugin
@@ -36,7 +35,7 @@
 			
 			function getData() {
 				var request= $.ajax({
-					type: 'POST',url: '../php/function.php',data: {action:'scrollpagination',number:$settings.nop,offset:offset+$settings.add,id:id},dataType : 'json',
+					type: 'POST',url: '../php/function.php',data: {action:'scrollpagination',number:$settings.nop,offset:offset+add,id:id},dataType : 'json',
 					success : function (data) {
 						$this.find('.loading-bar').html($initmessage);
 						if(data['ret'] == "End") {
@@ -51,9 +50,9 @@
 							var count= data['messages'].length;
 							for(var i=0; i<count;i++){
 								if(i%2==0)
-									mess.push('<div class="row-fluid evenmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
+									mess.push('<div class="row-fluid evenmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p><p class="postnumber">Post Number: '+(totalmsg-settings.nop-add-i)+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
 								else
-									mess.push('<div class="row-fluid oddmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
+									mess.push('<div class="row-fluid oddmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p><p class="postnumber">Post Number: '+(totalmsg-settings.nop-add-i)+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
 								var upcount=data['messages'][i].length;
 								if(upcount>3){
 									mess.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">');
@@ -106,7 +105,6 @@
 			
 			// Also content can be loaded by clicking the loading bar/
 			$this.find('.loading-bar').click(function() {
-			
 				if(busy == false) {
 					busy = true;
 					getData();

@@ -139,6 +139,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					$conpass=htmlspecialchars(mb_convert_encoding(implode('',$conpass), "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
 				}
 				$query = "SELECT 
+								(SELECT COUNT(*) FROM ".$SupportMessagesTable." WHERE ticket_id=?) as qta,
 								a.id,
 								b.name,
 								a.message,
@@ -150,15 +151,17 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							WHERE a.ticket_id=? ORDER BY a.created_time DESC LIMIT 10";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_SESSION[$_GET['id']]['id'],PDO::PARAM_STR);
+				$STH->bindParam(2,$_SESSION[$_GET['id']]['id'],PDO::PARAM_STR);
 				$STH->execute();
 				$STH->setFetchMode(PDO::FETCH_ASSOC);
 				$a = $STH->fetch();
+				$totnummsg=$a['qta'];
 				if(!empty($a)){
 					$list=array();
 					$messageid=array();
 					$count=0;
 					do{
-						$list[$a['id']]=array(0=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),1=>$a['message'],2=>$a['created_time']);
+						$list[$a['id']]=array(0=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),1=>$a['message'],2=>$a['created_time'],3=>($totnummsg-$count));
 						if($a['attachment']==1)
 							$messageid[]=$a['id'];
 						$count++;
@@ -477,13 +480,13 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							<?php 
 								for($i=0;$i<$count;$i++){
 									if($i==0)
-										echo '<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><span class="label label-important newest">Newest</span></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
+										echo '<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p><span class="label label-important newest">Newest</span></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
 									else if($i%2==0)
-										echo '<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
+										echo '<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
 									else
-										echo '<div class="row-fluid oddmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
+										echo '<div class="row-fluid oddmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
 									$upcount=count($list[$i]);
-									if($upcount>3){
+									if($upcount>4){
 										echo '<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">';
 										for($j=3;$j<$upcount;$j++)
 											echo $list[$i][$j];
@@ -511,9 +514,9 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/jRating.jquery.js,js/loadmessages.js&amp;5259487' ?>"></script>
 	<?php } ?>
 	<script>
-	var add=0,editor, writing=false;
-	 $(document).ready(function(){
-	 
+	var add=0,editor, writing=false, totalmsg=<?php echo $totnummsg;?>;
+	$(document).ready(function(){
+
 		$('#statustk').val("<?php echo ($stat==2 || $stat==1) ?  1:0; ?>").change();
 		$('#contype').val('<?php echo $connection; ?>').change(); 
 		
@@ -531,8 +534,8 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$(".razorate").jRating();
 		<?php } ?>
 		
-		$('#messages').scrollPagination({scroll:false,id:'<?php echo $_GET['id'];?>',add:add});
-		
+		$('#messages').scrollPagination({scroll:false,id:'<?php echo $_GET['id'];?>'});
+
 		$('.loading-bar').delay(300).show('scale',null,400);
 		
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
@@ -648,6 +651,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	
 	function post_reply(mess, dat, name, up) {
+		totalmsg++;
 		<?php if(!$isMob){ ?> 
 			CKEDITOR.instances.message.setData(''); 
 		<?php } else { ?> 
@@ -658,7 +662,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		});
 		$(".attlist").append("<div class='row-fluid uploadfilebox'></div>");
 		tail = [];
-		$("#messages").children(".row-fluid:first").hasClass("oddmessage") ? tail.push('<div class="row-fluid evenmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p></div><div class="span8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row-fluid oddmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p></div><div class="span8 messagecell">' + mess + "</div></div>");
+		$("#messages").children(".row-fluid:first").hasClass("oddmessage") ? tail.push('<div class="row-fluid evenmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="span8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row-fluid oddmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="span8 messagecell">' + mess + "</div></div>");
 		if (null != up){
 			tail.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">');
 			var count= up.length;
