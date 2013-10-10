@@ -30,8 +30,12 @@ if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !
 }
 if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
 	setcookie(session_name(),'invalid',time()-3600);
-	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(array(0=>'Invalid Session ID, please reload the page'));
+	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'sessionerror',0));
+	}
+	else
+		echo '<script>window.location.replace("'.curPageURL().'?e=invalid");</script>';
 	exit();
 }
 session_start(); 
@@ -48,10 +52,10 @@ else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['
 	session_destroy();
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'Your Session has Expired, please reload the page and log in again'));
+		echo json_encode(array(0=>'sessionerror',1));
 	}
 	else
-		echo '<script>alert("Your Session has Expired, please reload the page and log in again");</script>';
+		echo '<script>window.location.replace("'.curPageURL().'?e=expired");</script>';
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -59,10 +63,10 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_destroy();
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'Invalid Session, please reload the page and log in again'));
+		echo json_encode(array(0=>'sessionerror',2));
 	}
 	else
-		echo '<script>alert("Invalid Session, please reload the page and log in again");</script>';
+		echo '<script>window.location.replace("'.curPageURL().'?e=local");</script>';
 	exit();
 }
 else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
@@ -70,10 +74,10 @@ else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_
 	session_destroy();
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'Invalid Token, for security reason you will be logged out, please reload the page'));
+		echo json_encode(array(0=>'sessionerror',3));
 	}
 	else
-		echo '<script>alert("Invalid Token, for security reason you will be logged out, please reload the page");</script>';
+		echo '<script>window.location.replace("'.curPageURL().'?e=token");</script>';
 	exit();
 }
 
@@ -2261,5 +2265,6 @@ function retrive_mime($encname,$mustang){
 function covert_size($val){if(empty($val))return 0;$val = trim($val);preg_match('#([0-9]+)[\s]*([a-z]+)#i', $val, $matches);$last = '';if(isset($matches[2]))$last = $matches[2];if(isset($matches[1]))$val = (int) $matches[1];switch (strtolower($last)){case 'g':case 'gb':$val *= 1024;case 'm':case 'mb':$val *= 1024;case 'k':case 'kb':$val *= 1024;}return (int) $val;}
 function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])){$ip=$_SERVER['HTTP_CLIENT_IP'];}elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])){$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];}else{$ip=$_SERVER['REMOTE_ADDR'];}return $ip;}
 function get_random_string($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ0123456789';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return dirname(dirname($pageURL));}						
 
 ?>

@@ -28,7 +28,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -171,7 +171,86 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script>
 	$(document).ready(function() {
 		$('#enablealert option[value="<?php echo $_SESSION['mail_alert'];?>"]').attr('selected','selected');
-		$("#savesett").click(function(){var a=$("#usrname").val(),b=$("#gna").val(),e=$("#enablealert").val(),f=$("#opass").val(),c=$("#npass").val(),d=$("#ckpass").val();""!=a.replace(/\s+/g,"")&&""!=b.replace(/\s+/g,"")?""!=f.replace(/\s+/g,"")&&""!=c.replace(/\s+/g,"")&&""!=d.replace(/\s+/g,"")?c==d?(a=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_setting",name:a,mail:b,almail:e,oldpwd:f,nldpwd:c,rpwd:d},dataType:"json",success:function(a){"Saved"==a[0]?($('#opass').val(''),$('#npass').val(''),$('#ckpass').val(''),noty({text:"Saved",type:"success", timeout:9E3})):noty({text:a[0],type:"error",timeout:9E3})}}),a.fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})):noty({text:"New Passwords Mismatch",type:"error",timeout:9E3}):(a=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_setting",name:a,mail:b,almail:e},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}}),a.fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})):noty({text:"Empty Field", type:"error",timeout:9E3})});
+		$("#savesett").click(function(){
+			var a=$("#usrname").val(),
+				b=$("#gna").val(),
+				e=$("#enablealert").val(),
+				f=$("#opass").val(),
+				c=$("#npass").val(),
+				d=$("#ckpass").val();
+			if(""!=a.replace(/\s+/g,"")&&""!=b.replace(/\s+/g,"")){
+				if(""!=f.replace(/\s+/g,"")&&""!=c.replace(/\s+/g,"")&&""!=d.replace(/\s+/g,"")){
+					if(c==d){
+						$.ajax({
+							type:"POST",
+							url:"../php/function.php",
+							data:{<?php echo $_SESSION['token']['act']; ?>:"save_setting",name:a,mail:b,almail:e,oldpwd:f,nldpwd:c,rpwd:d},
+							dataType:"json",
+							success:function(a){
+								if("Saved"==a[0]){
+									$('#opass').val(''),
+									$('#npass').val(''),
+									$('#ckpass').val(''),
+									noty({text:"Saved",type:"success", timeout:9E3})
+								}
+								else if(a[0]=='sessionex'){
+									switch(a[1]){
+										case 0:
+											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+											break;
+										case 1:
+											window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+											break;
+										case 2:
+											window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+											break;
+										case 3:
+											window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+											break;
+									}
+								}
+								else
+									noty({text:a[0],type:"error",timeout:9E3})}
+						}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})
+					}
+					else
+						noty({text:"New Passwords Mismatch",type:"error",timeout:9E3})
+				}
+				else{
+					a=$.ajax({
+						type:"POST",
+						url:"../php/function.php",
+						data:{<?php echo $_SESSION['token']['act']; ?>:"save_setting",name:a,mail:b,almail:e},
+						dataType:"json",
+						success:function(a){
+							if("Saved"==a[0])
+								noty({text:"Saved",type:"success",timeout:9E3})
+							else if(a[0]=='sessionex'){
+								switch(a[1]){
+									case 0:
+										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+										break;
+									case 1:
+										window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+										break;
+									case 2:
+										window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+										break;
+									case 3:
+										window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+										break;
+								}
+							}
+							else
+								noty({text:a[0],type:"error",timeout:9E3})}
+					}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})
+				}
+			}
+			else
+				noty({text:"Empty Field", type:"error",timeout:9E3})
+		});
+		
+		
 		$('#dela').click(function(){$("#delaccform").slideToggle(800)});
 		
 		$('#delacc').click(function(){
@@ -186,9 +265,23 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						success : function (a) {
 							if(a[0]=='Deleted'){
 								noty({text: 'The account has been deleted, bye bye',type:'success',timeout:3E3});
-								setTimeout(function() {
-									 location.reload();
-								}, 2500);
+								setTimeout(function() {location.reload();}, 2500);
+							}
+							else if(a[0]=='sessionex'){
+								switch(a[1]){
+									case 0:
+										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+										break;
+									case 1:
+										window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+										break;
+									case 2:
+										window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+										break;
+									case 3:
+										window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+										break;
+								}
 							}
 							else
 								noty({text: a[0],type:'error',timeout:9E3});

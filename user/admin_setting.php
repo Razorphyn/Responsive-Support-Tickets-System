@@ -28,7 +28,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -277,9 +277,87 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			$("#allfaq > option[value='<?php echo $setting[8];?>']").attr('selected','selected');
 		<?php } ?>
 		
-		$("#deleteupload").click(function() { if(confirm("Do you want to delete all the files inside this period?")) { var a = $("#delfromdate").val(), c = $("#todeldate").val(); "" != a.replace(/\s+/g, "") && "" != c.replace(/\s+/g, "") ? $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"delete_files", from:a, to:c}, dataType:"json", success:function(b) { "Deleted" == b[0] ? ($("#delfromdate").val(""), $("#todeldate").val("")) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:"Request Error:" + a, type:"error", timeout:9E3}) }) : noty({text:"Complete both the date", type:"error", timeout:9E3}) } return!1 });
+		$("#deleteupload").click(function() { 
+			if(confirm("Do you want to delete all the files inside this period?")) {
+				var a = $("#delfromdate").val(), 
+					c = $("#todeldate").val(); 
+				if("" != a.replace(/\s+/g, "") && "" != c.replace(/\s+/g, "")){
+					$.ajax({
+						type:"POST", 
+						url:"../php/admin_function.php", 
+						data:{<?php echo $_SESSION['token']['act']; ?>:"delete_files", from:a, to:c}, 
+						dataType:"json", 
+						success:function(b) {
+							if("Deleted" == b[0]){
+								$("#delfromdate").val(""), $("#todeldate").val(""));
+								noty({text:"The files has been deleted", type:"error", timeout:9E3});
+							}
+							else if(b[0]=='sessionex'){
+								switch(b[1]){
+									case 0:
+										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+										break;
+									case 1:
+										window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+										break;
+									case 2:
+										window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+										break;
+									case 3:
+										window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+										break;
+								}
+							}
+							else
+								noty({text:b[0], type:"error", timeout:9E3}) 
+						}
+					}).fail(function(b, a) { noty({text:"Request Error:" + a, type:"error", timeout:9E3}) }
+				}
+				else
+					noty({text:"Complete both the date", type:"error", timeout:9E3})
+			}
+			return!1
+		});
 		
-		$("#saveopt").click(function(){var a=$("#titsite").val().replace(/\s+/g," "),c=$("#notmail").val(),d=$("#senrep").val(),e=$("#senope").val(),f=$("#timezone").val(),g=$("#maxsize").val(),h=$("#allup > option:checked").val(),k=$("#allrat").val(),q=$("#commlop").val(),r=$("#allfaq").val();$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r},dataType:"json",success:function(b){"Saved"==b[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:"Options cannot be saved. Error: "+ b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});return!1});		
+		$("#saveopt").click(function(){
+			var a=$("#titsite").val().replace(/\s+/g," "),
+				c=$("#notmail").val(),d=$("#senrep").val(),
+				e=$("#senope").val(),
+				f=$("#timezone").val(),
+				g=$("#maxsize").val(),
+				h=$("#allup > option:checked").val(),
+				k=$("#allrat").val(),
+				q=$("#commlop").val(),
+				r=$("#allfaq").val();
+			$.ajax({
+				type:"POST",
+				url:"../php/admin_function.php",
+				data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r},
+				dataType:"json",
+				success:function(b){
+					if("Saved"==b[0])
+						noty({text:"Saved",type:"success",timeout:9E3})
+					else if(b[0]=='sessionex'){
+						switch(b[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
+					else
+						noty({text:"Options cannot be saved. Error: "+ b[0],type:"error",timeout:9E3})}
+			}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});
+			return!1
+		});		
 	});
 
 	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text: a[0],type:'error',timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};

@@ -45,16 +45,17 @@ else{
 	if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 	if(isset($setting[4])) date_default_timezone_set($setting[4]);
 
-	if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800) $_SESSION['time']=time();
-	
+	if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800) 
+		$_SESSION['time']=time();
 	else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 		session_unset();
 		session_destroy();
 		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Your Session has Expired, please reload the page and log in again'));
-		}else
-			echo '<script>alert("Your Session has Expired, please reload the page and log in again");</script>';
+			echo json_encode(array(0=>'sessionerror',1));
+		}
+		else
+			echo '<script>window.location.replace("'.curPageURL().'?e=expired");</script>';
 		exit();
 	}
 	else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -62,21 +63,21 @@ else{
 		session_destroy();
 		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Invalid Session, please reload the page and log in again'));
+			echo json_encode(array(0=>'sessionerror',2));
 		}
 		else
-			echo '<script>alert("Invalid Session, please reload the page and log in again");</script>';
+			echo '<script>window.location.replace("'.curPageURL().'?e=local");</script>';
 		exit();
 	}
-	else if(!isset($_POST[$_SESSION['token']['act']])){
+	else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
 		session_unset();
 		session_destroy();
 		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Invalid Token, for security reason you will be logged out, please reload the page'));
+			echo json_encode(array(0=>'sessionerror',3));
 		}
 		else
-			echo '<script>alert("Invalid Token, for security reason you will be logged out, please reload the page");</script>';
+			echo '<script>window.location.replace("'.curPageURL().'?e=token");</script>';
 		exit();
 	}
 

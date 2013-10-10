@@ -32,7 +32,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){

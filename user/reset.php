@@ -106,15 +106,38 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 				var a = $("#npwd").val(),
 					b = $("#rnpwd").val(),
 					c = $("#rmail").val();
-				"" != a.replace(/\s+/g, "") && a == b ? $.ajax({
-					type: "POST",
-					url: "../php/function.php",
-					data: {<?php echo $_SESSION['token']['act']; ?>: "reset_password",npass: a,rnpass: b,rmail: c,key: "<?php echo $key; ?>"},
-					dataType: "json",
-					success: function (a) {
-						"Updated" == a[0] ? window.location = "<?php echo dirname(curPageURL()); ?>" : noty({text: a[0],type: "error",timeout: 9E3})
-					}
-				}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "The passwords don't match",type: "error",timeout: 9E3})
+				if("" != a.replace(/\s+/g, "") && a == b){
+					$.ajax({
+						type: "POST",
+						url: "../php/function.php",
+						data: {<?php echo $_SESSION['token']['act']; ?>: "reset_password",npass: a,rnpass: b,rmail: c,key: "<?php echo $key; ?>"},
+						dataType: "json",
+						success: function (a) {
+							if("Updated" == a[0]
+								window.location = "<?php echo dirname(curPageURL()); ?>"
+							else if(a[0]=='sessionex'){
+								switch(a[1]){
+									case 0:
+										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+										break;
+									case 1:
+										window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+										break;
+									case 2:
+										window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+										break;
+									case 3:
+										window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+										break;
+								}
+							}
+							else
+								noty({text: a[0],type: "error",timeout: 9E3})
+						}
+					}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})})
+				}
+				else
+					noty({text: "The passwords don't match",type: "error",timeout: 9E3})
 			});	
 		});
 	

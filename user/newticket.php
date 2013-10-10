@@ -29,7 +29,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -211,7 +211,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		<?php } ?>
 		<script>
 			 $(document).ready(function() {
-				var request = $.ajax({
+				$.ajax({
 					type: "POST",
 					url: "../php/function.php",
 					data: {<?php echo $_SESSION['token']['act']; ?>: "retrive_depart",sect: "new"},
@@ -230,12 +230,27 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						else if("empty" == a.response){
 							 $("#loading").remove(), $("#createticket").html("<p>Sorry, you cannot open a new ticket because: " + a[1] + "</p>");
 						}
+						else if(a[0]=='sessionex'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
 						else
 							$("#loading").remove(), $("#createticket").html("<h4>Error: " + a[0] + " <br/>Please contact the administrator.</h4>");
 						$("#createticket").slideToggle(1500)
 					}
-				});
-				request.fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})});	
+				}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})});	
 				
 				$("#createticket").submit(function(){<?php if(!$isMob){ ?>if(""==CKEDITOR.instances.message.getData().replace(/\s+/g,"")||""==$("#title").val().replace(/\s+/g,""))<?php }else { ?>if($("#message").val().replace(/\s+/g,'') == '' || $('#title').val().replace(/\s+/g,'')=='')<?php } ?>return noty({text:"Empty Fields. PLeasy check the title and the message",type:"error",timeout:9E3}),!1;$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 

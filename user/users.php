@@ -28,7 +28,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -204,6 +204,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						}]
 					})
 				}
+				else if(a[0]=='sessionex'){
+					switch(a[1]){
+						case 0:
+							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+							break;
+						case 1:
+							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+							break;
+						case 2:
+							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+							break;
+						case 3:
+							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+							break;
+					}
+				}
 				else
 					noty({text: a[0],type: "error",timeout: 9E3})
 			}
@@ -222,7 +238,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			var mail=$('#new_rmail').val();
 			var role=$('#new_usr_role').val();
 			if(name.replace(/\s+/g,'')!='' && mail.replace(/\s+/g,'')!=''){
-				var request= $.ajax({
+				$.ajax({
 					type: 'POST',
 					url: '../php/admin_function.php',
 					data: {<?php echo $_SESSION['token']['act']; ?>:'admin_user_add',name: name,mail: mail,role:role},
@@ -233,11 +249,26 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							a[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a[1]['num'] + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + a[1]['num'] + '"><i class="icon-remove"></i></button></div>';
 							table.fnAddData(a[1]);
 						}
+						else if(a[0]=='sessionex'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
 						else
 							noty({text: data[0],type:'error',timeout:9E3});
 					}
-				});
-				request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+				}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 			}
 			else{
 				$(".main").nimbleLoader("hide");
@@ -287,17 +318,34 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				data: {<?php echo $_SESSION['token']['act']; ?>: "update_user_info",id: b,name: e,mail: f,status: g,holiday: c,seldepa: h},
 				dataType: "json",
 				success: function (d) {
-					"Updated" == d[0] ? (
+					if("Updated" == d[0]){
 						d[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + b + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + b + '"><i class="icon-remove"></i></button></div>', 
 						d[1]['rating']=($.isNumeric(l))? l:'Unrated',
 						table.fnDeleteRow(k, function(){table.fnAddData(d[1])}),
 						a.prev().remove(),
 						a.remove()
-					) : (a.children("input").each(function () {
-						$(this).removeAttr("disabled", "disabled")
-					}), a.children("select").each(function () {
-						$(this).removeAttr("disabled", "disabled")
-					}), noty({text: d[0],type: "error",timeout: 9E3}))
+					}
+					else if(d[0]=='sessionex'){
+						switch(d[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
+					else{
+						a.children("input").each(function () {$(this).removeAttr("disabled", "disabled")}), 
+						a.children("select").each(function () {$(this).removeAttr("disabled", "disabled")}), 
+						noty({text: d[0],type: "error",timeout: 9E3}))
+					}
 				}
 			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})
 			})) : noty({text: data[0],type: "Empty Field",timeout: 9E3});
@@ -313,7 +361,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				modal: true,
 				buttons: {
 					'Remove User': function() {
-						var request= $.ajax({
+						$.ajax({
 							type: 'POST',
 							url: '../php/admin_function.php',
 							data: {<?php echo $_SESSION['token']['act']; ?>:'del_usr',id:id},
@@ -321,11 +369,26 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							success : function (data) {
 								if(data[0]=='Deleted')
 									table.fnDeleteRow(pos);
+								else if(data[0]=='sessionex'){
+									switch(data[1]){
+										case 0:
+											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+											break;
+										case 1:
+											window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+											break;
+										case 2:
+											window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+											break;
+										case 3:
+											window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+											break;
+									}
+								}
 								else
 									noty({text: 'Cannot delete department. Error: '+data[0],type:'error',timeout:9000});
 							}
-						});
-						request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+						}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 						$( this ).dialog( "close" );
 					},
 					'Close': function() {
@@ -352,11 +415,30 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				data: {<?php echo $_SESSION['token']['act']; ?>: "select_depa_usr",id: c},
 				dataType: "json",
 				success: function (b) {
-					"ok" == b.res ? (a.parent().find(".loading").remove(), a.after(b.depa.join(""))) : noty({text: b[0],type: "error",timeout: 9E3})
+					if("ok" == b.res){
+						a.parent().find(".loading").remove(), 
+						a.after(b.depa.join(""))
+					}
+					else if(b[0]=='sessionex'){
+						switch(b[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
+					else
+						noty({text: b[0],type: "error",timeout: 9E3})
 				}
-			}).fail(function (b, a) {
-				noty({text: a,type: "error",timeout: 9E3});$(this).removeAttr('disabled');
-			})
+			}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3});$(this).removeAttr('disabled');})
 		});
 		
 		$(document).on("click", ".load_usr_rate", function () {
@@ -384,6 +466,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							}
 							else
 								a.after("<br/><p>This user hasn't got any rating");
+						}
+						else if(b[0]=='sessionex'){
+							switch(b[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
 						}
 						else{
 							noty({text: b[0],type: "error",timeout: 9E3})

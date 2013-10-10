@@ -30,7 +30,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -201,15 +201,65 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				if(a.response=='ret'){
 					<?php if($_SESSION['status']==0){ ?>
 					
-						utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
+						utab=$("#usertable").dataTable({
+								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sWrapper:"dataTables_wrapper form-inline",
+								bDestroy:true,
+								bProcessing:true,
+								aaSorting:[[2,"desc"]],
+								oLanguage:{sEmptyTable:"No Tickets"},
+									aoColumns:[
+										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+									]
+						}),
 						
 						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
 						utab.fnAddData(a.tickets.user);
 						
 					<?php } else if($_SESSION['status']==1){ ?>
 					
-						utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
-						otab=$("#operatortable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
+						utab=$("#usertable").dataTable({
+								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sWrapper:"dataTables_wrapper form-inline",
+								bDestroy:true,
+								bProcessing:true,
+								aaSorting:[[2,"desc"]],
+								oLanguage:{sEmptyTable:"No Tickets"},
+									aoColumns:[
+										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+									]
+							}),
+						
+						otab=$("#operatortable").dataTable({
+								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sWrapper:"dataTables_wrapper form-inline",
+								bDestroy:true,
+								bProcessing:true,
+								aaSorting:[[2,"desc"]],
+								oLanguage:{sEmptyTable:"No Tickets"},
+								aoColumns:[
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+								]
+							}),
 						
 						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
 						utab.fnAddData(a.tickets.user);
@@ -219,8 +269,43 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						
 					<?php } else if($_SESSION['status']==2){ ?>
 
-						utab=$("#usertable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
-						otab=$("#operatortable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]}),
+						utab=$("#usertable").dataTable({
+								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sWrapper:"dataTables_wrapper form-inline",
+								bDestroy:true,
+								bProcessing:true,
+								aaSorting:[[2,"desc"]],
+								oLanguage:{sEmptyTable:"No Tickets"},
+									aoColumns:[
+										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+									]
+							}),
+						
+						otab=$("#operatortable").dataTable({
+								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sWrapper:"dataTables_wrapper form-inline",
+								bDestroy:true,
+								bProcessing:true,
+								aaSorting:[[2,"desc"]],
+								oLanguage:{sEmptyTable:"No Tickets"},
+								aoColumns:[
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+								]
+							}),
+						
 						atab=$("#admintable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
 
 						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
@@ -274,7 +359,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							<?php } ?>
 						}
 						else
-							noty({text: 'Ticket cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
+							noty({text:a[0],type:"error",timeout:9E3});
 					}
 				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 				
@@ -318,7 +403,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								<?php } ?>
 							}
 							else
-								noty({text: 'Ticket cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
+								noty({text:a[0],type:"error",timeout:9E3});
 						}
 					}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});}),
 
@@ -365,7 +450,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								<?php } ?>
 							}
 							else
-							noty({text: 'Ticket cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
+							noty({text:a[0],type:"error",timeout:9E3});
 						}
 					}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 					

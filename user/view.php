@@ -28,7 +28,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -531,11 +531,13 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$('.loading-bar').delay(300).show('scale',null,400);
 		
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
-
+		
+		//Add redirect
 		$("#subrepo").click(function(){var a=$("#problem").val();""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"report_ticket",message:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Submitted"==b[0]?noty({text:"Your complaint has been submitted",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"The message cannot be empty",type:"error",timeout:9E3})});
 		
 		$("#showhide").click(function(){var a=$("#conpass").val()+"";$("#conpass").is(":password")?($("#passcont").html('<input type="text" id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Hide")):($("#passcont").html('<input type="password" id="conpass" autocomplete="off" />'),$("#conpass").val(a),$("#showhide").text("Show"))});
-
+		
+		//Add redirect
 		$("#updstatus").click(function() { var a = $("#statustk").val(); $.ajax({type:"POST", url:"../php/function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"update_status", status:a, id:"<?php echo $_GET['id'];?>"}, dataType:"json", success:function(b) { "Saved" == b[0] ? (0 == a ? $(".ratingsect").slideToggle(800) : $(".ratingsect").slideToggle(800), noty({text:"Updated", type:"success", timeout:9E3})) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
 
 		//Update Ticket Title
@@ -547,7 +549,26 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				data: {<?php echo $_SESSION['token']['act']; ?>: "update_ticket_title",tit: a,id: "<?php echo $_GET['id'];?>"},
 				dataType: "json",
 				success: function (b) {
-					"Updated" == b[0] ? $(".pagefun").text(b[1]) : noty({text: b[0],type: "error",timeout: 9E3})
+					if("Updated" == b[0])
+						$(".pagefun").text(b[1])
+					else if(b[0]=='sessionex'){
+						switch(b[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
+					else
+						noty({text: b[0],type: "error",timeout: 9E3})
 				}
 			}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})}) : noty({text: "Empty Title",type: "error",timeout: 9E3})
 		});	
@@ -564,7 +585,26 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				data: {<?php echo $_SESSION['token']['act']; ?>: "update_ticket_connection",website: web,contype: a,user: c,pass: d,id: "<?php echo $_GET['id'];?>"},
 				dataType: "json",
 				success: function (b) {
-					"Updated" == b[0] ? noty({text: "Updated",type: "success",timeout: 9E3}) : noty({text: b[0],type: "error",timeout: 9E3})
+					if("Updated" == b[0])
+						noty({text: "Updated",type: "success",timeout: 9E3})
+					else if(b[0]=='sessionex'){
+						switch(b[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
+					else
+						noty({text: b[0],type: "error",timeout: 9E3})
 				}
 			}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})})
 		});
@@ -598,6 +638,22 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 								par.parent().remove();
 							noty({text: 'The file has been deleted',type:'success',timeout:9000});
 						}
+						else if(a[0]=='sessionex'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
 						else
 							noty({text: a[0],type:'error',timeout:9000});
 					}
@@ -609,8 +665,8 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			$('#fielduploadinput').wrap('<form>').closest('form').get(0).reset();
 			$('#fielduploadinput').unwrap();
 		});
-		
-		//Check if writing
+
+		//Check if writing ---- Problem: doesn't identify first character and last delete
 		<?php if(!$isMob) { ?>
 			CKEDITOR.instances.message.on('key', function(event) {
 				var m=CKEDITOR.instances.message.getData().replace(/\s+/g,"");
@@ -629,7 +685,26 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				$.ajax({
 					type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'move_opera_ticket',dpid:dpid,id:'<?php echo $_GET['id'];?>'},dataType : 'json',
 					success : function (a) {
-						(a[0]=='Moved')? noty({text: 'Moved',type:'success',timeout:9000}):noty({text: a[0],type:'error',timeout:9000});
+						if(a[0]=='Moved')
+							noty({text: 'Moved',type:'success',timeout:9000})
+						else if(a[0]=='sessionex'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else
+							noty({text: a[0],type:'error',timeout:9000});
 					}
 				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			});

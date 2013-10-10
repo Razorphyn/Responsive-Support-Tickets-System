@@ -30,7 +30,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -171,12 +171,54 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
-		
+
 		var table;
-		var request=$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_reported_ticket"},dataType:"json",success:function(a){if("ret"==a.response||"empty"==a.response){if("ret"==a.response){var b=a.ticket.length;for(i=0;i<b;i++)a.ticket[i].action='<div class="btn-group"><button class="btn btn-info read" value="'+a.ticket[i].encid+'"><i class="icon-eye-open"></i></button><button class="btn btn-danger solved" value="'+a.ticket[i].encid+'"><i class="icon-remove"></i></button></div>'}$("#loading").remove(); table=$("#deptable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaData:a.ticket,oLanguage:{sEmptyTable:"No Complaints"},aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reference ID",mDataProp:"ref_id",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reference ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reporter Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Mail: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reporter Role",mDataProp:"role",sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Role: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Comment",mDataProp:"reason",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Comment: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1, sWidth:"120px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]})}else noty({text:a[0],type:"error",timeout:9E3})}});request.fail(function(a,b){alert("Ajax Error: "+b)});
-		
+		$.ajax({
+			type:"POST",
+			url:"../php/admin_function.php",
+			data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_reported_ticket"},
+			dataType:"json",
+			success:function(a){
+				if("ret"==a.response||"empty"==a.response){
+					if("ret"==a.response){
+						var b=a.ticket.length;
+						for(i=0;i<b;i++)
+							a.ticket[i].action='<div class="btn-group"><button class="btn btn-info read" value="'+a.ticket[i].encid+'"><i class="icon-eye-open"></i></button><button class="btn btn-danger solved" value="'+a.ticket[i].encid+'"><i class="icon-remove"></i></button></div>'
+					}
+					$("#loading").remove(); 
+					table=$("#deptable").dataTable({
+						sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+						sWrapper:"dataTables_wrapper form-inline",
+						bDestroy:!0,
+						bProcessing:!0,
+						aaData:a.ticket,
+						oLanguage:{sEmptyTable:"No Complaints"},
+						aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reference ID",mDataProp:"ref_id",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reference ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reporter Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Mail: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reporter Role",mDataProp:"role",sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Role: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Comment",mDataProp:"reason",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Comment: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1, sWidth:"120px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]
+					})
+				}
+				else if(a[0]=='sessionex'){
+					switch(a[1]){
+						case 0:
+							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+							break;
+						case 1:
+							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+							break;
+						case 2:
+							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+							break;
+						case 3:
+							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+							break;
+					}
+				}
+				else 
+					noty({text:a[0],type:"error",timeout:9E3})
+			}
+		}).fail(function(a,b){alert("Ajax Error: "+b)});
+
 		$("#deptable").on("click",".read",function(){var b=$(this).val(),c=$(this).val().replace(/\./g,"_");var a=this.parentNode.parentNode.parentNode.parentNode;table.fnGetPosition(a,null,!0);a=table.fnGetData(a);0<$("#"+a.id).length?$("html,body").animate({scrollTop:$("#"+a.id).offset().top},1500):(b="<hr><div id='"+c+"' ><span>Reference <strong>"+a.ref_id+"</strong> submitted by <strong>"+a.role+"</strong></span><button class='btn btn-link btn_close_form'>Close</button><div class='row-fluid'><div class='span2'><label><strong>Reference ID</strong></label></div><div class='span4'><p>"+ a.ref_id+"</p></div><div class='span2'><label><strong>Reporter mail</strong></label></div><div class='span4'><p>"+a.mail+"</p></div></div><div class='row-fluid'><div class='span2'><label><strong>Complaint Reason</strong></label></div></div><div class='row-fluid'><div class='span12 flagcont'>"+a.reason+"</div></div><div class='row-fluid'><div class='span2 offset5'><a href='view.php?id="+b+"' class='btn btn-info' title='Read Tciket'>View Ticket</a></div></div></div>",$("#deplist").after(b),b="Yes"== a["public"]?1:0,$('select[name="edit_depa_active"]:first option[value='+("Yes"==a.active?1:0)+"]").attr("selected","selected"),$('select[name="edit_depa_public"]:first option[value='+b+"]").attr("selected","selected"))});
-		
+
 		$('#deptable').on('click','.solved',function(){
 			var id=$(this).val();
 			var fid=$(this).val().replace(/\./g, '_');
@@ -188,7 +230,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					modal: true,
 					buttons: {
 						"Sign as Solved": function() {
-							var request= $.ajax({
+							$.ajax({
 								type: 'POST',
 								url: '../php/admin_function.php',
 								data: {<?php echo $_SESSION['token']['act']; ?>:'rem_flag',id:id},
@@ -198,11 +240,26 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 										$('#'+fid).remove();
 										table.fnDeleteRow(pos);
 									}
+									else if(data[0]=='sessionex'){
+										switch(data[1]){
+											case 0:
+												window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+												break;
+											case 1:
+												window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+												break;
+											case 2:
+												window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+												break;
+											case 3:
+												window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+												break;
+										}
+									}
 									else
 										noty({text: 'Cannot sign as solved. Error: '+data[0],type:'error',timeout:9000});
 								}
-							});
-							request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+							}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 							$(this).dialog( "close" );
 						},
 						'Close': function() {

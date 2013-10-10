@@ -30,7 +30,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -270,57 +270,50 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		$("#to").datepicker("option","maxDate",dateObject);
 		
 		var table;
-		var request=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_depart",sect:"new"},dataType:"json",success:function(a){"ret"==a.response?($("#loading").remove(),$("#dep").append(a.information)):"empty"==a.response?($("#loading").remove(),$("#searchform").html("<p>Sorry, no ticket could exists</p>")):($("#loading").remove(),$("#searchform").html("<h4>Error: "+a[0]+" <br/>Please contact the administrator.</h4>"));$("#searchform").slideToggle(1500)}});
-
-		$('#searchtk').click(function(){
-			$(".formcontainer").html('<form></form>');
-			$(".rescont").before("<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
-			var enid=$("#rid").val().replace(/\s+/g,"");
-			var title=$("#title").val();
-			var dep=$("#dep").val().replace(/\s+/g,"");
-			var statk=$("#statk").val().replace(/\s+/g,"");
-			var from=$("#from").val().replace(/\s+/g,"");
-			var to=$("#to").val().replace(/\s+/g,"");
-			<?php if($_SESSION['status']==0){ ?>
-			var operator=$('#operatorn').val();
-			<?php }if($_SESSION['status']==2){ ?>
-			var operator=$('#operatorn').val(), id=$('#id').val().replace(/\s+/g,""),mail=$('#umail').val().replace(/\s+/g,""), opid=$('#operatori').val().replace(/\s+/g,"");
-			<?php }  if($_SESSION['status']==1){ ?>
-					if(""!=enid||""!=title.replace(/\s+/g,"")||""!=dep||""!=from.replace(/\s+/g,"")||to.replace(/\s+/g,"")){
-					<?php } if($_SESSION['status']==0){ ?>
-					if(""!=enid||""!=title.replace(/\s+/g,"")||""!=dep||""!=from.replace(/\s+/g,"")||""!=to.replace(/\s+/g,"")||operator.replace(/\s+/g,"")){
-					<?php } if($_SESSION['status']==2){ ?>
-					if(""!=id||""!=mail||""!=opid||""!=enid||""!=title.replace(/\s+/g,"")||""!=dep||""!=from.replace(/\s+/g,"")||""!=to.replace(/\s+/g,"")||operator.replace(/\s+/g,"")){
-					<?php } ?>
-				var request= $.ajax({
-					type: 'POST',
-					url: '../php/function.php',
-					<?php if($_SESSION['status']==1){ ?>
-					data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',enid:enid,title:title,dep:dep,from:from,to:to,statk:statk},
-					<?php } if($_SESSION['status']==0){ ?>
-					data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',enid:enid,title:title,dep:dep,from:from,to:to,op:operator,statk:statk},
-					<?php } if($_SESSION['status']==2){ ?>
-					data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',id:id,mail:mail,opid:opid,enid:enid,title:title,dep:dep,from:from,to:to,op:operator,statk:statk},
-					<?php } ?>
-					dataType : 'json',
-					success : function (data) {
-						var l=data.search.length;if(l>0){for(i=0;i<l;i++)$.extend(data.search[i],{title:'<a href="view.php?id='+data.search[i].id+'" alt="View Ticket" title="View Ticket">'+data.search[i].title+"</a>",action:'<div class="btn-group"><button class="btn btn-warning editusr hidden-phone" value="'+data.search[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+data.search[i].id+'"><i class="icon-remove"></i></button></div>'});}$(".loading:first").remove(); "ret"==data.response||"empty"==data.response?(table=$("#restable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaData:data.search,oLanguage:{sEmptyTable:"No Results"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span> " + $(nTd).html() + '</span>');}}, {sTitle:"Operator",mDataProp:"opname",sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Tooggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Tooggle: </strong></span><span> " + $(nTd).html() + '</span>');}}]}),$(".rescont").css("display","block")):noty({text:data[0],type:"error",timeout:9E3});
-						$('#restable').css('width', '')
+		$.ajax({
+			type:"POST",
+			url:"../php/function.php",
+			data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_depart",sect:"new"},
+			dataType:"json",
+			success:function(a){
+				if("ret"==a.response){
+					$("#loading").remove(),
+					$("#dep").append(a.information)
+				}
+				else if(a[0]=='sessionex'){
+					switch(a[1]){
+						case 0:
+							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+							break;
+						case 1:
+							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+							break;
+						case 2:
+							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+							break;
+						case 3:
+							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+							break;
 					}
-				});
-				request.fail(function(jqXHR, textStatus){noty({text: 'Ajax Error: '+ textStatus,type:'error',timeout:9000});});
+				}
+				else if("empty"==a.response){
+					$("#loading").remove(),
+					$("#searchform").html("<p>Sorry, no ticket could exists</p>")
+				}
+				else{
+					$("#loading").remove(),
+					$("#searchform").html("<h4>Error: "+a[0]+" <br/>Please contact the administrator.</h4>")
+				}
+				$("#searchform").slideToggle(1000)
 			}
-			else
-				noty({text: 'Please,compleate at least one field',type:'error',timeout:9000});
-			$('#loading').remove();
-		});
+		}).fail(function(jqXHR, textStatus){noty({text: 'Ajax Error: '+ textStatus,type:'error',timeout:9000});});
 		
 		$(document).on('click','.remusr',function(){
 			var enc=$(this).val();
 			var table=$(this).parent().parent().parent().parent().parent().parent().attr('id');
 			var pos=$('#'+table).dataTable().fnGetPosition(this.parentNode.parentNode.parentNode.parentNode,null,true);
 			if(confirm('Do you want to delete this tickets all the the related information?')){
-				var request= $.ajax({
+				$.ajax({
 					type: 'POST',
 					url: '../php/function.php',
 					data: {<?php echo $_SESSION['token']['act']; ?>:'delete_ticket',enc:enc},
@@ -334,11 +327,26 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								});
 							}
 						}
+						else if(data[0]=='sessionex'){
+							switch(data[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
 						else
 							noty({text: 'Ticket cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
 					}
-				});
-				request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			}
 		
 		});
@@ -398,7 +406,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			var stat= dom.find('select[name="edit_depa_active"]').val();
 			var prio= dom.find('select[name="edit_depa_public"]').val();
 			if(tit.replace(/\s+/g,'')!=''){
-				var request= $.ajax({
+				$.ajax({
 					type: 'POST',
 					url: '../php/function.php',
 					data: {<?php echo $_SESSION['token']['act']; ?>:'update_ticket_index',id:id,title:tit,status:stat,priority:prio},
@@ -428,14 +436,109 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							dom.prev().remove();
 							dom.remove();
 						}
+						else if(data[0]=='sessionex'){
+							switch(data[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
 						else
 							noty({text: data[0],type:'error',timeout:9000});
 					}
-				});
-				request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			}
 			else
 				noty({text: 'Form Error - Empty Title',type:'error',timeout:9000});
+		});
+		
+		$('#searchtk').click(function(){
+			$(".formcontainer").html('<form></form>');
+			$(".rescont").before("<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
+			var enid=$("#rid").val().replace(/\s+/g,""),
+				title=$("#title").val(),
+				dep=$("#dep").val().replace(/\s+/g,""),
+				statk=$("#statk").val().replace(/\s+/g,""),
+				from=$("#from").val().replace(/\s+/g,""),
+				to=$("#to").val().replace(/\s+/g,"");
+			<?php if($_SESSION['status']==0){ ?>
+			var operator=$('#operatorn').val();
+			<?php }if($_SESSION['status']==2){ ?>
+			var operator=$('#operatorn').val(), 
+				id=$('#id').val().replace(/\s+/g,""),
+				mail=$('#umail').val().replace(/\s+/g,""), 
+				opid=$('#operatori').val().replace(/\s+/g,"");
+			<?php }  if($_SESSION['status']==1){ ?>
+					if(""!=enid||""!=title.replace(/\s+/g,"")||""!=dep||""!=from.replace(/\s+/g,"")||to.replace(/\s+/g,"")){
+					<?php } if($_SESSION['status']==0){ ?>
+					if(""!=enid||""!=title.replace(/\s+/g,"")||""!=dep||""!=from.replace(/\s+/g,"")||""!=to.replace(/\s+/g,"")||operator.replace(/\s+/g,"")){
+					<?php } if($_SESSION['status']==2){ ?>
+					if(""!=id||""!=mail||""!=opid||""!=enid||""!=title.replace(/\s+/g,"")||""!=dep||""!=from.replace(/\s+/g,"")||""!=to.replace(/\s+/g,"")||operator.replace(/\s+/g,"")){
+					<?php } ?>
+						$.ajax({
+							type: 'POST',
+							url: '../php/function.php',
+							<?php if($_SESSION['status']==1){ ?>
+							data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',enid:enid,title:title,dep:dep,from:from,to:to,statk:statk},
+							<?php } if($_SESSION['status']==0){ ?>
+							data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',enid:enid,title:title,dep:dep,from:from,to:to,op:operator,statk:statk},
+							<?php } if($_SESSION['status']==2){ ?>
+							data: {<?php echo $_SESSION['token']['act']; ?>:'search_ticket',id:id,mail:mail,opid:opid,enid:enid,title:title,dep:dep,from:from,to:to,op:operator,statk:statk},
+							<?php } ?>
+							dataType : 'json',
+							success : function (data) {
+								var l=data.search.length;
+								if(l>0){
+									for(i=0;i<l;i++)
+										$.extend(data.search[i],{title:'<a href="view.php?id='+data.search[i].id+'" alt="View Ticket" title="View Ticket">'+data.search[i].title+"</a>",action:'<div class="btn-group"><button class="btn btn-warning editusr hidden-phone" value="'+data.search[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+data.search[i].id+'"><i class="icon-remove"></i></button></div>'});
+								}
+								$(".loading:first").remove(); 
+								if("ret"==data.response||"empty"==data.response){
+									table=$("#restable").dataTable({
+												sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+												sWrapper:"dataTables_wrapper form-inline",
+												bDestroy:!0,
+												bProcessing:!0,
+												aaData:data.search,
+												oLanguage:{sEmptyTable:"No Results"},
+												aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span> " + $(nTd).html() + '</span>');}}, {sTitle:"Operator",mDataProp:"opname",sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Tooggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Tooggle: </strong></span><span> " + $(nTd).html() + '</span>');}}]
+											})
+									$(".rescont").css("display","block")
+								}
+								else if(data[0]=='sessionex'){
+									switch(data[1]){
+										case 0:
+											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+											break;
+										case 1:
+											window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+											break;
+										case 2:
+											window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+											break;
+										case 3:
+											window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+											break;
+									}
+								}				
+								else
+									noty({text:data[0],type:"error",timeout:9E3});
+								$('#restable').css('width', '')
+							}
+						}).fail(function(jqXHR, textStatus){noty({text: 'Ajax Error: '+ textStatus,type:'error',timeout:9000});});
+					}
+					else
+						noty({text: 'Please,compleate at least one field',type:'error',timeout:9000});
+			$('#loading').remove();
 		});
 		
 	});

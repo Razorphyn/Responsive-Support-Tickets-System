@@ -30,7 +30,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -190,7 +190,48 @@ $stmp[8]=implode('',$stmp[8]);
 	<script>
 	 $(document).ready(function() {
 		var table;
-		var request=$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_depart",sect:"admin"},dataType:"json",success:function(a){if("ret"==a.response||"empty"==a.response){if("ret"==a.response){var b=a.information.length;for(i=0;i<b;i++)a.information[i].action='<div class="btn-group"><button class="btn btn-info editdep" value="'+a.information[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+a.information[i].id+'"><i class="icon-remove"></i></button></div>'}$("#loading").remove(); table=$("#deptable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:!0,bProcessing:!0,aaData:a.information,oLanguage:{sEmptyTable:"No Departments"},aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]})}else noty({text:a[0], type:"error",timeout:9E3})}});request.fail(function(a,b){alert("Ajax Error: "+b)});		
+		$.ajax({
+			type:"POST",
+			url:"../php/function.php",
+			data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_depart",sect:"admin"},
+			dataType:"json",
+			success:function(a){
+				if("ret"==a.response||"empty"==a.response){
+					if("ret"==a.response){
+						var b=a.information.length;
+						for(i=0;i<b;i++)
+							a.information[i].action='<div class="btn-group"><button class="btn btn-info editdep" value="'+a.information[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+a.information[i].id+'"><i class="icon-remove"></i></button></div>'
+					}
+					$("#loading").remove(); 
+					table=$("#deptable").dataTable({
+											sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+											sWrapper:"dataTables_wrapper form-inline",
+											bDestroy:!0,
+											bProcessing:!0,
+											aaData:a.information,
+											oLanguage:{sEmptyTable:"No Departments"},
+											aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]}
+						)
+				}
+				else if(a[0]=='sessionex'){
+					switch(a[1]){
+						case 0:
+							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+							break;
+						case 1:
+							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+							break;
+						case 2:
+							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+							break;
+						case 3:
+							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+							break;
+					}
+				}
+				else 
+					noty({text:a[0], type:"error",timeout:9E3})}
+		}).fail(function(a,b){alert("Ajax Error: "+b)});		
 				
 		$("#deptable").on("click", ".editdep", function () {
 			$(this).val();
@@ -225,7 +266,23 @@ $stmp[8]=implode('',$stmp[8]);
 							dataType : 'json',
 							success : function (data) {
 								if(data[0]=='Deleted')
-									table.fnDeleteRow(pos);
+									table.fnDeleteRow(pos)
+								else if(data[0]=='sessionex'){
+									switch(data[1]){
+										case 0:
+											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+											break;
+										case 1:
+											window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+											break;
+										case 2:
+											window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+											break;
+										case 3:
+											window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+											break;
+									}
+								}
 								else
 									noty({text: 'Department cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
 							}
@@ -241,7 +298,23 @@ $stmp[8]=implode('',$stmp[8]);
 							dataType : 'json',
 							success : function (data) {
 								if(data[0]=='Deleted')
-									table.fnDeleteRow(pos);
+									table.fnDeleteRow(pos)
+								else if(data[0]=='sessionex'){
+									switch(data[1]){
+										case 0:
+											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+											break;
+										case 1:
+											window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+											break;
+										case 2:
+											window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+											break;
+										case 3:
+											window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+											break;
+									}
+								}
 								else
 									noty({text: 'Department cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
 							}
@@ -273,6 +346,22 @@ $stmp[8]=implode('',$stmp[8]);
 						table.fnAddData(a.information),
 						$("#depname").val("")
 					}
+					else if(a[0]=='sessionex'){
+						switch(a[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
 					else
 						noty({text: a[0],type: "error",timeout: 9E3})
 				}
@@ -298,6 +387,22 @@ $stmp[8]=implode('',$stmp[8]);
 						a.prev().remove(), 
 						a.remove()
 					}
+					else if(e[0]=='sessionex'){
+						switch(e[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
 					else
 						noty({text: e[0],type: "error",timeout: 9E3})
 				}
@@ -308,21 +413,41 @@ $stmp[8]=implode('',$stmp[8]);
 			var b = $("#depname").val().replace(/\s+/g, " "),
 				c = $("#activedep").val(),
 				d = $("#publicdep").val();
-			"" != b.replace(/\s+/g, "") ? $.ajax({
-				type: "POST",
-				url: "../php/admin_function.php",
-				data: {<?php echo $_SESSION['token']['act']; ?>: "add_depart",tit: b,active: c,pubdep: d},
-				dataType: "json",
-				success: function (a) {
-					if("Added" == a.response){
-						a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>',
-						table.fnAddData(a.information),
-						$("#depname").val("")
+			if("" != b.replace(/\s+/g, ""){
+				$.ajax({
+					type: "POST",
+					url: "../php/admin_function.php",
+					data: {<?php echo $_SESSION['token']['act']; ?>: "add_depart",tit: b,active: c,pubdep: d},
+					dataType: "json",
+					success: function (a) {
+						if("Added" == a.response){
+							a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>',
+							table.fnAddData(a.information),
+							$("#depname").val("")
+						}
+						else if(a[0]=='sessionex'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else
+							noty({text: a[0],type: "error",timeout: 9E3})
 					}
-					else
-						noty({text: a[0],type: "error",timeout: 9E3})
-				}
-			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "Form Error - Empty Field",type: "error",timeout: 9E3})
+				}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})})
+			}
+			else
+				noty({text: "Form Error - Empty Field",type: "error",timeout: 9E3})
 		});
 		
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($(this).parent().prev().remove(),$(this).parent().remove());return!1});

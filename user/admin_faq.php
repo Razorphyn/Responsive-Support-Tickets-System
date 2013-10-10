@@ -30,7 +30,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -229,7 +229,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				data: { <?php echo $_SESSION['token']['act']; ?> : "retrive_faq_answer",id: b},
 				dataType: "json",
 				success: function (c) {
-					"ret" == c[0] ? (
+					if("ret" == c[0]){
 						$("#faq_id").html(a.id), 
 						$("#faq_id").html(a.id), 
 						$("#faq_edit_id").val(a.id), 
@@ -239,7 +239,25 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						<?php if (!$isMob) { ?> CKEDITOR.instances.edit_faq_answer.setData(data[1]) <?php } else { ?> $("#edit_faq_answer").val(data[1]) <?php } ?> , 
 						$('select[name="edit_faq_active"]:first option[value=' + ("Yes" == a.active ? 1 : 0) + "]").attr("selected", "selected")
 						
-					) : noty({text: "Cannot retrieve Answer. Error: " + c[0],type: "error",timeout: 9E3})
+					}
+					else if(c[0]=='sessionex'){
+							switch(c[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+					else
+						noty({text: "Cannot retrieve Answer. Error: " + c[0],type: "error",timeout: 9E3})
 				}
 			}), b.fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})
 			})) : (b = $.ajax({
@@ -248,8 +266,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				data: { <?php echo $_SESSION['token']['act']; ?> : "retrive_faq_answer",id: b},
 				dataType: "json",
 				success: function (b) {
-					"ret" == b[0] ? (
-					
+					if("ret" == b[0]){
 						$("#edit_faq").addClass("open"), 
 						$("#faq_id").html(a.id), 
 						$("#faq_edit_id").val(a.id), 
@@ -260,13 +277,33 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						$("#activedep option[value=" + ("Yes" == a.active ? 1 : 0) + "]").attr("selected", "selected"), 
 						$("#faq_div").slideToggle(600)
 						
-					) : noty({text: "Cannot retrieve Answer. Error: " + b[0],type: "error",timeout: 9E3})
+					}
+					else if(b[0]=='sessionex'){
+						switch(b[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
+					else
+						noty({text: "Cannot retrieve Answer. Error: " + b[0],type: "error",timeout: 9E3})
 				}
 			}), b.fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})}))
 		});
 		
+		//Add redirect
 		$("#faqtable").on("click", ".remdep", function() { var a = $(this).val(), c = table.fnGetPosition(this.parentNode.parentNode.parentNode.parentNode, null, !0); confirm("Do you realy want to delete this FAQ?") && $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"del_faq", id:a}, dataType:"json", success:function(b) { "Deleted" == b[0] ? table.fnDeleteRow(c) : noty({text:"FAQ cannot be deleted. Error: " + b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
 
+		//Add redirect
 		$("#btnaddfaq").click(function () {var b = $("#question").val().replace(/\s+/g, " "),<?php if (!$isMob) { ?> c = CKEDITOR.instances.answer.getData().replace(/\s+/g, " ") <?php } else { ?> c = $("#answer").val().replace(/\s+/g, ' ') <?php } ?>, d = $("#position").val().replace(/\s+/g, ""); e = $("#activefaq").val(); "" != b.replace(/\s+/g, "") && "" != c.replace(/\s+/g, "") ? $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"add_faq", question:b, answer:c, pos:d, active:e}, dataType:"json", success:function(a) { "Added" == a.response ? ($("#question").val(""), a.information.rate = "Unrated", a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>', table.fnAddData(a.information), $("#faqtable").val(""),<?php if(!$isMob) { ?> CKEDITOR.instances.answer.setData('') <?php }else { ?>$("#answer").val('') <?php } ?>) : noty({text:a[0], type:"error", timeout:9E3}) }}).fail(function(a, f) { noty({text:f, type:"error", timeout:9E3}) }) : noty({text:"Form Error - Empty Field", type:"error", timeout:9E3});});		
 		
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($('#faq_div').slideToggle(600),$('#edit_faq').removeClass('open'));return!1});
@@ -301,6 +338,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							<?php } ?>
 							$('#faq_div').slideToggle(600);
 							$('#edit_faq').removeClass('open');
+						}
+						else if(a[0]=='sessionex'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
 						}
 						else
 							noty({text: a[0],type:'error',timeout:9000});

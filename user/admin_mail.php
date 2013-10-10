@@ -30,7 +30,7 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=exipred");
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -337,10 +337,69 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				}			
 			<?php } ?>
 			
-			if(""!=subject.replace(/\s+/g,"")&&""!=message.replace(/\s+/g,"")){var request=$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_mail_body",sec:sec,sub:subject,message:message},dataType:"json",success:function(a){"Saved"==a[0]?noty({text:"Saved",type:"success",timeout:9E3}):noty({text:a[0],type:"error",timeout:9E3})}});request.fail(function(a,b){noty({text:"Request Error:"+b,type:"error",timeout:9E3})})}else noty({text:"Empty Field",type:"error",timeout:9E3});return !1;
+			if(""!=subject.replace(/\s+/g,"")&&""!=message.replace(/\s+/g,"")){
+				$.ajax({
+					type:"POST",
+					url:"../php/admin_function.php",
+					data:{<?php echo $_SESSION['token']['act']; ?>:"save_mail_body",sec:sec,sub:subject,message:message},
+					dataType:"json",
+					success:function(a){
+						if("Saved"==a[0])
+							noty({text:"Saved",type:"success",timeout:9E3})
+						else if(a[0]=='sessionex'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else
+							noty({text:a[0],type:"error",timeout:9E3})}
+				}).fail(function(a,b){noty({text:"Request Error:"+b,type:"error",timeout:9E3})})}
+			else 
+				noty({text:"Empty Field",type:"error",timeout:9E3});
+			return !1;
 		});
 		
-		$("#savestmp").click(function(){var a=$("#stmpserv").val(),c=$("#stmpname").val(),d=$("#stmphost").val(),e=$("#stmpport").val(),f=$("#stmpsec > option:selected").val(),g=$("#stmpmail").val(),h=$("#stmpaut > option:selected").val(),k=$("#stmpusr").val(),l=$("#stmppas").val();$.ajax({type:"POST",url:"../php/admin_function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"save_stmp",serv:a,name:c,host:d,port:e,ssl:f,mail:g,auth:h,usr:k,pass:l},dataType:"json",success:function(b){"Saved"==b[0]?noty({text:"STMP Information Saved",type:"success", timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})});
+		$("#savestmp").click(function(){
+			var a=$("#stmpserv").val(),c=$("#stmpname").val(),d=$("#stmphost").val(),e=$("#stmpport").val(),f=$("#stmpsec > option:selected").val(),g=$("#stmpmail").val(),h=$("#stmpaut > option:selected").val(),k=$("#stmpusr").val(),l=$("#stmppas").val();
+			$.ajax({
+				type:"POST",
+				url:"../php/admin_function.php",
+				data:{<?php echo $_SESSION['token']['act']; ?>:"save_stmp",serv:a,name:c,host:d,port:e,ssl:f,mail:g,auth:h,usr:k,pass:l},
+				dataType:"json",
+				success:function(b){
+					if("Saved"==b[0])
+						noty({text:"STMP Information Saved",type:"success", timeout:9E3})
+					else if(b[0]=='sessionex'){
+						switch(b[1]){
+							case 0:
+								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+								break;
+							case 1:
+								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+								break;
+							case 2:
+								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+								break;
+							case 3:
+								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+								break;
+						}
+					}
+					else
+						noty({text:b[0],type:"error",timeout:9E3})}
+			}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})})
+		});
 		
 		$(document).on("change","#stmpaut",function(){1==$("#stmpaut > option:checked").val()?($("#stmpusr").attr("required","required"),$("#stmppas").attr("required","required")):($("#stmpusr").removeAttr("required"),$("#stmppas").removeAttr("required"))});
 
