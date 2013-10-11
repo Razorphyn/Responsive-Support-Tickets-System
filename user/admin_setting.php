@@ -277,7 +277,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			$("#allfaq > option[value='<?php echo $setting[8];?>']").attr('selected','selected');
 		<?php } ?>
 		
-		$("#deleteupload").click(function() { 
+		$("#deleteupload").click(function() {
 			if(confirm("Do you want to delete all the files inside this period?")) {
 				var a = $("#delfromdate").val(), 
 					c = $("#todeldate").val(); 
@@ -289,7 +289,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						dataType:"json", 
 						success:function(b) {
 							if("Deleted" == b[0]){
-								$("#delfromdate").val(""), $("#todeldate").val(""));
+								$("#delfromdate").val("");
+								$("#todeldate").val("");
 								noty({text:"The files has been deleted", type:"error", timeout:9E3});
 							}
 							else if(b[0]=='sessionex'){
@@ -311,7 +312,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							else
 								noty({text:b[0], type:"error", timeout:9E3}) 
 						}
-					}).fail(function(b, a) { noty({text:"Request Error:" + a, type:"error", timeout:9E3}) }
+					}).fail(function(b, a) { noty({text:"Request Error:" + a, type:"error", timeout:9E3})});
 				}
 				else
 					noty({text:"Complete both the date", type:"error", timeout:9E3})

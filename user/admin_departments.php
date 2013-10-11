@@ -335,37 +335,41 @@ $stmp[8]=implode('',$stmp[8]);
 			var b = $("#depname").val().replace(/\s+/g, " "),
 				c = $("#activedep").val(),
 				d = $("#publicdep").val();
-			"" != b.replace(/\s+/g, "") ? $.ajax({
-				type: "POST",
-				url: "../php/admin_function.php",
-				data: { <?php echo $_SESSION['token']['act']; ?> : "add_depart",tit: b,active: c,pubdep: d},
-				dataType: "json",
-				success: function (a) {
-					if("Added" == a.response){
-						a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>',
-						table.fnAddData(a.information),
-						$("#depname").val("")
-					}
-					else if(a[0]=='sessionex'){
-						switch(a[1]){
-							case 0:
-								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-								break;
-							case 1:
-								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-								break;
-							case 2:
-								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-								break;
-							case 3:
-								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-								break;
+			if(b.replace(/\s+/g, "")!=""){
+				$.ajax({
+					type: "POST",
+					url: "../php/admin_function.php",
+					data: { <?php echo $_SESSION['token']['act']; ?> : "add_depart",tit: b,active: c,pubdep: d},
+					dataType: "json",
+					success: function (a) {
+						if("Added" == a.response){
+							a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>',
+							table.fnAddData(a.information),
+							$("#depname").val("")
 						}
+						else if(a[0]=='sessionex'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else
+							noty({text: a[0],type: "error",timeout: 9E3})
 					}
-					else
-						noty({text: a[0],type: "error",timeout: 9E3})
-				}
-			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "Form Error - Empty Field",type: "error",timeout: 9E3})
+				}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})})
+			}
+			else
+				noty({text: "Form Error - Empty Field",type: "error",timeout: 9E3})
 		});
 		
 		$(document).on("click", ".submit_changes",function (){
