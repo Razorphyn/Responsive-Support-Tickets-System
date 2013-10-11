@@ -342,9 +342,9 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						}
 					}
 					else{
-						a.children("input").each(function () {$(this).removeAttr("disabled", "disabled")}), 
-						a.children("select").each(function () {$(this).removeAttr("disabled", "disabled")}), 
-						noty({text: d[0],type: "error",timeout: 9E3}))
+						a.children("input").each(function () {$(this).removeAttr("disabled", "disabled")});
+						a.children("select").each(function () {$(this).removeAttr("disabled", "disabled")});
+						noty({text: d[0],type: "error",timeout: 9E3})
 					}
 				}
 			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})
@@ -388,7 +388,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								else
 									noty({text: 'Cannot delete department. Error: '+data[0],type:'error',timeout:9000});
 							}
-						}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+						}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000})});
 						$( this ).dialog( "close" );
 					},
 					'Close': function() {
