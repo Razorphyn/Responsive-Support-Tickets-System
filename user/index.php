@@ -331,7 +331,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				$(this).hide(400);
 				$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 			});
-			setTimeout(function(){
+			//setTimeout(function(){
 				$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:1},dataType : 'json',
 					success : function (a) {
 						if(a.response=='ret'){
@@ -364,7 +364,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 				
 				$.when($('.loading').remove()).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
-			},800);
+			//},800);
 		});
 		
 		$(document).on('click','#tkclosed', function(){
@@ -374,7 +374,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				$(this).hide(400);
 				$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 			});
-			setTimeout(function(){
+			//setTimeout(function(){
 				$.when(
 					$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:0},dataType : 'json',
 						success : function (a) {
@@ -409,7 +409,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 
 					$('.loading').remove()
 				).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
-			},800);
+			//},800);
 		});
 
 		<?php if($_SESSION['status']==2){ ?>
@@ -422,7 +422,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 				});
 				
-				setTimeout(function(){
+			//	setTimeout(function(){
 					$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:2},dataType : 'json',
 						success : function (a) {
 							if(a.response=='ret'){
@@ -455,7 +455,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 					
 					$.when($('.loading').remove()).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
-				},800);
+			//	},800);
 			});
 		
 			$(document).on("click", "#aut_ass_tk", function () {
