@@ -87,25 +87,25 @@ if($_POST[$_SESSION['token']['act']]=='register'){
 	if($_POST['pwd']==$_POST['rpwd']){
 		
 		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
-			$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
+			$_POST['name']=trim(preg_replace('/\s+/',' ',$_POST['name']));
 		else{
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
-		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
+		$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+		if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
 		}
-		$pass= trim(preg_replace('/\s+/','',$_POST['pwd']));
-		if($pass==''){
+		$_POST['pwd']= trim(preg_replace('/\s+/','',$_POST['pwd']));
+		if($_POST['pwd']==''){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Password'));
 			exit();
 		}
-		$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
+		$_POST['pwd']=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
 
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -115,15 +115,15 @@ if($_POST[$_SESSION['token']['act']]=='register'){
 			$ip=retrive_ip();
 			$reg=get_random_string(60);
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
+			$STH->bindParam(1,$_POST['name'],PDO::PARAM_STR);
 			$STH->bindParam(2,$reg,PDO::PARAM_STR);
-			$STH->bindParam(3,$viper,PDO::PARAM_STR);
-			$STH->bindParam(4,$pass,PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['mail'],PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['pwd'],PDO::PARAM_STR);
 			$STH->bindParam(5,$ip,PDO::PARAM_STR);
 			$STH->execute();
 				$_SESSION['id']=$DBH->lastInsertId();;
-				$_SESSION['name']=$mustang;
-				$_SESSION['mail']=$viper;
+				$_SESSION['name']=$_POST['name'];
+				$_SESSION['mail']=$_POST['mail'];
 				$_SESSION['status']=3;
 				$_SESSION['time']=time();
 				$_SESSION['ip']=retrive_ip();
@@ -140,7 +140,7 @@ if($_POST[$_SESSION['token']['act']]=='register'){
 			
 			if((int)$e->getCode()==1062){
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>"User with mail: ".$viper." is already registred"));
+				echo json_encode(array(0=>"User with mail: ".$_POST['mail']." is already registred"));
 			}
 			else{
 				header('Content-Type: application/json; charset=utf-8');
@@ -191,23 +191,23 @@ else if(isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST[$_SESSION
 }
 
 else if(!isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='login'){
-	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-	if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
+	$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+	if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Mail'));
 		exit();
 	}
-	$pass= trim(preg_replace('/\s+/','',$_POST['pwd']));
-	$pass=($pass!='') ? $pass:exit();
-	$pass=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
+
+	$_POST['pwd']=(trim(preg_replace('/\s+/','',$_POST['pwd']))!='') ? $_POST['pwd']:exit();
+	$_POST['pwd']=hash('whirlpool',crypt($_POST['pwd'],'$#%H4!df84a$%#RZ@£'));
 
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$query = "SELECT `id`,`name`,`mail`,`status`,`mail_alert` FROM ".$SupportUserTable." WHERE `mail`=?  AND `password`= ? LIMIT 1";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$viper,PDO::PARAM_STR);
-		$STH->bindParam(2,$pass,PDO::PARAM_STR);
+		$STH->bindParam(1,$_POST['mail'],PDO::PARAM_STR);
+		$STH->bindParam(2,$_POST['pwd'],PDO::PARAM_STR);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
@@ -239,8 +239,8 @@ else if(!isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='login
 }
 
 else if($_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='delete_ticket'){
-	$encid=trim(preg_replace('/\s+/','',$_POST['enc']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
+	$_POST['enc']=trim(preg_replace('/\s+/','',$_POST['enc']));
+	$_POST['enc']=($_POST['enc']!='' && strlen($_POST['enc'])==87) ? $_POST['enc']:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -251,17 +251,17 @@ else if($_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='delete_tick
 					SET b.assigned_tickets= CASE  WHEN b.assigned_tickets!='0' THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END  
 				WHERE a.enc_id=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_STR,87);
 		$STH->execute();
 		
 		$query = "DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id`=(SELECT `id` FROM ".$SupportTicketsTable." WHERE `enc_id`=?) ";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_STR,87);
 		$STH->execute();
 
 		$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_STR,87);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
@@ -275,18 +275,18 @@ else if($_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='delete_tick
 			}while ($a = $STH->fetch());
 			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+			$STH->bindParam(1,$_POST['enc'],PDO::PARAM_STR,87);
 			$STH->execute();
 		}
 		
 		$query = "DELETE FROM ".$SupportFlagTable." WHERE `enc_id`=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_STR,87);
 		$STH->execute();
 		
 		$query = "DELETE FROM ".$SupportTicketsTable." WHERE `enc_id`=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_STR,87);
 		$STH->execute();
 		
 		header('Content-Type: application/json; charset=utf-8');
@@ -303,8 +303,8 @@ else if($_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='delete_tick
 }
 	
 else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_account'){
-	$key=trim(preg_replace('/\s+/','',$_POST['key']));
-	if(60!=strlen($key)){
+	$_POST['key']=trim(preg_replace('/\s+/','',$_POST['key']));
+	if(60!=strlen($_POST['key'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Key'));
 		exit();
@@ -316,7 +316,7 @@ else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_acc
 			
 			$query = "SELECT `id`,`name`,`mail`,`mail_alert` FROM ".$SupportUserTable." WHERE `reg_key`=? LIMIT 1";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$key,PDO::PARAM_STR,60);
+			$STH->bindParam(1,$_POST['key'],PDO::PARAM_STR,60);
 			$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
@@ -397,8 +397,8 @@ else if(isset($_SESSION['status']) && $_SESSION['status']>2 && $_POST[$_SESSION[
 }
 
 else if($_POST[$_SESSION['token']['act']]=='forgot'){
-	$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-	if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
+	$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+	if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Mail'));
 		exit();
@@ -417,8 +417,8 @@ else if($_POST[$_SESSION['token']['act']]=='forgot'){
 
 		$query = "SELECT `id` FROM ".$SupportUserTable." WHERE mail=? AND name=? LIMIT 1";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$viper,PDO::PARAM_STR);
-		$STH->bindParam(2,$mustang,PDO::PARAM_STR);
+		$STH->bindParam(1,$_POST['mail'],PDO::PARAM_STR);
+		$STH->bindParam(2,$_POST['name'],PDO::PARAM_STR);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
@@ -457,25 +457,23 @@ else if($_POST[$_SESSION['token']['act']]=='forgot'){
 }
 
 else if($_POST[$_SESSION['token']['act']]=='reset_password'){
-	$npwd=(string)$_POST['npass'];
-	$rpwd=(string)$_POST['rnpass'];
 	
-	$rmail= trim(preg_replace('/\s+/','',$_POST['rmail']));
-	if(empty($rmail) || filter_var($rmail, FILTER_VALIDATE_EMAIL)!=true){
+	$_POST['rmail']= trim(preg_replace('/\s+/','',$_POST['rmail']));
+	if(empty($_POST['rmail']) || filter_var($_POST['rmail'], FILTER_VALIDATE_EMAIL)!=true){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Mail'));
 		exit();
 	}
 	
-	$reskey=trim(preg_replace('/\s+/','',$_POST['key']));
-	if(empty($reskey) && strlen($encid)!=87){
+	$_POST['key']=trim(preg_replace('/\s+/','',$_POST['key']));
+	if(empty($_POST['key']) || strlen($_POST['key'])!=87){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Key'));
 		exit();
 	}
 	
-	if(trim(preg_replace('/\s+/','',$rpwd))!='' && $rpwd==$npwd){
-		$pass=hash('whirlpool',crypt($rpwd,'$#%H4!df84a$%#RZ@£'));
+	if(trim(preg_replace('/\s+/','',$_POST['rnpass']))!='' && $_POST['rnpass']==$_POST['npass']){
+		$_POST['rnpass']=hash('whirlpool',crypt($_POST['rnpass'],'$#%H4!df84a$%#RZ@£'));
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -483,9 +481,9 @@ else if($_POST[$_SESSION['token']['act']]=='reset_password'){
 			$query = "UPDATE ".$SupportUserTable." SET password=?,tmp_password=NULL WHERE mail=? AND tmp_password=?";
 			
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$pass,PDO::PARAM_STR);
-			$STH->bindParam(2,$rmail,PDO::PARAM_STR);
-			$STH->bindParam(3,$reskey,PDO::PARAM_STR);
+			$STH->bindParam(1,$_POST['rnpass'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['rmail'],PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['key'],PDO::PARAM_STR);
 			$STH->execute();
 			
 			header('Content-Type: application/json; charset=utf-8');
@@ -507,9 +505,8 @@ else if($_POST[$_SESSION['token']['act']]=='reset_password'){
 
 else if($_POST[$_SESSION['token']['act']]=='del_account'){//check
 
-	$pass= trim(preg_replace('/\s+/','',$_POST['pas']));
-	$pass=($pass!='') ? $pass:exit();
-	$pass=hash('whirlpool',crypt($_POST['pas'],'$#%H4!df84a$%#RZ@£'));
+	$_POST['pas']=(trim(preg_replace('/\s+/','',$_POST['pas']))!='') ? $_POST['pas']:exit();
+	$_POST['pas']=hash('whirlpool',crypt($_POST['pas'],'$#%H4!df84a$%#RZ@£'));
 
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -518,25 +515,26 @@ else if($_POST[$_SESSION['token']['act']]=='del_account'){//check
 		$query = "SELECT `id` FROM ".$SupportUserTable." WHERE `mail`=?  AND `password`= ? LIMIT 1";
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$_SESSION['mail'],PDO::PARAM_STR);
-		$STH->bindParam(2,$pass,PDO::PARAM_STR);
+		$STH->bindParam(2,$_POST['pas'],PDO::PARAM_STR);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
 		if(!empty($a)){
-			$camaro=(is_numeric($_SESSION['id']) && $a['id']==$_SESSION['id'])? (int)$_SESSION['id']:exit();
+			if(!is_numeric($_SESSION['id']) || $a['id']!=$_SESSION['id'])
+				exit();
 			$query = "DELETE FROM ".$SupportMessagesTable." WHERE user_id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
-		
+
 			$query = "DELETE FROM ".$SupportTicketsTable." WHERE user_id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 				
 			$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `uploader`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
@@ -551,22 +549,22 @@ else if($_POST[$_SESSION['token']['act']]=='del_account'){//check
 			}
 			$query = "DELETE FROM ".$SupportUploadTable." WHERE uploader=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 															
 			$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN '1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$query = "DELETE FROM ".$SupportUserTable." WHERE id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			session_unset();
@@ -600,12 +598,12 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 	$letarr=array('M','d','C','f','K','w','p','T','B','X');
 	$error=array();
 	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
-		$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
+		$_POST['message']=trim(preg_replace('/\s+/',' ',$_POST['message']));
 		require_once 'htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		$purifier = new HTMLPurifier($config);
-		$message = $purifier->purify($message);
-		$check=trim(strip_tags($message));
+		$_POST['message'] = $purifier->purify($_POST['message']);
+		$check=trim(strip_tags($_POST['message']));
 		if(empty($check)){
 			$error[]='Empty Message';
 		}
@@ -614,34 +612,34 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 		$error[]='Empty Message';
 	
 	if(trim(preg_replace('/\s+/','',$_POST['title']))!='')
-		$tit=trim(preg_replace('/\s+/',' ',$_POST['title']));
+		$_POST['title']=trim(preg_replace('/\s+/',' ',$_POST['title']));
 	else
 		$error[]='Empty Title';
 		
 	if(is_numeric($_POST['dep']))
-		$dep=(int)trim($_POST['dep']);
+		$_POST['dep']=(int)trim($_POST['dep']);
 	else
 		$error[]='Error Department';
 
 	if(is_numeric($_POST['priority']))
-		$prio=trim($_POST['priority']);
+		$_POST['priority']=trim($_POST['priority']);
 	else
-		$error[]='Error ';
+		$error[]='Error, invalid value ';
 
 	if(!isset($error[0])){
-		$wsurl=(trim(preg_replace('/\s+/','',$_POST['wsurl'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['wsurl'])):'';
-		$contype=(trim(is_numeric($_POST['contype'])))? (int)$_POST['contype']:exit();
-		$ftppass=(trim(preg_replace('/\s+/','',$_POST['ftppass'])!=''))? $_POST['ftppass']:'';
-		$ftpus=(trim(preg_replace('/\s+/','',$_POST['ftpus'])!=''))? trim($_POST['ftpus']):'';
-		if($ftppass!=''){
+		$_POST['wsurl']=(trim(preg_replace('/\s+/','',$_POST['wsurl'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['wsurl'])):'';
+		$_POST['contype']=(trim(is_numeric($_POST['contype'])))? (int)$_POST['contype']:exit();
+		$_POST['ftppass']=(trim(preg_replace('/\s+/','',$_POST['ftppass'])!=''))? $_POST['ftppass']:'';
+		$_POST['ftpus']=(trim(preg_replace('/\s+/','',$_POST['ftpus'])!=''))? trim($_POST['ftpus']):'';
+		if($_POST['ftppass']!=''){
 			$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
-			$ftppass=str_split($ftppass);
-			$c=count($ftppass);
+			$_POST['ftppass']=str_split($_POST['ftppass']);
+			$c=count($_POST['ftppass']);
 			for($i=0;$i<$c;$i++){
-				if(array_key_exists($ftppass[$i],$crypttable))
-					$ftppass[$i]=$crypttable[$crypttable[$ftppass[$i]]];
+				if(array_key_exists($_POST['ftppass'][$i],$crypttable))
+					$_POST['ftppass'][$i]=$crypttable[$crypttable[$_POST['ftppass'][$i]]];
 			}
-			$ftppass=implode('',$ftppass);
+			$_POST['ftppass']=implode('',$_POST['ftppass']);
 		}
 
 		try{
@@ -652,14 +650,14 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 			$query = "INSERT INTO ".$SupportTicketsTable."(`department_id`,`user_id`,`title`,`priority`,`website`,`contype`,`ftp_user`,`ftp_password`,`created_time`,`last_reply`) VALUES (?,?,?,?,?,?,?,?,?,?)";
 			$STH = $DBH->prepare($query);
 			$date=date("Y-m-d H:i:s");
-			$STH->bindParam(1,$dep,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['dep'],PDO::PARAM_INT);
 			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
-			$STH->bindParam(3,$tit,PDO::PARAM_STR);
-			$STH->bindParam(4,$prio,PDO::PARAM_INT);
-			$STH->bindParam(5,$wsurl,PDO::PARAM_STR);
-			$STH->bindParam(6,$contype,PDO::PARAM_STR);
-			$STH->bindParam(7,$ftpus,PDO::PARAM_STR);
-			$STH->bindParam(8,$ftppass,PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['title'],PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['priority'],PDO::PARAM_INT);
+			$STH->bindParam(5,$_POST['wsurl'],PDO::PARAM_STR);
+			$STH->bindParam(6,$_POST['contype'],PDO::PARAM_STR);
+			$STH->bindParam(7,$_POST['ftpus'],PDO::PARAM_STR);
+			$STH->bindParam(8,$_POST['ftppass'],PDO::PARAM_STR);
 			$STH->bindParam(9,$date,PDO::PARAM_STR);
 			$STH->bindParam(10,$date,PDO::PARAM_STR);
 			$STH->execute();
@@ -669,7 +667,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 			
 			$tkid=$DBH->lastInsertId();
 			$ip=retrive_ip();
-			$refid=uniqid(hash('sha256',$tkid.$tit.$_SESSION['id']),true);
+			$refid=uniqid(hash('sha256',$tkid.$_POST['title'].$_SESSION['id']),true);
 			$randomref=get_random_string(6);
 			$spadd=str_split(strrev($_SESSION['id'].''));
 			$lll=count($spadd);
@@ -687,7 +685,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 			$query = "INSERT INTO ".$SupportMessagesTable."(`user_id`,`message`,`ticket_id`,`ip_address`,`created_time`) VALUES (?,?,?,?,?);";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
-			$STH->bindParam(2,$message,PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['message'],PDO::PARAM_STR);
 			$STH->bindParam(3,$tkid,PDO::PARAM_INT);
 			$STH->bindParam(4,$ip,PDO::PARAM_STR);
 			$STH->bindParam(5,$date,PDO::PARAM_STR);
@@ -753,7 +751,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 			}
 
 			//Assign Ticket
-			$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $dep,$_SESSION['id']);
+			$selopid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dep'],$_SESSION['id']);
 			$selopid=(is_numeric($selopid))?$selopid:null;
 			if(is_numeric($selopid)){
 				$query = "UPDATE ".$SupportTicketsTable." a ,".$SupportUserTable." b SET a.operator_id=?,a.ticket_status='1',b.assigned_tickets=(b.assigned_tickets+1) WHERE a.id=? AND b.id=? ";
@@ -792,7 +790,7 @@ else if(isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['st
 		}
 		catch(PDOException $e){
 			if((int)$e->getCode()==1062)
-				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "You have already created a Ticket named: '.$tit.'",timeout:2000});</script>';
+				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "You have already created a Ticket named: '.$_POST['title'].'",timeout:2000});</script>';
 			else{
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
 				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "We are sorry, but an error has occurred, please contact the administrator if it persist",type:"information",timeout:2000});</script>';
@@ -820,8 +818,6 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 			exit();
 			
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$viper,PDO::PARAM_STR);
-		$STH->bindParam(2,$pass,PDO::PARAM_STR);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
@@ -834,7 +830,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 			}
 			else if($_POST['sect']=='admin' && $_SESSION['status']==2){
 				do{
-					$dn['information'][]=array('id'=>$$a['id'],'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),'active'=>$a['active'],'public'=>$a['public']);
+					$dn['information'][]=array('id'=>$a['id'],'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),'active'=>$a['active'],'public'=>$a['public']);
 				}while ($a = $STH->fetch());
 			}
 			header('Content-Type: application/json; charset=utf-8');
@@ -981,10 +977,10 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 }
 
 else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['action']=='scrollpagination'){
-	$offset = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
-	$postnumbers = is_numeric($_POST['number']) ? $_POST['number'] : exit();
-	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:'';
+	$_POST['offset'] = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
+	$_POST['number'] = is_numeric($_POST['number']) ? $_POST['number'] : exit();
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	$_POST['id']=($encid!='' && strlen($encid)==87) ? $encid:'';
 	if(isset($_SESSION[$encid]['id']) && $encid!='' ){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -998,9 +994,11 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 						FROM ".$SupportMessagesTable." a
 						LEFT JOIN ".$SupportUserTable." b
 							ON b.id=a.user_id
-						WHERE `ticket_id`=? ORDER BY `created_time` DESC LIMIT ".$offset.",".$postnumbers;
+						WHERE `ticket_id`=? ORDER BY `created_time` DESC LIMIT ?,".$postnumbers;
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_SESSION[$encid]['id'],PDO::PARAM_STR);
+			$STH->bindParam(1,$_SESSION[$_POST['id']]['id'],PDO::PARAM_STR,87);
+			$STH->bindParam(2,$_POST['offset'],PDO::PARAM_INT);
+			$STH->bindParam(3,$_POST['number'],PDO::PARAM_INT);
 			$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
@@ -1019,8 +1017,6 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 					try{
 						$query = "SELECT `uploader`,`name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
 						$STH = $DBH->prepare($query);
-						$STH->bindParam(1,$viper,PDO::PARAM_STR);
-						$STH->bindParam(2,$pass,PDO::PARAM_STR);
 						$STH->execute();
 						$STH->setFetchMode(PDO::FETCH_ASSOC);
 						$a = $STH->fetch();
@@ -1063,15 +1059,15 @@ else if(isset($_POST['action']) && isset($_SESSION['status']) && $_SESSION['stat
 
 else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='save_setting'){
 	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
-		$mustang=trim(preg_replace('/\s+/',' ',$_POST['name']));
+		$_POST['name']=trim(preg_replace('/\s+/',' ',$_POST['name']));
 	else{
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 		exit();
 	}
-	$alert=($_POST['almail']!='no') ? 'yes':'no';
-	$dfmail=trim(preg_replace('/\s+/','',$_POST['mail']));
-	if(empty($dfmail) || !filter_var($dfmail, FILTER_VALIDATE_EMAIL)){
+	$_POST['almail']=($_POST['almail']!='no') ? 'yes':'no';
+	$_POST['mail']=trim(preg_replace('/\s+/','',$_POST['mail']));
+	if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid Mail: empty mail or not allowed characters'));
 		exit();
@@ -1080,12 +1076,13 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		if(isset($_POST['oldpwd']) && isset($_POST['nldpwd']) && isset($_POST['rpwd']) && $_POST['nldpwd']==$_POST['rpwd']){
-			$opass=hash("whirlpool",crypt($_POST['oldpwd'],'$#%H4!df84a$%#RZ@£'));
+		$pass=trim(preg_replace('/\s+/','',$_POST['nldpwd']));
+		if(isset($_POST['oldpwd']) && isset($_POST['nldpwd']) && isset($_POST['rpwd']) && !empty($pass) && $_POST['nldpwd']==$_POST['rpwd']){
+			$_POST['oldpwd']=hash("whirlpool",crypt($_POST['oldpwd'],'$#%H4!df84a$%#RZ@£'));
 			$query = "SELECT `id` FROM ".$SupportUserTable." WHERE `password`= ? LIMIT 1";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$opass,PDO::PARAM_STR);
-			$STH->execute();	
+			$STH->bindParam(1,$_POST['oldpwd'],PDO::PARAM_STR);
+			$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
 			if(!empty($a)){
@@ -1094,7 +1091,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 				}while ($a = $STH->fetch());
 				
 				if($camaroret==$_SESSION['id']){
-					$pass=hash("whirlpool",crypt($_POST['nldpwd'],'$#%H4!df84a$%#RZ@£'));
+					$_POST['nldpwd']=hash("whirlpool",crypt($_POST['nldpwd'],'$#%H4!df84a$%#RZ@£'));
 					$query = "UPDATE ".$SupportUserTable." SET `name`=?, `mail`=?, `mail_alert`=?, `password`=? WHERE id=".$_SESSION['id'];
 					$passupd=true;
 					$check=true;
@@ -1113,20 +1110,20 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 			$STH = $DBH->prepare($query);
 			if(isset($passupd) && $passupd==true){
 				unset($passupd);
-				$STH->bindParam(1,$mustang,PDO::PARAM_STR);
-				$STH->bindParam(2,$dfmail,PDO::PARAM_STR);
-				$STH->bindParam(3,$alert,PDO::PARAM_STR);
-				$STH->bindParam(4,$pass,PDO::PARAM_STR);
+				$STH->bindParam(1,$_POST['name'],PDO::PARAM_STR);
+				$STH->bindParam(2,$_POST['mail'],PDO::PARAM_STR);
+				$STH->bindParam(3,$_POST['almail'],PDO::PARAM_STR);
+				$STH->bindParam(4,$_POST['nldpwd'],PDO::PARAM_STR);
 			}
 			else{
-				$STH->bindParam(1,$mustang,PDO::PARAM_STR);
-				$STH->bindParam(2,$dfmail,PDO::PARAM_STR);
-				$STH->bindParam(3,$alert,PDO::PARAM_STR);
+				$STH->bindParam(1,$_POST['name'],PDO::PARAM_STR);
+				$STH->bindParam(2,$_POST['mail'],PDO::PARAM_STR);
+				$STH->bindParam(3,$_POST['almail'],PDO::PARAM_STR);
 			}
 			$STH->execute();
-			$_SESSION['name']=$mustang;
-			$_SESSION['mail_alert']=$alert;
-			$_SESSION['mail']=$dfmail;
+			$_SESSION['name']=$_POST['name'];
+			$_SESSION['mail_alert']=$_POST['almail'];
+			$_SESSION['mail']=$_POST['mail'];
 			
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
@@ -1143,7 +1140,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	catch(PDOException $e){
 		if((int)$e->getCode()==1062){
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>"User with mail: ".$dfmail." is already registred"));
+			echo json_encode(array(0=>"User with mail: ".$_POST['mail']." is already registred"));
 		}
 		else{
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1156,16 +1153,16 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 }
 
 else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['post_reply']=='Post Reply'){//check
-	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
 	$error=array();
 	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
-		$message=trim(preg_replace('/\s+/',' ',$_POST['message']));
+		$_POST['message']=trim(preg_replace('/\s+/',' ',$_POST['message']));
 		require_once 'htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		$purifier = new HTMLPurifier($config);
-		$message = $purifier->purify($message);
-		$check=trim(strip_tags($message));
+		$_POST['message'] = $purifier->purify($_POST['message']);
+		$check=trim(strip_tags($_POST['message']));
 		if(empty($check)){
 			$error[]='Empty Message';
 		}
@@ -1174,13 +1171,13 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 		$error[]='Empty Message';
 	
 	if(!isset($error[0])){
-		if(isset($_SESSION[$encid]['id'])){
+		if(isset($_SESSION[$_POST['id']]['id'])){
 			try{
 				$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 				$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 				
 				//User open ticket on reply
-				if($_SESSION[$encid]['status']==0 && $_SESSION['id']==$_SESSION[$encid]['usr_id']){//check
+				if($_SESSION[$_POST['id']]['status']==0 && $_SESSION['id']==$_SESSION[$_POST['id']]['usr_id']){//check
 					try{
 					$query = "UPDATE ".$SupportTicketsTable." a 
 								LEFT OUTER JOIN ".$SupportUserTable." b 
@@ -1191,19 +1188,19 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 									a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END 
 								WHERE a.enc_id=?";
 					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+					$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR,87);
 					$STH->execute();
 					
 					$query = "SELECT ticket_status FROM ".$SupportTicketsTable." WHERE id=? LIMIT 1";
 					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$_SESSION[$encid]['id'],PDO::PARAM_INT);
+					$STH->bindParam(1,$_SESSION[$_POST['id']]['id'],PDO::PARAM_INT);
 					$STH->execute();
 					
 					$STH->setFetchMode(PDO::FETCH_ASSOC);
 					$a = $STH->fetch();
 					if(!empty($a)){
 						do{
-							$_SESSION[$encid]['status']=$tkst;
+							$_SESSION[$_POST['id']]['status']=$tkst;
 						}while ($a = $STH->fetch());
 						echo '<script>parent.$("#statustk").val(\'1\').change();</script>';
 					}
@@ -1220,15 +1217,15 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				$query = "UPDATE ".$SupportTicketsTable." SET last_reply=? WHERE enc_id=?";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$date,PDO::PARAM_STR);
-				$STH->bindParam(2,$encid,PDO::PARAM_STR,87);
+				$STH->bindParam(2,$_POST['id'],PDO::PARAM_STR,87);
 				$STH->execute();
 				
 				//Insert new message
 				$query = "INSERT INTO ".$SupportMessagesTable."(`user_id`,`message`,`ticket_id`,`ip_address`,`created_time`) VALUES (?,?,?,?,?);";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
-				$STH->bindParam(2,$message,PDO::PARAM_STR);
-				$STH->bindParam(3,$_SESSION[$encid]['id'],PDO::PARAM_INT);
+				$STH->bindParam(2,$_POST['message'],PDO::PARAM_STR);
+				$STH->bindParam(3,$_SESSION[$_POST['id']]['id'],PDO::PARAM_INT);
 				$STH->bindParam(4,$ip,PDO::PARAM_STR);
 				$STH->bindParam(5,$date,PDO::PARAM_STR);
 				$STH->execute();
@@ -1257,8 +1254,8 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 											$target_path = "../upload/".$encname;
 											if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
 												$movedfiles[]=$_FILES['filename']['name'][$i];
-												$uploadarr[]=array($encid,$encname,$_FILES['filename']['name'][$i]);
-												$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$_SESSION[$encid]['id'].',"'.$encid.'","'.$msid.'","'.$date.'"),';
+												$uploadarr[]=array($_POST['id'],$encname,$_FILES['filename']['name'][$i]);
+												$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$_SESSION[$_POST['id']]['id'].',"'.$_POST['id'].'","'.$msid.'","'.$date.'"),';
 												echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' has been uploaded",type:"success",timeout:2000});</script>';
 											}
 										}
@@ -1295,14 +1292,14 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				//End Upload
 				
 				//Send Mail
-				if($_SESSION[$encid]['status']!=2){
-					if($_SESSION['id']==$_SESSION[$encid]['usr_id']){
+				if($_SESSION[$_POST['id']]['status']!=2){
+					if($_SESSION['id']==$_SESSION[$_POST['id']]['usr_id']){
 						$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 0";
+						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$_POST['id']." 0";
 					}
-					else if($_SESSION[$encid]['status']==1){
+					else if($_SESSION[$_POST['id']]['status']==1){
 						$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$encid." 1";
+						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$_POST['id']." 1";
 					}
 					
 					if(isset($ex)){
@@ -1317,10 +1314,10 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				//Post Reply(send to javascript)
 				if(isset($uploadarr[0])){
 					$json=json_encode($uploadarr);
-					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',".$json.");</script>";
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($_POST['message'])."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',".$json.");</script>";
 				}
 				else
-					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($message)."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',null);</script>";
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($_POST['message'])."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',null);</script>";
 				//end
 			}
 			catch(PDOException $e){
@@ -1338,12 +1335,12 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 
 else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='update_status'){
 	if($_SESSION['status']==0)
-		$charger=($_POST['status']==1 || $_POST['status']==2)? 1:0;
+		$_POST['status']=($_POST['status']==1 || $_POST['status']==2)? 1:0;
 	else
-		$charger=($_POST['status']==0 || $_POST['status']==1 || $_POST['status']==2)? $_POST['status']:0;
-	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	if($charger==0){
+		$_POST['status']=($_POST['status']==0 || $_POST['status']==1 || $_POST['status']==2)? $_POST['status']:0;
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
+	if($_POST['status']==0){
 		$fquery = "UPDATE ".$SupportTicketsTable." a
 					LEFT OUTER JOIN ".$SupportUserTable." b
 					ON b.id=a.operator_id
@@ -1356,7 +1353,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 						a.ticket_status='0'
 					WHERE a.enc_id=? ";
 	}
-	else if($charger==2){
+	else if($_POST['status']==2){
 		$fquery = "UPDATE ".$SupportTicketsTable." a
 					LEFT OUTER JOIN ".$SupportUserTable." b
 						ON b.id=a.operator_id
@@ -1370,7 +1367,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 						a.ticket_status='2'
 					WHERE a.enc_id=?";
 	}
-	else if($charger==1){
+	else if($_POST['status']==1){
 		$fquery = "UPDATE ".$SupportTicketsTable." a 
 						LEFT OUTER JOIN ".$SupportUserTable." b
 						ON b.id=a.operator_id
@@ -1391,22 +1388,22 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		
 		$STH = $DBH->prepare($fquery);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR,87);
 		$STH->execute();
 
 		$STH = $DBH->prepare($lquery);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR,87);
 		$STH->execute();
 		
 		$query = "SELECT ticket_status FROM ".$SupportTicketsTable." WHERE enc_id=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR,87);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
 		if(!empty($a)){
 			do{
-				$_SESSION[$encid]['status']=$a['ticket_status'];
+				$_SESSION[$_POST['id']]['status']=$a['ticket_status'];
 			}while ($a = $STH->fetch());
 		}
 		header('Content-Type: application/json; charset=utf-8');
@@ -1422,13 +1419,13 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 }
 
 else if(isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST[$_SESSION['token']['act']]=='move_opera_ticket'){// deep check
-	$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
-	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
+	$_POST['dpid']=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		$opid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $dpid,$_SESSION[$encid]['usr_id']);
+		$opid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dpid'],$_SESSION[$_POST['id']]['usr_id']);
 		if(!is_numeric($opid))
 			$opid=0;
 		$query="UPDATE ".$SupportTicketsTable." a
@@ -1443,13 +1440,13 @@ else if(isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST[$_SESSION
 							c.assigned_tickets=IF(c.id!=a.operator_id,c.assigned_tickets+1,c.assigned_tickets),
 							a.operator_id=?
 						WHERE a.enc_id=? ";
-		
+
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$dpid,PDO::PARAM_INT);
+		$STH->bindParam(1,$_POST['dpid'],PDO::PARAM_INT);
 		$STH->bindParam(2,$opid,PDO::PARAM_INT);
 		$STH->bindParam(3,$opid,PDO::PARAM_INT);
 		$STH->bindParam(4,$opid,PDO::PARAM_INT);
-		$STH->bindParam(5,$encid,PDO::PARAM_STR);
+		$STH->bindParam(5,$_POST['id'],PDO::PARAM_STR);
 		$STH->execute();
 		
 		header('Content-Type: application/json; charset=utf-8');
@@ -1465,20 +1462,20 @@ else if(isset($_SESSION['status']) && $_SESSION['status']==1 && $_POST[$_SESSION
 }
 
 else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='update_ticket_title'){
-	$tit=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
-	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
+	$_POST['tit']=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$query="UPDATE ".$SupportTicketsTable." SET title=? WHERE enc_id=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$tit,PDO::PARAM_STR);
-		$STH->bindParam(2,$encid,PDO::PARAM_STR);
+		$STH->bindParam(1,$_POST['tit'],PDO::PARAM_STR);
+		$STH->bindParam(2,$_POST['id'],PDO::PARAM_STR);
 		$STH->execute();
 		
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'Updated',1=>htmlspecialchars($tit,ENT_QUOTES,'UTF-8')));
+		echo json_encode(array(0=>'Updated',1=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8')));
 	}
 	catch(PDOException $e){  
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1490,33 +1487,33 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 }
 
 else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='update_ticket_connection'){
-	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$con=(is_numeric($_POST['contype']))? $_POST['contype']:exit();
-	$web=(trim(preg_replace('/\s+/','',$_POST['website']))!='')?trim(preg_replace('/\s+/','',$_POST['website'])):'';
-	$usr=(trim(preg_replace('/\s+/','',$_POST['user'])!=''))? trim($_POST['user']):'';
-	$pass=(trim(preg_replace('/\s+/','',$_POST['pass'])!=''))? $_POST['pass']:'';
-	if($pass!='' && $pass!=null){
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
+	$_POST['contype']=(is_numeric($_POST['contype']))? $_POST['contype']:exit();
+	$_POST['website']=(trim(preg_replace('/\s+/','',$_POST['website']))!='')?trim(preg_replace('/\s+/','',$_POST['website'])):'';
+	$_POST['user']=(trim(preg_replace('/\s+/','',$_POST['user'])!=''))? trim($_POST['user']):'';
+	$_POST['pass']=(trim(preg_replace('/\s+/','',$_POST['pass'])!=''))? $_POST['pass']:'';
+	if($_POST['pass']!='' && $_POST['pass']!=null){
 		$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
 								
-		$pass=str_split($pass);
-		$c=count($pass);
+		$_POST['pass']=str_split($_POST['pass']);
+		$c=count($_POST['pass']);
 		for($i=0;$i<$c;$i++){
-			if(array_key_exists($pass[$i],$crypttable))
-				$pass[$i]=$crypttable[$crypttable[$pass[$i]]];
+			if(array_key_exists($_POST['pass'][$i],$crypttable))
+				$_POST['pass'][$i]=$crypttable[$crypttable[$_POST['pass'][$i]]];
 		}
-		$pass=implode('',$pass);
+		$_POST['pass']=implode('',$_POST['pass']);
 	}
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$query="UPDATE ".$SupportTicketsTable." SET website=?,contype=?,ftp_user=?,ftp_password=? WHERE enc_id=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$web,PDO::PARAM_STR);
-		$STH->bindParam(2,$con,PDO::PARAM_STR);
-		$STH->bindParam(3,$usr,PDO::PARAM_STR);
-		$STH->bindParam(4,$pass,PDO::PARAM_STR);
-		$STH->bindParam(5,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['website'],PDO::PARAM_STR);
+		$STH->bindParam(2,$_POST['contype'],PDO::PARAM_STR);
+		$STH->bindParam(3,$_POST['user'],PDO::PARAM_STR);
+		$STH->bindParam(4,$_POST['pass'],PDO::PARAM_STR);
+		$STH->bindParam(5,$_POST['id'],PDO::PARAM_STR,87);
 		$STH->execute();
 
 		header('Content-Type: application/json; charset=utf-8');
@@ -1532,23 +1529,23 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 }
 
 else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSION['status']<3){
-	$encid=trim(preg_replace('/\s+/','',$_POST['ticket_id']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$file=(trim(preg_replace('/\s+/','',$_POST['file_download']))!='') ? $_POST['file_download']:exit();
+	$_POST['ticket_id']=trim(preg_replace('/\s+/','',$_POST['ticket_id']));
+	$_POST['ticket_id']=($_POST['ticket_id']!='' && strlen($_POST['ticket_id'])==87) ? $_POST['ticket_id']:exit();
+	$_POST['file_download']=(trim(preg_replace('/\s+/','',$_POST['file_download']))!='') ? $_POST['file_download']:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		
 		$query="SELECT name FROM ".$SupportUploadTable." WHERE ticket_id=? AND enc=? LIMIT 1";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
-		$STH->bindParam(2,$file,PDO::PARAM_STR);
+		$STH->bindParam(1,$_POST['ticket_id'],PDO::PARAM_STR,87);
+		$STH->bindParam(2,$_POST['file_download'],PDO::PARAM_STR);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a=$STH->fetch();
 		if(!empty($a)){
 			do{
-				$enc='../upload/'.$file;
+				$enc='../upload/'.$_POST['file_download'];
 					$mime=retrive_mime($enc,$a['name']);
 					if($mime!='Error'){
 						header("Content-Type: ".$mime);
@@ -1576,17 +1573,17 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 }
 
 else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='update_ticket_index'){
-	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$tit=(trim(preg_replace('/\s+/','',$_POST['title'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['title'])):exit();
-	$prio = (is_numeric($_POST['priority']))? (int)$_POST['priority']:0;
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
+	$_POST['title']=(trim(preg_replace('/\s+/','',$_POST['title'])!=''))? trim(preg_replace('/\s+/',' ',$_POST['title'])):exit();
+	$_POST['priority'] = (is_numeric($_POST['priority']))? (int)$_POST['priority']:0;
 
 	if($_SESSION['status']==0)
-		$charger=($_POST['status']==1 || $_POST['status']==2)? 1:0;
+		$_POST['status']=($_POST['status']==1 || $_POST['status']==2)? 1:0;
 	else
-		$charger=($_POST['status']==0 || $_POST['status']==1 || $_POST['status']==2)? $_POST['status']:0;
+		$_POST['status']=($_POST['status']==0 || $_POST['status']==1 || $_POST['status']==2)? $_POST['status']:0;
 
-	if($charger==0){
+	if($_POST['status']==0){
 		$fquery = "UPDATE ".$SupportTicketsTable." a
 					LEFT OUTER JOIN ".$SupportUserTable." b
 						ON b.id=a.operator_id
@@ -1601,7 +1598,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 						a.ticket_status=?
 					WHERE a.enc_id=?";
 	}
-	else if($charger==1){
+	else if($_POST['status']==1){
 		$fquery = "UPDATE ".$SupportTicketsTable." a
 					LEFT OUTER JOIN ".$SupportUserTable." b
 						ON b.id=a.operator_id
@@ -1617,7 +1614,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 						a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END 
 					WHERE a.enc_id=?";
 	}
-	else if($charger==2){
+	else if($_POST['status']==2){
 		$fquery = "UPDATE ".$SupportTicketsTable." a
 					LEFT JOIN ".$SupportUserTable." b
 						ON b.id=a.operator_id
@@ -1640,18 +1637,18 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		$STH = $DBH->prepare($fquery);
-		$STH->bindParam(1,$encid,PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR,87);
 		$STH->execute();
 		
 		$STH = $DBH->prepare($lquery);
-		$STH->bindParam(1,$tit,PDO::PARAM_STR);
-		$STH->bindParam(2,$prio,PDO::PARAM_STR);
-		$STH->bindParam(3,$charger,PDO::PARAM_STR);
-		$STH->bindParam(4,$encid,PDO::PARAM_STR);
+		$STH->bindParam(1,$_POST['title'],PDO::PARAM_STR);
+		$STH->bindParam(2,$_POST['priority'],PDO::PARAM_STR);
+		$STH->bindParam(3,$_POST['status'],PDO::PARAM_STR);
+		$STH->bindParam(4,$_POST['id'],PDO::PARAM_STR);
 		$STH->execute();
 		
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'Saved',1=>array($encid,htmlspecialchars($tit,ENT_QUOTES,'UTF-8'),$prio,$charger)));
+		echo json_encode(array(0=>'Saved',1=>array($_POST['id'],htmlspecialchars($_POST['title'],ENT_QUOTES,'UTF-8'),$_POST['priority'],$_POST['status'])));
 	}
 	catch(Exception $e){
 		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1663,12 +1660,12 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 }
 
 else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='rating'){//deep check
-	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
-	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
-	$encid=trim(preg_replace('/\s+/','',$_POST['tkid']));
-	$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-	$note=trim(preg_replace('/\s+/',' ',$_POST['comment']));
-	if(isset($_SESSION[$encid]['status']) && $_SESSION[$encid]['status']==0){
+	$_POST['rate']=(is_numeric($_POST['rate']))? $_POST['rate']:0;
+	//$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
+	$_POST['tkid']=trim(preg_replace('/\s+/','',$_POST['tkid']));
+	$_POST['tkid']=($_POST['tkid']!='' && strlen($_POST['tkid'])==87) ? $_POST['tkid']:exit();
+	$_POST['comment']=trim(preg_replace('/\s+/',' ',$_POST['comment']));
+	if(isset($_SESSION[$_POST['tkid']]['status']) && $_SESSION[$_POST['tkid']]['status']==0){
 		try{
 			$query = "UPDATE ".$SupportUserTable." a
 					INNER JOIN ".$SupportTicketsTable." b 
@@ -1680,21 +1677,21 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			$STH = $DBH->prepare($query);
-			$STH->bindValue(1,strval($rate));
-			$STH->bindValue(2,strval($rate));
-			$STH->bindParam(3,$encid,PDO::PARAM_STR);
+			$STH->bindValue(1,strval($_POST['rate']));
+			$STH->bindValue(2,strval($_POST['rate']));
+			$STH->bindParam(3,$_POST['tkid'],PDO::PARAM_STR);
 			$STH->execute();
 			
 			$query = "INSERT INTO ".$SupportRateTable." (`ref_id`,`enc_id`,`usr_id`,`rate`,`note`) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE `rate`=?,`note`=?";
 			
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_SESSION[$encid]['ref_id'],PDO::PARAM_STR);
-			$STH->bindParam(2,$encid,PDO::PARAM_STR);
+			$STH->bindParam(1,$_SESSION[$_POST['tkid']]['ref_id'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['tkid'],PDO::PARAM_STR);
 			$STH->bindParam(3,$_SESSION['id'],PDO::PARAM_INT);
-			$STH->bindParam(4,$rate,PDO::PARAM_INT);
-			$STH->bindParam(5,$note,PDO::PARAM_STR);
-			$STH->bindParam(6,$rate,PDO::PARAM_INT);
-			$STH->bindParam(7,$note,PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['rate'],PDO::PARAM_INT);
+			$STH->bindParam(5,$_POST['comment'],PDO::PARAM_STR);
+			$STH->bindParam(6,$_POST['rate'],PDO::PARAM_INT);
+			$STH->bindParam(7,$_POST['comment'],PDO::PARAM_STR);
 			$STH->execute();
 			
 			header('Content-Type: application/json; charset=utf-8');
@@ -1715,8 +1712,8 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 }
 
 else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST['act']=='faq_rating'){
-	$rate=(is_numeric($_POST['rate']))? $_POST['rate']:0;
-	$GT86=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
+	$_POST['rate']=(is_numeric($_POST['rate']))? $_POST['rate']:0;
+	$_POST['idBox']=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
 	if($GT86>10 && $rate>0){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1724,7 +1721,7 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			
 			$query = "SELECT `rate` FROM ".$SupportRateFaqTable." WHERE `faq_id`=?  AND `usr_id`= ? LIMIT 1";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$GT86,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['idBox'],PDO::PARAM_INT);
 			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -1738,10 +1735,10 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$orate=(is_numeric($orate) && !empty($orate))? $orate:0;
 			$query = "INSERT INTO ".$SupportRateFaqTable." (`faq_id`,`usr_id`,`rate`) VALUES (?,?,?) ON DUPLICATE KEY UPDATE updated='1',`rate`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$GT86,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['idBox'],PDO::PARAM_INT);
 			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
-			$STH->bindParam(3,$rate,PDO::PARAM_INT);
-			$STH->bindParam(4,$rate,PDO::PARAM_INT);
+			$STH->bindParam(3,$_POST['rate'],PDO::PARAM_INT);
+			$STH->bindParam(4,$_POST['rate'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$query = "UPDATE ".$SupportFaqTable." a
@@ -1756,8 +1753,8 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->bindParam(2,$orate,PDO::PARAM_INT);
-			$STH->bindParam(3,$rate,PDO::PARAM_INT);
-			$STH->bindParam(4,$GT86,PDO::PARAM_INT);
+			$STH->bindParam(3,$_POST['rate'],PDO::PARAM_INT);
+			$STH->bindParam(4,$_POST['idBox'],PDO::PARAM_INT);
 			$STH->execute();
 
 			header('Content-Type: application/json; charset=utf-8');
@@ -1780,45 +1777,36 @@ else if(isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status'
 }
 
 else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='search_ticket'){
-	$enid=trim(preg_replace('/\s+/','',$_POST['enid']));
-	$tit=trim(preg_replace('/\s+/',' ',$_POST['title']));
-	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
-		$tit=trim(preg_replace('/\s+/',' ',$_POST['message']));
-		require_once 'htmlpurifier/HTMLPurifier.auto.php';
-		$config = HTMLPurifier_Config::createDefault();
-		$purifier = new HTMLPurifier($config);
-		$tit = $purifier->purify($tit);
-		$check=trim(strip_tags($tit));
-		if(empty($check)){
-			$error[]='Empty Title';
-		}
-	}
-	else
-		$error[]='Empty Title';
-	$dep=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
-	$statk=(is_numeric($_POST['statk']))? (int)$_POST['statk']:'';
-	$from=trim(preg_replace('/\s+/','',$_POST['from']));
-	$to=trim(preg_replace('/\s+/','',$_POST['to']));
-	if($from!=''){
-		list($yyyy,$mm,$dd) = explode('-',$from);
+	$_POST['enid']=trim(preg_replace('/\s+/','',$_POST['enid']));
+	$_POST['title']=trim(preg_replace('/\s+/',' ',$_POST['title']));
+	$_POST['dep']=(is_numeric($_POST['dep']))? (int)$_POST['dep']:'';
+	$_POST['statk']=(is_numeric($_POST['statk']))? (int)$_POST['statk']:'';//add
+	$_POST['from']=trim(preg_replace('/\s+/','',$_POST['from']));
+	$_POST['to']=trim(preg_replace('/\s+/','',$_POST['to']));
+	if($_POST['from']!=''){
+		list($yyyy,$mm,$dd) = explode('-',$_POST['from']);
 		if (!checkdate($mm,$dd,$yyyy))
-			$from='';
+			$_POST['from']='';
 		else
-			$from=$from." 00:00:00";
+			$_POST['from']=$_POST['from']." 00:00:00";
 	}
-	if($to!=''){
-		list($yyyy,$mm,$dd) = explode('-',$to);
+	if($_POST['to']!=''){
+		list($yyyy,$mm,$dd) = explode('-',$_POST['to']);
 		if (!checkdate($mm,$dd,$yyyy))
-			$to='';
+			$_POST['to']='';
 		else
-			$to=$to." 23:59:59";
+			$_POST['to']=$_POST['to']." 23:59:59";
 	}
+	
 	if($_SESSION['status']==0 || $_SESSION['status']==2)
-		$op=trim(preg_replace('/\s+/',' ',$_POST['op']));
+		$_POST['op']=trim(preg_replace('/\s+/',' ',$_POST['op']));
+
 	if($_SESSION['status']==2){
-		$id=(is_numeric($_POST['id']))? (int)$_POST['id']:'';
-		$opid=(is_numeric($_POST['opid']))? (int)$_POST['opid']:'';
-		$usmail=trim(preg_replace('/\s+/','',$_POST['mail']));
+		$_POST['id']=(is_numeric($_POST['id']))? (int)$_POST['id']:'';
+		$_POST['opid']=(is_numeric($_POST['opid']))? (int)$_POST['opid']:'';
+		$_POST['mail']=trim(preg_replace('/\s+/','',$_POST['mail']));
+		$_POST['mail']=trim(preg_replace('/\s+/','',$_POST['mail']));
+		$_POST['mail']=(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL))? '':$_POST['mail'];
 	}
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1841,92 +1829,104 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 			$merge=array();
 			if($_SESSION['status']==0){
 				$query.=' a.user_id='.$_SESSION['id'];
-				if($enid!=''){
+				if($_POST['enid']!=''){
 					$query.=' AND a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$enid);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['enid']);
 				}
-				if($tit!=''){
+				if($_POST['title']!=''){
 					$query.=' AND a.title LIKE ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$tit.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['title'].'%');
 				}
-				if($dep!=''){
+				if($_POST['statk']!=''){
+					$tail[]=' AND a.ref_id=?';
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['statk']);
+				}
+				if($_POST['dep']!=''){
 					$query.=' AND a.department_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$dep);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['dep']);
 				}
-				if($op!=''){
+				if($_POST['op']!=''){
 					$query.=' AND a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$op.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['op'].'%');
 				}
-				if($from!=''){
+				if($_POST['from']!=''){
 					$query.=' AND a.created_time >= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$from);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['from']);
 				}
-				if($to!=''){
+				if($_POST['to']!=''){
 					$query.=' AND a.created_time =< ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$to);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['to']);
 				}
 			}
 			else if($_SESSION['status']==1){
 				$query.=' a.user_id='.$_SESSION['id'].' OR a.operator_id='.$_SESSION['id'];
-				if($enid!=''){
+				if($_POST['enid']!=''){
 					$query.=' AND a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$enid);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['enid']);
 				}
-				if($tit!=''){
+				if($_POST['title']!=''){
 					$query.=' AND a.title LIKE ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$tit.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['title'].'%');
 				}
-				if($dep!=''){
+				if($_POST['statk']!=''){
+					$tail[]=' AND a.ref_id=?';
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['statk']);
+				}
+				if($_POST['dep']!=''){
 					$query.=' AND a.department_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$dep);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['dep']);
 				}
-				if($from!=''){
+				if($_POST['from']!=''){
 					$query.=' AND a.created_time >= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$from);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['from']);
 				}
-				if($to!=''){
+				if($_POST['to']!=''){
 					$query.=' AND a.created_time <= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$to);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['to']);
 				}
 			}
 			else if($_SESSION['status']==2){
 				$tail=array();
-				if($id!=''){
+				if($_POST['id']!=''){
 					$tail[]='a.user_i`=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$id);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['id']);
 				}
-				if($enid!=''){
+				if($_POST['enid']!=''){
 					$tail[]='a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$enid);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['enid']);
 				}
-				if($tit!=''){
+				if($_POST['title']!=''){
 					$tail[]='a.title LIKE ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$tit.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['title'].'%');
 				}
-				if($dep!=''){
+				if($_POST['statk']!=''){
+					$tail[]='a.ref_id=?';
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['statk']);
+				}
+				if($_POST['dep']!=''){
 					$tail[]='a.department_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$dep);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['dep']);
 				}
-				if($opid!=''){
+				if($_POST['opid']!=''){
 					$tail[]='a.operator_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$opid);
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['opid']);
 				}
-				if($op!=''){
+				if($_POST['op']!=''){
 					$tail[]='a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$op.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['op'].'%');
 				}
-				if($from!=''){
+				if($_POST['from']!=''){
 					$tail[]='a.created_time >= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$from);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['from']);
 				}
-				if($to!=''){
+				if($_POST['to']!=''){
 					$tail[]='a.created_time <= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$to);
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['to']);
 				}
-				if($usmail!=''){
+				if($_POST['mail']!=''){
 					$tail[]='(a.user_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1) OR operator_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1))';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$usmail.'%');
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$usmail.'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['mail'].'%');
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['mail'].'%');
 				}
 				$query.=implode(' AND ',$tail);
 			}
@@ -1962,12 +1962,12 @@ else if(isset($_SESSION['status'])  && $_SESSION['status']<3 && $_POST[$_SESSION
 else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='report_ticket'){
 
 	if(trim(preg_replace('/\s+/','',strip_tags($_POST['message'])))!=''){
-		$message=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
+		$_POST['message']=preg_replace('/\s+/',' ',preg_replace('/\r\n|[\r\n]/','<br/>',$_POST['message']));
 		require_once 'htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		$purifier = new HTMLPurifier($config);
-		$message = $purifier->purify($message);
-		$check=trim(strip_tags($message));
+		$_POST['message'] = $purifier->purify($_POST['message']);
+		$check=trim(strip_tags($_POST['message']));
 		if(empty($check)){
 			$error[]='Empty Message';
 		}
@@ -1975,30 +1975,30 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 	else
 		$error[]='Empty Message';
 	
-	$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-	if($encid=='' && strlen($encid)==87)
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	if($_POST['id']=='' && strlen($_POST['id'])==87)
 		$error[]='Incorrect ID';
 
-	if(!isset($_SESSION[$encid]))
+	if(!isset($_SESSION[$_POST['id']]))
 		$error[]='No information has been found about you and the ticket';
 
 	if(!isset($error[0])){
 		try{
-			$side=($_SESSION[$encid]['usr_id']==$_SESSION['id'])? 'User':'Operator';
+			$side=($_SESSION[$_POST['id']]['usr_id']==$_SESSION['id'])? 'User':'Operator';
 			$query = "INSERT INTO ".$SupportFlagTable." (ref_id,enc_id,usr_id,side,reason) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE reason=?";
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 				
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_SESSION[$encid]['ref_id'],PDO::PARAM_STR);
-			$STH->bindParam(2,$encid,PDO::PARAM_STR);
+			$STH->bindParam(1,$_SESSION[$_POST['id']]['ref_id'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['id'],PDO::PARAM_STR);
 			$STH->bindParam(3,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->bindParam(4,$side,PDO::PARAM_STR);
-			$STH->bindParam(5,$message,PDO::PARAM_STR);	
-			$STH->bindParam(6,$message,PDO::PARAM_STR);	
+			$STH->bindParam(5,$_POST['message'],PDO::PARAM_STR);	
+			$STH->bindParam(6,$_POST['message'],PDO::PARAM_STR);	
 			$STH->execute();
 					
-			$_SESSION[$_GET['id']]['reason']=$message;
+			$_SESSION[$_GET['id']]['reason']=$_POST['message'];
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Submitted'));
 		}
@@ -2019,11 +2019,11 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 
 else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION['token']['act']]=='del_post_file'){
 	
-	$tk_id=trim(preg_replace('/\s+/','',$_POST['id']));
-	$tk_id=($tk_id!='' && strlen($tk_id)==87) ? $tk_id:exit();
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
 	
-	$file_id=trim(preg_replace('/\s+/','',$_POST['file_id']));
-	$file_id=($file_id!='' && strlen($file_id)==87) ? $file_id:exit();
+	$_POST['file_id']=trim(preg_replace('/\s+/','',$_POST['file_id']));
+	$_POST['file_id']=($_POST['file_id']!='' && strlen($_POST['file_id'])==87) ? $_POST['file_id']:exit();
 	
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -2031,8 +2031,8 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 		
 		$query = "SELECT message_id FROM ".$SupportUploadTable." WHERE `ticket_id`=? AND `enc`=? LIMIT 1";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$tk_id,PDO::PARAM_STR);
-		$STH->bindParam(2,$file_id,PDO::PARAM_STR);
+		$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR);
+		$STH->bindParam(2,$_POST['file_id'],PDO::PARAM_STR);
 		$STH->execute();
 
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -2040,14 +2040,14 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 		if(!empty($a)){
 
 			$msid=$a['message_id'];
-			$path='../upload/'.$file_id;
+			$path='../upload/'.$_POST['file_id'];
 			file_put_contents($path,'');
 			unlink($path);
 
 			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=? AND `enc`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$tk_id,PDO::PARAM_STR);
-			$STH->bindParam(2,$file_id,PDO::PARAM_STR);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['file_id'],PDO::PARAM_STR);
 			$STH->execute();
 			if($STH->rowCount()>0){
 				$query = "SELECT COUNT(*) AS qta FROM ".$SupportUploadTable." WHERE `message_id`=?";
