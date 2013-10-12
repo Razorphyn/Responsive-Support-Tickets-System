@@ -14,8 +14,10 @@
  * @author     	Razorphyn
  * @Site		http://razorphyn.com/
  */
+
 if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
-	include_once '../php/config/database.php';
+	 file_put_contents('callmail',print_r($argv[1]));
+	require_once '../php/config/database.php';
 	require_once '../lib/Swift/lib/swift_required.php';
 	if(is_file('../php/config/mail/stmp.txt')){
 		$stmp=file('../php/config/mail/stmp.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -26,7 +28,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 	}
 	if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 	if(is_file('../php/config/mail/stmp.php')) include_once('../php/config/mail/stmp.php');
-	
+
 	switch ($argv[1]){
 		case 'NewMem':
 			if(is_file('../php/config/mail/newuser.txt')){
@@ -36,7 +38,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 			else
 				exit();
 			break;
-		
+
 		case 'NewRep':
 			if(is_file('../php/config/mail/newreply.txt')){
 				$file=file('../php/config/mail/newreply.txt',FILE_IGNORE_NEW_LINES);
