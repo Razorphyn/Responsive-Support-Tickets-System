@@ -16,7 +16,7 @@
  */
 
 if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
-	 file_put_contents('callmail',print_r($argv[1]));
+
 	require_once '../php/config/database.php';
 	require_once '../lib/Swift/lib/swift_required.php';
 	if(is_file('../php/config/mail/stmp.txt')){
@@ -42,7 +42,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 		case 'NewRep':
 			if(is_file('../php/config/mail/newreply.txt')){
 				$file=file('../php/config/mail/newreply.txt',FILE_IGNORE_NEW_LINES);
-				if($argv[2]==1)//user
+				if($argv[3]==1)//user
 					$query="SELECT 
 									a.ref_id,
 									CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE 'Error' END,
@@ -167,32 +167,28 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 						$result = $stmt->bind_result($tomail, $gmane, $reg_key);
 					else if($argv[1]=='Forgot')
 						$result = $stmt->bind_result($tomail, $gmane);
-					else if($argv[1]=='NewRep' && $argv[2]==1)
-						$result = $stmt->bind_result($refid,$prio, $stat, $tit, $gmane, $allow, $dpname, $tomail, $opname);
+					else if($argv[1]=='NewRep' && $argv[3]==1)
+						$result = $stmt->bind_result($refid,$priority, $stat, $tit, $gmane, $allow, $dpname, $tomail, $opname);
 					else
-						$result = $stmt->bind_result($refid,$prio, $stat, $tit, $gmane, $dpname, $tomail, $opname);
+						$result = $stmt->bind_result($refid,$priority, $stat, $tit, $gmane, $dpname, $tomail, $opname);
 					
 					if($stmt->num_rows>0){
 						switch ($argv[1]){
 							case 'NewMem':
 								while (mysqli_stmt_fetch($stmt)){
-									$gnmail=$tomail;
-									$allow=$allow;
 									$rep=array('{USER_NAME}'=>$gmane,'{USER_ACTIVATION_LINK}'=>"<a href='".(dirname(dirname(curPageURL())))."/index.php?act=activate&reg=".$reg_key."'>Activate your Account</a>",'{USER_EMAIL}'=>$gnmail);
 								}
 								break;
 							
 							case 'Forgot':
 								while (mysqli_stmt_fetch($stmt)){
-									$gnmail=$tomail;
-									$rep=array('{USER_NAME}'=>$gmane,'{USER_EMAIL}'=>$gnmail,'{USER_RESET_LINK}'=>"<a href='".dirname(dirname(curPageURL())).'/user/reset.php?act=resetpass&key='.$argv[3]."'>Reset Password </a>");
+									$rep=array('{USER_NAME}'=>$gmane,'{USER_EMAIL}'=>$tomail,'{USER_RESET_LINK}'=>"<a href='".dirname(dirname(curPageURL())).'/user/reset.php?act=resetpass&key='.$argv[3]."'>Reset Password </a>");
 								}
 								break;
 							
 							default:
 								while (mysqli_stmt_fetch($stmt)){
-									$gnmail=$tomail;
-									$rep=array('{TICKET_REFERENCE_ID}'=>$refid,'{TICKET_OPERATOR_NAME}'=>$opname,'{TICKET_CREATOR_NAME}'=>$gmane,'{TICKET_PRIORITY}'=>$prio,'{TICKET_STATUS}'=>$stat,'{TICKET_DEPARTMENT}'=>$dpname,'{TICKET_URL}'=>dirname(dirname(curPageURL())).'/user/view.php?id='.$argv[2],'{TICKET_TITLE}'=>$tit);
+									$rep=array('{TICKET_REFERENCE_ID}'=>$refid,'{TICKET_OPERATOR_NAME}'=>$opname,'{TICKET_CREATOR_NAME}'=>$gmane,'{TICKET_PRIORITY}'=>$priority,'{TICKET_STATUS}'=>$stat,'{TICKET_DEPARTMENT}'=>$dpname,'{TICKET_URL}'=>dirname(dirname(curPageURL())).'/user/view.php?id='.$argv[2],'{TICKET_TITLE}'=>$tit);
 								}
 								break;
 						}
@@ -216,7 +212,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 							$message->setBody($plain,'text/plain');						
 							$message->addPart($file[1],'text/html');
 							
-							$message->setTo($gnmail);
+							$message->setTo($tomail);
 
 							if($smailservice==0)
 								$transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -t');

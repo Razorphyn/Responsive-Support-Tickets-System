@@ -17,7 +17,12 @@ if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !
 }
 if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
 	setcookie(session_name(),'invalid',time()-3600);
-	header("location: ../index.php?e=invalid");
+	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'sessionerror',0));
+	}
+	else
+		echo '<script>top.window.location.replace("'.curPageURL().'?e=invalid");</script>';
 	exit();
 }
 session_start(); 
@@ -28,18 +33,40 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=expired");
+	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'sessionerror',1));
+	}
+	else
+		echo '<script>top.window.location.replace("'.curPageURL().'?e=expired");</script>';
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
-	header("location: ../index.php?e=local");
+	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'sessionerror',2));
+	}
+	else
+		echo '<script>top.window.location.replace("'.curPageURL().'?e=local");</script>';
+	exit();
+}
+else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
+	session_unset();
+	session_destroy();
+	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'sessionerror',3));
+	}
+	else
+		echo '<script>top.window.location.replace("'.curPageURL().'?e=token");</script>';
 	exit();
 }
 else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
-	 header("location: ../index.php");
-	 exit();
+	header('Content-Type: application/json; charset=utf-8');
+	echo json_encode(array('Access Denied'));
+	exit();
 }
 
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);

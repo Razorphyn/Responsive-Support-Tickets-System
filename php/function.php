@@ -36,7 +36,7 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 		echo json_encode(array(0=>'sessionerror',0));
 	}
 	else
-		echo '<script>window.location.replace("'.curPageURL().'?e=invalid");</script>';
+		echo '<script>top.window.location.replace("'.curPageURL().'?e=invalid");</script>';
 	exit();
 }
 session_start(); 
@@ -56,7 +56,7 @@ else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['
 		echo json_encode(array(0=>'sessionerror',1));
 	}
 	else
-		echo '<script>window.location.replace("'.curPageURL().'?e=expired");</script>';
+		echo '<script>top.window.location.replace("'.curPageURL().'?e=expired");</script>';
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
@@ -67,7 +67,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 		echo json_encode(array(0=>'sessionerror',2));
 	}
 	else
-		echo '<script>window.location.replace("'.curPageURL().'?e=local");</script>';
+		echo '<script>top.window.location.replace("'.curPageURL().'?e=local");</script>';
 	exit();
 }
 else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
@@ -78,7 +78,7 @@ else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_
 		echo json_encode(array(0=>'sessionerror',3));
 	}
 	else
-		echo '<script>window.location.replace("'.curPageURL().'?e=token");</script>';
+		echo '<script>top.window.location.replace("'.curPageURL().'?e=token");</script>';
 	exit();
 }
 
@@ -1294,13 +1294,14 @@ else if(isset($_POST['post_reply']) && isset($_SESSION['status']) && $_SESSION['
 				
 				//Send Mail
 				if($_SESSION[$_POST['id']]['status']!=2){
+				
 					if($_SESSION['id']==$_SESSION[$_POST['id']]['usr_id']){
 						$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$_POST['id']." 0";
+						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$_POST['id']." 1";
 					}
 					else if($_SESSION[$_POST['id']]['status']==1){
 						$setting[8]=(isset($setting[8]))? $setting[8]:'php5-cli';
-						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$_POST['id']." 1";
+						$ex=$setting[8]." ".dirname(__FILE__)."/sendmail.php NewRep ".$_POST['id']." 0";
 					}
 					
 					if(isset($ex)){
