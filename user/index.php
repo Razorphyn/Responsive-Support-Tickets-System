@@ -320,6 +320,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						
 					<?php } ?>
 				}
+				else if(a[0]=='sessionerror'){
+					switch(a[1]){
+						case 0:
+							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+							break;
+						case 1:
+							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+							break;
+						case 2:
+							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+							break;
+						case 3:
+							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+							break;
+					}
+				}
 				else
 					noty({text:a[0],type:"error",timeout:9E3});
 			}
@@ -332,7 +348,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				$(this).hide(400);
 				$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 			});
-			//setTimeout(function(){
+
 				$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:1},dataType : 'json',
 					success : function (a) {
 						if(a.response=='ret'){
@@ -359,13 +375,28 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								
 							<?php } ?>
 						}
+						else if(a[0]=='sessionerror'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
 						else
 							noty({text:a[0],type:"error",timeout:9E3});
 					}
 				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 				
 				$.when($('.loading').remove()).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
-			//},800);
 		});
 		
 		$(document).on('click','#tkclosed', function(){
@@ -375,7 +406,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				$(this).hide(400);
 				$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 			});
-			//setTimeout(function(){
+
 				$.when(
 					$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:0},dataType : 'json',
 						success : function (a) {
@@ -403,6 +434,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								
 								<?php } ?>
 							}
+							else if(a[0]=='sessionerror'){
+								switch(a[1]){
+									case 0:
+										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+										break;
+									case 1:
+										window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+										break;
+									case 2:
+										window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+										break;
+									case 3:
+										window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+										break;
+								}
+							}
 							else
 								noty({text:a[0],type:"error",timeout:9E3});
 						}
@@ -410,7 +457,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 
 					$('.loading').remove()
 				).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
-			//},800);
+
 		});
 
 		<?php if($_SESSION['status']==2){ ?>
@@ -423,7 +470,6 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 				});
 				
-			//	setTimeout(function(){
 					$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:2},dataType : 'json',
 						success : function (a) {
 							if(a.response=='ret'){
@@ -450,13 +496,29 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								
 								<?php } ?>
 							}
+							else if(data[0]=='sessionerror'){
+								switch(data[1]){
+									case 0:
+										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+										break;
+									case 1:
+										window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+										break;
+									case 2:
+										window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+										break;
+									case 3:
+										window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+										break;
+								}
+							}
 							else
-							noty({text:a[0],type:"error",timeout:9E3});
+								noty({text:a[0],type:"error",timeout:9E3});
 						}
 					}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 					
 					$.when($('.loading').remove()).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
-			//	},800);
+
 			});
 		
 			$(document).on("click", "#aut_ass_tk", function () {
@@ -466,7 +528,29 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					data: { <?php echo $_SESSION['token']['act']; ?> : "automatic_assign_ticket"},
 					dataType: "json",
 					success: function (a) {
-						"Assigned" == a[0] ? confirm("Do you want to refresh the page to see the changes?") && (window.location = "<?php echo curPageURL(); ?>") : noty({text: a[0],type: "error",timeout: 9E3})
+						if("Assigned" == a[0]){
+							if(confirm("Do you want to refresh the page to see the changes?"))
+								window.location = "<?php echo curPageURL(); ?>";
+						}
+						else if(data[0]=='sessionerror'){
+							switch(data[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else
+							noty({text: a[0],type: "error",timeout: 9E3});
+						
 					}
 				}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})})
 			});		
@@ -481,7 +565,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			var table=$(this).parent().parent().parent().parent().parent().parent().attr('id');
 			var pos=$('#'+table).dataTable().fnGetPosition(this.parentNode.parentNode.parentNode.parentNode,null,true);
 			if(confirm('Do you want to delete this tickets all the the related information?')){
-				var request= $.ajax({
+				$.ajax({
 					type: 'POST',
 					url: '../php/function.php',
 					data: {<?php echo $_SESSION['token']['act']; ?>:'delete_ticket',enc:enc},
@@ -495,11 +579,26 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								});
 							}
 						}
+						else if(data[0]=='sessionerror'){
+							switch(data[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
 						else
 							noty({text: 'Ticket cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
 					}
-				});
-				request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			}
 		});
 		
@@ -573,7 +672,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			var stat= dom.find('select[name="edit_depa_active"]').val();
 			var prio= dom.find('select[name="edit_depa_public"]').val();
 			if(tit.replace(/\s+/g,'')!=''){
-				var request= $.ajax({
+				$.ajax({
 					type: 'POST',
 					url: '../php/function.php',
 					data: {<?php echo $_SESSION['token']['act']; ?>:'update_ticket_index',id:id,title:tit,status:stat,priority:prio},
@@ -613,11 +712,26 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							}
 								
 						}
+						else if(data[0]=='sessionerror'){
+							switch(data[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
 						else
 							noty({text: data[0],type:'error',timeout:9000});
 					}
-				});
-				request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			}
 			else
 				noty({text: 'Form Error - Empty Title',type:'error',timeout:9000});
@@ -626,7 +740,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		$(document).on('click',".viewtk",function(){
 			var id=$(this).val();
 			if(id.match(/[a-z0-9.]{87}/g,id))
-				window.location="<?php echo $siteurl.'/user/view.php?id=';?>"+id;
+				window.location.replace="<?php echo $siteurl.'/user/view.php?id=';?>"+id;
 			else
 				noty({text: 'Invalid Ticket ID',type:'error',timeout:9000});
 		});
