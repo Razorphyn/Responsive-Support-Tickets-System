@@ -44,6 +44,7 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']>2){
 	 exit();
 }
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
+
 $siteurl=dirname(curPageURL());
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];

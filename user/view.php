@@ -551,7 +551,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				success: function (b) {
 					if("Updated" == b[0])
 						$(".pagefun").text(b[1])
-					else if(b[0]=='sessionex'){
+					else if(b[0]=='sessionerror'){
 						switch(b[1]){
 							case 0:
 								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -587,7 +587,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				success: function (b) {
 					if("Updated" == b[0])
 						noty({text: "Updated",type: "success",timeout: 9E3})
-					else if(b[0]=='sessionex'){
+					else if(b[0]=='sessionerror'){
 						switch(b[1]){
 							case 0:
 								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -638,7 +638,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 								par.parent().remove();
 							noty({text: 'The file has been deleted',type:'success',timeout:9000});
 						}
-						else if(a[0]=='sessionex'){
+						else if(a[0]=='sessionerror'){
 							switch(a[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -687,7 +687,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					success : function (a) {
 						if(a[0]=='Moved')
 							noty({text: 'Moved',type:'success',timeout:9000})
-						else if(a[0]=='sessionex'){
+						else if(a[0]=='sessionerror'){
 							switch(a[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");

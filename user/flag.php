@@ -196,7 +196,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reference ID",mDataProp:"ref_id",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reference ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reporter Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Mail: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reporter Role",mDataProp:"role",sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Role: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Comment",mDataProp:"reason",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Comment: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1, sWidth:"120px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]
 					})
 				}
-				else if(a[0]=='sessionex'){
+				else if(a[0]=='sessionerror'){
 					switch(a[1]){
 						case 0:
 							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -240,7 +240,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 										$('#'+fid).remove();
 										table.fnDeleteRow(pos);
 									}
-									else if(data[0]=='sessionex'){
+									else if(data[0]=='sessionerror'){
 										switch(data[1]){
 											case 0:
 												window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");

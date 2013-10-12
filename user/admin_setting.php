@@ -293,7 +293,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								$("#todeldate").val("");
 								noty({text:"The files has been deleted", type:"error", timeout:9E3});
 							}
-							else if(b[0]=='sessionex'){
+							else if(b[0]=='sessionerror'){
 								switch(b[1]){
 									case 0:
 										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -338,7 +338,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				success:function(b){
 					if("Saved"==b[0])
 						noty({text:"Saved",type:"success",timeout:9E3})
-					else if(b[0]=='sessionex'){
+					else if(b[0]=='sessionerror'){
 						switch(b[1]){
 							case 0:
 								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");

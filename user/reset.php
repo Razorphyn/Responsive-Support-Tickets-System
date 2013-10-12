@@ -115,7 +115,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 						success: function (a) {
 							if("Updated" == a[0]
 								window.location = "<?php echo dirname(curPageURL()); ?>"
-							else if(a[0]=='sessionex'){
+							else if(a[0]=='sessionerror'){
 								switch(a[1]){
 									case 0:
 										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");

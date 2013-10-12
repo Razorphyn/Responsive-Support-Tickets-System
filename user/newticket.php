@@ -230,7 +230,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						else if("empty" == a.response){
 							 $("#loading").remove(), $("#createticket").html("<p>Sorry, you cannot open a new ticket because: " + a[1] + "</p>");
 						}
-						else if(a[0]=='sessionex'){
+						else if(a[0]=='sessionerror'){
 							switch(a[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");

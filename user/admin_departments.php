@@ -213,7 +213,7 @@ $stmp[8]=implode('',$stmp[8]);
 											aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]}
 						)
 				}
-				else if(a[0]=='sessionex'){
+				else if(a[0]=='sessionerror'){
 					switch(a[1]){
 						case 0:
 							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -267,7 +267,7 @@ $stmp[8]=implode('',$stmp[8]);
 							success : function (data) {
 								if(data[0]=='Deleted')
 									table.fnDeleteRow(pos)
-								else if(data[0]=='sessionex'){
+								else if(data[0]=='sessionerror'){
 									switch(data[1]){
 										case 0:
 											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -299,7 +299,7 @@ $stmp[8]=implode('',$stmp[8]);
 							success : function (data) {
 								if(data[0]=='Deleted')
 									table.fnDeleteRow(pos)
-								else if(data[0]=='sessionex'){
+								else if(data[0]=='sessionerror'){
 									switch(data[1]){
 										case 0:
 											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -347,7 +347,7 @@ $stmp[8]=implode('',$stmp[8]);
 							table.fnAddData(a.information),
 							$("#depname").val("")
 						}
-						else if(a[0]=='sessionex'){
+						else if(a[0]=='sessionerror'){
 							switch(a[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -391,7 +391,7 @@ $stmp[8]=implode('',$stmp[8]);
 						a.prev().remove(), 
 						a.remove()
 					}
-					else if(e[0]=='sessionex'){
+					else if(e[0]=='sessionerror'){
 						switch(e[1]){
 							case 0:
 								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -429,7 +429,7 @@ $stmp[8]=implode('',$stmp[8]);
 							table.fnAddData(a.information),
 							$("#depname").val("")
 						}
-						else if(a[0]=='sessionex'){
+						else if(a[0]=='sessionerror'){
 							switch(a[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");

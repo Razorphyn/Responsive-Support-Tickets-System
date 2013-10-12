@@ -280,7 +280,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					$("#loading").remove(),
 					$("#dep").append(a.information)
 				}
-				else if(a[0]=='sessionex'){
+				else if(a[0]=='sessionerror'){
 					switch(a[1]){
 						case 0:
 							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -327,7 +327,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								});
 							}
 						}
-						else if(data[0]=='sessionex'){
+						else if(data[0]=='sessionerror'){
 							switch(data[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -436,7 +436,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							dom.prev().remove();
 							dom.remove();
 						}
-						else if(data[0]=='sessionex'){
+						else if(data[0]=='sessionerror'){
 							switch(data[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -514,7 +514,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											})
 									$(".rescont").css("display","block")
 								}
-								else if(data[0]=='sessionex'){
+								else if(data[0]=='sessionerror'){
 									switch(data[1]){
 										case 0:
 											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");

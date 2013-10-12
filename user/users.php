@@ -204,7 +204,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						}]
 					})
 				}
-				else if(a[0]=='sessionex'){
+				else if(a[0]=='sessionerror'){
 					switch(a[1]){
 						case 0:
 							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -249,7 +249,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							a[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a[1]['num'] + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + a[1]['num'] + '"><i class="icon-remove"></i></button></div>';
 							table.fnAddData(a[1]);
 						}
-						else if(a[0]=='sessionex'){
+						else if(a[0]=='sessionerror'){
 							switch(a[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -325,7 +325,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						a.prev().remove(),
 						a.remove()
 					}
-					else if(d[0]=='sessionex'){
+					else if(d[0]=='sessionerror'){
 						switch(d[1]){
 							case 0:
 								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -369,7 +369,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							success : function (data) {
 								if(data[0]=='Deleted')
 									table.fnDeleteRow(pos);
-								else if(data[0]=='sessionex'){
+								else if(data[0]=='sessionerror'){
 									switch(data[1]){
 										case 0:
 											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -419,7 +419,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						a.parent().find(".loading").remove(), 
 						a.after(b.depa.join(""))
 					}
-					else if(b[0]=='sessionex'){
+					else if(b[0]=='sessionerror'){
 						switch(b[1]){
 							case 0:
 								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -467,7 +467,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							else
 								a.after("<br/><p>This user hasn't got any rating");
 						}
-						else if(b[0]=='sessionex'){
+						else if(b[0]=='sessionerror'){
 							switch(b[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");

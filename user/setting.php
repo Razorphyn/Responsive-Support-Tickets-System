@@ -202,7 +202,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									$('#ckpass').val(''),
 									noty({text:"Saved",type:"success", timeout:9E3})
 								}
-								else if(a[0]=='sessionex'){
+								else if(a[0]=='sessionerror'){
 									switch(a[1]){
 										case 0:
 											window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -234,7 +234,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						success:function(a){
 							if("Saved"==a[0])
 								noty({text:"Saved",type:"success",timeout:9E3})
-							else if(a[0]=='sessionex'){
+							else if(a[0]=='sessionerror'){
 								switch(a[1]){
 									case 0:
 										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
@@ -276,7 +276,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								noty({text: 'The account has been deleted, bye bye',type:'success',timeout:3E3});
 								setTimeout(function() {location.reload();}, 2500);
 							}
-							else if(a[0]=='sessionex'){
+							else if(a[0]=='sessionerror'){
 								switch(a[1]){
 									case 0:
 										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
