@@ -119,17 +119,17 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='admin_user_add'){
-		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
-		if(empty($mustang)){
+		$_POST['name']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		if(empty($_POST['name'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
-		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		$viper=($viper!='' && filter_var($viper, FILTER_VALIDATE_EMAIL)) ? $viper:exit();
+		$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+		$_POST['mail']=($_POST['mail']!='' && filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)) ? $_POST['mail']:exit();
 		$pass=get_random_string(5);
 		$dpass=hash('whirlpool',crypt($pass,'$#%H4!df84a$%#RZ@£'));
-		$staus=(is_numeric($_POST['role']))? $_POST['role']:exit();
+		$_POST['role']=(is_numeric($_POST['role']))? $_POST['role']:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -137,25 +137,25 @@ else{
 			$query = "INSERT INTO ".$SupportUserTable." (`name`,`mail`,`password`,`status`,`ip_address`) VALUES (?,?,?,?,?) ";
 			$STH = $DBH->prepare($query);
 			$ip='127.0.0.1';
-			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
-			$STH->bindParam(2,$viper,PDO::PARAM_STR);
+			$STH->bindParam(1,$_POST['name'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['mail'],PDO::PARAM_STR);
 			$STH->bindParam(3,$dpass,PDO::PARAM_STR);
-			$STH->bindParam(4,$staus,PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['role'],PDO::PARAM_STR);
 			$STH->bindParam(5,$ip,PDO::PARAM_STR);
 			$STH->execute();
 			$uid=$DBH->lastInsertId();
-			switch($staus){
+			switch($_POST['role']){
 				case 0:
-					$staus='User';
+					$_POST['role']='User';
 					break;
 				case 1:
-					$staus='Operator';
+					$_POST['role']='Operator';
 					break;
 				case 2:
-					$staus='Administrator';
+					$_POST['role']='Administrator';
 					break;
 				default:
-					$staus='Error';
+					$_POST['role']='Error';
 			}
 			
 
@@ -167,17 +167,17 @@ else{
 				$headers[] = "From: ".$setting[1];
 			$headers[] = "X-Mailer: PHP/".phpversion();
 
-			$body="Hi,\r\n\r\nan account has been just created at this site: ".$site." \r\nThese are the information:\r\n Name: ".$mustang."\r\n Mail: ".$viper." \r\n Password: ".$pass." \r\n\r\nBest Regards, \r\n ".$_SESSION['name']." Site Administrator";
-			if(!mail($viper,'Account created by Administrator',$body,implode("\r\n", $headers)))
-				file_put_contents('mailsendadminerror','Couldn\'t send mail to: '.$viper);
+			$body="Hi,\r\n\r\nan account has been just created at this site: ".$site." \r\nThese are the information:\r\n Name: ".$_POST['name']."\r\n Mail: ".$_POST['mail']." \r\n Password: ".$pass." \r\n\r\nBest Regards, \r\n ".$_SESSION['name']." Site Administrator";
+			if(!mail($_POST['mail'],'Account created by Administrator',$body,implode("\r\n", $headers)))
+				file_put_contents('mailsendadminerror','Couldn\'t send mail to: '.$_POST['mail']);
 			
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($viper,ENT_QUOTES,'UTF-8'),'status'=>$staus,'holiday'=>'No','rating'=>'Unrated')));
+			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($_POST['mail'],ENT_QUOTES,'UTF-8'),'status'=>$_POST['role'],'holiday'=>'No','rating'=>'Unrated')));
 		}
 		catch(PDOException $e){
 			if((int)$e->getCode()==1062){
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>"User with mail: ".htmlspecialchars($viper,ENT_QUOTES,'UTF-8')." is already registred"));
+				echo json_encode(array(0=>"User with mail: ".htmlspecialchars($_POST['mail'],ENT_QUOTES,'UTF-8')." is already registred"));
 			}
 			else{
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -191,37 +191,37 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='add_depart'){//check
-		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
-		if(empty($mustang)){
+		$_POST['tit']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
+		if(empty($_POST['tit'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
-		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
-		$public=(is_numeric($_POST['pubdep']))? $_POST['pubdep']:exit();
+		$_POST['active']=(is_numeric($_POST['active']))? $_POST['active']:exit();
+		$_POST['pubdep']=(is_numeric($_POST['pubdep']))? $_POST['pubdep']:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 			$query = "INSERT INTO ".$SupportDepaTable."(`department_name`,`active`,`public_view`) VALUES (?,?,?)";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
-			$STH->bindParam(2,$active,PDO::PARAM_STR);
-			$STH->bindParam(3,$public,PDO::PARAM_STR);
+			$STH->bindParam(1,$_POST['tit'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['active'],PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['pubdep'],PDO::PARAM_STR);
 			$STH->execute();
 			$data=array();
 			$data['response']='Added';
 			$dpid=$DBH->lastInsertId();
-			$active=((int)$active==0) ? 'No':'Yes';
-			$public=((int)$public==0) ? 'No':'Yes';
-			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'active'=>$active,'public'=>$public);
+			$_POST['active']=($active==0) ? 'No':'Yes';
+			$_POST['pubdep']=($_POST['pubdep']==0) ? 'No':'Yes';
+			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pubdep']);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($data);
 		}
 		catch(PDOException $e){
 			if((int)$e->getCode()==1062){
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($mustang,ENT_QUOTES,'UTF-8')." already exist"));
+				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8')." already exist"));
 			}
 			else{
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -233,35 +233,35 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='edit_depart'){//check
-		$camaro=(is_numeric($_POST['id'])) ? (int)$_POST['id']:exit();
-		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
-		if(empty($mustang)){
+		$_POST['id']=(is_numeric($_POST['id'])) ? (int)$_POST['id']:exit();
+		$_POST['name']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		if(empty($_POST['name'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
-		$active=(is_numeric($_POST['active'])) ? $_POST['active']:exit();
-		$public=(is_numeric($_POST['pub'])) ? $_POST['pub']:exit();
+		$_POST['active']=(is_numeric($_POST['active'])) ? $_POST['active']:exit();
+		$_POST['pub']=(is_numeric($_POST['pub'])) ? $_POST['pub']:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 			$query = "UPDATE ".$SupportDepaTable." SET `department_name`=?,`active`=?,`public_view`=? WHERE id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
-			$STH->bindParam(2,$active,PDO::PARAM_STR);
-			$STH->bindParam(3,$public,PDO::PARAM_STR);
-			$STH->bindParam(4,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['name'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['active'],PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['pub'],PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
-			$active=((int)$active==0) ? 'No':'Yes';
-			$public=((int)$public==0) ? 'No':'Yes';
+			$_POST['active']=($_POST['active']==0) ? 'No':'Yes';
+			$_POST['pub']=($_POST['pub']==0) ? 'No':'Yes';
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Succeed',1=>array('id'=>$camaro,'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'active'=>$active,'public'=>$public)));
+			echo json_encode(array(0=>'Succeed',1=>array('id'=>$_POST['id'],'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pub'])));
 		}
 		catch(PDOException $e){
 			if((int)$e->getCode()==1062){
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>"Department name: ".json_encode($mustang, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS)." already exist"));
+				echo json_encode(array(0=>"Department name: ".json_encode($_POST['name'], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS)." already exist"));
 			}
 			else{
 				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -273,23 +273,23 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='del_dep'){//check
-	$sub=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
-	$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']:exit();
+	$_POST['sub']=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
+	$_POST['id']=(is_numeric($_POST['id']))? (int)$_POST['id']:exit();
 	
 	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-		if($sub=='del_name'){
+		if($_POST['sub']=='del_name'){
 			try{
 				$sedquery="DELETE FROM ".$SupportUserPerDepaTable." WHERE `department_id`=?;";
 				$delquery="DELETE FROM ".$SupportDepaTable." WHERE `id`= ?  ;";
 				
 				$STH = $DBH->prepare($sedquery);
-				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
 				
 				$STH = $DBH->prepare($delquery);
-				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Deleted'));
@@ -300,22 +300,22 @@ else{
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
 		}
-		else if($sub=='del_every'){
+		else if($_POST['sub']=='del_every'){
 			$sedquery="DELETE FROM ".$SupportUserPerDepaTable." WHERE `department_id`=?";
 			$delquery="DELETE FROM ".$SupportDepaTable." WHERE `id`= ?";
 			$seltk="SELECT id FROM ".$SupportTicketsTable." WHERE `department_id`= ?";
 			$deltk="DELETE FROM ".$SupportTicketsTable." WHERE `department_id`= ?";
 			try{
 				$STH = $DBH->prepare($sedquery);
-				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
 			
 				$STH = $DBH->prepare($delquery);
-				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
 				
 				$STH = $DBH->prepare($seltk);
-				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
 				
 				$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -330,7 +330,7 @@ else{
 					$list=implode(',',$list);
 					
 					$STH = $DBH->prepare($deltk);
-					$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+					$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 					$STH->execute();
 					
 					$delmsg="DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id` IN (".$list.")";
@@ -380,26 +380,26 @@ else{
 }
 
 	else if($_POST[$_SESSION['token']['act']]=='save_options'){
-		$senreply=(is_numeric($_POST['senrep'])) ? (int)$_POST['senrep']:exit();
-		$senope=(is_numeric($_POST['senope'])) ? (int)$_POST['senope']:exit();
-		$upload=(is_numeric($_POST['upload'])) ? (int)$_POST['upload']:exit();
-		$faq=(is_numeric($_POST['faq'])) ? (int)$_POST['faq']:exit();
-		$maxsize=(is_numeric($_POST['maxsize'])) ? ($_POST['maxsize']*1048576 ):null;
-		$enrat=(is_numeric($_POST['enrat'])) ? $_POST['enrat']:exit();
-		$commlop=(trim(preg_replace('/\s+/',' ',$_POST['commlop']))=='php -f')? 'php -f':'php5-cli';
-		$tit=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
-		if(empty($tit)){
+		$_POST['senrep']=(is_numeric($_POST['senrep'])) ? (int)$_POST['senrep']:exit();
+		$_POST['senope']=(is_numeric($_POST['senope'])) ? (int)$_POST['senope']:exit();
+		$_POST['upload']=(is_numeric($_POST['upload'])) ? (int)$_POST['upload']:exit();
+		$_POST['faq']=(is_numeric($_POST['faq'])) ? (int)$_POST['faq']:exit();
+		$_POST['maxsize']=(is_numeric($_POST['maxsize'])) ? ($_POST['maxsize']*1048576 ):null;
+		$_POST['enrat']=(is_numeric($_POST['enrat'])) ? $_POST['enrat']:exit();
+		$_POST['commlop']=(trim(preg_replace('/\s+/',' ',$_POST['commlop']))=='php -f')? 'php -f':'php5-cli';
+		$_POST['tit']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
+		if(empty($_POST['tit'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Title'));
 			exit();
 		}
-		$amail= trim(preg_replace('/\s+/','',$_POST['mail']));
-		if(empty($amail) || !filter_var($amail, FILTER_VALIDATE_EMAIL)){
+		$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+		if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
 		}
-		if(file_put_contents('config/setting.txt',$tit."\n".$amail."\n".$senreply."\n".$senope."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$maxsize."\n".$enrat."\n".$commlop."\n".$faq)){
+		if(file_put_contents('config/setting.txt',$_POST['tit']."\n".$_POST['mail']."\n".$_POST['senrep']."\n".$_POST['senope']."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$_POST['maxsize']."\n".$_POST['enrat']."\n".$_POST['commlop']."\n".$_POST['faq'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
 		}
@@ -415,37 +415,37 @@ else{
 			file_put_contents('config/mail/stmp.txt','');
 			unlink('config/mail/stmp.txt');
 		}
-		$serv=(is_numeric($_POST['serv'])) ? (int)$_POST['serv']:exit();
-		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
-		if(empty($mustang)){
+		$_POST['serv']=(is_numeric($_POST['serv'])) ? (int)$_POST['serv']:exit();
+		$_POST['name']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		if(empty($_POST['name'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
-		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
+		$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+		if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
 		}
-		$host=(trim(preg_replace('/\s+/','',$_POST['host']))!='')? trim(preg_replace('/\s+/','',$_POST['host'])):exit();
-		$port=(is_numeric(filter_var($_POST['port'], FILTER_SANITIZE_NUMBER_INT))) ? filter_var($_POST['port'], FILTER_SANITIZE_NUMBER_INT):exit();
-		$ssl=(is_numeric($_POST['ssl'])) ? $_POST['ssl']:exit();
-		$auth=(is_numeric($_POST['auth'])) ? $_POST['auth']:exit();
+		$_POST['host']=(trim(preg_replace('/\s+/','',$_POST['host']))!='')? trim(preg_replace('/\s+/','',$_POST['host'])):exit();
+		$_POST['port']=(is_numeric(filter_var($_POST['port'], FILTER_SANITIZE_NUMBER_INT))) ? filter_var($_POST['port'], FILTER_SANITIZE_NUMBER_INT):exit();
+		$_POST['ssl']=(is_numeric($_POST['ssl'])) ? $_POST['ssl']:exit();
+		$_POST['auth']=(is_numeric($_POST['auth'])) ? $_POST['auth']:exit();
 		
-		$usr=(string)$_POST['usr'];
-		$pass=(string)$_POST['pass'];
+		$_POST['usr']=(string)$_POST['usr'];
+		$_POST['pass']=(string)$_POST['pass'];
 		if(trim(preg_replace('/\s+/','',$_POST['pass']))!=''){
 			$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
-			$pass=str_split($pass);
-			$c=count($pass);
+			$_POST['pass']=str_split($_POST['pass']);
+			$c=count($_POST['pass']);
 			for($i=0;$i<$c;$i++){
-				if(array_key_exists($pass[$i],$crypttable))
-					$pass[$i]=$crypttable[$crypttable[$pass[$i]]];
+				if(array_key_exists($_POST['pass'][$i],$crypttable))
+					$_POST['pass'][$i]=$crypttable[$crypttable[$_POST['pass'][$i]]];
 			}
-			$pass=implode('',$pass);
+			$_POST['pass']=implode('',$_POST['pass']);
 		}
-		$string='<?php $smailservice='.$serv.";\n".'$smailname=\''.$mustang."';\n".'$settingmail=\''.$viper."';\n".'$smailhost=\''.$host."';\n".'$smailport='.$port.";\n".'$smailssl='.$ssl.";\n".'$smailauth='.$auth.";\n".'$smailuser=\''.$mustang."';\n".'$smailpassword=\''.$mustang."';\n ?>";
+		$string='<?php $smailservice='.$_POST['serv'].";\n".'$smailname=\''.$_POST['name']."';\n".'$settingmail=\''.$_POST['mail']."';\n".'$smailhost=\''.$_POST['host']."';\n".'$smailport='.$_POST['port'].";\n".'$smailssl='.$_POST['ssl'].";\n".'$smailauth='.$_POST['auth'].";\n".'$smailuser=\''.$_POST['usr']."';\n".'$smailpassword=\''.$_POST['pass']."';\n ?>";
 		if(file_put_contents('config/mail/stmp.php',$string)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
@@ -458,14 +458,14 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='save_mail_body'){
-		$sub=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
+		$_POST['sub']=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
 		if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
-			$mess=trim(preg_replace('/\s+/',' ',$_POST['message']));
+			$_POST['message']=trim(preg_replace('/\s+/',' ',$_POST['message']));
 			require_once 'htmlpurifier/HTMLPurifier.auto.php';
 			$config = HTMLPurifier_Config::createDefault();
 			$purifier = new HTMLPurifier($config);
-			$mess = $purifier->purify($mess);
-			$check=trim(strip_tags($mess));
+			$_POST['message'] = $purifier->purify($_POST['message']);
+			$check=trim(strip_tags($_POST['message']));
 			if(empty($check)){
 				$error[]='Empty Message';
 			}
@@ -473,15 +473,15 @@ else{
 		else
 			$error[]='Empty Message';
 		$act=(is_numeric($_POST['sec']))? $_POST['sec']:exit();
-		if($act==0 && file_put_contents('config/mail/newuser.txt',$sub."\n".$mess))
+		if($act==0 && file_put_contents('config/mail/newuser.txt',$_POST['sub']."\n".$_POST['message']))
 			$saved=true;
-		else if($act==1 && file_put_contents('config/mail/newreply.txt',$sub."\n".$mess))
+		else if($act==1 && file_put_contents('config/mail/newreply.txt',$_POST['sub']."\n".$_POST['message']))
 			$saved=true;
-		else if($act==2 && file_put_contents('config/mail/newticket.txt',$sub."\n".$mess))
+		else if($act==2 && file_put_contents('config/mail/newticket.txt',$_POST['sub']."\n".$_POST['message']))
 			$saved=true;
-		else if($act==3 && file_put_contents('config/mail/assigned.txt',$sub."\n".$mess))
+		else if($act==3 && file_put_contents('config/mail/assigned.txt',$_POST['sub']."\n".$_POST['message']))
 			$saved=true;
-		else if($act==4 && file_put_contents('config/mail/forgotten.txt',$sub."\n".$mess))
+		else if($act==4 && file_put_contents('config/mail/forgotten.txt',$_POST['sub']."\n".$_POST['message']))
 			$saved=true;
 		else
 			$saved=false;
@@ -494,7 +494,6 @@ else{
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Error'));
 		}
-
 		exit();
 	}
 
@@ -556,56 +555,64 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='update_user_info'){
-		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
-		$mustang=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
-		if(empty($mustang)){
+		$_POST['id']=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
+		$_POST['name']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
+		if(empty($_POST['name'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
-		$viper= trim(preg_replace('/\s+/','',$_POST['mail']));
-		if(empty($viper) || !filter_var($viper, FILTER_VALIDATE_EMAIL)){
+		$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+		if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
 		}
-		$charger=(is_numeric($_POST['status'])) ? (string)$_POST['status']:exit();
-		$holiday=(is_numeric($_POST['holiday'])) ? (string)$_POST['holiday']:exit();
-		$seldepa=$_POST['seldepa'];
+		$_POST['status']=(is_numeric($_POST['status'])) ? (string)$_POST['status']:exit();
+		$_POST['holiday']=(is_numeric($_POST['holiday'])) ? (string)$_POST['holiday']:exit();
+		$_POST['seldepa']=array_filter($_POST['seldepa'],'is_numeric');
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		
 			$query = "UPDATE ".$SupportUserTable." SET name=?,mail=?,status=?,holiday=?  WHERE id=? LIMIT 1";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$mustang,PDO::PARAM_STR);
-			$STH->bindParam(2,$viper,PDO::PARAM_STR);
-			$STH->bindParam(3,$charger,PDO::PARAM_STR);
-			$STH->bindParam(4,$holiday,PDO::PARAM_STR);
-			$STH->bindParam(5,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['name'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['mail'],PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['status'],PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['holiday'],PDO::PARAM_STR);
+			$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
-			if($charger=='1' && count($seldepa)>0){
+			if($_POST['status']=='1' && count($_POST['seldepa'])>0){
 				$query = "INSERT INTO ".$SupportUserPerDepaTable." (`department_name`, `department_id` , `user_id`) VALUES ";
-				$count=count($seldepa);
+				$count=count($_POST['seldepa']);
+				$a=array();
 				for($i=0;$i<$count;$i++){
 					if ($i!=$count-1)
-						$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id='.((int)$seldepa[$i]).'),'.((int)$seldepa[$i]).','.((int)$camaro).'),';
+						$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id=?),?,?),';
 					else
-						$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id='.((int)$seldepa[$i]).'),'.((int)$seldepa[$i]).','.((int)$camaro).')';
+						$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id=?),?,?)';
+					$a[]=array($_POST['seldepa'][$i],$_POST['id']);
 				}
 				$STH = $DBH->prepare($query);
+				$count=count($a);
+				for($i=0;$i<$count;$i++){
+					$STH->bindParam($i+1,$a[$i][0],PDO::PARAM_INT);
+					$STH->bindParam($i+2,$a[$i][0],PDO::PARAM_INT);
+					$STH->bindParam($i+3,$a[$i][1],PDO::PARAM_INT);
+				}
 				$STH->execute();
-				$camarolist=join(',',$seldepa);
-				
+				$camarolist=join(',',$_POST['seldepa']);
+
 				$query="SELECT id,department_id,user_id FROM ".$SupportTicketsTable." WHERE ticket_status='1' AND operator_id=? AND department_id NOT IN (".$camarolist.")";
 				$STH = $DBH->prepare($query);
-				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
 				
 				$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -624,7 +631,7 @@ else{
 					$query = "UPDATE ".$SupportUserTable." SET assigned_tickets=(assigned_tickets-?)  WHERE id=?";
 					$STH = $DBH->prepare($query);
 					$STH->bindParam(1,$sub,PDO::PARAM_INT);
-					$STH->bindParam(2,$camaro,PDO::PARAM_INT);
+					$STH->bindParam(2,$_POST['id'],PDO::PARAM_INT);
 					$STH->execute();
 					
 					foreach($tktoedit as $k=>$v){
@@ -653,107 +660,107 @@ else{
 							$STH->execute();
 						}
 					}
-					$holiday=($holiday==1)? 'Yes':'No';
-					switch($charger){
+					$_POST['holiday']=($_POST['holiday']==1)? 'Yes':'No';
+					switch($_POST['status']){
 						case 0:
-							$charger='User';
+							$_POST['status']='User';
 							break;
 						case 1:
-							$charger='Operator';
+							$_POST['status']='Operator';
 							break;
 						case 2:
-							$charger='Administrator';
+							$_POST['status']='Administrator';
 							break;
 						case 3:
-							$charger='Activation';
+							$_POST['status']='Activation';
 							break;
 						case 4:
-							$charger='Banned';
+							$_POST['status']='Banned';
 							break;
 						default:
-							$charger='Error';
+							$_POST['status']='Error';
 					}
 					header('Content-Type: application/json; charset=utf-8');
-					echo json_encode(array(0=>'Updated',1=>array('num'=>($camaro-54),'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
+					echo json_encode(array(0=>'Updated',1=>array('num'=>($_POST['id']-54),'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'mail'=>$_POST['mail'],'status'=>$_POST['status'],'holiday'=>$_POST['holiday'])));
 				}
 				else{
 					
-					$holiday=($holiday==1)? 'Yes':'No';
-					switch($charger){
+					$_POST['holiday']=($_POST['holiday']==1)? 'Yes':'No';
+					switch($_POST['status']){
 						case 0:
-							$charger='User';
+							$_POST['status']='User';
 							break;
 						case 1:
-							$charger='Operator';
+							$_POST['status']='Operator';
 							break;
 						case 2:
-							$charger='Administrator';
+							$_POST['status']='Administrator';
 							break;
 						case 3:
-							$charger='Activation';
+							$_POST['status']='Activation';
 							break;
 						case 4:
-							$charger='Banned';
+							$_POST['status']='Banned';
 							break;
 						default:
-							$charger='Error';
+							$_POST['status']='Error';
 					}
 					header('Content-Type: application/json; charset=utf-8');
-					echo json_encode(array(0=>'Updated',1=>array('num'=>($camaro-54),'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
+					echo json_encode(array(0=>'Updated',1=>array('num'=>($_POST['id']-54),'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'mail'=>$_POST['mail'],'status'=>$_POST['status'],'holiday'=>$_POST['holiday'])));
 				}
 			}
-			else if($charger!=1 && $charger!=2){
+			else if($_POST['status']!=1 && $_POST['status']!=2){
 				$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN ticket_status='1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
 				$STH = $DBH->prepare($query);
-				$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
 
-				$holiday=($holiday==1)? 'Yes':'No';
-				switch($charger){
+				$_POST['holiday']=($_POST['holiday']==1)? 'Yes':'No';
+				switch($_POST['status']){
 					case 0:
-						$charger='User';
+						$_POST['status']='User';
 						break;
 					case 1:
-						$charger='Operator';
+						$_POST['status']='Operator';
 						break;
 					case 2:
-						$charger='Administrator';
+						$_POST['status']='Administrator';
 						break;
 					case 3:
-						$charger='Activation';
+						$_POST['status']='Activation';
 						break;
 					case 4:
-						$charger='Banned';
+						$_POST['status']='Banned';
 						break;
 					default:
-						$charger='Error';
+						$_POST['status']='Error';
 				}
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>'Updated',1=>array('num'=>($camaro-54),'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
+				echo json_encode(array(0=>'Updated',1=>array('num'=>($_POST['id']-54),'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'mail'=>$_POST['mail'],'status'=>$_POST['status'],'holiday'=>$_POST['holiday'])));
 			}
 			else{
-				$holiday=($holiday==1)? 'Yes':'No';
-				switch($charger){
+				$_POST['holiday']=($_POST['holiday']==1)? 'Yes':'No';
+				switch($_POST['status']){
 					case 0:
-						$charger='User';
+						$_POST['status']='User';
 						break;
 					case 1:
-						$charger='Operator';
+						$_POST['status']='Operator';
 						break;
 					case 2:
-						$charger='Administrator';
+						$_POST['status']='Administrator';
 						break;
 					case 3:
-						$charger='Activation';
+						$_POST['status']='Activation';
 						break;
 					case 4:
-						$charger='Banned';
+						$_POST['status']='Banned';
 						break;
 					default:
-						$charger='Error';
+						$_POST['status']='Error';
 				}
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>'Updated',1=>array('num'=>($camaro-54),'name'=>htmlspecialchars($mustang,ENT_QUOTES,'UTF-8'),'mail'=>$viper,'status'=>$charger,'holiday'=>$holiday)));
+				echo json_encode(array(0=>'Updated',1=>array('num'=>($_POST['id']-54),'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'mail'=>$_POST['mail'],'status'=>$_POST['status'],'holiday'=>$_POST['holiday'])));
 			}
 		}
 		catch(PDOException $e){  
@@ -765,7 +772,7 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='select_depa_usr'){
-		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
+		$_POST['id']=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -773,7 +780,7 @@ else{
 			$query = "SELECT `department_id` FROM ".$SupportUserPerDepaTable." WHERE `user_id`=? ORDER BY `department_name` ASC";
 			
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -804,7 +811,7 @@ else{
 	}
 	
 	else if($_POST[$_SESSION['token']['act']]=='select_usr_rate'){
-		$camaro=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
+		$_POST['id']=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -822,7 +829,7 @@ else{
 						WHERE a.operator_id=? ORDER BY b.id ASC LIMIT 700";
 
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -843,24 +850,24 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='del_usr'){//check
-		$camaro=(is_numeric($_POST['id']))? (int)$_POST['id']+54:exit();
+		$_POST['id']=(is_numeric($_POST['id']))? (int)$_POST['id']+54:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 			$query = "DELETE FROM ".$SupportMessagesTable." WHERE user_id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 		
 			$query = "DELETE FROM ".$SupportTicketsTable." WHERE user_id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `uploader`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
@@ -876,22 +883,22 @@ else{
 
 			$query = "DELETE FROM ".$SupportUploadTable." WHERE uploader=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 															
 			$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN '1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$query = "DELETE FROM ".$SupportUserTable." WHERE id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			header('Content-Type: application/json; charset=utf-8');
@@ -956,17 +963,42 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='retrive_operator_assign'){//check
-		$encid=trim(preg_replace('/\s+/','',$_POST['enc']));
-		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
-		$departmentid=(is_numeric($_POST['id'])) ? $_POST['id']:exit();
+		$_POST['enc']=trim(preg_replace('/\s+/','',$_POST['enc']));
+		$_POST['enc']=($_POST['enc']!='' && strlen($_POST['enc'])==87) ? $_POST['enc']:exit();
+		$_POST['id']=(is_numeric($_POST['id'])) ? $_POST['id']:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			$query="SELECT id,name,status FROM ((SELECT a.id,a.name,a.status  FROM ".$SupportUserTable." a WHERE  a.status='2' AND a.id!='".$_SESSION['id']."' AND a.id!='".$_SESSION[$encid]['op_id']."') UNION (SELECT a.id,a.name,a.status  FROM  ".$SupportUserTable." a LEFT JOIN  ".$SupportUserPerDepaTable." b ON a.id=b.user_id  WHERE b.department_id=? AND a.id!=".$_SESSION['id'].")) AS tab ORDER BY tab.status ASC, tab.name ASC";
-			
+			$query="SELECT
+							id,
+							name,
+							status 
+						FROM (	
+								(
+									SELECT 
+										a.id,
+										a.name,
+										a.status  
+									FROM ".$SupportUserTable." a 
+									WHERE  a.status='2' AND a.id!=? AND a.id!=?
+								) 
+								UNION (
+									SELECT a.id,
+											a.name,
+											a.status  
+									FROM  ".$SupportUserTable." a
+									LEFT JOIN  ".$SupportUserPerDepaTable." b ON a.id=b.user_id  
+									WHERE b.department_id=? AND a.id!=?
+								)
+							) AS tab 
+					ORDER BY tab.status ASC, tab.name ASC";
+
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$departmentid,PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION[$_POST['enc']]['op_id'],PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -994,18 +1026,18 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='move_admin_ticket'){//deep check
-		$opid=(is_numeric($_POST['opid'])) ? $_POST['opid']:exit();
-		$dpid=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
-		$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
+		$_POST['opid']=(is_numeric($_POST['opid'])) ? $_POST['opid']:exit();
+		$_POST['dpid']=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
+		$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+		$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			if($opid==-1){
-				$opid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $dpid,$_SESSION[$encid]['usr_id']);
-				if(!is_numeric($opid))
-					$opid=0;
+			if($_POST['opid']==-1){
+				$_POST['opid']=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dpid'],$_SESSION[$_POST['id']]['usr_id']);
+				if(!is_numeric($_POST['opid']))
+					$_POST['opid']=0;
 			}
 			$query="UPDATE ".$SupportTicketsTable." a
 						LEFT JOIN ".$SupportUserTable." b
@@ -1020,16 +1052,16 @@ else{
 							a.operator_id=?
 						WHERE a.enc_id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$opid,PDO::PARAM_INT);
-			$STH->bindParam(2,$dpid,PDO::PARAM_INT);
-			$STH->bindParam(3,$opid,PDO::PARAM_INT);
-			$STH->bindParam(4,$opid,PDO::PARAM_INT);
-			$STH->bindParam(5,$opid,PDO::PARAM_INT);
-			$STH->bindParam(6,$opid,PDO::PARAM_INT);
-			$STH->bindParam(7,$encid,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['opid'],PDO::PARAM_INT);
+			$STH->bindParam(2,$_POST['dpid'],PDO::PARAM_INT);
+			$STH->bindParam(3,$_POST['opid'],PDO::PARAM_INT);
+			$STH->bindParam(4,$_POST['opid'],PDO::PARAM_INT);
+			$STH->bindParam(5,$_POST['opid'],PDO::PARAM_INT);
+			$STH->bindParam(6,$_POST['opid'],PDO::PARAM_INT);
+			$STH->bindParam(7,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
-			if($opid>0){
+			if($_POST['opid']>0){
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'AMoved'));
 			}
@@ -1047,8 +1079,8 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='delete_files'){//check
-		$from=(trim(preg_replace('/\s+/','',$_POST['from']))!='')? trim(preg_replace('/\s+/','',$_POST['from']))." 00:00:00":exit();
-		$to=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 00:00:00":exit();
+		$_POST['from']=(trim(preg_replace('/\s+/','',$_POST['from']))!='')? trim(preg_replace('/\s+/','',$_POST['from']))." 00:00:00":exit();
+		$_POST['to']=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 00:00:00":exit();
 		
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1056,10 +1088,10 @@ else{
 			
 			$query = "SELECT enc,message_id FROM ".$SupportUploadTable." WHERE `upload_date` BETWEEN ? AND ? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$from,PDO::PARAM_STR);
-			$STH->bindParam(2,$to,PDO::PARAM_STR);
+			$STH->bindParam(1,$_POST['from'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['to'],PDO::PARAM_STR);
 			$STH->execute();
-			
+
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
 			if(!empty($a)){
@@ -1075,13 +1107,13 @@ else{
 				
 				$query = "DELETE FROM ".$SupportUploadTable." WHERE `upload_date` BETWEEN ? AND ?";
 				$STH = $DBH->prepare($query);
-				$STH->bindParam(1,$from,PDO::PARAM_STR);
-				$STH->bindParam(2,$to,PDO::PARAM_STR);
+				$STH->bindParam(1,$_POST['from'],PDO::PARAM_STR);
+				$STH->bindParam(2,$_POST['to'],PDO::PARAM_STR);
 				$STH->execute();
 				
 				$c=count($list);
 				$list=implode(',',$list);
-				
+
 				$query = "UPDATE ".$SupportMessagesTable." SET attachment='0' WHERE id IN (".$list.") LIMIT ?";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$c,PDO::PARAM_INT);
@@ -1132,15 +1164,15 @@ else{
 	
 	else if($_POST[$_SESSION['token']['act']]=='add_faq'){
 	
-		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
+		$_POST['question']=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
 
-		$answer=trim(preg_replace('/\s+/',' ',$_POST['answer']));
+		$_POST['answer']=trim(preg_replace('/\s+/',' ',$_POST['answer']));
 		if(trim(preg_replace('/\s+/','',$_POST['answer']))!=''){
 			require_once 'htmlpurifier/HTMLPurifier.auto.php';
 			$config = HTMLPurifier_Config::createDefault();
 			$purifier = new HTMLPurifier($config);
-			$answer = $purifier->purify($answer);
-			$check=trim(strip_tags($answer));
+			$_POST['answer'] = $purifier->purify($_POST['answer']);
+			$check=trim(strip_tags($_POST['answer']));
 			if(empty($check)){
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Empty Answer'));
@@ -1153,8 +1185,8 @@ else{
 			exit();
 		}
 
-		$pos=(is_numeric($_POST['pos']))? $_POST['pos']:NULL;
-		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
+		$_POST['pos']=(is_numeric($_POST['pos']))? $_POST['pos']:NULL;
+		$_POST['active']=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -1163,21 +1195,21 @@ else{
 						VALUES (?,?,?,CASE WHEN ? IS NULL THEN (IF ((SELECT MAX(c.position) FROM ".$SupportFaqTable." c ) IS NOT NULL,(SELECT MAX(d.position) FROM ".$SupportFaqTable." d )+1,0)) ELSE ? END)";
 				
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$question,PDO::PARAM_STR);
-			$STH->bindParam(2,$answer,PDO::PARAM_STR);
-			$STH->bindParam(3,$active,PDO::PARAM_STR);
-			$STH->bindParam(4,$pos,PDO::PARAM_INT);
-			$STH->bindParam(5,$pos,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['question'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['answer'],PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['active'],PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['pos'],PDO::PARAM_INT);
+			$STH->bindParam(5,$_POST['pos'],PDO::PARAM_INT);
 			$STH->execute();
 
 			$data=array('response'=>'Added');
-								
+
 			$dpid=$DBH->lastInsertId();
 
-			$active=((int)$active==0) ? 'No':'Yes';
-			$data['information']=array('id'=>$dpid,'question'=>htmlspecialchars($question,ENT_QUOTES,'UTF-8'),'position'=>$pos,'active'=>$active);
-		
-			if($pos==NULL){
+			$_POST['active']=((int)$_POST['active']==0) ? 'No':'Yes';
+			$data['information']=array('id'=>$dpid,'question'=>htmlspecialchars($_POST['question'],ENT_QUOTES,'UTF-8'),'position'=>$_POST['pos'],'active'=>$_POST['active']);
+
+			if($_POST['pos']==NULL){
 				$query = "SELECT `position` FROM ".$SupportFaqTable." WHERE `id`='".$dpid."' LIMIT 1";
 				$STH = $DBH->prepare($query);
 				$STH->execute();
@@ -1202,19 +1234,19 @@ else{
 	}
 	
 	else if($_POST[$_SESSION['token']['act']]=='del_faq'){
-		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
+		$_POST['id']=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			
 			$query="DELETE FROM ".$SupportRateFaqTable." WHERE `faq_id`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$query="DELETE FROM ".$SupportFaqTable." WHERE `id`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			header('Content-Type: application/json; charset=utf-8');
@@ -1229,16 +1261,16 @@ else{
 	}
 	
 	else if($_POST[$_SESSION['token']['act']]=='edit_faq'){
-		$camaro=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
-		$question=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
-		$answer=trim(preg_replace('/\s+/',' ',$_POST['answer']));
-		$rate=(is_numeric($_POST['rate']))? $_POST['id']+14:exit();
+		$_POST['id']=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
+		$_POST['question']=(trim(preg_replace('/\s+/','',$_POST['question']))!='')? trim(preg_replace('/\s+/',' ',$_POST['question'])):exit();
+		$_POST['answer']=trim(preg_replace('/\s+/',' ',$_POST['answer']));
+		$_POST['rate']=(is_numeric($_POST['rate']))? $_POST['rate']:exit();
 		if(trim(preg_replace('/\s+/','',$_POST['answer']))!=''){
 			require_once 'htmlpurifier/HTMLPurifier.auto.php';
 			$config = HTMLPurifier_Config::createDefault();
 			$purifier = new HTMLPurifier($config);
-			$answer = $purifier->purify($answer);
-			$check=trim(strip_tags($answer));
+			$_POST['answer'] = $purifier->purify($_POST['answer']);
+			$check=trim(strip_tags($_POST['answer']));
 			if(empty($check)){
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Empty Answer'));
@@ -1251,13 +1283,13 @@ else{
 			exit();
 		}
 		
-		$pos=(is_numeric($_POST['position']))? $_POST['position']:NULL;
-		$active=(is_numeric($_POST['active']))? $_POST['active']:exit();
+		$_POST['position']=(is_numeric($_POST['position']))? $_POST['position']:NULL;
+		$_POST['active']=(is_numeric($_POST['active']))? $_POST['active']:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			if($pos==NULL){
+			if($_POST['position']==NULL){
 				try{
 					$query = "SELECT (IF ((SELECT c.id FROM ".$SupportFaqTable." c LIMIT 1) IS NOT NULL AND (SELECT COUNT(*) FROM ".$SupportFaqTable." LIMIT 3) > 1,(SELECT MAX(d.position) FROM ".$SupportFaqTable." d )+1,0)) AS rpos FROM ".$SupportFaqTable;
 					
@@ -1268,7 +1300,7 @@ else{
 					$a = $STH->fetch();
 					if(!empty($a)){
 						do{
-							$pos=$a['rpos'];
+							$_POST['position']=$a['rpos'];
 						}while ($a = $STH->fetch());
 					}
 				}
@@ -1283,16 +1315,16 @@ else{
 							active=? 
 						WHERE id=? ";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$question,PDO::PARAM_STR);
-			$STH->bindParam(2,$answer,PDO::PARAM_STR);
-			$STH->bindParam(3,$pos,PDO::PARAM_INT);
-			$STH->bindParam(4,$active,PDO::PARAM_STR);
-			$STH->bindParam(5,$camaro,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['question'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['answer'],PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['position'],PDO::PARAM_INT);
+			$STH->bindParam(4,$_POST['active'],PDO::PARAM_STR);
+			$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
-			$active=($active==0)?'No':'Yes';
+			$_POST['active']=($_POST['active']==0)?'No':'Yes';
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Succeed',1=>array('id'=>($camaro-14),'question'=>htmlspecialchars($question,ENT_QUOTES,'UTF-8'),'position'=>$pos,'active'=>$active,'rate'=>'Unrated')));
+			echo json_encode(array(0=>'Succeed',1=>array('id'=>($_POST['id']-14),'question'=>htmlspecialchars($_POST['question'],ENT_QUOTES,'UTF-8'),'position'=>$_POST['position'],'active'=>$_POST['active'],'rate'=>'Unrated')));
 		}
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
@@ -1303,7 +1335,7 @@ else{
 	}
 	
 	else if($_POST[$_SESSION['token']['act']]=='retrive_faq_answer'){
-		$cs=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
+		$_POST['id']=(is_numeric($_POST['id']))? $_POST['id']+14:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -1311,7 +1343,7 @@ else{
 			$query = "SELECT answer FROM ".$SupportFaqTable." WHERE id=? LIMIT 1";
 			
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$cs,PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -1334,8 +1366,8 @@ else{
 	}
 	
 	else if($_POST[$_SESSION['token']['act']]=='rem_flag'){//check
-		$encid=trim(preg_replace('/\s+/','',$_POST['id']));
-		$encid=($encid!='' && strlen($encid)==87) ? $encid:exit();
+		$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+		$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
 		
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1343,7 +1375,7 @@ else{
 			
 			$query="DELETE FROM ".$SupportFlagTable." WHERE `enc_id`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$encid,PDO::PARAM_STR);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR);
 			$STH->execute();
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Deleted'));
