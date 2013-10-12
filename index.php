@@ -37,6 +37,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 }
 
 if(is_file('php/config/setting.txt')) $setting=file('php/config/setting.txt',FILE_IGNORE_NEW_LINES);
+if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 
 $siteurl=explode('?',curPageURL());
 $siteurl=$siteurl[0];
@@ -121,10 +122,9 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			</div>
 		<div class='daddy'>
 			<div class="jumbotron" >
-				<h1 class="muted pagefun"><a href='http://razorphyn.com'><img id='logo' src='css/images/logo.png' alt='Razorphyn' title='Razorphyn'/></a></h1>
+				<h1 class="muted pagefun"><img id='logo' src='<?php if(isset($logo) && !empty($logo)) echo $logo; else echo 'css/images/logo.png'; ?>' alt='<?php if(isset($setting[0])) echo $setting[0];?>' title='<?php if(isset($setting[0])) echo $setting[0];?>'/></h1>
 				<h3 class='pagefun'>Welcome to the support center</h3>
 			</div>
-			
 			<hr>
 			<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
 				<div class='row-fluid main'>
