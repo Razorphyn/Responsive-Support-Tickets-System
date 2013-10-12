@@ -570,7 +570,7 @@ else{
 		}
 		$_POST['status']=(is_numeric($_POST['status'])) ? (string)$_POST['status']:exit();
 		$_POST['holiday']=(is_numeric($_POST['holiday'])) ? (string)$_POST['holiday']:exit();
-		
+		$_POST['seldepa']=array_filter($_POST['seldepa'],'is_numeric');
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -590,8 +590,6 @@ else{
 			$STH->execute();
 			
 			if($_POST['status']=='1' && count($_POST['seldepa'])>0){
-				$_POST['seldepa']=array_filter($_POST['seldepa'],'is_numeric');
-
 				$query = "INSERT INTO ".$SupportUserPerDepaTable." (`department_name`, `department_id` , `user_id`) VALUES ";
 				$count=count($_POST['seldepa']);
 				$a=array();
@@ -600,14 +598,14 @@ else{
 						$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id=?),?,?),';
 					else
 						$query.='((SELECT `department_name` FROM '.$SupportDepaTable.' WHERE id=?),?,?)';
-					$a[$i]=array($_POST['seldepa'][$i],$_POST['id']);
+					$a[]=array($_POST['seldepa'][$i],$_POST['id']);
 				}
 				$STH = $DBH->prepare($query);
 				$count=count($a);
 				for($i=0;$i<$count;$i++){
-					$STH->bindParam(($i*3+1),$a[$i][0],PDO::PARAM_INT);
-					$STH->bindParam(($i*3+2),$a[$i][0],PDO::PARAM_INT);
-					$STH->bindParam(($i*3+3),$a[$i][1],PDO::PARAM_INT);
+					$STH->bindParam($i+1,$a[$i][0],PDO::PARAM_INT);
+					$STH->bindParam($i+2,$a[$i][0],PDO::PARAM_INT);
+					$STH->bindParam($i+3,$a[$i][1],PDO::PARAM_INT);
 				}
 				$STH->execute();
 				$camarolist=join(',',$_POST['seldepa']);
