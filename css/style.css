@@ -6,7 +6,7 @@ textarea{width:100% !important;max-width:100%;display:block;word-wrap: break-wor
 table{text-align:center!important;position:relaitve!important}
 table td,table th{text-align:center!important;display:table-cell!important;word-wrap: break-word!important}
 table tr{text-align:center!important}
-.navbar{-webkit-box-shadow:  0px 5px 0px 0px rgba(0, 0, 0.1);box-shadow: 0px 5px 0px 0px rgba( 0, 0, 0.1);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)}
+.navbar{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)!important}
 
 .container > hr {margin: 60px 0;border-color:#ccc}
 
