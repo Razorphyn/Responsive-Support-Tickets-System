@@ -165,7 +165,6 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		<div id='delcat' style='display:none' title="Delete Department?">
 			<p>Irreversible Operation</p>
 		</div>
-	<iframe name='hidden_frame' style='display:none;width:0;height:0'></iframe>
 
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>

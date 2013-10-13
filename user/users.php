@@ -170,7 +170,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		<div id='delusr' style='display:none;height:40px' title="Delete this User?">
 			<p>Every information will be irreversibly deleted.</p>
 		</div>
-	<iframe name='hidden_frame' style='display:none;width:0;height:0'></iframe>
+
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js,js/jquery-ui-1.10.3.custom.min.js&amp;5259487' ?>"></script>
 	<script>

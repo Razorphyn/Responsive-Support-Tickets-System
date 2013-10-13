@@ -200,8 +200,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			<hr>
 		</div>
 		</div>
-		<iframe style='display:none' name='hidden_upload' id='hidden_upload'></iframe>
-		
+		<iframe style='display:none' name='hidden_upload' id='hidden_upload' src="about:blank" ></iframe>
 		<?php if(!$isMob) { ?>
 			<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 			<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
@@ -252,7 +251,16 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					}
 				}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})});	
 				
-				$("#createticket").submit(function(){<?php if(!$isMob){ ?>if(""==CKEDITOR.instances.message.getData().replace(/\s+/g,"")||""==$("#title").val().replace(/\s+/g,""))<?php }else { ?>if($("#message").val().replace(/\s+/g,'') == '' || $('#title').val().replace(/\s+/g,'')=='')<?php } ?>return noty({text:"Empty Fields. PLeasy check the title and the message",type:"error",timeout:9E3}),!1;$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
+				$("#createticket").submit(function(){
+					<?php if(!$isMob){ ?>
+						if(""==CKEDITOR.instances.message.getData().replace(/\s+/g,"")||""==$("#title").val().replace(/\s+/g,""))
+					<?php }else { ?>
+						if($("#message").val().replace(/\s+/g,'') == '' || $('#title').val().replace(/\s+/g,'')=='')
+					<?php } ?>
+							return noty({text:"Empty Fields. PLeasy check the title and the message",type:"error",timeout:9E3}),!1;
+					$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});
+					return!0
+				});
 
 				$(document).on('click','#resetfile',function(){
 					$('#fielduploadinput').wrap('<form>').closest('form').get(0).reset();

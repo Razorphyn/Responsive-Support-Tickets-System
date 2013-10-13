@@ -283,7 +283,6 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			</div>
 			<br/><br/>
 		</div>
-	<iframe name='hidden_frame' style='display:none;width:0;height:0'></iframe>
 	
 	<?php if(!$isMob) { ?>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>

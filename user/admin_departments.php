@@ -22,8 +22,6 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 }
 session_start(); 
 
-
-
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
@@ -182,7 +180,6 @@ $stmp[8]=implode('',$stmp[8]);
 		<div id='delcat' style='display:none' title="Delete Department?">
 			<p>Irriversible Operation</p>
 		</div>
-	<iframe name='hidden_frame' style='display:none;width:0;height:0'></iframe>
 
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>

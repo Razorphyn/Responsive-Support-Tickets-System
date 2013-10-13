@@ -493,7 +493,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					<?php } ?>
 			</div>
 		</div>
-	<iframe style='display:none' name='hidden_upload' id='hidden_upload'></iframe>
+	<iframe style='display:none' name='hidden_upload' id='hidden_upload' src="about:blank"></iframe>
 	<?php if(!$isMob) { ?>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
