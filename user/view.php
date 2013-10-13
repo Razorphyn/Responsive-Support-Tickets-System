@@ -170,7 +170,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 
 					if(count($messageid)>0){
 						$messageid=implode(',',$messageid);
-						$query = "SELECT `uploader`,`name`,`enc`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
+						$query = "SELECT `id`,`uploader`,`name`,`message_id` FROM ".$SupportUploadTable." WHERE message_id IN (".$messageid.")";
 						$STH = $DBH->prepare($query);
 						$STH->execute();
 						$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -178,9 +178,9 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 						if(!empty($a)){
 							do{
 								if($_SESSION['id']==$a['uploader'])
-									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"> &nbsp;&nbsp; <i class="icon-remove-sign remfile" title="Delete File" alt="Delete File"></i></form>';
+									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['id'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"> &nbsp;&nbsp; <i class="icon-remove-sign remfile" title="Delete File" alt="Delete File"></i></form>';
 								else
-									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['enc'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form>';
+									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['id'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form>';
 							}while ($a = $STH->fetch());
 						}
 						unset($a);
@@ -196,7 +196,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 			}
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 		$error='We are sorry, but an error has occurred, please contact the administrator if it persist';
 	}
 	$DBH=null;
@@ -222,7 +222,7 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 			return json_encode($b);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			return json_encode(array(0=>"Can't retrieve Departments"));
 		}
 	}
@@ -258,7 +258,7 @@ function retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, 
 			return json_encode($b);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			$DBH=null;
 			return json_encode(array(0=>"Can't retrieve Operators"));
 		}
@@ -480,7 +480,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 									$upcount=count($list[$i]);
 									if($upcount>4){
 										echo '<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">';
-										for($j=3;$j<$upcount;$j++)
+										for($j=4;$j<$upcount;$j++)
 											echo $list[$i][$j];
 										echo'</div></div>';
 									}
@@ -746,6 +746,8 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$(".newest").remove();
 		$("#messages").children(".row-fluid:first").before(tail.join(""));
 		$("#messages").children(".row-fluid:first").delay(300).show('scale');
+		$('#fielduploadinput').wrap('<form>').closest('form').get(0).reset();
+		$('#fielduploadinput').unwrap();
 		add++;
 		writing=false;
 	}

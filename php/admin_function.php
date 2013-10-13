@@ -111,7 +111,7 @@ else{
 			echo json_encode($list);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -180,7 +180,7 @@ else{
 				echo json_encode(array(0=>"User with mail: ".htmlspecialchars($_POST['mail'],ENT_QUOTES,'UTF-8')." is already registred"));
 			}
 			else{
-				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			}
@@ -224,7 +224,7 @@ else{
 				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8')." already exist"));
 			}
 			else{
-				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
@@ -264,7 +264,7 @@ else{
 				echo json_encode(array(0=>"Department name: ".json_encode($_POST['name'], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS)." already exist"));
 			}
 			else{
-				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
@@ -295,7 +295,7 @@ else{
 				echo json_encode(array(0=>'Deleted'));
 			}
 			catch(PDOException $e){  
-				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
@@ -367,7 +367,7 @@ else{
 				}
 			}
 			catch(PDOException $e){  
-				file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
@@ -547,7 +547,7 @@ else{
 							
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -766,7 +766,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -805,7 +805,7 @@ else{
 			echo json_encode($ret);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -844,7 +844,7 @@ else{
 			echo json_encode($ret);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -907,7 +907,7 @@ else{
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -958,7 +958,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -1020,7 +1020,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1073,7 +1073,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1130,7 +1130,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -1157,7 +1157,7 @@ else{
 			echo json_encode($list);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1227,7 +1227,7 @@ else{
 			echo json_encode($data);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1255,7 +1255,7 @@ else{
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1307,7 +1307,7 @@ else{
 					}
 				}
 				catch(PDOException $e){
-					file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+					file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 				}
 			}
 			$query = "UPDATE ".$SupportFaqTable."
@@ -1329,7 +1329,7 @@ else{
 			echo json_encode(array(0=>'Succeed',1=>array('id'=>($_POST['id']-14),'question'=>htmlspecialchars($_POST['question'],ENT_QUOTES,'UTF-8'),'position'=>$_POST['position'],'active'=>$_POST['active'],'rate'=>'Unrated')));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1360,7 +1360,7 @@ else{
 			echo json_encode($list);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1383,7 +1383,7 @@ else{
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1425,7 +1425,7 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 		}
 	}
 }
@@ -1468,7 +1468,7 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', $e->getMessage()."\n", FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 		return 'An Error has occurred, please read the PDOErrors file and contact a programmer';
 	}
 }

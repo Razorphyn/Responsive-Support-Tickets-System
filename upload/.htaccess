@@ -2,6 +2,6 @@ Deny from All
 Options All -Indexes
 IndexIgnore *
 Options -ExecCGI
-AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
+AddHandler cgi-script .php .php3 .php4 .phtml .pl .py .jsp .asp .htm .shtml .sh .cgi
 
 php_value allow_url_fopen Off
