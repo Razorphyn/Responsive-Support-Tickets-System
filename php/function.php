@@ -2063,12 +2063,12 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
 		if(!empty($a)){
-
+			$msid=$a['message_id'];
 			$path='../upload/'.$a['enc'];
 			file_put_contents($path,'');
 			unlink($path);
 
-			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=? AND `enc`=?";
+			$query = "DELETE FROM ".$SupportUploadTable." WHERE `ticket_id`=? AND `id`=?";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR);
 			$STH->bindParam(2,$_POST['file_id'],PDO::PARAM_STR);
@@ -2076,7 +2076,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 			if($STH->rowCount()>0){
 				$query = "SELECT COUNT(*) AS qta FROM ".$SupportUploadTable." WHERE `message_id`=?";
 				$STH = $DBH->prepare($query);
-				$STH->bindParam(1,$a['message_id'],PDO::PARAM_INT);
+				$STH->bindParam(1,$msid,PDO::PARAM_INT);
 				$STH->execute();
 				$STH->setFetchMode(PDO::FETCH_ASSOC);
 
@@ -2084,7 +2084,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']<3 && $_POST[$_SESSION[
 				if(empty($a) || $a['qta']<1){
 					$query = "UPDATE ".$SupportMessagesTable." SET attachment='0' WHERE id=? LIMIT 1";
 					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$a['message_id'],PDO::PARAM_INT);
+					$STH->bindParam(1,$msid,PDO::PARAM_INT);
 					$STH->execute();
 				}
 			}
