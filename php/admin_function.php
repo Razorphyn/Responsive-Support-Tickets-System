@@ -344,8 +344,8 @@ else{
 					if(!empty($a)){
 						$path='../upload/';
 						do{
-							file_put_contents($path.$enc,'');
-							unlink($path.$enc);
+							file_put_contents($path.$a['enc'],'');
+							unlink($path.$a['enc']);
 						}while ($a = $STH->fetch());
 						
 						$delup="DELETE FROM ".$SupportUploadTable." WHERE `tk_id` IN (".$list.")";
@@ -963,7 +963,11 @@ else{
 
 	else if($_POST[$_SESSION['token']['act']]=='retrive_operator_assign'){//check
 		$_POST['enc']=trim(preg_replace('/\s+/','',$_POST['enc']));
-		$_POST['enc']=($_POST['enc']!='' && strlen($_POST['enc'])==87) ? $_POST['enc']:exit();
+		if(!preg_match('/^[0-9]{1,11}$/',$_POST['enc'])){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid ID'));
+			exit();
+		}
 		$_POST['id']=(is_numeric($_POST['id'])) ? $_POST['id']:exit();
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -995,7 +999,7 @@ else{
 
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
-			$STH->bindParam(1,$_SESSION[$_POST['enc']]['op_id'],PDO::PARAM_INT);
+			$STH->bindParam(1,$_SESSION['tickets'][$_POST['enc']]['op_id'],PDO::PARAM_INT);
 			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
@@ -1028,13 +1032,17 @@ else{
 		$_POST['opid']=(is_numeric($_POST['opid'])) ? $_POST['opid']:exit();
 		$_POST['dpid']=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 		$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-		$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
+		if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid ID'));
+			exit();
+		}
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 			if($_POST['opid']==-1){
-				$_POST['opid']=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dpid'],$_SESSION[$_POST['id']]['usr_id']);
+				$_POST['opid']=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dpid'],$_SESSION['tickets'][$_POST['id']]['usr_id']);
 				if(!is_numeric($_POST['opid']))
 					$_POST['opid']=0;
 			}
@@ -1366,7 +1374,11 @@ else{
 	
 	else if($_POST[$_SESSION['token']['act']]=='rem_flag'){//check
 		$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-		$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
+		if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid ID'));
+			exit();
+		}
 		
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
