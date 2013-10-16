@@ -89,7 +89,6 @@ else{
 				$query = "SELECT 
 							a.id,
 							a.ref_id,
-							a.enc_id,
 							CASE b.status WHEN '0' THEN 'User' WHEN '1' THEN 'Operator' WHEN '2' THEN 'Adminsitrator' ELSE 'Useless' END AS urole,
 							a.reason,
 							b.mail  
@@ -103,7 +102,7 @@ else{
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'encid'=>$a['enc_id'],'role'=>$a['urole'],'reason'=>htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
+					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'role'=>$a['urole'],'reason'=>htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
 				}
 				while ($a = $STH->fetch());
 			}
@@ -157,7 +156,6 @@ else{
 				default:
 					$_POST['role']='Error';
 			}
-			
 
 			$site=curPageURL();
 			$headers   = array();
@@ -273,10 +271,10 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='del_dep'){//check
-	$_POST['sub']=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
-	$_POST['id']=(is_numeric($_POST['id']))? (int)$_POST['id']:exit();
-	
-	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$_POST['sub']=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
+		$_POST['id']=(is_numeric($_POST['id']))? (int)$_POST['id']:exit();
+		
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 		if($_POST['sub']=='del_name'){
@@ -337,7 +335,7 @@ else{
 					$STH = $DBH->prepare($delmsg);
 					$STH->execute();
 					
-					$selupl="SELECT enc FROM ".$SupportUploadTable." WHERE `num_id` IN (".$list.")";
+					$selupl="SELECT enc FROM ".$SupportUploadTable." WHERE `tk_id` IN (".$list.")";
 					$STH = $DBH->prepare($selupl);
 					$STH->execute();
 					
@@ -350,7 +348,7 @@ else{
 							unlink($path.$enc);
 						}while ($a = $STH->fetch());
 						
-						$delup="DELETE FROM ".$SupportUploadTable." WHERE `num_id` IN (".$list.")";
+						$delup="DELETE FROM ".$SupportUploadTable." WHERE `tk_id` IN (".$list.")";
 						$STH = $DBH->prepare($delup);
 						$STH->execute();
 						header('Content-Type: application/json; charset=utf-8');
@@ -376,8 +374,8 @@ else{
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Cannot select sub process'));
 		}
-	exit();
-}
+		exit();
+	}
 
 	else if($_POST[$_SESSION['token']['act']]=='save_options'){
 		$_POST['senrep']=(is_numeric($_POST['senrep'])) ? (int)$_POST['senrep']:exit();
@@ -524,11 +522,11 @@ else{
 						CASE `status` WHEN '0' THEN 'User'  WHEN '1' THEN 'Operator'  WHEN '2' THEN 'Administrator'  WHEN '3' THEN 'Activation'  WHEN '4' THEN 'Banned' ELSE 'Error' END AS ustat,
 						CASE `holiday` WHEN '0' THEN 'No' ELSE 'Yes' END AS hol, 
 						CASE WHEN `number_rating`='0' THEN 'No Rating' WHEN `number_rating`!='0' THEN `rating` ELSE 'Error' END AS rt
-					FROM ".$SupportUserTable;
+					FROM ".$SupportUserTable." LIMIT 700";
 			
 			$STH = $DBH->prepare($query);
 			$STH->execute();
-			
+
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
 			if(!empty($a)){
@@ -811,7 +809,7 @@ else{
 		}
 		exit();
 	}
-	
+
 	else if($_POST[$_SESSION['token']['act']]=='select_usr_rate'){
 		$_POST['id']=(is_numeric($_POST['id'])) ? ((int)$_POST['id']+54):exit();
 		try{
@@ -821,7 +819,6 @@ else{
 			$query = "SELECT 
 							b.rate,
 							b.note,
-							b.enc_id,
 							c.mail
 						FROM ".$SupportTicketsTable." a
 						LEFT JOIN ".$SupportRateTable." b
@@ -838,7 +835,7 @@ else{
 			$ret=array('res'=>'ok','rate'=>array());
 			$camaros=array();
 			while ($a = $STH->fetch()){
-				$ret['rate'][]=array($a['rate'],$a['note'],$a['enc_id'],htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
+				$ret['rate'][]=array($a['rate'],$a['note'],htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
 			}
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($ret);
@@ -1052,7 +1049,7 @@ else{
 							b.assigned_tickets=IF(b.id!=?,b.assigned_tickets-1,b.assigned_tickets),
 							c.assigned_tickets=IF(c.id!=a.operator_id,c.assigned_tickets+1,c.assigned_tickets),
 							a.operator_id=?
-						WHERE a.enc_id=? ";
+						WHERE a.id=? ";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['opid'],PDO::PARAM_INT);
 			$STH->bindParam(2,$_POST['dpid'],PDO::PARAM_INT);
@@ -1375,9 +1372,9 @@ else{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			
-			$query="DELETE FROM ".$SupportFlagTable." WHERE `enc_id`=?";
+			$query="DELETE FROM ".$SupportFlagTable." WHERE `tk_id`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['id'],PDO::PARAM_STR);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Deleted'));

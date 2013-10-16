@@ -60,7 +60,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 									ON c.id=a.department_id
 								LEFT JOIN ".$SupportUserTable." tu
 									ON tu.id=a.operator_id
-								WHERE a.enc_id=?
+								WHERE a.id=?
 								LIMIT 1;";
 				else//operator
 					$query="SELECT	
@@ -79,7 +79,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 									ON c.id=a.department_id
 								LEFT JOIN ".$SupportUserTable." tu
 									ON tu.id=a.operator_id
-								WHERE a.enc_id=?
+								WHERE a.id=?
 								LIMIT 1;";
 			}
 			else 
@@ -104,7 +104,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 								ON c.id=a.department_id
 							LEFT JOIN ".$SupportUserTable." tu
 								ON tu.id=a.operator_id
-							WHERE a.enc_id=?
+							WHERE a.id=?
 							LIMIT 1;";
 			}
 			else 
@@ -129,7 +129,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 								ON c.id=a.department_id
 							LEFT JOIN ".$SupportUserTable." tu
 								ON tu.id=a.operator_id
-							WHERE a.enc_id=?
+							WHERE a.id=?
 							LIMIT 1;";
 			}
 			else 
@@ -158,7 +158,7 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 			if($argv[1]=='NewMem' || $argv[1]=='Forgot')
 				$bind=$stmt->bind_param('i', $argv[2]);
 			else
-				$bind=$stmt->bind_param('s', $argv[2]);
+				$bind=$stmt->bind_param('i', $argv[2]);
 
 			if($bind){
 				if($stmt->execute()){

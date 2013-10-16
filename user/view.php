@@ -22,6 +22,9 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 }
 session_start(); 
 
+if(!preg_match('/^[0-9]{1,11}$/',$_GET['id']))
+	header("location: index.php");
+
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
@@ -74,10 +77,10 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							c.reason
 						FROM ".$SupportTicketsTable." a
 						LEFT JOIN ".$SupportRateTable." b
-							ON b.enc_id=a.enc_id
+							ON b.id=a.id
 						LEFT JOIN ".$SupportFlagTable." c
-							ON c.enc_id=a.enc_id AND c.usr_id='".$_SESSION['id']."'
-						WHERE a.enc_id=? LIMIT 1";
+							ON c.id=a.id AND c.usr_id='".$_SESSION['id']."'
+						WHERE a.id=? LIMIT 1";
 		}
 		else{
 			$query = "SELECT 
@@ -97,13 +100,13 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							c.reason
 						FROM ".$SupportTicketsTable." a
 						LEFT JOIN ".$SupportRateTable." b
-							ON b.enc_id=a.enc_id
+							ON b.id=a.id
 						LEFT JOIN ".$SupportFlagTable." c
-							ON c.enc_id=a.enc_id AND c.usr_id='".$_SESSION['id']."'
-						WHERE a.enc_id=? AND a.user_id=".$_SESSION['id']." LIMIT 1";
+							ON c.id=a.id AND c.usr_id='".$_SESSION['id']."'
+						WHERE a.id=? AND a.user_id=".$_SESSION['id']." LIMIT 1";
 		}
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_GET['id'],PDO::PARAM_STR);
+		$STH->bindParam(1,$_GET['id'],PDO::PARAM_INT);
 		$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
@@ -123,7 +126,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					$rate=$a['rate'];
 					$note=htmlspecialchars(mb_convert_encoding($a['note'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
 					$reason=htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8');
-					$_SESSION[$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
+					$_SESSION['tickets'][$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
 				}while ($a = $STH->fetch());
 				unset($a);
 				$rate=($rate!=NULL)? $rate:'';
@@ -150,8 +153,8 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 								ON b.id=a.user_id
 							WHERE a.ticket_id=? ORDER BY a.created_time DESC LIMIT 10";
 				$STH = $DBH->prepare($query);
-				$STH->bindParam(1,$_SESSION[$_GET['id']]['id'],PDO::PARAM_STR);
-				$STH->bindParam(2,$_SESSION[$_GET['id']]['id'],PDO::PARAM_STR);
+				$STH->bindParam(1,$_GET['id'],PDO::PARAM_INT);
+				$STH->bindParam(2,$_GET['id'],PDO::PARAM_INT);
 				$STH->execute();
 				$STH->setFetchMode(PDO::FETCH_ASSOC);
 				$a = $STH->fetch();
@@ -389,7 +392,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							<div class='span3'><select id='statustk'><option value='1'>Open</option><option value='0'>Closed</option></select></div>
 							<div class='span1'><input type='submit' class='btn btn-success' id='updstatus' onclick='javascript:return false;' value='Update'/></div>
 						</div>
-						<?php if($_SESSION[$_GET['id']]['usr_id']==$_SESSION['id'] && $setting[7]==1){ ?>
+						<?php if($_SESSION['tickets'][$_GET['id']]['usr_id']==$_SESSION['id'] && $setting[7]==1){ ?>
 							<div class='ratingsect row-fluid' <?php if($stat!=0) echo 'style="display:none"' ;?>>
 								<div class='row-fluid'>
 									<div class='span2'>Rate Operator</div>
@@ -522,7 +525,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 			CKEDITOR.replace('message');
 		<?php }else { ?>
 			$('#message').wysihtml5();
-		<?php } if($_SESSION[$_GET['id']]['usr_id']==$_SESSION['id'] && $setting[7]==1){ ?>
+		<?php } if($_SESSION['tickets'][$_GET['id']]['usr_id']==$_SESSION['id'] && $setting[7]==1){ ?>
 		$(".razorate").jRating();
 		<?php } ?>
 		

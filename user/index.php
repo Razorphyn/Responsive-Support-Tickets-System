@@ -558,7 +558,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		$(document).on('click','.remusr',function(){
 			var enc=$(this).val();
-			if(!enc.match(/[a-z0-9.]{87}/g)){
+			if(!enc.match(/[0-9]{1,11}/g)){
 				noty({text: 'Invalid ID',type:'error',timeout:9000});
 				return;
 			}
@@ -606,7 +606,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 
 		<?php if($_SESSION['status']==2 || $_SESSION['status']==1){ ?>
 			$(document).on("click", ".editusr", function(){
-				if(!$(this).val().match(/[a-z0-9.]{87}/g)){
+				if(!$(this).val().match(/[0-9]{1,11}/g)){
 					noty({text: 'Invalid ID',type:'error',timeout:9000});
 					return;
 				}
@@ -635,7 +635,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			});
 		<?php } else { ?>
 			$(document).on("click", ".editusr", function () {
-				if(!$(this).val().match(/[a-z0-9.]{87}/g)){
+				if(!$(this).val().match(/[0-9]{1,11}/g)){
 					noty({text: 'Invalid ID',type:'error',timeout:9000});
 					return;
 				}
@@ -739,7 +739,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		$(document).on('click',".viewtk",function(){
 			var id=$(this).val();
-			if(id.match(/[a-z0-9.]{87}/g,id))
+			if(id.match(/[0-9]{1,11}/g,id))
 				window.location.replace("<?php echo $siteurl.'/user/view.php?id=';?>"+id);
 			else
 				noty({text: 'Invalid Ticket ID',type:'error',timeout:9000});
