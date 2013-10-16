@@ -2,7 +2,7 @@
 
 //First Table Update 16/10/2013
 
-include_once 'php/config/database.php';
+include_once '../php/config/database.php';
 try{
 	$query="DROP PROCEDURE IF EXISTS `schema_change`;
 
