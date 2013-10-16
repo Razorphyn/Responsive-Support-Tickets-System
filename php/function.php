@@ -760,8 +760,7 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 		$error[]='Empty Message';
 	
 	if(!isset($error[0])){
-		file_put_contents('a',print_r($_SESSION['tickets'],true));
-		if(isset($_SESSION['tickets'][$_POST['id']]['usr_id'])){
+		if(isset($_SESSION['tickets'][$_POST['id']]['id']) && $_SESSION['tickets'][$_POST['id']]['id']==$_POST['id']){
 			try{
 				$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 				$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -955,16 +954,35 @@ else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		
+
+		if($_SESSION['status']!=2){
+			if($_SESSION['status']==0)
+				$query = "SELECT id FROM ".$SupportTicketsTable." WHERE `id`=? AND user_id=? LIMIT 1";
+			else if($_SESSION['status']==1)
+				$query = "SELECT id FROM ".$SupportTicketsTable." WHERE `id`=? AND operator_id=? LIMIT 1";
+				
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['enc'],PARAM_INT);
+			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->execute();
+			$a = $STH->fetch();
+			if(empty($a)){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Access Denied'));
+				exit();
+			}
+		}
+
 		$query="UPDATE ".$SupportTicketsTable." a
-					INNER JOIN ".$SupportUserTable." b
-						ON b.id=a.operator_id
-					SET b.assigned_tickets= CASE  WHEN b.assigned_tickets!='0' THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END  
+				INNER JOIN ".$SupportUserTable." b
+					ON b.id=a.operator_id
+				SET b.assigned_tickets= CASE  WHEN b.assigned_tickets!='0' THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END  
 				WHERE a.id=?";
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$_POST['enc'],PARAM_INT);
+		$STH->bindParam(1,$_SESSION['id'],PARAM_INT);
 		$STH->execute();
-		
+
 		$query = "DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id`=? ";
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
@@ -1428,16 +1446,16 @@ else if($_POST[$_SESSION['token']['act']]=='update_status' && isset($_SESSION['s
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		
 		$STH = $DBH->prepare($fquery);
-		$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
+		$STH->bindParam(1,$_SESSION['tickets'][$_POST['id']]['id'],PDO::PARAM_INT);
 		$STH->execute();
 
 		$STH = $DBH->prepare($lquery);
-		$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
+		$STH->bindParam(1,$_SESSION['tickets'][$_POST['id']]['id'],PDO::PARAM_INT);
 		$STH->execute();
 		
 		$query = "SELECT ticket_status FROM ".$SupportTicketsTable." WHERE id=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
+		$STH->bindParam(1,$_SESSION['tickets'][$_POST['id']]['id'],PDO::PARAM_INT);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
@@ -1649,13 +1667,13 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESS
 					SET 
 						b.solved_tickets= CASE WHEN a.ticket_status='1' THEN (b.solved_tickets+1) ELSE b.solved_tickets END , 
 						b.assigned_tickets= CASE  WHEN ( a.ticket_status!='0' AND b.assigned_tickets>=1) THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END
-					WHERE a.id=?";
+					WHERE a.id=? AND user_id=?";
 		$lquery = "UPDATE ".$SupportTicketsTable." a
 					SET 
 						a.title=? , 
 						a.priority=?,
 						a.ticket_status=?
-					WHERE a.id=?";
+					WHERE a.id=? AND user_id=?";
 	}
 	else if($_POST['status']==1){
 		$fquery = "UPDATE ".$SupportTicketsTable." a
@@ -1664,14 +1682,14 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESS
 					SET
 						b.assigned_tickets= CASE WHEN a.ticket_status='0' THEN (b.assigned_tickets+1) ELSE b.assigned_tickets END,
 						b.solved_tickets= CASE WHEN a.ticket_status='0' AND b.solved_tickets>=1 THEN (b.solved_tickets-1) ELSE b.solved_tickets END
-					WHERE a.id=?";
+					WHERE a.id=? AND operator_id=?";
 		$lquery = "UPDATE ".$SupportTicketsTable." a
 					SET
 						a.title=? , 
 						a.priority=?, 
 						a.ticket_status= CASE WHEN a.operator_id=0 THEN '2' ELSE ? END,
 						a.ticket_status= CASE WHEN a.operator_id='0' THEN '2' ELSE '1' END 
-					WHERE a.id=?";
+					WHERE a.id=? AND operator_id=?";
 	}
 	else if($_POST['status']==2){
 		$fquery = "UPDATE ".$SupportTicketsTable." a
@@ -1704,6 +1722,8 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESS
 		$STH->bindParam(2,$_POST['priority'],PDO::PARAM_STR);
 		$STH->bindParam(3,$_POST['status'],PDO::PARAM_STR);
 		$STH->bindParam(4,$_POST['id'],PDO::PARAM_INT);
+		if($_SESSION['status']!=2)
+			$STH->bindParam(5,$_SESSION['id'],PDO::PARAM_INT);
 		$STH->execute();
 		
 		header('Content-Type: application/json; charset=utf-8');
