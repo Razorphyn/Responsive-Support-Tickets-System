@@ -10,39 +10,39 @@ try{
 
 	CREATE PROCEDURE `schema_change`()
 	BEGIN
-		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = 'razorphyn_support_uploaded_file' AND column_name = 'ticket_id') 
+		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportUploadTable."' AND column_name = 'ticket_id') 
 			THEN
-				ALTER TABLE razorphyn_support_uploaded_file DROP COLUMN `ticket_id`;
+				ALTER TABLE ".$SupportUploadTable." DROP COLUMN `ticket_id`;
 		END IF;
 
-		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = 'razorphyn_support_list_tickets' AND column_name = 'enc_id') 
+		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportTicketsTable."' AND column_name = 'enc_id') 
 			THEN
-				ALTER TABLE razorphyn_support_list_tickets DROP INDEX `enc_id`;
-				ALTER TABLE razorphyn_support_list_tickets DROP COLUMN `enc_id`;
-				ALTER TABLE razorphyn_support_list_tickets ADD INDEX `ticket_index` (`id`, `department_id`, `operator_id`, `user_id`, `ticket_status`);
+				ALTER TABLE ".$SupportTicketsTable." DROP INDEX `enc_id`;
+				ALTER TABLE ".$SupportTicketsTable." DROP COLUMN `enc_id`;
+				ALTER TABLE ".$SupportTicketsTable." ADD INDEX `ticket_index` (`id`, `department_id`, `operator_id`, `user_id`, `ticket_status`);
 		END IF;
 
 		/*Rename Columns*/
-		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = 'razorphyn_support_uploaded_file' AND column_name = 'num_id') THEN
-				ALTER TABLE razorphyn_support_uploaded_file CHANGE `num_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL;
+		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportUploadTable."' AND column_name = 'num_id') THEN
+				ALTER TABLE ".$SupportUploadTable." CHANGE `num_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL;
 		END IF;
 
-		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = 'razorphyn_support_operator_rate' AND column_name = 'enc_id') 
+		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportRateTable."' AND column_name = 'enc_id') 
 			THEN
-				ALTER TABLE razorphyn_support_operator_rate DROP INDEX `enc_id`;
-				ALTER TABLE razorphyn_support_operator_rate CHANGE `enc_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL;
-				ALTER TABLE razorphyn_support_operator_rate ADD INDEX `op_rate_index` (`ref_id`, `tk_id`, `rate`);
-				ALTER TABLE razorphyn_support_operator_rate ADD UNIQUE KEY(`tk_id`);
+				ALTER TABLE ".$SupportRateTable." DROP INDEX `enc_id`;
+				ALTER TABLE ".$SupportRateTable." CHANGE `enc_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL;
+				ALTER TABLE ".$SupportRateTable." ADD INDEX `op_rate_index` (`ref_id`, `tk_id`, `rate`);
+				ALTER TABLE ".$SupportRateTable." ADD UNIQUE KEY(`tk_id`);
 		END IF;
 
-		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = 'razorphyn_support_flag_tickets' AND column_name = 'enc_id') 
+		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportFlagTable."' AND column_name = 'enc_id') 
 			THEN
-				ALTER TABLE razorphyn_support_flag_tickets DROP INDEX `ref_id`;
-				ALTER TABLE razorphyn_support_flag_tickets CHANGE `enc_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL;
-				ALTER TABLE razorphyn_support_flag_tickets ADD INDEX `flag_index` (`ref_id`, `tk_id`, `usr_id`);
+				ALTER TABLE ".$SupportFlagTable." DROP INDEX `ref_id`;
+				ALTER TABLE ".$SupportFlagTable." CHANGE `enc_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL;
+				ALTER TABLE ".$SupportFlagTable." ADD INDEX `flag_index` (`ref_id`, `tk_id`, `usr_id`);
 		END IF;
 
-		ALTER TABLE razorphyn_support_list_messages MODIFY COLUMN `ticket_id` BIGINT(15) UNSIGNED NOT NULL;
+		ALTER TABLE ".$SupportMessagesTable." MODIFY COLUMN `ticket_id` BIGINT(15) UNSIGNED NOT NULL;
 	END;;
 
 	DELIMITER ;
