@@ -739,7 +739,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		$(document).on('click',".viewtk",function(){
 			var id=$(this).val();
-			if(id.match(/[0-9]{1,11}/g,id))
+			if(id.match(/[0-9]{1,15}/g,id))
 				window.location.replace("<?php echo $siteurl.'/user/view.php?id=';?>"+id);
 			else
 				noty({text: 'Invalid Ticket ID',type:'error',timeout:9000});

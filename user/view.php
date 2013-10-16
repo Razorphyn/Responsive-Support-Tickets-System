@@ -22,7 +22,7 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 }
 session_start(); 
 
-if(!preg_match('/^[0-9]{1,11}$/',$_GET['id']))
+if(!preg_match('/^[0-9]{1,15}$/',$_GET['id']))
 	header("location: index.php");
 
 //Session Check

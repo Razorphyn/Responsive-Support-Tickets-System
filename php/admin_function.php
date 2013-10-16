@@ -963,7 +963,7 @@ else{
 
 	else if($_POST[$_SESSION['token']['act']]=='retrive_operator_assign'){//check
 		$_POST['enc']=trim(preg_replace('/\s+/','',$_POST['enc']));
-		if(!preg_match('/^[0-9]{1,11}$/',$_POST['enc'])){
+		if(!preg_match('/^[0-9]{1,15}$/',$_POST['enc'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid ID'));
 			exit();
@@ -999,9 +999,9 @@ else{
 
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
-			$STH->bindParam(1,$_SESSION['tickets'][$_POST['enc']]['op_id'],PDO::PARAM_INT);
-			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
-			$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
+			$STH->bindParam(2,$_SESSION['tickets'][$_POST['enc']]['op_id'],PDO::PARAM_INT);
+			$STH->bindParam(3,$_POST['id'],PDO::PARAM_INT);
+			$STH->bindParam(4,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 			
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -1032,7 +1032,7 @@ else{
 		$_POST['opid']=(is_numeric($_POST['opid'])) ? $_POST['opid']:exit();
 		$_POST['dpid']=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 		$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-		if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+		if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid ID'));
 			exit();
@@ -1374,7 +1374,7 @@ else{
 	
 	else if($_POST[$_SESSION['token']['act']]=='rem_flag'){//check
 		$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-		if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+		if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid ID'));
 			exit();

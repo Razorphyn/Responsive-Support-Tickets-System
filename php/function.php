@@ -269,7 +269,7 @@ else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_acc
 
 				$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key=NULL WHERE `id`=?";
 				$STH = $DBH->prepare($query);
-				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT,87);
+				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 				$STH->execute();
 				$_SESSION['status']=0;
 				$_SESSION['time']=time();
@@ -740,7 +740,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 
 else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && isset($_SESSION['status']) && $_SESSION['status']<3){//check
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid ID",type:"error",timeout:9000});</script>';
 		exit();
 	}
@@ -947,7 +947,7 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 
 else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status']<3){
 	$_POST['enc']=trim(preg_replace('/\s+/','',$_POST['enc']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -967,7 +967,7 @@ else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status
 		
 		$query = "DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id`=? ";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_STR,87);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
 		$STH->execute();
 
 		$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `tk_id`=?";
@@ -1191,7 +1191,7 @@ else if($_POST['action']=='scrollpagination' && isset($_POST['action']) && isset
 	$_POST['offset'] = is_numeric($_POST['offset']) ? $_POST['offset'] : exit();
 	$_POST['number'] = is_numeric($_POST['number']) ? $_POST['number'] : exit();
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -1374,7 +1374,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_status' && isset($_SESSION['s
 	else
 		$_POST['status']=($_POST['status']==0 || $_POST['status']==1 || $_POST['status']==2)? $_POST['status']:0;
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -1461,7 +1461,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_status' && isset($_SESSION['s
 else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSION['status']) && $_SESSION['status']==1){// deep check
 	$_POST['dpid']=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -1508,7 +1508,7 @@ else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSIO
 else if($_POST[$_SESSION['token']['act']]=='update_ticket_title' && isset($_SESSION['status']) && $_SESSION['status']<3){
 	$_POST['tit']=(trim(preg_replace('/\s+/','',$_POST['tit']))!='')? trim(preg_replace('/\s+/',' ',$_POST['tit'])):exit();
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -1536,7 +1536,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_title' && isset($_SESS
 
 else if($_POST[$_SESSION['token']['act']]=='update_ticket_connection' && isset($_SESSION['status']) && $_SESSION['status']<3){
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -1582,7 +1582,11 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_connection' && isset($
 
 else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSION['status']<3){
 	$_POST['ticket_id']=trim(preg_replace('/\s+/','',$_POST['ticket_id']));
-	$_POST['ticket_id']=($_POST['ticket_id']!='' && strlen($_POST['ticket_id'])==87) ? $_POST['ticket_id']:exit();
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['ticket_id'])){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid ID'));
+		exit();
+	}
 	$_POST['file_download']=(is_numeric($_POST['file_download'])) ? (int)$_POST['file_download']:exit();
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1590,8 +1594,8 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 
 		$query="SELECT name,enc FROM ".$SupportUploadTable." WHERE ticket_id=? AND id=? LIMIT 1";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['ticket_id'],PDO::PARAM_STR,87);
-		$STH->bindParam(2,$_POST['file_download'],PDO::PARAM_STR);
+		$STH->bindParam(1,$_POST['ticket_id'],PDO::PARAM_INT);
+		$STH->bindParam(2,$_POST['file_download'],PDO::PARAM_INT);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a=$STH->fetch();
@@ -1625,7 +1629,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 
 else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESSION['status']) && $_SESSION['status']<3){
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -1717,7 +1721,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESS
 else if($_POST[$_SESSION['token']['act']]=='rating' && isset($_SESSION['status']) && $_SESSION['status']<3){//deep check
 	$_POST['rate']=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$_POST['tkid']=trim(preg_replace('/\s+/','',$_POST['tkid']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['tkid'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['tkid'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -2033,7 +2037,7 @@ else if($_POST[$_SESSION['token']['act']]=='report_ticket' && isset($_SESSION['s
 		$error[]='Empty Message';
 	
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	if(!preg_match('/^[0-9]{1,11}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		$error[]='Incorrect ID';
 	}
 
@@ -2080,7 +2084,11 @@ else if($_POST[$_SESSION['token']['act']]=='report_ticket' && isset($_SESSION['s
 else if($_POST[$_SESSION['token']['act']]=='del_post_file' && isset($_SESSION['status']) && $_SESSION['status']<3){
 	
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
-	$_POST['id']=($_POST['id']!='' && strlen($_POST['id'])==87) ? $_POST['id']:exit();
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid ID'));
+		exit();
+	}
 	
 	$_POST['file_id']=(is_numeric($_POST['file_id']))? (int)$_POST['file_id']:exit();
 	
