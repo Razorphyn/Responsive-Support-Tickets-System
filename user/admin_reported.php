@@ -43,30 +43,49 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 	 header("location: ../index.php");
 	 exit();
 }
-
+include_once '../php/config/database.php';
+try{
+	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+	$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+	$query = "SELECT 
+					a.id,
+					a.ref_id,
+					CASE b.status WHEN '0' THEN 'User' WHEN '1' THEN 'Operator' WHEN '2' THEN 'Adminsitrator' ELSE 'Useless' END AS urole,
+					a.reason,
+					b.mail  
+			FROM ".$SupportFlagTable." a
+			LEFT JOIN ".$SupportUserTable." b
+				ON b.id=a.usr_id";
+	$STH = $DBH->prepare($query);
+	$STH->execute();
+	$STH->setFetchMode(PDO::FETCH_ASSOC);
+	$list=array();
+	$a = $STH->fetch();
+	if(!empty($a)){
+		do{
+			$a['id']=$a['id']-14;
+			$list[]=array(	'id'=>$a['id'],
+							'ref_id'=>$a['ref_id'],
+							'role'=>$a['urole'],
+							'reason'=>htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8'),
+							'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'),
+							'action'=>'<div class="btn-group"><button class="btn btn-info read" value="'.$a['id'].'"><i class="icon-eye-open"></i></button><button class="btn btn-danger solved" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+						);
+		}
+		while ($a = $STH->fetch());
+	}
+}
+catch(PDOException $e){  
+	file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	$error='An Error has occurred, please read the PDOErrors file and contact a programmer';
+}
+		
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
-if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/logo.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-if(is_file('../php/config/mail/stmp.txt')) $stmp=file('../php/config/mail/stmp.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-if(is_file('../php/config/mail/newuser.txt')) $nu=file('../php/config/mail/newuser.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-if(is_file('../php/config/mail/newreply.txt')) $nr=file('../php/config/mail/newreply.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-if(is_file('../php/config/mail/newticket.txt')) $nt=file('../php/config/mail/newticket.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-if(is_file('../php/config/mail/assigned.txt')) $as=file('../php/config/mail/assigned.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-if(is_file('../php/config/mail/forgotten.txt')) $fo=file('../php/config/mail/forgotten.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
-
-$crypttable=array_flip(array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l'));
-		
-$stmp[8]=str_split($stmp[8]);
-$c=count($stmp[8]);
-for($i=0;$i<$c;$i++){
-	if(array_key_exists($stmp[8][$i],$crypttable))
-		$stmp[8][$i]=$crypttable[$stmp[8][$i]];
-}
-$stmp[8]=implode('',$stmp[8]);
 
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
@@ -137,7 +156,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
 										</li>
 										<li role="presentation" class='active'>
-											<a href="flag.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
+											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
 										</li>
 									</ul>
 								</li>
@@ -153,11 +172,23 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<h2 class='pagefun'>Reported Tickets</h2>
 				</div>
 				<hr>
-				<div class='row-fluid' id='deplist'>
-					<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-					<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="deptable">
-					</table>
-				</div>
+				<?php if(!isset($error)){ ?>
+					<div class='row-fluid' id='deplist'>
+						<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="deptable">
+						<tbody>
+							<?php 
+								$c=count($list);
+								for($i=0;$i<$c;$i++)
+									echo'<tr><td>'.$list[$i]['id'].'</td><td>'.$list[$i]['ref_id'].'</td><td>'.$list[$i]['mail'].'</td><td>'.$list[$i]['role'].'</td><td>'.$list[$i]['reason'].'</td><td>'.$list[$i]['action'].'</td><tr>';
+							?>
+						</table>
+					</div>
+				<?php
+					}
+					else
+						echo '<p>'.$error.'</p>';
+				?>
 				<br/><br/>
 				<hr>
 			</div>
@@ -170,51 +201,25 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
-
-		var table;
-		$.ajax({
-			type:"POST",
-			url:"../php/admin_function.php",
-			data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_reported_ticket"},
-			dataType:"json",
-			success:function(a){
-				if("ret"==a.response||"empty"==a.response){
-					if("ret"==a.response){
-						var b=a.ticket.length;
-						for(i=0;i<b;i++)
-							a.ticket[i].action='<div class="btn-group"><button class="btn btn-info read" value="'+a.ticket[i].encid+'"><i class="icon-eye-open"></i></button><button class="btn btn-danger solved" value="'+a.ticket[i].encid+'"><i class="icon-remove"></i></button></div>'
-					}
-					$("#loading").remove(); 
-					table=$("#deptable").dataTable({
+		
+		var table=$("#deptable").dataTable({
 						sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
 						sWrapper:"dataTables_wrapper form-inline",
 						bDestroy:!0,
 						bProcessing:!0,
-						aaData:a.ticket,
 						oLanguage:{sEmptyTable:"No Complaints"},
-						aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reference ID",mDataProp:"ref_id",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reference ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reporter Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Mail: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Reporter Role",mDataProp:"role",sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Role: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Comment",mDataProp:"reason",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Comment: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1, sWidth:"120px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]
-					})
-				}
-				else if(a[0]=='sessionerror'){
-					switch(a[1]){
-						case 0:
-							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-							break;
-						case 1:
-							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-							break;
-						case 2:
-							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-							break;
-						case 3:
-							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-							break;
-					}
-				}
-				else 
-					noty({text:a[0],type:"error",timeout:9E3})
-			}
-		}).fail(function(a,b){alert("Ajax Error: "+b)});
+						aoColumns:[
+							{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle:"Reference ID",mDataProp:"ref_id",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reference ID: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle:"Reporter Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Mail: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle:"Reporter Role",mDataProp:"role",sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Reporter Role: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle:"Comment",mDataProp:"reason",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Comment: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1, sWidth:"120px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
+						]
+					});
+		$("#loading").remove();
+		$("#deptable").show(800);
+					
 
 		$("#deptable").on("click",".read",function(){var b=$(this).val(),c=$(this).val().replace(/\./g,"_");var a=this.parentNode.parentNode.parentNode.parentNode;table.fnGetPosition(a,null,!0);a=table.fnGetData(a);0<$("#"+a.id).length?$("html,body").animate({scrollTop:$("#"+a.id).offset().top},1500):(b="<hr><div id='"+c+"' ><span>Reference <strong>"+a.ref_id+"</strong> submitted by <strong>"+a.role+"</strong></span><button class='btn btn-link btn_close_form'>Close</button><div class='row-fluid'><div class='span2'><label><strong>Reference ID</strong></label></div><div class='span4'><p>"+ a.ref_id+"</p></div><div class='span2'><label><strong>Reporter mail</strong></label></div><div class='span4'><p>"+a.mail+"</p></div></div><div class='row-fluid'><div class='span2'><label><strong>Complaint Reason</strong></label></div></div><div class='row-fluid'><div class='span12 flagcont'>"+a.reason+"</div></div><div class='row-fluid'><div class='span2 offset5'><a href='view.php?id="+b+"' class='btn btn-info' title='Read Tciket'>View Ticket</a></div></div></div>",$("#deplist").after(b),b="Yes"== a["public"]?1:0,$('select[name="edit_depa_active"]:first option[value='+("Yes"==a.active?1:0)+"]").attr("selected","selected"),$('select[name="edit_depa_public"]:first option[value='+b+"]").attr("selected","selected"))});
 

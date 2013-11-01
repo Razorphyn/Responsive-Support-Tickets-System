@@ -22,8 +22,6 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 }
 session_start(); 
 
-
-
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
@@ -43,6 +41,42 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 	 header("location: ../index.php");
 	 exit();
 }
+include_once '../php/config/database.php';
+try{
+	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+	$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+	
+	$query = "SELECT 	id,
+						question,
+						position,
+						CASE active WHEN '0' THEN 'No' ELSE 'Yes' END AS ac,
+						CASE rate WHEN 0 THEN 'Unrated' ELSE rate END AS rat 
+				FROM ".$SupportFaqTable;
+	$STH = $DBH->prepare($query);
+	$STH->execute();
+
+	$STH->setFetchMode(PDO::FETCH_ASSOC);
+	$list=array();
+	$a = $STH->fetch();
+	if(!empty($a)){
+		do{
+			$a['id']=$a['id']-14;
+			$list[]=array(	'id'=>$a['id'],
+							'question'=>htmlspecialchars($a['question'],ENT_QUOTES,'UTF-8'),
+							'position'=>$a['position'],
+							'active'=>$a['ac'],
+							'rate'=>$a['rat'],
+							'action'=>'<div class="btn-group"><button class="btn btn-info editdep" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+						);
+		}while ($a = $STH->fetch());
+	}
+
+}
+catch(PDOException $e){  
+	file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	$error='An Error has occurred, please read the PDOErrors file and contact a programmer';
+}
+		
 include_once '../php/mobileESP.php';
 $uagent_obj = new uagent_info();
 $isMob=$uagent_obj->DetectMobileQuick();
@@ -124,7 +158,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
 										</li>
 										<li role="presentation">
-											<a href="flag.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
+											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
 										</li>
 									</ul>
 								</li>
@@ -140,59 +174,72 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<h2 class='pagefun'>Administration - FAQs</h2>
 				</div>
 				<hr>
-				<h3 class='sectname'>FAQs</h3>
-				<div class='row-fluid' id='deplist'>
-					<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-					<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="faqtable">
-					</table>
-				</div>
-				<br/><br/>
-				<div id='faq_div' style='display:none;'>
-					<hr>
-					<form action='' method='post' class='submit_changes_depa' id='edit_faq'>
-						Edit FAQ with ID:<span id='faq_id'></span><button  class='btn btn-link btn_close_form'>Close</button>
-						<input type='hidden' id='faq_edit_id' name='faq_edit_id'/>
-						<input type='hidden' id='faq_edit_pos' name='faq_edit_pos' />
-						<div class='row-fluid'>
-							<div class='span2'><label for='edit_faq_question'>Question:</label></div>
-							<div class='span9'><input type='text' id='edit_faq_question' /></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='edit_faq_answer'>Answer:</label></div>
-							<div class='span9'><textarea type='text' id='edit_faq_answer' name='edit_faq_answer' placeholder='Answer'></textarea></div>
-						</div>
-						<br/>
-						<div class='row-fluid'>
-							<div class='span2'><label for='edit_faq_position'>Position</label></div>
-							<div class='span4'><input type='number' id='edit_faq_position' name='edit_faq_position' placeholder='Position, leave blank for last'/></div>
-							<div class='span2'><label for='activedep'>Is Active?</label></div>
-							<div class='span4'><select name='edit_faq_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div>
-						</div>
-						<input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' />
-					</form>
+				<?php if(!isset($error)){ ?>
+					<h3 class='sectname'>FAQs</h3>
+					<div class='row-fluid' id='deplist'>
+						<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="faqtable">
+							<tbody>
+								<?php 
+									$c=count($list);
+									for($i=0;$i<$c;$i++)
+										echo '<tr><td>'.$list[$i]['id'].'</td><td>'.$list[$i]['question'].'</td><td>'.$list[$i]['position'].'</td><td>'.$list[$i]['active'].'</td><td>'.$list[$i]['rate'].'</td><td>'.$list[$i]['action'].'</td></tr>';
+								?>
+							</tbody>
+						</table>
+					</div>
 					<br/><br/>
-				</div>
-				<hr>
-				<h4 class='sectname'>Add New FAQ</h4>
-				<form id='newfaqform' action='' method='post'>
-						<div class='row-fluid'>
-							<div class='span2'><label for='question'>Question:</label></div>
-							<div class='span4'><input type="text" name='question' id="question" placeholder="Question" required /></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='answer'>Answer:</label></div>
-							<div class='span9'><textarea class='mailmessage' id='answer' rows="5" placeholder='Answer' required></textarea></div>	
-						</div>
-						<br/>
-						<div class='row-fluid'>
-							<div class='span2'><label for='position'>Position:</label></div>
-							<div class='span4'><input type="number" name='position' id="position" placeholder="Position, leave blank for last"/></div>
-							<div class='span2'><label for='activefaq'>Is Active?</label></div>
-							<div class='span4'><select name='activefaq' id='activefaq'><option value='1'>Yes</option><option value='0'>No</option></select>
+					<div id='faq_div' style='display:none;'>
+						<hr>
+						<form action='' method='post' class='submit_changes_depa' id='edit_faq'>
+							Edit FAQ with ID:<span id='faq_id'></span><button  class='btn btn-link btn_close_form'>Close</button>
+							<input type='hidden' id='faq_edit_id' name='faq_edit_id'/>
+							<input type='hidden' id='faq_edit_pos' name='faq_edit_pos' />
+							<div class='row-fluid'>
+								<div class='span2'><label for='edit_faq_question'>Question:</label></div>
+								<div class='span9'><input type='text' id='edit_faq_question' /></div>
 							</div>
-						</div>
-					<input type="submit" class="btn btn-success" value='Add New FAQ' onclick='javascript:return false;' id='btnaddfaq'/>
-				</form>
+							<div class='row-fluid'>
+								<div class='span2'><label for='edit_faq_answer'>Answer:</label></div>
+								<div class='span9'><textarea type='text' id='edit_faq_answer' name='edit_faq_answer' placeholder='Answer'></textarea></div>
+							</div>
+							<br/>
+							<div class='row-fluid'>
+								<div class='span2'><label for='edit_faq_position'>Position</label></div>
+								<div class='span4'><input type='number' id='edit_faq_position' name='edit_faq_position' placeholder='Position, leave blank for last'/></div>
+								<div class='span2'><label for='activedep'>Is Active?</label></div>
+								<div class='span4'><select name='edit_faq_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div>
+							</div>
+							<input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' />
+						</form>
+						<br/><br/>
+					</div>
+					<hr>
+					<h4 class='sectname'>Add New FAQ</h4>
+					<form id='newfaqform' action='' method='post'>
+							<div class='row-fluid'>
+								<div class='span2'><label for='question'>Question:</label></div>
+								<div class='span4'><input type="text" name='question' id="question" placeholder="Question" required /></div>
+							</div>
+							<div class='row-fluid'>
+								<div class='span2'><label for='answer'>Answer:</label></div>
+								<div class='span9'><textarea class='mailmessage' id='answer' rows="5" placeholder='Answer' required></textarea></div>	
+							</div>
+							<br/>
+							<div class='row-fluid'>
+								<div class='span2'><label for='position'>Position:</label></div>
+								<div class='span4'><input type="number" name='position' id="position" placeholder="Position, leave blank for last"/></div>
+								<div class='span2'><label for='activefaq'>Is Active?</label></div>
+								<div class='span4'><select name='activefaq' id='activefaq'><option value='1'>Yes</option><option value='0'>No</option></select>
+								</div>
+							</div>
+						<input type="submit" class="btn btn-success" value='Add New FAQ' onclick='javascript:return false;' id='btnaddfaq'/>
+					</form>
+				<?php
+					}
+					else
+						echo '<p>'.$error.'</p>';
+				?>
 				<br/><br/>
 			</div>
 		</div>
@@ -208,9 +255,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	
 	<script>
 	 $(document).ready(function() {
-		var table;
-		var request = $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_faq"}, dataType:"json", success:function(b) { if("ret" == b.response || "empty" == b.response) { if("ret" == b.response) { var f = b.faq.length; for(i = 0;i < f;i++) { b.faq[i].action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + b.faq[i].id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + b.faq[i].id + '"><i class="icon-remove"></i></button></div>' } } $("#loading").remove(); table = $("#faqtable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>", sWrapper:"dataTables_wrapper form-inline", bProcessing:!0, aaData:b.faq, oLanguage:{sEmptyTable:"No FAQs"}, aoColumns:[{sTitle:"ID", mDataProp:"id", sWidth:"60px", fnCreatedCell:function(a, b, c, d, e) { $(a).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(a).html() + "</span>") }}, {sTitle:"Question", mDataProp:"question", fnCreatedCell:function(a, b, c, d, e) { $(a).html("<span><strong class='visible-phone'>Question: </strong></span><span> " + $(a).html() + "</span>") }}, {sTitle:"Position", mDataProp:"position", sWidth:"50px", fnCreatedCell:function(a, b, c, d, e) { $(a).html("<span><strong class='visible-phone'>Position: </strong></span><span> " + $(a).html() + "</span>") }}, {sTitle:"Active", mDataProp:"active", sWidth:"60px", fnCreatedCell:function(a, b, c, d, e) { $(a).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(a).html() + "</span>") }}, {sTitle:"Rate", mDataProp:"rate", sWidth:"40px", fnCreatedCell:function(a, b, c, d, e) { $(a).html("<span><strong class='visible-phone'>Rate: </strong></span><span> " + $(a).html() + "</span>") }}, {sTitle:"Toogle", mDataProp:"action", bSortable:!1, bSearchable:!1, sWidth:"60px", fnCreatedCell:function(a, b, c, d, e) { $(a).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(a).html() + "</span>") }}]}) }else { noty({text:b[0], type:"error", timeout:9E3}) } }}); request.fail(function(b, f) { noty({text:f, type:"error", timeout:9E3}) });
-
+		var table = $("#faqtable").dataTable({
+									sDom: "<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+									sWrapper: "dataTables_wrapper form-inline",
+									bProcessing: !0,
+									oLanguage: {sEmptyTable: "No FAQs"},
+									aoColumns: [
+										{sTitle: "ID",mDataProp: "id",sWidth: "60px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Question",mDataProp: "question",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Question: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Position",mDataProp: "position",sWidth: "50px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Position: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Active",mDataProp: "active",sWidth: "60px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Rate",mDataProp: "rate",sWidth: "40px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Rate: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Toogle",mDataProp: "action",sWidth: "60px",bSortable: !1,bSearchable: !1,fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(a).html() + "</span>")}}
+									]
+								});
+		$("#loading").remove();
+		$("#faqtable").show(800);
 		<?php if(!$isMob) {?>
 			CKEDITOR.replace('answer');
 			CKEDITOR.replace('edit_faq_answer');

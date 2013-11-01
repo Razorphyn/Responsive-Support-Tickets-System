@@ -82,42 +82,8 @@ else{
 	}
 
 	//Functions
-	if($_POST[$_SESSION['token']['act']]=='retrive_reported_ticket'){//check
-		try{
-			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
-			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-				$query = "SELECT 
-							a.id,
-							a.ref_id,
-							CASE b.status WHEN '0' THEN 'User' WHEN '1' THEN 'Operator' WHEN '2' THEN 'Adminsitrator' ELSE 'Useless' END AS urole,
-							a.reason,
-							b.mail  
-				FROM ".$SupportFlagTable." a
-				LEFT JOIN ".$SupportUserTable." b
-					ON b.id=a.usr_id";
-			$STH = $DBH->prepare($query);
-			$STH->execute();
-			$STH->setFetchMode(PDO::FETCH_ASSOC);
-			$list=array('response'=>'ret','ticket'=>array());
-			$a = $STH->fetch();
-			if(!empty($a)){
-				do{
-					$list['ticket'][]=array('id'=>$a['id']-14,'ref_id'=>$a['ref_id'],'role'=>$a['urole'],'reason'=>htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
-				}
-				while ($a = $STH->fetch());
-			}
-			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode($list);
-		}
-		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
-			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
-		}
-		exit();
-	}
 
-	else if($_POST[$_SESSION['token']['act']]=='admin_user_add'){
+	if($_POST[$_SESSION['token']['act']]=='admin_user_add'){
 		$_POST['name']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
 		if(empty($_POST['name'])){
 			header('Content-Type: application/json; charset=utf-8');
@@ -210,7 +176,7 @@ else{
 			$data=array();
 			$data['response']='Added';
 			$dpid=$DBH->lastInsertId();
-			$_POST['active']=($active==0) ? 'No':'Yes';
+			$_POST['active']=($_POST['active']==0) ? 'No':'Yes';
 			$_POST['pubdep']=($_POST['pubdep']==0) ? 'No':'Yes';
 			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pubdep']);
 			header('Content-Type: application/json; charset=utf-8');
@@ -506,48 +472,6 @@ else{
 				}
 				else
 					echo "<script>parent.noty({text: 'Error during moving',type:'error',timeout:9E3});</script>";
-		}
-		exit();
-	}
-
-	else if($_POST[$_SESSION['token']['act']]=='retrive_users'){
-		try{
-			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
-			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-
-			$query = "SELECT 
-						`id`,
-						`name`,
-						`mail`,
-						CASE `status` WHEN '0' THEN 'User'  WHEN '1' THEN 'Operator'  WHEN '2' THEN 'Administrator'  WHEN '3' THEN 'Activation'  WHEN '4' THEN 'Banned' ELSE 'Error' END AS ustat,
-						CASE `holiday` WHEN '0' THEN 'No' ELSE 'Yes' END AS hol, 
-						CASE WHEN `number_rating`='0' THEN 'No Rating' WHEN `number_rating`!='0' THEN `rating` ELSE 'Error' END AS rt
-					FROM ".$SupportUserTable." LIMIT 700";
-			
-			$STH = $DBH->prepare($query);
-			$STH->execute();
-
-			$STH->setFetchMode(PDO::FETCH_ASSOC);
-			$a = $STH->fetch();
-			if(!empty($a)){
-				$users=array('response'=>'ret','information'=>array());
-				do{
-					$users['information'][]=array('num'=>$a['id']-54,'name'=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'),'status'=>$a['ustat'],'holiday'=>$a['hol'],"rating"=>$a['rt']);
-				}while ($a = $STH->fetch());
-				
-				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode($users);
-			}
-			else{
-				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array('response'=>array('empty'),'information'=>array()));
-			}
-							
-		}
-		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
-			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
 	}
@@ -1136,34 +1060,6 @@ else{
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
-			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
-		}
-		exit();
-	}
-	
-	else if($_POST[$_SESSION['token']['act']]=='retrive_faq'){
-		try{
-			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
-			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-
-			$query = "SELECT id,question,position,CASE active WHEN '0' THEN 'No' ELSE 'Yes' END AS ac,CASE rate WHEN 0 THEN 'Unrated' ELSE rate END AS rat FROM ".$SupportFaqTable;
-			$STH = $DBH->prepare($query);
-			$STH->execute();
-			
-			$STH->setFetchMode(PDO::FETCH_ASSOC);
-			$list=array('response'=>'ret','faq'=>array());
-			$a = $STH->fetch();
-			if(!empty($a)){
-				do{
-					$list['faq'][]=array('id'=>($a['id']-14),'question'=>htmlspecialchars($a['question'],ENT_QUOTES,'UTF-8'),'position'=>$a['position'],'active'=>$a['ac'],'rate'=>$a['rat']);
-				}while ($a = $STH->fetch());
-			}
-			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode($list);
-		}
-		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
-			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();

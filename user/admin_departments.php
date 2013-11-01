@@ -41,6 +41,36 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 	 header("location: ../index.php");
 	 exit();
 }
+include_once '../php/config/database.php';
+try{
+	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+	$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+	$query = "SELECT id,
+					department_name,
+					CASE active WHEN '1' THEN 'Yes' ELSE 'No' END AS active, 
+					CASE public_view WHEN '1' THEN 'Yes' ELSE 'No' END AS public 
+				FROM ".$SupportDepaTable;
+		
+	$STH = $DBH->prepare($query);
+	$STH->execute();
+	$STH->setFetchMode(PDO::FETCH_ASSOC);
+	$a = $STH->fetch();
+	$dn=array();
+	if(!empty($a)){
+		do{
+			$dn[]=array('id'=>$a['id'],
+						'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),
+						'active'=>$a['active'],
+						'public'=>$a['public'],
+						'action'=>'<div class="btn-group"><button class="btn btn-info editdep" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+			);
+		}while ($a = $STH->fetch());
+	}
+}
+catch(PDOException $e){
+	file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	$error='We are sorry, but an error has occurred, please contact the administrator if it persist';
+}
 
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 
@@ -48,16 +78,6 @@ $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
-
-$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
-		
-$stmp[8]=str_split($stmp[8]);
-$c=count($stmp[8]);
-for($i=0;$i<$c;$i++){
-	if(array_key_exists($stmp[8][$i],$crypttable))
-		$stmp[8][$i]=$crypttable[$crypttable[$stmp[8][$i]]];
-}
-$stmp[8]=implode('',$stmp[8]);
 							
 ?>
 <!DOCTYPE html>
@@ -126,7 +146,7 @@ $stmp[8]=implode('',$stmp[8]);
 											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
 										</li>
 										<li role="presentation">
-											<a href="flag.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
+											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
 										</li>
 									</ul>
 								</li>
@@ -142,38 +162,51 @@ $stmp[8]=implode('',$stmp[8]);
 					<h2 class='pagefun'>Administration - Departments</h2>
 				</div>
 				<hr>
-				<h3 class='sectname'>Departments</h3>
-				<div class='row-fluid' id='deplist'>
-					<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-					<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="deptable">
-					</table>
-				</div>
-				<br/><br/>
-				<hr>
-				<h4 class='sectname'>Add New Department</h4>
-				<form action='' method='post'>
-						<div class='row-fluid'>
-							<div class='span2'><label for='depname'>Name</label></div>
-							<div class='span4'><input type="text" name='depname' id="depname" placeholder="Department Name" required /></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='activedep'>Is Active?</label></div>
-							<div class='span4'>
-								<select name='activedep' id='activedep'>
-									<option value='1'>Yes</option>
-									<option value='0'>No</option>
-								</select>
+				<?php if(!isset($error)){ ?>
+					<h3 class='sectname'>Departments</h3>
+					<div class='row-fluid' id='deplist'>
+						<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="deptable">
+						<tbody>
+						<?php
+							$c=count($dn);
+							for($i=0;$i<$c;$i++)
+								echo '<tr><td>'.$dn[$i]['id'].'</td><td>'.$dn[$i]['name'].'</td><td>'.$dn[$i]['active'].'</td><td>'.$dn[$i]['public'].'</td><td>'.$dn[$i]['action'].'</td></tr>';
+						?>
+						</tbody>
+						</table>
+					</div>
+					<br/><br/>
+					<hr>
+					<h4 class='sectname'>Add New Department</h4>
+					<form action='' method='post'>
+							<div class='row-fluid'>
+								<div class='span2'><label for='depname'>Name</label></div>
+								<div class='span4'><input type="text" name='depname' id="depname" placeholder="Department Name" required /></div>
 							</div>
-							<div class='span2'><label for='publicdep'>Is Public?</label></div>
-							<div class='span4'>
-								<select name='publicdep' id='publicdep'>
-									<option value='1'>Yes</option>
-									<option value='0'>No</option>
-								</select>
+							<div class='row-fluid'>
+								<div class='span2'><label for='activedep'>Is Active?</label></div>
+								<div class='span4'>
+									<select name='activedep' id='activedep'>
+										<option value='1'>Yes</option>
+										<option value='0'>No</option>
+									</select>
+								</div>
+								<div class='span2'><label for='publicdep'>Is Public?</label></div>
+								<div class='span4'>
+									<select name='publicdep' id='publicdep'>
+										<option value='1'>Yes</option>
+										<option value='0'>No</option>
+									</select>
+								</div>
 							</div>
-						</div>
-					<input type="submit" class="btn btn-success" value='Add New Department' onclick='javascript:return false;' id='btnadddep'/>
-				</form>
+						<input type="submit" class="btn btn-success" value='Add New Department' onclick='javascript:return false;' id='btnadddep'/>
+					</form>
+				<?php
+					}
+					else
+						echo '<p>'.$error.'</p>';
+				?>
 				<br/><br/>
 			</div>
 		</div>
@@ -186,49 +219,22 @@ $stmp[8]=implode('',$stmp[8]);
 	
 	<script>
 	 $(document).ready(function() {
-		var table;
-		$.ajax({
-			type:"POST",
-			url:"../php/function.php",
-			data:{<?php echo $_SESSION['token']['act']; ?>:"retrive_depart",sect:"admin"},
-			dataType:"json",
-			success:function(a){
-				if("ret"==a.response||"empty"==a.response){
-					if("ret"==a.response){
-						var b=a.information.length;
-						for(i=0;i<b;i++)
-							a.information[i].action='<div class="btn-group"><button class="btn btn-info editdep" value="'+a.information[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+a.information[i].id+'"><i class="icon-remove"></i></button></div>'
-					}
-					$("#loading").remove(); 
-					table=$("#deptable").dataTable({
+		var table=$("#deptable").dataTable({
 											sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
 											sWrapper:"dataTables_wrapper form-inline",
 											bDestroy:!0,
 											bProcessing:!0,
-											aaData:a.information,
 											oLanguage:{sEmptyTable:"No Departments"},
-											aoColumns:[{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Toogle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}]}
-						)
-				}
-				else if(a[0]=='sessionerror'){
-					switch(a[1]){
-						case 0:
-							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-							break;
-						case 1:
-							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-							break;
-						case 2:
-							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-							break;
-						case 3:
-							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-							break;
-					}
-				}
-				else 
-					noty({text:a[0], type:"error",timeout:9E3})}
-		}).fail(function(a,b){alert("Ajax Error: "+b)});		
+											aoColumns:[
+												{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Toogle",mDataProp:"action",sWidth:"60px",bSortable:!1,bSearchable:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
+											]
+								});
+		$("#loading").remove(),
+		$("#deptable").show(800);
 				
 		$("#deptable").on("click", ".editdep", function () {
 			$(this).val();
@@ -408,47 +414,6 @@ $stmp[8]=implode('',$stmp[8]);
 						noty({text: e[0],type: "error",timeout: 9E3})
 				}
 			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "Form Error - Empty Fields",type: "error",timeout: 9E3})
-		});
-
-		$("#btnadddep").click(function () {
-			var b = $("#depname").val().replace(/\s+/g, " "),
-				c = $("#activedep").val(),
-				d = $("#publicdep").val();
-			if("" != b.replace(/\s+/g, ""){
-				$.ajax({
-					type: "POST",
-					url: "../php/admin_function.php",
-					data: {<?php echo $_SESSION['token']['act']; ?>: "add_depart",tit: b,active: c,pubdep: d},
-					dataType: "json",
-					success: function (a) {
-						if("Added" == a.response){
-							a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>',
-							table.fnAddData(a.information),
-							$("#depname").val("")
-						}
-						else if(a[0]=='sessionerror'){
-							switch(a[1]){
-								case 0:
-									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-									break;
-								case 1:
-									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-									break;
-								case 2:
-									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-									break;
-								case 3:
-									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-									break;
-							}
-						}
-						else
-							noty({text: a[0],type: "error",timeout: 9E3})
-					}
-				}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})})
-			}
-			else
-				noty({text: "Form Error - Empty Field",type: "error",timeout: 9E3})
 		});
 		
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($(this).parent().prev().remove(),$(this).parent().remove());return!1});

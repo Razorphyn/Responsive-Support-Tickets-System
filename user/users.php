@@ -41,7 +41,46 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 	 header("location: ../index.php");
 	 exit();
 }
+include_once '../php/config/database.php';
+try{
+	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+	$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
+	$query = "SELECT 
+				`id`,
+				`name`,
+				`mail`,
+				CASE `status` WHEN '0' THEN 'User'  WHEN '1' THEN 'Operator'  WHEN '2' THEN 'Administrator'  WHEN '3' THEN 'Activation'  WHEN '4' THEN 'Banned' ELSE 'Error' END AS ustat,
+				CASE `holiday` WHEN '0' THEN 'No' ELSE 'Yes' END AS hol, 
+				CASE WHEN `number_rating`='0' THEN 'No Rating' WHEN `number_rating`!='0' THEN `rating` ELSE 'Error' END AS rt
+			FROM ".$SupportUserTable." LIMIT 700";
+			
+	$STH = $DBH->prepare($query);
+	$STH->execute();
+
+	$STH->setFetchMode(PDO::FETCH_ASSOC);
+	$c=0;
+	$a = $STH->fetch();
+	if(!empty($a)){
+		$users=array();
+		do{
+			$a['id']=$a['id']-54;
+			$users[]=array(	'num'=>$a['id'],
+							'name'=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),
+							'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'),
+							'status'=>$a['ustat'],
+							'holiday'=>$a['hol'],
+							'rating'=>$a['rt'],
+							'action'=>'<div class="btn-group"><button class="btn btn-info edituser" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+						);
+			$c++;
+		}while ($a = $STH->fetch());
+	}
+}
+catch(PDOException $e){  
+	file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	$error='An Error has occurred, please read the PDOErrors file and contact a programmer';
+}
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
@@ -115,7 +154,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
 										</li>
 										<li role="presentation">
-											<a href="flag.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
+											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
 										</li>
 									</ul>
 								</li>
@@ -131,100 +170,80 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<h2 class='pagefun'>Users Administration Tools</h2>
 				</div>
 				<hr>
-				<h3 class='sectname'>Users</h3>
-				<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-				<div class='row-fluid' id='userlist'>
-					<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
-					</table>
-				</div>
-				<br/><br/>
-				<hr>
-				<p class='cif'><i class='icon-plus-sign'></i> Create New User</p>
-				<form style='display:none'>
-					<h3 class='sectname'>New Users</h3>
-					<small><p>Every created user through this function is automatically activated</p></small>
-					<div class='row-fluid'>
-						<div class='span2'><label for='new_rname'>Name</label></div>
-						<div class='span4'><input type="text" id="new_rname" placeholder="Name" required></div>
+				<?php if(!isset($error)){ ?>
+					<h3 class='sectname'>Users</h3>
+					<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+					<div class='row-fluid' id='userlist'>
+						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
+							<tbody>
+								<?php
+									for($i=0;$i<$c;$i++)
+										echo '<tr><td>'.$users[$i]['num'].'</td><td>'.$users[$i]['name'].'</td><td>'.$users[$i]['mail'].'</td><td>'.$users[$i]['status'].'</td><td>'.$users[$i]['holiday'].'</td><td>'.$users[$i]['rating'].'</td><td>'.$users[$i]['action'].'</td></tr>';
+
+								?>
+							</tbody>
+						</table>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label for='new_rmail'>Email</label></div>
-						<div class='span4'><input type="email" id="new_rmail" placeholder="Email" required></div>
-					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label for='new_rmail'>User Role/Status</label></div>
-						<div class='span4'>
-							<select id='new_usr_role'>
-								<option value='0'>User</option>
-								<option value='1'>Operator</option>
-								<option value='2'>Administrator</option>
-							</select>
+					<br/><br/>
+					<hr>
+					<p class='cif'><i class='icon-plus-sign'></i> Create New User</p>
+					<form style='display:none'>
+						<h3 class='sectname'>New Users</h3>
+						<small><p>Every created user through this function is automatically activated</p></small>
+						<div class='row-fluid'>
+							<div class='span2'><label for='new_rname'>Name</label></div>
+							<div class='span4'><input type="text" id="new_rname" placeholder="Name" required></div>
 						</div>
-					</div>
-					<input type="submit" id='new_user' onclick='javascript:return !1;' class="btn btn-success" value='Register'/>
-				</form>
-				<br/>
-				<hr>
+						<div class='row-fluid'>
+							<div class='span2'><label for='new_rmail'>Email</label></div>
+							<div class='span4'><input type="email" id="new_rmail" placeholder="Email" required></div>
+						</div>
+						<div class='row-fluid'>
+							<div class='span2'><label for='new_rmail'>User Role/Status</label></div>
+							<div class='span4'>
+								<select id='new_usr_role'>
+									<option value='0'>User</option>
+									<option value='1'>Operator</option>
+									<option value='2'>Administrator</option>
+								</select>
+							</div>
+						</div>
+						<input type="submit" id='new_user' onclick='javascript:return !1;' class="btn btn-success" value='Register'/>
+					</form>
+					<br/>
+					<hr>
+				<?php 
+					} 
+					else
+						echo '<p>'$error.'</p>';
+				?>
 			</div>
 		</div>
-		<div id='delusr' style='display:none;height:40px' title="Delete this User?">
-			<p>Every information will be irreversibly deleted.</p>
-		</div>
-
+			<div id='delusr' style='display:none;height:40px' title="Delete this User?">
+				<p>Every information will be irreversibly deleted.</p>
+			</div>
+	
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js,js/jquery-ui-1.10.3.custom.min.js&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
-		var table;
-		var request = $.ajax({
-			type: "POST",
-			url: "../php/admin_function.php",
-			data: {<?php echo $_SESSION['token']['act']; ?>: "retrive_users"},
-			dataType: "json",
-			success: function (a) {
-				if ("ret" == a.response || "empty" == a.response) {
-					var b = a.information.length;
-					for (i = 0; i < b; i++) 
-						a.information[i].action = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a.information[i].num + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + a.information[i].num + '"><i class="icon-remove"></i></button></div>';
-					$(".loading:first").remove();
-					table = $("#usertable").dataTable({
+		var table = $("#usertable").dataTable({
 						sDom: "<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
 						sWrapper: "dataTables_wrapper form-inline",
 						bProcessing: !0,
-						aaData: a.information,
 						oLanguage: {sEmptyTable: "No Users"},
 						aoColumns: [
-							{sTitle: "Number",mDataProp: "num",sWidth: "60px",sClass: "visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Number: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Name",mDataProp: "name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Mail",mDataProp: "mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Status/Role",mDataProp: "status",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status/Role: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Holiday",mDataProp: "holiday",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Rating",mDataProp: "rating",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Tooggle",mDataProp: "action",bSortable: !1,bSearchable: !1,sWidth: "60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
+							{sTitle: "Number",mDataProp:"num",sWidth: "60px",sClass: "visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Number: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Status/Role",mDataProp:"status",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status/Role: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Holiday",mDataProp:"holiday",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Rating",mDataProp:"rating",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Tooggle",mDataProp:"action",bSortable: !1,bSearchable: !1,sWidth: "60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
 						}]
-					})
-				}
-				else if(a[0]=='sessionerror'){
-					switch(a[1]){
-						case 0:
-							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-							break;
-						case 1:
-							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-							break;
-						case 2:
-							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-							break;
-						case 3:
-							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-							break;
-					}
-				}
-				else
-					noty({text: a[0],type: "error",timeout: 9E3})
-			}
-		});
-		request.fail(function (a, b) {noty({text: "Ajax Error: " + b,type: "error",timeout: 9E3})});	
+					});
+			
+			$('.loading').remove(),$('#usertable').show(800);
 		
 		<?php if(isset($setting[2])){?>
 		$("#senrep option[value="+<?php echo $setting[2];?>+"]").attr('selected','selected');

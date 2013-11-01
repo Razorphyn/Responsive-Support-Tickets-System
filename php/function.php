@@ -535,7 +535,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 	$letarr=array('M','d','C','f','K','w','p','T','B','X');
 	$error=array();
 	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
-		$_POST['message']=trim(preg_replace('/\s+/',' ',$_POST['message']));
+		$_POST['message']=trim($_POST['message']);
 		require_once 'htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		$purifier = new HTMLPurifier($config);
@@ -746,7 +746,7 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 	}
 	$error=array();
 	if(trim(preg_replace('/\s+/','',$_POST['message']))!=''){
-		$_POST['message']=trim(preg_replace('/\s+/',' ',$_POST['message']));
+		$_POST['message']=trim($_POST['message']);
 		require_once 'htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		$purifier = new HTMLPurifier($config);
@@ -925,10 +925,10 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 				//Post Reply(send to javascript)
 				if(isset($uploadarr[0])){
 					$json=json_encode($uploadarr);
-					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($_POST['message'])."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',".$json.");</script>";
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply(".json_encode($_POST['message']).",'".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',".$json.");</script>";
 				}
 				else
-					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply('".addslashes($_POST['message'])."','".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',null);</script>";
+					echo "<script>parent.$('#formreply').nimbleLoader('hide');parent.post_reply(".json_encode($_POST['message']).",'".$date."','".htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8')."',null);</script>";
 				//end
 			}
 			catch(PDOException $e){
@@ -946,7 +946,7 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 
 else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status']<3){
 	$_POST['enc']=trim(preg_replace('/\s+/','',$_POST['enc']));
-	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['enc'])){
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Invalid ID'));
 		exit();
@@ -962,7 +962,7 @@ else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status
 				$query = "SELECT id FROM ".$SupportTicketsTable." WHERE `id`=? AND operator_id=? LIMIT 1";
 				
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['enc'],PARAM_INT);
+			$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
 			$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
 			$STH->execute();
 			$a = $STH->fetch();
@@ -979,8 +979,7 @@ else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status
 				SET b.assigned_tickets= CASE  WHEN b.assigned_tickets!='0' THEN (b.assigned_tickets-1) ELSE b.assigned_tickets END  
 				WHERE a.id=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['enc'],PARAM_INT);
-		$STH->bindParam(1,$_SESSION['id'],PARAM_INT);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
 		$STH->execute();
 
 		$query = "DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id`=? ";
@@ -990,7 +989,7 @@ else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status
 
 		$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `tk_id`=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['enc'],PARAM_INT);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
 		$STH->execute();
 		$STH->setFetchMode(PDO::FETCH_ASSOC);
 		$a = $STH->fetch();
@@ -1004,18 +1003,18 @@ else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status
 			}while ($a = $STH->fetch());
 			$query = "DELETE FROM ".$SupportUploadTable." WHERE `tk_id`=?";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['enc'],PARAM_INT);
+			$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
 			$STH->execute();
 		}
 		
 		$query = "DELETE FROM ".$SupportFlagTable." WHERE `tk_id`=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['enc'],PARAM_INT);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
 		$STH->execute();
 		
 		$query = "DELETE FROM ".$SupportTicketsTable." WHERE `id`=?";
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['enc'],PARAM_INT);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
 		$STH->execute();
 		
 		header('Content-Type: application/json; charset=utf-8');
@@ -1679,7 +1678,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESS
 			$query = "SELECT id FROM ".$SupportTicketsTable." WHERE `id`=? AND operator_id=? LIMIT 1";
 
 		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['enc'],PARAM_INT);
+		$STH->bindParam(1,$_POST['enc'],PDO::PARAM_INT);
 		$STH->bindParam(2,$_SESSION['id'],PDO::PARAM_INT);
 		$STH->execute();
 		$a = $STH->fetch();

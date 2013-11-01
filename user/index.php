@@ -43,6 +43,166 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']>2){
 	 header("location: ../index.php");
 	 exit();
 }
+include_once '../php/config/database.php';
+try{
+	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+	$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+	if($_SESSION['status']==0){
+		$query = "SELECT 
+					a.id,
+					IF(b.department_name IS NOT NULL, b.department_name,'Unknown'),
+					IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')),
+					a.title,
+					CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
+					a.created_time,
+					a.last_reply
+				FROM ".$SupportTicketsTable." a
+				LEFT JOIN ".$SupportDepaTable." b
+					ON	b.id=a.department_id
+				LEFT JOIN ".$SupportUserTable." c
+					ON c.id=a.operator_id
+				WHERE a.user_id=".$_SESSION['id']."  AND a.ticket_status='1'
+				ORDER BY a.last_reply DESC 
+				LIMIT 350";
+		$STH = $DBH->prepare($query);
+		$STH->execute();
+		$list=array('response'=>'ret','tickets'=>array('user'=>array()));
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			do{
+				$list['tickets']['user'][]=array(
+													'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
+													'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
+													'title'=>'<button class="btn btn-link viewtk" value="'.$a['id'].'">'.htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8').'</button>',
+													'priority'=>$a['prio'],
+													'date'=>$a['created_time'],
+													'reply'=>$a['last_reply'],
+													'status'=>$a['stat'],
+													'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+												);
+			}while ($a = $STH->fetch());
+		}
+	}
+	else if($_SESSION['status']==1){
+		$query = "SELECT 
+					a.id,
+					IF(b.department_name IS NOT NULL, b.department_name,'Unknown'),
+					CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE (IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown'))) END,
+					a.operator_id,
+					a.title,
+					CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
+					a.created_time,
+					a.last_reply
+				FROM ".$SupportTicketsTable." a
+				JOIN ".$SupportDepaTable." b
+					ON	b.id=a.department_id
+				JOIN ".$SupportUserTable." c
+					ON c.id=a.operator_id
+				WHERE a.ticket_status='1' AND a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."' AND a.ticket_status='1'
+				ORDER BY a.last_reply DESC 
+				LIMIT 350" ;
+		$STH = $DBH->prepare($query);
+		$STH->execute();
+		$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array()));
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			do{
+				if($opid==$_SESSION['id'])
+					$list['tickets']['op'][]=array(	
+													'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
+													'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
+													'title'=>'<button class="btn btn-link viewtk" value="'.$a['id'].'">'.htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8').'</button>',
+													'priority'=>$a['prio'],
+													'date'=>$a['created_time'],
+													'reply'=>$a['last_reply'],
+													'status'=>$a['stat'],
+													'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+												);
+				else
+					$list['tickets']['user'][]=array(
+														'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
+														'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
+														'title'=>'<button class="btn btn-link viewtk" value="'.$a['id'].'">'.htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8').'</button>',
+														'priority'=>$a['prio'],
+														'date'=>$a['created_time'],
+														'reply'=>$a['last_reply'],
+														'status'=>$a['stat'],
+														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+													);
+			}while ($a = $STH->fetch());
+		}
+	}
+	else if($_SESSION['status']==2){
+		$query = "SELECT 
+						a.user_id,
+						a.id,
+						IF(b.department_name IS NOT NULL, b.department_name,'Unknown') AS dname,
+						CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE ( IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) ) END AS opname,
+						a.operator_id,
+						a.title,
+						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
+						a.created_time,
+						a.last_reply
+					FROM ".$SupportTicketsTable." a
+					LEFT JOIN ".$SupportDepaTable." b
+						ON	b.id=a.department_id
+					LEFT JOIN ".$SupportUserTable." c
+						ON c.id=a.operator_id
+					WHERE a.ticket_status='1'
+					ORDER BY a.last_reply DESC 
+					LIMIT 350";
+		$STH = $DBH->prepare($query);
+		$STH->execute();
+		$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array(),'admin'=>array()));
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if(!empty($a)){
+			do{
+				if($a['operator_id']==$_SESSION['id'])
+					$list['tickets']['op'][]=array(	
+														'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
+														'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
+														'title'=>'<button class="btn btn-link viewtk" value="'.$a['id'].'">'.htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8').'</button>',
+														'priority'=>$a['prio'],
+														'date'=>$a['created_time'],
+														'reply'=>$a['last_reply'],
+														'status'=>$a['stat'],
+														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+												);
+				else if($a['user_id']==$_SESSION['id'])
+					$list['tickets']['user'][]=array(
+														'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
+														'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
+														'title'=>'<button class="btn btn-link viewtk" value="'.$a['id'].'">'.htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8').'</button>',
+														'priority'=>$a['prio'],
+														'date'=>$a['created_time'],
+														'reply'=>$a['last_reply'],
+														'status'=>$a['stat'],
+														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+													);
+				else
+					$list['tickets']['admin'][]=array(
+														'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
+														'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
+														'title'=>'<button class="btn btn-link viewtk" value="'.$a['id'].'">'.htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8').'</button>',
+														'priority'=>$a['prio'],
+														'date'=>$a['created_time'],
+														'reply'=>$a['last_reply'],
+														'status'=>$a['stat'],
+														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+													);
+			}while ($a = $STH->fetch());
+		}
+	}
+}
+catch(PDOException $e){
+	file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	$error='We are sorry, but an error has occurred, please contact the administrator if it persist';
+}
+$DBH=null;
+	
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 
 $siteurl=dirname(curPageURL());
@@ -122,7 +282,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
 										</li>
 										<li role="presentation">
-											<a href="flag.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
+											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
 										</li>
 									</ul>
 								</li>
@@ -140,53 +300,99 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<h2 class='pagefun'>Ticket List</h2>
 			</div>
 			<hr>
-				<div class='row-fluid main'>
+				<?php if(!isset($error)){ ?>
+					<div class='row-fluid main'>
 
-					<ul id='tkstatnav' class="nav nav-tabs">
-						<li class="active" id='tkopen' value='1' ><a href="#">Open</a></li>
-						<li id='tkclosed' value='0'><a href="#">Closed</a></li>
-						<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
-							<li id='tkassi' value='2'><a href="#">To Assign</a></li>
-						<?php } ?>
-							<li><a href="newticket.php">New Ticket</a></li>
-						<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
-							<li id='aut_ass_tk' onclick='javascript:return false;'><a href="#">Automatic Tickets Assigment</a></li>
-						<?php } ?>
-					</ul>
+						<ul id='tkstatnav' class="nav nav-tabs">
+							<li class="active" id='tkopen' value='1' ><a href="#">Open</a></li>
+							<li id='tkclosed' value='0'><a href="#">Closed</a></li>
+							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+								<li id='tkassi' value='2'><a href="#">To Assign</a></li>
+							<?php } ?>
+								<li><a href="newticket.php">New Ticket</a></li>
+							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+								<li id='aut_ass_tk' onclick='javascript:return false;'><a href="#">Automatic Tickets Assigment</a></li>
+							<?php } ?>
+						</ul>
 
-					<h3 class='sectname'>Your Tickets</h3>
-					<div class='row-fluid'>
-						<div class='span12'>
-							<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-							<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable"></table>
+						<h3 class='sectname'>Your Tickets</h3>
+						<div class='row-fluid'>
+							<div class='span12'>
+								<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+								<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
+									<tbody>
+									<?php
+										if(isset($list['tickets']['user'])){
+											$c=count($list['tickets']['user']);
+											for($i=0;$i<$c;$i++)
+												echo '<tr><td>'.$list['tickets']['user'][$i]['title'].'</td><td>'.$list['tickets']['user'][$i]['date'].'</td><td>'.$list['tickets']['user'][$i]['reply'].'</td><td>'.$list['tickets']['user'][$i]['dname'].'</td><td>'.$list['tickets']['user'][$i]['opname'].'</td><td>'.$list['tickets']['user'][$i]['priority'].'</td><td>'.$list['tickets']['user'][$i]['action'].'</td></tr>';
+										}
+									?>
+									</tbody>
+								</table>
+							</div>
 						</div>
-					</div>
-					<?php if($_SESSION['status']==1){ ?>
-					<h3 class='sectname'>Assigned Tickets</h3>
-					<div class='row-fluid'>
-						<div class='span12'>
-							<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-							<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable"></table>
+						<?php if($_SESSION['status']==1){ ?>
+						<h3 class='sectname'>Assigned Tickets</h3>
+						<div class='row-fluid'>
+							<div class='span12'>
+								<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+								<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
+									<tbody>
+									<?php
+										if(isset($list['tickets']['op'])){
+											$c=count($list['tickets']['op']);
+											for($i=0;$i<$c;$i++)
+												echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
+										}
+									?>
+									</tbody>
+								</table>
+							</div>
 						</div>
-					</div>
-					<?php } else if($_SESSION['status']==2){ ?>
-					<h3 class='sectname'>Assigned Tickets</h3>
-					<div class='row-fluid'>
-						<div class='span12'>
-							<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-							<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable"></table>
+						<?php } else if($_SESSION['status']==2){ ?>
+						<h3 class='sectname'>Assigned Tickets</h3>
+						<div class='row-fluid'>
+							<div class='span12'>
+								<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+								<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
+									<tbody>
+									<?php
+										if(isset($list['tickets']['op'])){
+											$c=count($list['tickets']['op']);
+											for($i=0;$i<$c;$i++)
+												echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
+										}
+									?>
+									</tbody>
+								</table>
+							</div>
 						</div>
-					</div>
-					<h3 class='sectname admin_ticket'>Tickets Adminsitration</h3>
-					<div class='row-fluid'>
-						<div class='span12'>
-							<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-							<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="admintable"></table>
+						<h3 class='sectname admin_ticket'>Tickets Adminsitration</h3>
+						<div class='row-fluid'>
+							<div class='span12'>
+								<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+								<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="admintable">
+								<tbody>
+								<?php
+									if(isset($list['tickets']['admin'])){
+										$c=count($list['tickets']['admin']);
+										for($i=0;$i<$c;$i++)
+											echo '<tr><td>'.$list['tickets']['admin'][$i]['title'].'</td><td>'.$list['tickets']['admin'][$i]['date'].'</td><td>'.$list['tickets']['admin'][$i]['reply'].'</td><td>'.$list['tickets']['admin'][$i]['dname'].'</td><td>'.$list['tickets']['admin'][$i]['opname'].'</td><td>'.$list['tickets']['admin'][$i]['priority'].'</td><td>'.$list['tickets']['admin'][$i]['action'].'</td></tr>';
+									}
+								?>
+								</tbody>
+								</table>
+							</div>
 						</div>
+						<?php } ?>
+						<br/><br/>
 					</div>
-					<?php } ?>
-					<br/><br/>
-				</div>
+				<?php
+					}
+					else
+						echo '<p>'.$error.'</p>';
+				?>
 			<hr>
 		</div>
 		</div>
@@ -195,14 +401,11 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
-		var utab,otab,atab;
-		$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:1},dataType : 'json',
-			success : function (a) {
-				$('.loading').remove();
-				if(a.response=='ret'){
+		//var utab,otab,atab;
+
 					<?php if($_SESSION['status']==0){ ?>
 					
-						utab=$("#usertable").dataTable({
+						var utab=$("#usertable").dataTable({
 								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
 								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
@@ -220,57 +423,48 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									]
 						}),
 						
-						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
-						utab.fnAddData(a.tickets.user);
-						
 					<?php } else if($_SESSION['status']==1){ ?>
 					
-						utab=$("#usertable").dataTable({
-								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
-								sWrapper:"dataTables_wrapper form-inline",
-								bDestroy:true,
-								bProcessing:true,
-								aaSorting:[[2,"desc"]],
-								oLanguage:{sEmptyTable:"No Tickets"},
-									aoColumns:[
-										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
-									]
-							}),
+						var utab=$("#usertable").dataTable({
+										sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+										sWrapper:"dataTables_wrapper form-inline",
+										bDestroy:true,
+										bProcessing:true,
+										aaSorting:[[2,"desc"]],
+										oLanguage:{sEmptyTable:"No Tickets"},
+											aoColumns:[
+												{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+											]
+									}),
 						
-						otab=$("#operatortable").dataTable({
-								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
-								sWrapper:"dataTables_wrapper form-inline",
-								bDestroy:true,
-								bProcessing:true,
-								aaSorting:[[2,"desc"]],
-								oLanguage:{sEmptyTable:"No Tickets"},
-								aoColumns:[
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
-								]
-							}),
-						
-						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
-						utab.fnAddData(a.tickets.user);
-						
-						var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
-						otab.fnAddData(a.tickets.op);
+							otab=$("#operatortable").dataTable({
+										sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+										sWrapper:"dataTables_wrapper form-inline",
+										bDestroy:true,
+										bProcessing:true,
+										aaSorting:[[2,"desc"]],
+										oLanguage:{sEmptyTable:"No Tickets"},
+										aoColumns:[
+											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+										]
+									}),
 						
 					<?php } else if($_SESSION['status']==2){ ?>
 
-						utab=$("#usertable").dataTable({
+						var utab=$("#usertable").dataTable({
 								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
 								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
@@ -307,40 +501,31 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								]
 							}),
 						
-						atab=$("#admintable").dataTable({sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",sWrapper:"dataTables_wrapper form-inline",bDestroy:true,bProcessing:true,aaSorting:[[2,"desc"]],oLanguage:{sEmptyTable:"No Tickets"},aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}]});
+						atab=$("#admintable").dataTable({
+								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sWrapper:"dataTables_wrapper form-inline",
+								bDestroy:true,
+								bProcessing:true,
+								aaSorting:[[2,"desc"]],
+								oLanguage:{sEmptyTable:"No Tickets"},
+								aoColumns:[
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+								]
+							});
 
-						var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
-						utab.fnAddData(a.tickets.user);
-						
-						var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
-						otab.fnAddData(a.tickets.op);
-						
-						var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} 
-						atab.fnAddData(a.tickets.admin);
 						
 					<?php } ?>
-				}
-				else if(a[0]=='sessionerror'){
-					switch(a[1]){
-						case 0:
-							window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-							break;
-						case 1:
-							window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-							break;
-						case 2:
-							window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-							break;
-						case 3:
-							window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-							break;
-					}
-				}
-				else
-					noty({text:a[0],type:"error",timeout:9E3});
-			}
-		}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});
-		
+		$('.loading').remove();
+		$('table:hidden').each(function(){
+			$(this).show(400);
+		});
 		$(document).on('click','#tkopen', function(){
 			$('#tkstatnav > li.active').removeClass('active');
 			$(this).addClass('active');
@@ -406,7 +591,6 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				$(this).hide(400);
 				$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 			});
-
 				$.when(
 					$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:0},dataType : 'json',
 						success : function (a) {
