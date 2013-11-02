@@ -1048,7 +1048,7 @@ else{
 
 	else if($_POST[$_SESSION['token']['act']]=='delete_files'){//check
 		$_POST['from']=(trim(preg_replace('/\s+/','',$_POST['from']))!='')? trim(preg_replace('/\s+/','',$_POST['from']))." 00:00:00":exit();
-		$_POST['to']=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 00:00:00":exit();
+		$_POST['to']=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 23:59:59":exit();
 		
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -1072,7 +1072,7 @@ else{
 						$list[]=$a['message_id'];
 					}
 				}while ($a = $STH->fetch());
-				
+				$total=count($list);
 				$query = "DELETE FROM ".$SupportUploadTable." WHERE `upload_date` BETWEEN ? AND ?";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_POST['from'],PDO::PARAM_STR);
@@ -1088,11 +1088,145 @@ else{
 				$STH->execute();
 
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>'Deleted'));
+				echo json_encode(array(0=>'Deleted',1=>$total));
 			}
 			else{
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'There is no Uploaded Files inside this period'));
+			}
+		}
+		catch(PDOException $e){  
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+		}
+		exit();
+	}
+	
+	else if($_POST[$_SESSION['token']['act']]=='delete_tickets_period'){
+		$_POST['from']=(trim(preg_replace('/\s+/','',$_POST['from']))!='')? trim(preg_replace('/\s+/','',$_POST['from']))." 00:00:00":exit();
+		$_POST['to']=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 23:59:59":exit();
+		if(!array_filter($_POST['stat'], 'is_numeric')){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Delete by'));
+			exit();
+		}
+		$_POST['stat']=array_unique($_POST['stat']);
+		$_POST['by']=($_POST['by']==0)? 0:1;
+		$c=count($_POST['stat']);
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			if($_POST['by']==0){
+				$query = "SELECT id,operator_id,ticket_status FROM ".$SupportTicketsTable." WHERE `created_time` BETWEEN ? AND ?";
+				if($c<3){
+					for($i=0;$i<$c;$i++){
+						if($i=0)
+							$query.="AND ticket_status=? ";
+						else
+							$query.="OR ticket_status=? ";
+					}
+				}
+			}
+			else{
+				$query = "SELECT id,operator_id,ticket_status FROM ".$SupportTicketsTable." WHERE `last_reply` BETWEEN ? AND ?";
+				if($c<3){
+					for($i=0;$i<$c;$i++){
+						if($i=0)
+							$query.="AND ticket_status=? ";
+						else
+							$query.="OR ticket_status=? ";
+					}
+				}
+			}
+			
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['from'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['to'],PDO::PARAM_STR);
+			if($c<3){
+				for($i=0;$i<$c;$i++){
+					$STH->bindParam($i+3,$_POST['stat'][$i],PDO::PARAM_STR);
+				}
+			}
+			$STH->execute();
+
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(!empty($a)){
+				$ids=array();
+				$op=array();
+				do{
+					$ids[]=$a['id'];
+					if($a['ticket_status']==1){
+						if(isset($op[$a['operator_id']]))
+							$op[$a['operator_id']]=$op[$a['operator_id']]++;
+						else
+							$op[$a['operator_id']]=1;
+					}
+				}while ($a = $STH->fetch());
+				
+				$total=count($ids);
+				$list=implode(',',$ids);
+				$query = "SELECT id FROM ".$SupportMessagesTable." WHERE ticket_id IN (".$list.") AND attachment='1' ";
+				$STH = $DBH->prepare($query);
+				$STH->execute();
+
+				$STH->setFetchMode(PDO::FETCH_ASSOC);
+				$a = $STH->fetch();
+				if(!empty($a)){
+					unset($ids);
+					$ids=array();
+					do{
+						$ids[]=$a['id'];
+					}while ($a = $STH->fetch());
+					$ids=implode(',',$ids);
+					
+					$query = "SELECT enc FROM ".$SupportUploadTable." WHERE message_id IN (".$ids.")";
+					$STH = $DBH->prepare($query);
+					$STH->execute();
+					
+					$path='../upload/';
+					$a = $STH->fetch();
+					if(!empty($a)){
+						do{
+							if(is_file($path.$a['enc'])){
+								file_put_contents($path.$a['enc'],'');
+								unlink($path.$a['enc']);
+							}
+						}while ($a = $STH->fetch());
+
+						$query = "DELETE FROM ".$SupportUploadTable." WHERE `message_id` IN (".$ids.")";
+						$STH = $DBH->prepare($query);
+						$STH->execute();
+					}
+				}
+				
+				$query = "DELETE FROM ".$SupportMessagesTable." WHERE `ticket_id` IN (".$list.")";
+				$STH = $DBH->prepare($query);
+				$STH->execute();
+
+				$query = "DELETE FROM ".$SupportTicketsTable." WHERE `id` IN (".$list.")";
+				$STH = $DBH->prepare($query);
+				$STH->execute();
+				if(count($op)>0){
+					foreach($op as $k=>$v){
+						$query="UPDATE ".$SupportUserTable." b
+								SET b.assigned_tickets= CASE  WHEN b.assigned_tickets!='0' AND b.assigned_tickets-?>=0 THEN (b.assigned_tickets-?) ELSE '0' END  
+								WHERE b.id=?";
+						$STH = $DBH->prepare($query);
+						$STH->bindParam(1,$v,PDO::PARAM_INT);
+						$STH->bindParam(2,$v,PDO::PARAM_INT);
+						$STH->bindParam(3,$k,PDO::PARAM_INT);
+						$STH->execute();
+					}
+				}
+
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Deleted',1=>$total));
+				exit();
+			}
+			else{
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>"There aren't tickets inside this period"));
 			}
 		}
 		catch(PDOException $e){  

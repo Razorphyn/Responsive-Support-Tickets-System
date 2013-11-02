@@ -282,6 +282,34 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<br/><br/>
 				<hr>
 				<form action='' method='POST'>
+					<h3 class='sectname'>Delete Tickets</h3>
+					<div class='row-fluid'>
+						<div class='span3'><label>Delete by</label></div>
+						<div class='span4'>
+							<select name='delby' id='delby'>
+								<option value='1'>Last Reply</option>
+								<option value='0'>Opened Date</option>
+							</select>
+						</div>
+					</div>
+					<p>Tickets Status:</p>
+					<div class='row-fluid'>
+						<div class='span3'><input type="checkbox" name="stat[]" value="1"> Open</div>
+						<div class='span3'><input type="checkbox" name="stat[]" value="0"> Closed</div>
+						<div class='span3'><input type="checkbox" name="stat[]" value="2"> To Assign</div>
+					</div>
+					<br/>
+					<div class='row-fluid'>
+						<div class='span2'><label>From Date</label></div>
+						<div class='span3'><input type="text" id="deltkfromdate" placeholder="Delete from Date" /></div>
+						<div class='span1'><label>to Date</label></div>
+						<div class='span3'><input type="text" id="deltktodeldate" placeholder="to Date" /></div>
+					</div>
+					<input type="submit" class="btn btn-success" onclick='javascript:return !1;' value='Delete Tickects' id='deleteticket'/>
+				</form>
+				<br/><br/>
+				<hr>
+				<form action='' method='POST'>
 					<h3 class='sectname'>Delete Uploaded File</h3>
 					<div class='row-fluid'>
 						<div class='span2'><label>From Date</label></div>
@@ -295,8 +323,6 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			</div>
 		</div>
 		<iframe name='hidden_frame' style='display:none;width:0;height:0' src="about:blank" ></iframe>
-
-	
 	
 	<?php if(!$isMob) { ?>
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
@@ -318,6 +344,11 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		$('#todeldate').datepicker({dateFormat:'yy-mm-dd'});
 		$("#delfromdate").datepicker("option","maxDate",dateObject);
 		$("#todeldate").datepicker("option","maxDate",dateObject);
+		
+		$('#deltkfromdate').datepicker({dateFormat:'yy-mm-dd'});
+		$('#deltktodeldate').datepicker({dateFormat:'yy-mm-dd'});
+		$("#deltkfromdate").datepicker("option","maxDate",dateObject);
+		$("#deltktodeldate").datepicker("option","maxDate",dateObject);
 		
 		<?php if(!$isMob) { ?>
 			CKEDITOR.replace('privacytext');
@@ -353,7 +384,52 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							if("Deleted" == b[0]){
 								$("#delfromdate").val("");
 								$("#todeldate").val("");
-								noty({text:"The files has been deleted", type:"error", timeout:9E3});
+								noty({text:b[1]+" files has been deleted", type:"success", timeout:9E3});
+							}
+							else if(b[0]=='sessionerror'){
+								switch(b[1]){
+									case 0:
+										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+										break;
+									case 1:
+										window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+										break;
+									case 2:
+										window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+										break;
+									case 3:
+										window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+										break;
+								}
+							}
+							else
+								noty({text:b[0], type:"error", timeout:9E3}) 
+						}
+					}).fail(function(b, a) { noty({text:"Request Error:" + a, type:"error", timeout:9E3})});
+				}
+				else
+					noty({text:"Complete both the date", type:"error", timeout:9E3})
+			}
+			return!1
+		});
+		
+		$("#deleteticket").click(function() {
+			if(confirm("Do you want to delete all the tickets inside this period?")) {
+				var a = $("#deltkfromdate").val(), 
+					c = $("#deltktodeldate").val(),
+					s = $("input[name='stat[]']:checked").map(function(){return $(this).val();}).get(),
+					h = $("#delby > option:checked").val();
+				if("" != a.replace(/\s+/g, "") && "" != c.replace(/\s+/g, "")){
+					$.ajax({
+						type:"POST", 
+						url:"../php/admin_function.php", 
+						data:{<?php echo $_SESSION['token']['act']; ?>:"delete_tickets_period", from:a, to:c, stat:s, by:h}, 
+						dataType:"json", 
+						success:function(b) {
+							if("Deleted" == b[0]){
+								$("#delfromdate").val("");
+								$("#todeldate").val("");
+								noty({text: b[1]+" tickets has been deleted", type:"success", timeout:9E3});
 							}
 							else if(b[0]=='sessionerror'){
 								switch(b[1]){

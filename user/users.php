@@ -215,7 +215,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<?php 
 					} 
 					else
-						echo '<p>'$error.'</p>';
+						echo '<p>'.$error.'</p>';
 				?>
 			</div>
 		</div>

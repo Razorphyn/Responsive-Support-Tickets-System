@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_uploaded_file`(
 	`name` 				VARCHAR(50) 				NOT NULL,
 	`uploader` 			BIGINT(11) 	UNSIGNED		NOT NULL, 
 	`tk_id` 			BIGINT(15) 	UNSIGNED 		NOT NULL,
-	`ticket_id` 		CHAR(87),
+	`ticket_id` 		BIGINT(15) 	UNSIGNED 		NOT NULL,
 	`message_id` 		BIGINT(18) 	UNSIGNED		NOT NULL, 
 	`upload_date` 		DATETIME 					NOT NULL,
 	PRIMARY KEY (`id`),

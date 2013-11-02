@@ -218,12 +218,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					success: function (a) {
 						if("ret" == a.response){
 							$("#loading").remove();
-							$('.nwm').append("<textarea name='message' id='message' rows='5' placeholder='Your Message'> </textarea>");
+							$.when($('.nwm').append("<textarea name='message' id='message' rows='5' placeholder='Your Message'> </textarea>")).then(
 							<?php if (!$isMob) { ?> 
-								CKEDITOR.replace('message'); 
+								CKEDITOR.replace('message')
 							<?php } else { ?> 
-							$("#message").wysihtml5(); 
+							$("#message").wysihtml5()
 							<?php } ?> 
+							);
 							$("#deplist").html("<select name='dep' id='dep'>" + a.information + "</select>");
 						}
 						else if("empty" == a.response){

@@ -12,7 +12,7 @@ try{
 	BEGIN
 		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportUploadTable."' AND column_name = 'ticket_id') 
 			THEN
-				ALTER TABLE ".$SupportUploadTable." DROP COLUMN `ticket_id`;
+				ALTER TABLE ".$SupportUploadTable." CHANGE `ticket_id` `ticket_id` BIGINT(15) UNSIGNED NOT NULL;
 		END IF;
 
 		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportTicketsTable."' AND column_name = 'enc_id') 
