@@ -69,7 +69,12 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 	exit();
 }
 
+include_once '../php/mobileESP.php';
+$uagent_obj = new uagent_info();
+$isMob=$uagent_obj->DetectMobileQuick();
+
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
+if(is_file('../php/config/privacy.txt')) $privacy=file('../php/config/privacy.txt',FILE_IGNORE_NEW_LINES);
 if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/logo.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
 $siteurl=dirname(dirname(curPageURL()));
@@ -77,19 +82,10 @@ $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 
-$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
-		
-$stmp[8]=str_split($stmp[8]);
-$c=count($stmp[8]);
-for($i=0;$i<$c;$i++){
-	if(array_key_exists($stmp[8][$i],$crypttable))
-		$stmp[8][$i]=$crypttable[$crypttable[$stmp[8][$i]]];
-}
-$stmp[8]=implode('',$stmp[8]);
 
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
-					
+				
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -104,7 +100,9 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 
 		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_i&amp;5259487' ?>"/>
 		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_d&amp;5259487' ?>"/>
-		
+		<?php if($isMob) { ?>
+			<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_m&amp;5259487' ?>"/>
+		<?php } ?>
 	</head>
 	<body>
 		<div class="container">
@@ -265,6 +263,25 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<br/><br/>
 				<hr>
 				<form action='' method='POST'>
+					<h3 class='sectname'>Privacy Policy</h3>
+					<div class='row-fluid'>
+						<div class='span3'><label>Enable "Accept Privacy Policy"?</label></div>
+						<div class='span4'>
+							<select name='enprivacy' id='enprivacy'>
+								<option value='1'>Yes</option>
+								<option value='0'>No</option>
+							</select>
+						</div>
+					</div>
+					<div class='row-fluid'>
+						<div class='span12'><textarea class='privacytext' id='privacytext' rows="5" placeholder='Privacy Policy Text' required><?php if(isset($privacy[1])) echo $privacy[1];?></textarea></div>	
+					</div>
+					<br/>
+					<input type="submit" class="btn btn-success" onclick='javascript:return !1;' value='Save' id='saveprivacyc'/>
+				</form>
+				<br/><br/>
+				<hr>
+				<form action='' method='POST'>
 					<h3 class='sectname'>Delete Uploaded File</h3>
 					<div class='row-fluid'>
 						<div class='span2'><label>From Date</label></div>
@@ -279,10 +296,20 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		</div>
 		<iframe name='hidden_frame' style='display:none;width:0;height:0' src="about:blank" ></iframe>
 
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/timezoneautocomplete.js&amp;5259487' ?>"></script>
-
+	
+	
+	<?php if(!$isMob) { ?>
+		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/timezoneautocomplete.js&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
+	<?php }else { ?>
+		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/timezoneautocomplete.js&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_m&amp;5259487' ?>"></script>
+	<?php } ?>
+	
 	<script>
 	 $(document).ready(function() {
 		var today=new Date();
@@ -291,7 +318,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		$('#todeldate').datepicker({dateFormat:'yy-mm-dd'});
 		$("#delfromdate").datepicker("option","maxDate",dateObject);
 		$("#todeldate").datepicker("option","maxDate",dateObject);
-
+		
+		<?php if(!$isMob) { ?>
+			CKEDITOR.replace('privacytext');
+		<?php }else { ?>
+			$("#privacytext").wysihtml5();
+		<?php } ?>
+		
 		<?php if(isset($setting[2])){?>
 			$("#senrep > option[value='<?php echo $setting[2];?>']").attr('selected','selected');
 		<?php } if(isset($setting[3])){?>
@@ -302,6 +335,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			$("#allrat > option[value='<?php echo $setting[7];?>']").attr('selected','selected');
 		<?php } if(isset($setting[9])){?>
 			$("#allfaq > option[value='<?php echo $setting[8];?>']").attr('selected','selected');
+		<?php } if(isset($privacy[0])){?>
+			$("#enprivacy > option[value='<?php echo $privacy[0];?>']").attr('selected','selected');
 		<?php } ?>
 		
 		$("#deleteupload").click(function() {
@@ -385,7 +420,49 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						noty({text:"Options cannot be saved. Error: "+ b[0],type:"error",timeout:9E3})}
 			}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});
 			return!1
-		});		
+		});	
+		
+		$("#saveprivacyc").click(function(){
+			<?php if(!$isMob) { ?>
+				var text=CKEDITOR.instances.privacytext.getData().replace(/\s+/g," "),
+			<?php }else { ?>
+				var text=$("#privacytext").val().replace(/\s+/g,' '),
+			<?php } ?>
+				h=$("#enprivacy > option:checked").val();
+			if(""!=text.replace(/\s+/g,"")){
+				$.ajax({
+					type:"POST",
+					url:"../php/admin_function.php",
+					data:{<?php echo $_SESSION['token']['act']; ?>:"save_privacy",text:text,en:h},
+					dataType:"json",
+					success:function(a){
+						if("Saved"==a[0])
+							noty({text:"Saved",type:"success",timeout:9E3})
+						else if(a[0]=='sessionerror'){
+							switch(a[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else
+							noty({text:a[0],type:"error",timeout:9E3})}
+				}).fail(function(a,b){noty({text:"Request Error:"+b,type:"error",timeout:9E3})})
+			}
+			else 
+				noty({text:"Empty Field",type:"error",timeout:9E3});
+			return !1;
+		});
+		
 	});
 
 	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text: a[0],type:'error',timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};

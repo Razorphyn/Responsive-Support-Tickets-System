@@ -21,6 +21,7 @@ table tr{text-align:center!important}
 .marketing p + h4 {margin-top: 2.6%;}
 
 .register{display:none}
+.privacycont{max-height:200px;overflow:auto;padding:20px;border: 1px solid #ccc}
 .pwdres{display:none}
 .opthome{cursor:pointer}
 .opthome:hover{color:#F2860A}

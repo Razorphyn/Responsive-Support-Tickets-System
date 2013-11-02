@@ -37,6 +37,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 }
 
 if(is_file('php/config/setting.txt')) $setting=file('php/config/setting.txt',FILE_IGNORE_NEW_LINES);
+if(is_file('php/config/privacy.txt')) $privacy=file('php/config/privacy.txt',FILE_IGNORE_NEW_LINES);
 if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 
 $siteurl=explode('?',curPageURL());
@@ -166,12 +167,23 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 						<div class='row-fluid'>
 							<div class='span2'><label for='rmail'>Email</label></div>
 							<div class='span4'><input type="email" id="rmail" placeholder="Email" autocomplete="off" required></div>
-						</div><div class='row-fluid'>
+						</div>
+						<div class='row-fluid'>
 							<div class='span2'><label for='rpwd'>Password</label></div>
 							<div class='span4'><input type="password" id="rpwd" placeholder="Password" autocomplete="off" required></div>
 							<div class='span2'><label for='rrpwd'>Repeat Password</label></div>
 							<div class='span4'><input type="password" id="rrpwd" placeholder="Repeat Password" autocomplete="off" required></div>
 						</div>
+						<?php if(isset($privacy[0]) && $privacy[0]==1){ ?>
+							Privacy Policy
+							<div class='row-fluid'>
+								<div class='span12 privacycont'><?php echo $privacy[1]; ?></div>
+							</div>
+							<div class='row-fluid'>
+								<div class='span3'><label for='privacy'>Do you accept the Privacy policy?</label></div>
+								<div class='span3'><input type="checkbox" name="privacy" id="privacy" value="1"> Yes</div>
+							</div>
+						<?php } ?>
 						<input type="submit" onclick='javascript:register();return false;' class="btn btn-success" value='Register'/>
 					</form>
 					<form class='sect pwdres'>
@@ -208,15 +220,9 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 		<?php } else if(isset($_GET['e']) && $_GET['e']=='token'){ ?>
 			noty({text: 'Invalid Token, please log in again',type:'error',timeout:9E3});
 		<?php }  if(isset($_GET['act']) && $_GET['act']=='activate'){ ?>
-			$(".main").nimbleLoader("show", {
-				position             : "fixed",
-				loaderClass          : "loading_bar_body",
-				hasBackground        : true,
-				zIndex               : 999,
-				backgroundColor      : "#fff",
-				backgroundOpacity    : 0.9
-			});
-			var request= $.ajax({
+			$(".main").nimbleLoader("show", {position: "fixed",loaderClass: "loading_bar_body",hasBackground: true,zIndex: 999,backgroundColor: "#fff",backgroundOpacity: 0.9});
+			
+			$.ajax({
 				type: 'POST',
 				url: 'php/function.php',
 				data: {<?php echo $_SESSION['token']['act']; ?>:'activate_account',key:'<?php echo $_GET['reg']; ?>'},
@@ -229,8 +235,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 					else
 						noty({text: data[0],type:'error',timeout:9E3});
 				}
-			});
-			request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+			}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 	
 		<?php } ?>
 		$(".opthome").on("click", function() { $(".activesec").removeClass("activesec").slideToggle(800); $('form[class*="' + $(this).attr("name") + '"]').slideToggle(800).addClass("activesec") });
@@ -262,7 +267,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 	<?php if(isset($_SESSION['status']) && $_SESSION['status']==3){ ?>
 		function veirfy(){
 			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
-			var request= $.ajax({
+			$.ajax({
 				type: 'POST',
 				url: 'php/function.php',
 				data: {<?php echo $_SESSION['token']['act']; ?>:'verify'},
@@ -278,13 +283,12 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 					else
 						noty({text: data[0],type:'error',timeout:9E3});
 				}
-			});
-			request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+			}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 		}
 
 		function resend(){
 			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
-			var request= $.ajax({
+			$.ajax({
 				type: 'POST',
 				url: 'php/function.php',
 				data: {<?php echo $_SESSION['token']['act']; ?>:'send_again'},
@@ -297,38 +301,43 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 					else
 						noty({text: data[0],type:'error',timeout:9E3});
 				}
-			});
-			request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+			}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 		}
 	<?php } ?>
 	function register(){
-		$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
-		var name=$('#rname').val();
-		var mail=$('#rmail').val();
-		var pwd=$('#rpwd').val();
-		var rpwd=$('#rrpwd').val();
-		if(name.replace(/\s+/g,'')!='' && mail.replace(/\s+/g,'')!='' && pwd.replace(/\s+/g,'')!='' && pwd===rpwd){
-			var request= $.ajax({
-				type: 'POST',
-				url: 'php/function.php',
-				data: {<?php echo $_SESSION['token']['act'];?>:'register',name: name,mail: mail,pwd:pwd,rpwd:rpwd},
-				dataType : 'json',
-				success : function (data) {
-					$(".main").nimbleLoader("hide");
-					if(data[0]=='Registred'){
-						if(data.length>1) alert(data[1]);
-						window.location.reload();
+		<?php if(isset($privacy[0]) && $privacy[0]==1){ ?>
+		if($('input[name="privacy"]:checked').length > 0){
+		<?php } ?>
+			var name=$('#rname').val();
+			var mail=$('#rmail').val();
+			var pwd=$('#rpwd').val();
+			var rpwd=$('#rrpwd').val();
+			if(name.replace(/\s+/g,'')!='' && mail.replace(/\s+/g,'')!='' && pwd.replace(/\s+/g,'')!='' && pwd===rpwd){
+				$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
+				$.ajax({
+					type: 'POST',
+					url: 'php/function.php',
+					data: {<?php echo $_SESSION['token']['act'];?>:'register',name: name,mail: mail,pwd:pwd,rpwd:rpwd},
+					dataType : 'json',
+					success : function (data) {
+						$(".main").nimbleLoader("hide");
+						if(data[0]=='Registred'){
+							if(data.length>1) alert(data[1]);
+							window.location.reload();
+						}
+						else
+							noty({text: data[0],type:'error',timeout:9E3});
 					}
-					else
-						noty({text: data[0],type:'error',timeout:9E3});
-				}
-			});
-			request.fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+				}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
+			}
+			else{
+				noty({text: 'Empty Field or Password mismatch',type:'error',timeout:9E3});
+			}
+		<?php if(isset($privacy[0]) && $privacy[0]==1){ ?>
 		}
-		else{
-			$(".main").nimbleLoader("hide");
-			noty({text: 'Empty Field or Password mismatch',type:'error',timeout:9E3});
-		}
+		else
+			noty({text: 'You must accept our Privacy Policy to proceed.',type:'error',timeout:9E3});
+		<?php } ?>
 	}
 
 	function login(){$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});$.ajax({type:"POST",url:"php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"login",mail:$("#mail").val(),pwd:$("#pwd").val()},dataType:"json",success:function(a){$(".main").nimbleLoader("hide");"Logged"==a[0]? (window.location = '<?php echo $siteurl; ?>'):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){$(".main").nimbleLoader("hide");noty({text:b, type:"error",timeout:9E3})})};

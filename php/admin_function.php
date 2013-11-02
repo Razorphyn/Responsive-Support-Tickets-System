@@ -431,11 +431,16 @@ else{
 			$_POST['message'] = $purifier->purify($_POST['message']);
 			$check=trim(strip_tags($_POST['message']));
 			if(empty($check)){
-				$error[]='Empty Message';
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Empty Message'));
+				exit();
 			}
 		}
-		else
-			$error[]='Empty Message';
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Empty Message'));
+			exit();
+		}
 		$act=(is_numeric($_POST['sec']))? $_POST['sec']:exit();
 		if($act==0 && file_put_contents('config/mail/newuser.txt',$_POST['sub']."\n".$_POST['message']))
 			$saved=true;
@@ -460,7 +465,39 @@ else{
 		}
 		exit();
 	}
-
+	
+	else if($_POST[$_SESSION['token']['act']]=='save_privacy'){
+		$_POST['en']=($_POST['en']==0) ? 0:1;
+		if(trim(preg_replace('/\s+/','',$_POST['text']))!=''){
+			$_POST['text']=trim(preg_replace('/\s+/',' ',$_POST['text']));
+			require_once 'htmlpurifier/HTMLPurifier.auto.php';
+			$config = HTMLPurifier_Config::createDefault();
+			$purifier = new HTMLPurifier($config);
+			$_POST['text'] = $purifier->purify($_POST['text']);
+			$check=trim(strip_tags($_POST['text']));
+			if(empty($check)){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Empty Message'));
+				exit();
+			}
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Empty Message'));
+			exit();
+		}
+		
+		if(file_put_contents('config/privacy.txt',$_POST['en']."\n".$_POST['text'])){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Saved'));
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Error'));
+		}
+		exit();
+	}
+	
 	else if(isset($_POST['upload_logo'])  && isset($_FILES['new_logo'])){//check
 		$target_path = "../css/logo/".$_FILES['new_logo']['name'];
 		if($_FILES['new_logo']['type']=='image/gif' || $_FILES['new_logo']['type']=='image/jpeg' || $_FILES['new_logo']['type']=='image/png' || $_FILES['new_logo']['type']=='image/pjpeg'){

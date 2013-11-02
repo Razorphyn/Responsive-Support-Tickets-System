@@ -451,10 +451,10 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				<hr>
 					<?php 
 					if(!isset($error)){?>
+						<h3 class='sectname'>Reply</h3>
 						<form id='formreply' method="POST" action="../php/function.php" target='hidden_upload' enctype="multipart/form-data">
 							<input type='hidden' name='id' value='<?php echo $_GET['id']; ?>' />
 							<input type='hidden' name='<?php echo $_SESSION['token']['act']; ?>' value='Night' />
-							<h3 class='sectname'>Reply</h3>
 							<div class='row-fluid'>
 								<div class='span12'><textarea name='message' id='message' rows="5" placeholder='Your Reply'> </textarea></div>
 							</div>
@@ -513,7 +513,10 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 	$(document).ready(function(){
 
 		$('#statustk').val("<?php echo ($stat==2 || $stat==1) ?  1:0; ?>").change();
-		$('#contype').val('<?php echo $connection; ?>').change(); 
+		$('#contype').val('<?php echo $connection; ?>').change();
+		
+		$('#messages').scrollPagination({scroll:false,id:'<?php echo $_GET['id'];?>'});
+		$('.loading-bar').delay(300).show('scale',null,400);
 		
 		<?php if($_SESSION['status']==1) { ?>
 			$('#departments').val("<?php echo $departmentid; ?>").change();
@@ -528,11 +531,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		<?php } if($_SESSION['tickets'][$_GET['id']]['usr_id']==$_SESSION['id'] && $setting[7]==1){ ?>
 		$(".razorate").jRating();
 		<?php } ?>
-		
-		$('#messages').scrollPagination({scroll:false,id:'<?php echo $_GET['id'];?>'});
 
-		$('.loading-bar').delay(300).show('scale',null,400);
-		
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 		
 		//Add redirect
@@ -672,12 +671,12 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		//Check if writing ---- Problem: doesn't identify first character and last delete
 		<?php if(!$isMob) { ?>
 			CKEDITOR.instances.message.on('key', function(event) {
-				var m=CKEDITOR.instances.message.getData().replace(/\s+/g,"");
+				var m=$.trim(CKEDITOR.instances.message.getData().replace(/\s+/g,""));
 				writing=(m=="")? false:true;
 			});
 		<?php }else { ?>
 		$(document).on('change','#message',function(){
-			var m=$("#message").val().replace(/\s+/g,'');
+			var m=$.trim($("#message").val().replace(/\s+/g,''));
 			writing=(m=='')? false:true;
 		});
 		<?php } ?>

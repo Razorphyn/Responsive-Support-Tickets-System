@@ -198,7 +198,7 @@ try{
 	}
 }
 catch(PDOException $e){
-	file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 	$error='We are sorry, but an error has occurred, please contact the administrator if it persist';
 }
 $DBH=null;
