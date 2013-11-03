@@ -636,7 +636,6 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 						$maxsize=covert_size(ini_get('upload_max_filesize'));
 						if(isset($setting[6]) && $setting[6]!=null && $setting[6]!='')
 							$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
-						echo '<script>parent.noty({text: "File Upload Started",type:"information",timeout:2000});</script>';
 						if(!is_dir('../upload')) mkdir('../upload');
 						$movedfiles=array();
 						
@@ -682,7 +681,6 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 								echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "An error has occurred, please contact the administrator.",type:"error",timeout:9000});</script>';
 							}
 						}
-						echo '<script>parent.noty({text: "File Upload Finished",type:"information",timeout:2000});</script>';
 					}
 				}
 			}

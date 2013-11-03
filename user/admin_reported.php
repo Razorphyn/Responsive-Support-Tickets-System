@@ -180,7 +180,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							<?php 
 								$c=count($list);
 								for($i=0;$i<$c;$i++)
-									echo'<tr><td>'.$list[$i]['id'].'</td><td>'.$list[$i]['ref_id'].'</td><td>'.$list[$i]['mail'].'</td><td>'.$list[$i]['role'].'</td><td>'.$list[$i]['reason'].'</td><td>'.$list[$i]['action'].'</td><tr>';
+									echo'<tr><td>'.$list[$i]['id'].'</td><td>'.$list[$i]['ref_id'].'</td><td>'.$list[$i]['mail'].'</td><td>'.$list[$i]['role'].'</td><td>'.$list[$i]['reason'].'</td><td>'.$list[$i]['action'].'</td></tr>';
 							?>
 						</table>
 					</div>
@@ -221,7 +221,23 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		$("#deptable").show(800);
 					
 
-		$("#deptable").on("click",".read",function(){var b=$(this).val(),c=$(this).val().replace(/\./g,"_");var a=this.parentNode.parentNode.parentNode.parentNode;table.fnGetPosition(a,null,!0);a=table.fnGetData(a);0<$("#"+a.id).length?$("html,body").animate({scrollTop:$("#"+a.id).offset().top},1500):(b="<hr><div id='"+c+"' ><span>Reference <strong>"+a.ref_id+"</strong> submitted by <strong>"+a.role+"</strong></span><button class='btn btn-link btn_close_form'>Close</button><div class='row-fluid'><div class='span2'><label><strong>Reference ID</strong></label></div><div class='span4'><p>"+ a.ref_id+"</p></div><div class='span2'><label><strong>Reporter mail</strong></label></div><div class='span4'><p>"+a.mail+"</p></div></div><div class='row-fluid'><div class='span2'><label><strong>Complaint Reason</strong></label></div></div><div class='row-fluid'><div class='span12 flagcont'>"+a.reason+"</div></div><div class='row-fluid'><div class='span2 offset5'><a href='view.php?id="+b+"' class='btn btn-info' title='Read Tciket'>View Ticket</a></div></div></div>",$("#deplist").after(b),b="Yes"== a["public"]?1:0,$('select[name="edit_depa_active"]:first option[value='+("Yes"==a.active?1:0)+"]").attr("selected","selected"),$('select[name="edit_depa_public"]:first option[value='+b+"]").attr("selected","selected"))});
+		$("#deptable").on("click",".read",function(){
+			var b=$(this).val(),
+			c=$(this).val().replace(/\./g,"_"),
+			a=this.parentNode.parentNode.parentNode.parentNode;
+			
+			table.fnGetPosition(a,null,!0);
+			a=table.fnGetData(a);
+			if(0<$("#"+a.id).length)
+				$("html,body").animate({scrollTop:$("#"+a.id).offset().top},1500)
+			else{	
+				b="<hr><div id='"+c+"' ><span>Reference <strong>"+a.ref_id+"</strong> submitted by <strong>"+a.role+"</strong></span><button class='btn btn-link btn_close_form'>Close</button><div class='row-fluid'><div class='span2'><label><strong>Reference ID</strong></label></div><div class='span4'><p>"+ a.ref_id+"</p></div><div class='span2'><label><strong>Reporter mail</strong></label></div><div class='span4'><p>"+a.mail+"</p></div></div><div class='row-fluid'><div class='span2'><label><strong>Complaint Reason</strong></label></div></div><div class='row-fluid'><div class='span12 flagcont'>"+a.reason+"</div></div><div class='row-fluid'><div class='span2 offset5'><a href='view.php?id="+b+"' class='btn btn-info' title='Read Tciket'>View Ticket</a></div></div></div>",
+				$("#deplist").after(b),
+				b="Yes"== a["public"]?1:0,
+				$('select[name="edit_depa_active"]:first option[value='+("Yes"==a.active?1:0)+"]").attr("selected","selected"),
+				$('select[name="edit_depa_public"]:first option[value='+b+"]").attr("selected","selected")
+			}
+		});
 
 		$('#deptable').on('click','.solved',function(){
 			var id=$(this).val();

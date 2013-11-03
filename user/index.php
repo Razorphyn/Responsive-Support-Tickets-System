@@ -99,7 +99,7 @@ try{
 					ON	b.id=a.department_id
 				JOIN ".$SupportUserTable." c
 					ON c.id=a.operator_id
-				WHERE a.ticket_status='1' AND a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."' AND a.ticket_status='1'
+				WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status='1'
 				ORDER BY a.last_reply DESC 
 				LIMIT 350" ;
 		$STH = $DBH->prepare($query);

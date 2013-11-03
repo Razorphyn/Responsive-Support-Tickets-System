@@ -79,8 +79,8 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 						LEFT JOIN ".$SupportRateTable." b
 							ON b.id=a.id
 						LEFT JOIN ".$SupportFlagTable." c
-							ON c.id=a.id AND c.usr_id='".$_SESSION['id']."'
-						WHERE a.id=? LIMIT 1";
+							ON (c.tk_id=a.id AND c.usr_id='".$_SESSION['id']."')
+						WHERE a.id=?  LIMIT 1";
 		}
 		else{
 			$query = "SELECT 
@@ -102,7 +102,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 						LEFT JOIN ".$SupportRateTable." b
 							ON b.id=a.id
 						LEFT JOIN ".$SupportFlagTable." c
-							ON c.id=a.id AND c.usr_id='".$_SESSION['id']."'
+							ON (c.tk_id=a.id AND c.usr_id=".$_SESSION['id'].")
 						WHERE a.id=? AND a.user_id=".$_SESSION['id']." LIMIT 1";
 		}
 		$STH = $DBH->prepare($query);
@@ -535,8 +535,21 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 		
 		//Add redirect
-		$("#subrepo").click(function(){var a=$("#problem").val();""!=a.replace(/\s+/g,"")?$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"report_ticket",message:a,id:"<?php echo $_GET['id'];?>"},dataType:"json",success:function(b){"Submitted"==b[0]?noty({text:"Your complaint has been submitted",type:"success",timeout:9E3}):noty({text:b[0],type:"error",timeout:9E3})}}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})}):noty({text:"The message cannot be empty",type:"error",timeout:9E3})});
-		
+		$("#subrepo").click(function () {
+			var a = $("#problem").val();
+			if("" != a.replace(/\s+/g, ""))
+				$.ajax({
+					type: "POST",
+					url: "../php/function.php",
+					data: { <?php echo $_SESSION['token']['act']; ?> : "report_ticket",message: a,id: "<?php echo $_GET['id'];?>"},
+					dataType: "json",
+					success: function (b) {
+						"Submitted" == b[0] ? noty({text: "Your complaint has been submitted",type: "success",timeout: 9E3}) : noty({text: b[0],type: "error",timeout: 9E3})
+					}
+				}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})})
+			else
+				noty({text: "The message cannot be empty",type: "error",timeout: 9E3})
+		});		
 		$("#showhide").click(function(){var a=$("#conpass").val()+"";$("#conpass").is(":password")?($("#passcont").html('<input type="text" id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Hide")):($("#passcont").html('<input type="password" id="conpass" autocomplete="off" />'),$("#conpass").val(a),$("#showhide").text("Show"))});
 		
 		//Add redirect

@@ -1446,7 +1446,7 @@ else{
 			echo json_encode(array(0=>'Invalid ID'));
 			exit();
 		}
-		
+		$_POST['id']=$_POST['id']+14;
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
