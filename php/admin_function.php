@@ -139,7 +139,7 @@ else{
 			echo json_encode(array(0=>'Registred',1=>array('num'=>$uid-54,'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'mail'=>htmlspecialchars($_POST['mail'],ENT_QUOTES,'UTF-8'),'status'=>$_POST['role'],'holiday'=>'No','rating'=>'Unrated')));
 		}
 		catch(PDOException $e){
-			if((int)$e->getCode()==1062){
+			if ($e->errorInfo[1] == 1062) {
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>"User with mail: ".htmlspecialchars($_POST['mail'],ENT_QUOTES,'UTF-8')." is already registred"));
 			}
@@ -183,7 +183,7 @@ else{
 			echo json_encode($data);
 		}
 		catch(PDOException $e){
-			if((int)$e->getCode()==1062){
+			if ($e->errorInfo[1] == 1062) {
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8')." already exist"));
 			}
@@ -223,9 +223,9 @@ else{
 			echo json_encode(array(0=>'Succeed',1=>array('id'=>$_POST['id'],'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pub'])));
 		}
 		catch(PDOException $e){
-			if((int)$e->getCode()==1062){
+			if ($e->errorInfo[1] == 1062) {
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>"Department name: ".json_encode($_POST['name'], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS)." already exist"));
+				echo json_encode(array(0=>"Department name: ".json_encode($_POST['name'])." already exist"));
 			}
 			else{
 				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);

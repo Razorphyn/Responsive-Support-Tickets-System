@@ -205,14 +205,15 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 	$DBH=null;
 										
 
-function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable){
+function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable,$except){
 	if(isset($_SESSION['status'])){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable;
+			$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable." WHERE id=? OR active='1'";
 			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$except,PDO::PARAM_INT);
 			$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$b=array();
@@ -408,7 +409,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							<br/>
 						<?php } ?>
 					</div>
-					<?php if($_SESSION['status']==1){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable));?>
+					<?php if($_SESSION['status']==1){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid));?>
 						<hr>
 						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department </p>
 						<div class='expande'>

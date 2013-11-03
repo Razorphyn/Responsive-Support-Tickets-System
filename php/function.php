@@ -147,8 +147,7 @@ if($_POST[$_SESSION['token']['act']]=='register'){
 				echo json_encode(array(0=>'Registred'));
 		}
 		catch(PDOException $e){
-			
-			if((int)$e->getCode()==1062){
+			if ($e->errorInfo[1] == 1062) {
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>"User with mail: ".$_POST['mail']." is already registred"));
 			}
@@ -724,7 +723,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 			echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
 		}
 		catch(PDOException $e){
-			if((int)$e->getCode()==1062)
+			if ($e->errorInfo[1] == 1062) {
 				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "You have already created a Ticket named: '.$_POST['title'].'",timeout:2000});</script>';
 			else{
 				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
@@ -1038,9 +1037,6 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_depart' && isset($_SESSION['
 			$query = "SELECT * FROM ".$SupportDepaTable." WHERE active='1' AND public_view='1'";
 		else if($_POST['sect']=='new' && $_SESSION['status']!=0)
 			$query = "SELECT * FROM ".$SupportDepaTable." WHERE active='1' ";
-		else if($_POST['sect']=='admin' && $_SESSION['status']==2)
-			$query = "SELECT id,department_name,
-			CASE active WHEN '1' THEN 'Yes' ELSE 'No' END AS active, CASE public_view WHEN '1' THEN 'Yes' ELSE 'No' END AS public FROM ".$SupportDepaTable;
 		else
 			exit();
 			
@@ -1384,7 +1380,7 @@ else if($_POST[$_SESSION['token']['act']]=='save_setting' && isset($_SESSION['st
 		}
 	}
 	catch(PDOException $e){
-		if((int)$e->getCode()==1062){
+		if(strpos($e->getMessage(),1062)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>"User with mail: ".$_POST['mail']." is already registred"));
 		}
@@ -1492,7 +1488,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_status' && isset($_SESSION['s
 	exit();
 }
 
-else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSION['status']) && $_SESSION['status']==1){//check
+else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSION['status']) && $_SESSION['status']==1){
 	$_POST['dpid']=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
 	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
@@ -1847,9 +1843,9 @@ else if($_POST[$_SESSION['token']['act']]=='rating' && isset($_SESSION['status']
 			$STH->bindValue(2,strval($_POST['rate']));
 			$STH->bindParam(3,$_POST['tkid'],PDO::PARAM_INT);
 			$STH->execute();
-			
+
 			$query = "INSERT INTO ".$SupportRateTable." (`ref_id`,`tk_id`,`usr_id`,`rate`,`note`) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE `rate`=?,`note`=?";
-			
+
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_SESSION['tickets'][$_POST['tkid']]['ref_id'],PDO::PARAM_STR);
 			$STH->bindParam(2,$_POST['tkid'],PDO::PARAM_INT);
