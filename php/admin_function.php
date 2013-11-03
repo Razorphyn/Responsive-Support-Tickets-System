@@ -196,7 +196,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='edit_depart'){//check
+	else if($_POST[$_SESSION['token']['act']]=='edit_depart'){
 		$_POST['id']=(is_numeric($_POST['id'])) ? (int)$_POST['id']:exit();
 		$_POST['name']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
 		if(empty($_POST['name'])){
@@ -236,7 +236,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='del_dep'){//check
+	else if($_POST[$_SESSION['token']['act']]=='del_dep'){
 		$_POST['sub']=(trim(preg_replace('/\s+/','',$_POST['sub']))!='')? trim(preg_replace('/\s+/',' ',$_POST['sub'])):exit();
 		$_POST['id']=(is_numeric($_POST['id']))? (int)$_POST['id']:exit();
 		
@@ -498,7 +498,7 @@ else{
 		exit();
 	}
 	
-	else if(isset($_POST['upload_logo'])  && isset($_FILES['new_logo'])){//check
+	else if(isset($_POST['upload_logo'])  && isset($_FILES['new_logo'])){
 		$target_path = "../css/logo/".$_FILES['new_logo']['name'];
 		if($_FILES['new_logo']['type']=='image/gif' || $_FILES['new_logo']['type']=='image/jpeg' || $_FILES['new_logo']['type']=='image/png' || $_FILES['new_logo']['type']=='image/pjpeg'){
 				if(move_uploaded_file($_FILES['new_logo']['tmp_name'], $target_path)) {
@@ -922,7 +922,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='retrive_operator_assign'){//check
+	else if($_POST[$_SESSION['token']['act']]=='retrive_operator_assign'){
 		$_POST['enc']=trim(preg_replace('/\s+/','',$_POST['enc']));
 		if(!preg_match('/^[0-9]{1,15}$/',$_POST['enc'])){
 			header('Content-Type: application/json; charset=utf-8');
@@ -1016,6 +1016,7 @@ else{
 			$oldop=$a['operator_id'];
 		
 			if($_POST['opid']==-1){
+				$f=true;
 				$_POST['opid']=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dpid'],$_SESSION['tickets'][$_POST['id']]['usr_id']);
 				if(!is_numeric($_POST['opid']))
 					$_POST['opid']=0;
@@ -1030,9 +1031,9 @@ else{
 								WHERE a.id=? LIMIT 1";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_POST['dpid'],PDO::PARAM_INT);
-				$STH->bindParam(2,$opid,PDO::PARAM_INT);
-				$STH->bindParam(3,$opid,PDO::PARAM_INT);
-				$STH->bindParam(4,$opid,PDO::PARAM_INT);
+				$STH->bindParam(2,$_POST['opid'],PDO::PARAM_INT);
+				$STH->bindParam(3,$_POST['opid'],PDO::PARAM_INT);
+				$STH->bindParam(4,$_POST['opid'],PDO::PARAM_INT);
 				$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
 
@@ -1044,13 +1045,13 @@ else{
 				$STH->bindParam(1,$oldop,PDO::PARAM_INT);
 				$STH->execute();
 
-				if($opid!=0){
+				if($_POST['opid']!=0){
 					$query="UPDATE ".$SupportUserTable." c
 									SET
 										c.assigned_tickets=c.assigned_tickets+1
 									WHERE c.id=? LIMIT 1";
 					$STH = $DBH->prepare($query);
-					$STH->bindParam(1,$opid,PDO::PARAM_INT);
+					$STH->bindParam(1,$_POST['opid'],PDO::PARAM_INT);
 					$STH->execute();
 				}
 			}
@@ -1065,7 +1066,7 @@ else{
 				$STH->execute();
 			}
 		
-			if($_POST['opid']>0){
+			if($_POST['opid']>0 || !isset($f)){
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'AMoved'));
 			}

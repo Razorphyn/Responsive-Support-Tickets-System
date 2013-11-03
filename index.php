@@ -38,7 +38,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 
 if(is_file('php/config/setting.txt')) $setting=file('php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 if(is_file('php/config/privacy.txt')) $privacy=file('php/config/privacy.txt',FILE_IGNORE_NEW_LINES);
-if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
+if(is_file('php/config/logo.txt')) $logo=file_get_contents('php/config/logo.txt',FILE_IGNORE_NEW_LINES);
 
 $siteurl=explode('?',curPageURL());
 $siteurl=$siteurl[0];

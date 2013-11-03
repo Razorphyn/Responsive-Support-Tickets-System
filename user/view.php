@@ -210,7 +210,7 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-
+			
 			$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable." WHERE id=? OR active='1'";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$except,PDO::PARAM_INT);
@@ -419,7 +419,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 								<div class='span1'><input type='submit' class='btn btn-success' id='updtdpop' onclick='javascript:return false;' value='Update'/></div>
 							</div>
 						</div>
-					<?php } if($_SESSION['status']==2){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable));$c=json_decode(retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid));?>
+					<?php } if($_SESSION['status']==2){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid));$c=json_decode(retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid));?>
 						<hr>
 						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department and Operator</p>
 						<div class='expande'>

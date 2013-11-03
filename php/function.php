@@ -723,7 +723,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 			echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
 		}
 		catch(PDOException $e){
-			if ($e->errorInfo[1] == 1062) {
+			if ($e->errorInfo[1] == 1062)
 				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "You have already created a Ticket named: '.$_POST['title'].'",timeout:2000});</script>';
 			else{
 				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
@@ -1380,7 +1380,7 @@ else if($_POST[$_SESSION['token']['act']]=='save_setting' && isset($_SESSION['st
 		}
 	}
 	catch(PDOException $e){
-		if(strpos($e->getMessage(),1062)){
+		if ($e->errorInfo[1] == 1062) {
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>"User with mail: ".$_POST['mail']." is already registred"));
 		}
