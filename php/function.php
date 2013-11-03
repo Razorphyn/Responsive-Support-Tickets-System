@@ -45,6 +45,15 @@ include_once 'config/database.php';
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 if(isset($setting[4])) date_default_timezone_set($setting[4]);
 
+//Logout
+if($_POST[$_SESSION['token']['act']]=='logout' && isset($_SESSION['status'])){
+	session_unset();
+	session_destroy();
+	header('Content-Type: application/json; charset=utf-8');
+	echo json_encode(array(0=>'logout'));
+	exit();
+}
+
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
@@ -523,14 +532,6 @@ else if($_POST[$_SESSION['token']['act']]=='del_account'){//check
 	exit();
 }
 
-else if($_POST[$_SESSION['token']['act']]=='logout' && isset($_SESSION['status'])){
-	session_unset();
-	session_destroy();
-	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(array(0=>'logout'));
-	exit();
-}
-
 else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && isset($_SESSION['status']) && $_SESSION['status']<3){
 	$letarr=array('M','d','C','f','K','w','p','T','B','X');
 	$error=array();
@@ -738,7 +739,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 	exit();
 }
 
-else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && isset($_SESSION['status']) && $_SESSION['status']<3){//check
+else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && isset($_SESSION['status']) && $_SESSION['status']<3){
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
 	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 		echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "Invalid ID",type:"error",timeout:9000});</script>';
@@ -1109,7 +1110,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 					ORDER BY a.last_reply DESC 
 					LIMIT 350";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_STR);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array()));
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -1124,11 +1125,11 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 			$_POST['stat']=($_POST['stat']==0)? 0:1;
 			$query = "SELECT 
 						a.id,
-						IF(b.department_name IS NOT NULL, b.department_name,'Unknown'),
-						CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE (IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown'))) END,
+						IF(b.department_name IS NOT NULL, b.department_name,'Unknown') as dname,
+						CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE (IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown'))) END as opname,
 						a.operator_id,
 						a.title,
-						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
+						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END as prio,
 						a.created_time,
 						a.last_reply
 					FROM ".$SupportTicketsTable." a
@@ -1136,21 +1137,35 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 						ON	b.id=a.department_id
 					JOIN ".$SupportUserTable." c
 						ON c.id=a.operator_id
-					WHERE a.ticket_status='1' AND a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."' AND a.ticket_status=?
-					ORDER BY a.last_reply DESC 
+					WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status=?
+					ORDER BY a.last_reply DESC
 					LIMIT 350" ;
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_STR);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array()));
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					if($opid==$_SESSION['id'])
-						$list['tickets']['op'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+					if($a['operator_id']==$_SESSION['id'])
+						$list['tickets']['op'][]=array(	'id'=>$a['id'],
+														'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
+														'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
+														'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),
+														'priority'=>$a['prio'],
+														'date'=>$a['created_time'],
+														'reply'=>$a['last_reply']
+													);
 					else
-						$list['tickets']['user'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['user'][]=array(	'id'=>$a['id'],
+															'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
+															'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
+															'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),
+															'priority'=>$a['prio'],
+															'date'=>$a['created_time'],
+															'reply'=>$a['last_reply']
+														);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -1170,11 +1185,11 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 							ON	b.id=a.department_id
 						LEFT JOIN ".$SupportUserTable." c
 							ON c.id=a.operator_id
-						WHERE a.ticket_status=?
+						WHERE a.ticket_status='?'
 						ORDER BY a.last_reply DESC 
 						LIMIT 350";
 			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_INT);
+			$STH->bindParam(1,$_POST['stat'],PDO::PARAM_STR);
 			$STH->execute();
 			$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array(),'admin'=>array()));
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -1479,7 +1494,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_status' && isset($_SESSION['s
 	exit();
 }
 
-else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSION['status']) && $_SESSION['status']==1){// deep check
+else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSION['status']) && $_SESSION['status']==1){//check
 	$_POST['dpid']=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
 	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
@@ -1490,29 +1505,65 @@ else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSIO
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		
+		$query = "SELECT department_id,operator_id FROM ".$SupportTicketsTable." WHERE `id`=? LIMIT 1";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
+		$STH->execute();
+		$STH->setFetchMode(PDO::FETCH_ASSOC);
+		$a = $STH->fetch();
+		if($a['department_id']==$_POST['dpid']){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'The ticket is already assigned to this department'));
+			exit();
+		}
+		$oldop=$a['operator_id'];
 		$opid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dpid'],$_SESSION['tickets'][$_POST['id']]['usr_id']);
 		if(!is_numeric($opid))
 			$opid=0;
-		$query="UPDATE ".$SupportTicketsTable." a
-						LEFT JOIN ".$SupportUserTable." b
-							ON b.id=a.operator_id
-						LEFT JOIN ".$SupportUserTable." c
-							ON c.id=?
-						SET
-							a.department_id=?,
-							a.ticket_status= CASE WHEN ?=0 AND `ticket_status`!=0 THEN 2 WHEN ?!=0 AND `ticket_status`='2' THEN '1' ELSE `ticket_status` END,
-							b.assigned_tickets=IF(b.id!=?,b.assigned_tickets-1,b.assigned_tickets),
-							c.assigned_tickets=IF(c.id!=a.operator_id,c.assigned_tickets+1,c.assigned_tickets),
-							a.operator_id=?
-						WHERE a.id=? LIMIT 1";
+		if($oldop!=$opid){
+			$query="UPDATE ".$SupportTicketsTable." a
+							SET
+								a.department_id=?,
+								a.ticket_status= CASE WHEN ?=0 AND a.ticket_status!=0 THEN 2 WHEN ?!=0 AND a.ticket_status='2' THEN '1' ELSE a.ticket_status END,
+								a.operator_id=?
+							WHERE a.id=? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['dpid'],PDO::PARAM_INT);
+			$STH->bindParam(2,$opid,PDO::PARAM_INT);
+			$STH->bindParam(3,$opid,PDO::PARAM_INT);
+			$STH->bindParam(4,$opid,PDO::PARAM_INT);
+			$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
+			$STH->execute();
 
-		$STH = $DBH->prepare($query);
-		$STH->bindParam(1,$_POST['dpid'],PDO::PARAM_INT);
-		$STH->bindParam(2,$opid,PDO::PARAM_INT);
-		$STH->bindParam(3,$opid,PDO::PARAM_INT);
-		$STH->bindParam(4,$opid,PDO::PARAM_INT);
-		$STH->bindParam(5,$_POST['id'],PDO::PARAM_STR);
-		$STH->execute();
+			$query="UPDATE ".$SupportUserTable." b
+							SET
+								b.assigned_tickets=b.assigned_tickets-1
+							WHERE b.id=? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$oldop,PDO::PARAM_INT);
+			$STH->execute();
+
+			if($opid!=0){
+				$query="UPDATE ".$SupportUserTable." c
+								SET
+									c.assigned_tickets=c.assigned_tickets+1
+								WHERE c.id=? LIMIT 1";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$opid,PDO::PARAM_INT);
+				$STH->execute();
+			}
+		}
+		else{
+			$query="UPDATE ".$SupportTicketsTable." a
+							SET
+								a.department_id=?
+							WHERE a.id=? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['dpid'],PDO::PARAM_INT);
+			$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
+			$STH->execute();
+		}
 		
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Moved'));
