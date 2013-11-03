@@ -1516,6 +1516,7 @@ else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSIO
 			exit();
 		}
 		$oldop=$a['operator_id'];
+		
 		$opid=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dpid'],$_SESSION['tickets'][$_POST['id']]['usr_id']);
 		if(!is_numeric($opid))
 			$opid=0;

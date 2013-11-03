@@ -154,7 +154,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='add_depart'){//check
+	else if($_POST[$_SESSION['token']['act']]=='add_depart'){
 		$_POST['tit']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
 		if(empty($_POST['tit'])){
 			header('Content-Type: application/json; charset=utf-8');
@@ -989,7 +989,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='move_admin_ticket'){//deep check
+	else if($_POST[$_SESSION['token']['act']]=='move_admin_ticket'){
 		$_POST['opid']=(is_numeric($_POST['opid'])) ? $_POST['opid']:exit();
 		$_POST['dpid']=(is_numeric($_POST['dpid'])) ? $_POST['dpid']:exit();
 		$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
@@ -1001,34 +1001,70 @@ else{
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-
+			
+			$query = "SELECT department_id,operator_id FROM ".$SupportTicketsTable." WHERE `id`=? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
+			$STH->execute();
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if($a['department_id']==$_POST['dpid']){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'The ticket is already assigned to this department'));
+				exit();
+			}
+			$oldop=$a['operator_id'];
+		
 			if($_POST['opid']==-1){
 				$_POST['opid']=retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName, $SupportUserPerDepaTable, $SupportUserTable, $_POST['dpid'],$_SESSION['tickets'][$_POST['id']]['usr_id']);
 				if(!is_numeric($_POST['opid']))
 					$_POST['opid']=0;
 			}
-			$query="UPDATE ".$SupportTicketsTable." a
-						LEFT JOIN ".$SupportUserTable." b
-							ON b.id=a.operator_id
-						LEFT JOIN ".$SupportUserTable." c
-							ON c.id=?
-						SET
-							a.department_id=?,
-							a.ticket_status= CASE WHEN ?=0 AND `ticket_status`!=0 THEN 2 WHEN ?!=0 AND `ticket_status`='2' THEN '1' ELSE `ticket_status` END,
-							b.assigned_tickets=IF(b.id!=?,b.assigned_tickets-1,b.assigned_tickets),
-							c.assigned_tickets=IF(c.id!=a.operator_id,c.assigned_tickets+1,c.assigned_tickets),
-							a.operator_id=?
-						WHERE a.id=? ";
-			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['opid'],PDO::PARAM_INT);
-			$STH->bindParam(2,$_POST['dpid'],PDO::PARAM_INT);
-			$STH->bindParam(3,$_POST['opid'],PDO::PARAM_INT);
-			$STH->bindParam(4,$_POST['opid'],PDO::PARAM_INT);
-			$STH->bindParam(5,$_POST['opid'],PDO::PARAM_INT);
-			$STH->bindParam(6,$_POST['opid'],PDO::PARAM_INT);
-			$STH->bindParam(7,$_POST['id'],PDO::PARAM_INT);
-			$STH->execute();
 			
+			if($oldop!=$opid){
+				$query="UPDATE ".$SupportTicketsTable." a
+								SET
+									a.department_id=?,
+									a.ticket_status= CASE WHEN ?=0 AND a.ticket_status!=0 THEN 2 WHEN ?!=0 AND a.ticket_status='2' THEN '1' ELSE a.ticket_status END,
+									a.operator_id=?
+								WHERE a.id=? LIMIT 1";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$_POST['dpid'],PDO::PARAM_INT);
+				$STH->bindParam(2,$opid,PDO::PARAM_INT);
+				$STH->bindParam(3,$opid,PDO::PARAM_INT);
+				$STH->bindParam(4,$opid,PDO::PARAM_INT);
+				$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
+				$STH->execute();
+
+				$query="UPDATE ".$SupportUserTable." b
+								SET
+									b.assigned_tickets=b.assigned_tickets-1
+								WHERE b.id=? LIMIT 1";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$oldop,PDO::PARAM_INT);
+				$STH->execute();
+
+				if($opid!=0){
+					$query="UPDATE ".$SupportUserTable." c
+									SET
+										c.assigned_tickets=c.assigned_tickets+1
+									WHERE c.id=? LIMIT 1";
+					$STH = $DBH->prepare($query);
+					$STH->bindParam(1,$opid,PDO::PARAM_INT);
+					$STH->execute();
+				}
+			}
+			else{
+				$query="UPDATE ".$SupportTicketsTable." a
+								SET
+									a.department_id=?
+								WHERE a.id=? LIMIT 1";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$_POST['dpid'],PDO::PARAM_INT);
+				$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
+				$STH->execute();
+			}
+		
 			if($_POST['opid']>0){
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'AMoved'));
@@ -1046,7 +1082,7 @@ else{
 		exit();
 	}
 
-	else if($_POST[$_SESSION['token']['act']]=='delete_files'){//check
+	else if($_POST[$_SESSION['token']['act']]=='delete_files'){
 		$_POST['from']=(trim(preg_replace('/\s+/','',$_POST['from']))!='')? trim(preg_replace('/\s+/','',$_POST['from']))." 00:00:00":exit();
 		$_POST['to']=(trim(preg_replace('/\s+/','',$_POST['to']))!='')? trim(preg_replace('/\s+/','',$_POST['to']))." 23:59:59":exit();
 		
@@ -1439,7 +1475,7 @@ else{
 		exit();
 	}
 	
-	else if($_POST[$_SESSION['token']['act']]=='rem_flag'){//check
+	else if($_POST[$_SESSION['token']['act']]=='rem_flag'){
 		$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
 		if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
 			header('Content-Type: application/json; charset=utf-8');
@@ -1451,7 +1487,7 @@ else{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			
-			$query="DELETE FROM ".$SupportFlagTable." WHERE `tk_id`=?";
+			$query="DELETE FROM ".$SupportFlagTable." WHERE `id`=?";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
