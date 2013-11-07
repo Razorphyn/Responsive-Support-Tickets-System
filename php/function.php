@@ -718,7 +718,6 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 					pclose(popen("start /B ".$ex,"r")); 
 				else
 					shell_exec($ex." > /dev/null 2>/dev/null &");
-				echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
 			}
 			echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
 		}
