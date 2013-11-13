@@ -1875,7 +1875,7 @@ else if($_POST['act']=='rating' && isset($_SESSION['status']) && $_SESSION['stat
 else if($_POST['act']=='faq_rating' && isset($_POST['act']) && isset($_SESSION['status']) && $_SESSION['status']<3){
 	$_POST['rate']=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$_POST['idBox']=(is_numeric($_POST['idBox']))? $_POST['idBox']/3823:0;
-	if($GT86>10 && $rate>0){
+	if($_POST['idBox']>10 && $_POST['rate']>0){
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
