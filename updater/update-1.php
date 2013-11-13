@@ -4,6 +4,8 @@
 
 include_once '../php/config/database.php';
 try{
+	if(!is_file('../php/config/database_version') || file_get_contents('../php/config/database_version')!='1.0.0')
+		exit();
 	$query="DROP PROCEDURE IF EXISTS `schema_change`;
 
 	DELIMITER ;;
@@ -17,8 +19,8 @@ try{
 
 		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportTicketsTable."' AND column_name = 'enc_id') 
 			THEN
-				ALTER TABLE ".$SupportTicketsTable." DROP INDEX `enc_id`;
-				ALTER TABLE ".$SupportTicketsTable." DROP COLUMN `enc_id`;
+				ALTER TABLE ".$SupportTicketsTable." DROP INDEX `enc_id`,
+				ALTER TABLE ".$SupportTicketsTable." DROP COLUMN `enc_id`,
 				ALTER TABLE ".$SupportTicketsTable." ADD INDEX `ticket_index` (`id`, `department_id`, `operator_id`, `user_id`, `ticket_status`);
 		END IF;
 
@@ -29,16 +31,16 @@ try{
 
 		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportRateTable."' AND column_name = 'enc_id') 
 			THEN
-				ALTER TABLE ".$SupportRateTable." DROP INDEX `enc_id`;
-				ALTER TABLE ".$SupportRateTable." CHANGE `enc_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL;
-				ALTER TABLE ".$SupportRateTable." ADD INDEX `op_rate_index` (`ref_id`, `tk_id`, `rate`);
+				ALTER TABLE ".$SupportRateTable." DROP INDEX `enc_id`,
+				ALTER TABLE ".$SupportRateTable." CHANGE `enc_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL,
+				ALTER TABLE ".$SupportRateTable." ADD INDEX `op_rate_index` (`ref_id`, `tk_id`, `rate`),
 				ALTER TABLE ".$SupportRateTable." ADD UNIQUE KEY(`tk_id`);
 		END IF;
 
 		IF EXISTS (SELECT * FROM information_schema.columns WHERE table_name = '".$SupportFlagTable."' AND column_name = 'enc_id') 
 			THEN
-				ALTER TABLE ".$SupportFlagTable." DROP INDEX `ref_id`;
-				ALTER TABLE ".$SupportFlagTable." CHANGE `enc_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL;
+				ALTER TABLE ".$SupportFlagTable." DROP INDEX `ref_id`,
+				ALTER TABLE ".$SupportFlagTable." CHANGE `enc_id` `tk_id` BIGINT(15) UNSIGNED NOT NULL,
 				ALTER TABLE ".$SupportFlagTable." ADD INDEX `flag_index` (`ref_id`, `tk_id`, `usr_id`);
 		END IF;
 
@@ -54,8 +56,9 @@ try{
 	$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 	$STH = $DBH->prepare($query);
 	$STH->execute();
+	file_put_contents('../php/config/database_version','1.0.1');
 	echo "Database Updated, this file has been deleted";
-	unlink(__FILE__);
+	unlink('update-1.php');
 }
 catch(PDOException $e){
 	file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);

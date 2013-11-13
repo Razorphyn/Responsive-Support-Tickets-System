@@ -5,8 +5,12 @@ A full of functions Ticket Support System
 
 The package is under beta test.
 
+##ATTENTION
+I'm implementing a payment ticket system that ***IS NOT READY*** , so ***DO NOT*** to use it
+
 ToDo List
 -
+- Complete Payment System
 - Check few functions
 - Check STMP Connection
 - Add Create Ticket from Administrator for someone

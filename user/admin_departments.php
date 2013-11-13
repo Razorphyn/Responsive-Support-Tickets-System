@@ -48,7 +48,8 @@ try{
 	$query = "SELECT id,
 					department_name,
 					CASE active WHEN '1' THEN 'Yes' ELSE 'No' END AS active, 
-					CASE public_view WHEN '1' THEN 'Yes' ELSE 'No' END AS public 
+					CASE public_view WHEN '1' THEN 'Yes' ELSE 'No' END AS public,
+					CASE free WHEN '1' THEN 'Yes' ELSE 'No' END AS free
 				FROM ".$SupportDepaTable;
 		
 	$STH = $DBH->prepare($query);
@@ -62,6 +63,7 @@ try{
 						'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),
 						'active'=>$a['active'],
 						'public'=>$a['public'],
+						'free'=>$a['free'],
 						'action'=>'<div class="btn-group"><button class="btn btn-info editdep" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
 			);
 		}while ($a = $STH->fetch());
@@ -77,7 +79,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
-function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 							
 ?>
 <!DOCTYPE html>
@@ -171,7 +173,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 						<?php
 							$c=count($dn);
 							for($i=0;$i<$c;$i++)
-								echo '<tr><td>'.$dn[$i]['id'].'</td><td>'.$dn[$i]['name'].'</td><td>'.$dn[$i]['active'].'</td><td>'.$dn[$i]['public'].'</td><td>'.$dn[$i]['action'].'</td></tr>';
+								echo '<tr><td>'.$dn[$i]['id'].'</td><td>'.$dn[$i]['name'].'</td><td>'.$dn[$i]['active'].'</td><td>'.$dn[$i]['public'].'</td><td>'.$dn[$i]['free'].'</td><td>'.$dn[$i]['action'].'</td></tr>';
 						?>
 						</tbody>
 						</table>
@@ -181,20 +183,27 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 					<h4 class='sectname'>Add New Department</h4>
 					<form action='' method='post'>
 							<div class='row-fluid'>
-								<div class='span2'><label for='depname'>Name</label></div>
-								<div class='span4'><input type="text" name='depname' id="depname" placeholder="Department Name" required /></div>
+								<div class='span1'><label for='depname'>Name</label></div>
+								<div class='span3'><input type="text" name='depname' id="depname" placeholder="Department Name" required /></div>
 							</div>
 							<div class='row-fluid'>
-								<div class='span2'><label for='activedep'>Is Active?</label></div>
-								<div class='span4'>
+								<div class='span1'><label for='activedep'>Is Active?</label></div>
+								<div class='span3'>
 									<select name='activedep' id='activedep'>
 										<option value='1'>Yes</option>
 										<option value='0'>No</option>
 									</select>
 								</div>
-								<div class='span2'><label for='publicdep'>Is Public?</label></div>
-								<div class='span4'>
+								<div class='span1'><label for='publicdep'>Is Public?</label></div>
+								<div class='span3'>
 									<select name='publicdep' id='publicdep'>
+										<option value='1'>Yes</option>
+										<option value='0'>No</option>
+									</select>
+								</div>
+								<div class='span1'><label for='freedep'>Is Free?</label></div>
+								<div class='span3'>
+									<select name='freedep' id='freedep'>
 										<option value='1'>Yes</option>
 										<option value='0'>No</option>
 									</select>
@@ -230,6 +239,7 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 												{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},
 												{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},
 												{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Free",mDataProp:"free",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Free: </strong></span><span> " + $(nTd).html() + '</span>');}},
 												{sTitle:"Toogle",mDataProp:"action",sWidth:"60px",bSortable:!1,bSearchable:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
 											]
 								});
@@ -245,11 +255,11 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				$("html,body").animate({scrollTop: $("#" + a.id).offset().top}, 1500)
 			}
 			else{
-				b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row-fluid'><div class='span2'><label>Is Active?</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='span2'><label>Is Public?</label></div><div class='span4'><select name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>",
+				b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row-fluid'><div class='span1'><label>Is Active?</label></div><div class='span3'><select name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='span1'><label>Is Public?</label></div><div class='span3'><select name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='span1'><label>Is Free?</label></div><div class='span3'><select name='edit_depa_free'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>",
 				$("#deplist").after(b),
-				b = "Yes" == a["public"] ? 1 : 0,
 				$('select[name="edit_depa_active"]:first option[value=' + ("Yes" == a.active ? 1 : 0) + "]").attr("selected", "selected"),
-				$('select[name="edit_depa_public"]:first option[value=' + b + "]").attr("selected", "selected")
+				$('select[name="edit_depa_free"]:first option[value=' + ("Yes" == a.free ? 1 : 0) + "]").attr("selected", "selected"),
+				$('select[name="edit_depa_public"]:first option[value=' + ("Yes" == a.public ? 1 : 0) + "]").attr("selected", "selected")
 			}
 		});
 		
@@ -337,12 +347,13 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 		$("#btnadddep").click(function () {
 			var b = $("#depname").val().replace(/\s+/g, " "),
 				c = $("#activedep").val(),
-				d = $("#publicdep").val();
+				d = $("#publicdep").val(),
+				e = $("#freedep").val();
 			if(b.replace(/\s+/g, "")!=""){
 				$.ajax({
 					type: "POST",
 					url: "../php/admin_function.php",
-					data: { <?php echo $_SESSION['token']['act']; ?> : "add_depart",tit: b,active: c,pubdep: d},
+					data: { <?php echo $_SESSION['token']['act']; ?> : "add_depart",tit: b,active: c,pubdep: d,freedep: e},
 					dataType: "json",
 					success: function (a) {
 						if("Added" == a.response){
@@ -381,11 +392,12 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 				g = parseInt(a.children('input[name="depa_edit_pos"]').val()),
 				f = a.find('input[name="edit_depa_name"]').val().replace(/\s+/g, " "),
 				c = a.find('select[name="edit_depa_active"]').val(),
-				d = a.find('select[name="edit_depa_public"]').val();
+				d = a.find('select[name="edit_depa_public"]').val(),
+				h = a.find('select[name="edit_depa_free"]').val();
 			"" != f.replace(/\s+/g, "") ? $.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {<?php echo $_SESSION['token']['act']; ?>: "edit_depart",id: b,name: f,active: c,pub: d},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "edit_depart",id: b,name: f,active: c,pub: d,free:h},
 				dataType: "json",
 				success: function (e) {
 					if("Succeed" == e[0]){

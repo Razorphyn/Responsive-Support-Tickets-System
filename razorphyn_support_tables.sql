@@ -22,24 +22,27 @@ INSERT IGNORE INTO `razorphyn_support_users` (`id`, `name`, `mail`, `password`, 
 (54, 'Admin', 'admin@admin.com', 'd16a2f5a824df504eafae57bae3ed217c5be8ffc15d8c576b536910e19b30ca27a3abe8f42e01222ec15e5f81a471f79428dbb940106e279d9cf45e50379c81e', NULL , NULL, '127.0.0.1', '2', '0', 'yes', 0, 0, 0, 0.00);
 
 CREATE TABLE IF NOT EXISTS `razorphyn_support_list_tickets` (
-	`id` 				BIGINT(15) 	UNSIGNED 		NOT NULL 	AUTO_INCREMENT,
+	`id` 				BIGINT(15) 					UNSIGNED 		NOT NULL 	AUTO_INCREMENT,
+	`enabled` 			ENUM('0','1') 								NOT NULL 	DEFAULT '1',
 	`ref_id` 			VARCHAR(18),
-	`department_id` 	BIGINT(11) 	UNSIGNED		NOT NULL,
-	`operator_id`	 	BIGINT(11) 	UNSIGNED		NOT NULL DEFAULT 0,
-	`user_id` 			BIGINT(11) 	UNSIGNED 		NOT NULL,
-	`title` 			VARCHAR(255)				NOT NULL,
-	`priority` 			INT(2) 		UNSIGNED		NOT NULL,
-	`website` 			VARCHAR(200) 				NOT NULL,
-	`contype` 			ENUM('0','1','2','3','4','5') 	NOT NULL 	DEFAULT '0',
-	`ftp_user` 			VARCHAR(60) 				NOT NULL,
-	`ftp_password` 		VARCHAR(60) 				NOT NULL,
-	`created_time` 		DATETIME 					NOT NULL,
-	`last_reply` 		DATETIME  					NOT NULL,
-	`ticket_status` 	ENUM('0','1','2','3') 		NOT NULL 	DEFAULT '2',
+	`department_id` 	BIGINT(11) 					UNSIGNED		NOT NULL,
+	`operator_id`	 	BIGINT(11) 					UNSIGNED		NOT NULL DEFAULT 0,
+	`user_id` 			BIGINT(11) 					UNSIGNED 		NOT NULL,
+	`title` 			VARCHAR(255)								NOT NULL,
+	`priority` 			INT(2) 						UNSIGNED		NOT NULL,
+	`website` 			VARCHAR(200) 								NOT NULL,
+	`contype` 			ENUM('0','1','2','3','4','5') 				NOT NULL 	DEFAULT '0',
+	`ftp_user` 			VARCHAR(60) 								NOT NULL,
+	`ftp_password` 		VARCHAR(60) 								NOT NULL,
+	`created_time` 		DATETIME 									NOT NULL,
+	`last_reply` 		DATETIME  									NOT NULL,
+	`closed_date` 		DATETIME  									NULL,
+	`ticket_status` 	ENUM('0','1','2','3') 						NOT NULL 	DEFAULT '2',
 	`operator_rate`		DECIMAL(4,2) 				UNSIGNED,
+	`support_time`		INT(5) 						UNSIGNED		NULL,
 	PRIMARY KEY (`id`),
-	UNIQUE KEY (`user_id`,`title`),
-	INDEX (`id`,`department_id`,`operator_id`,`user_id`,`ticket_status`)
+	UNIQUE KEY (`user_id`,`title`,`department_id`),
+	INDEX `ticket_index` (`id`,`department_id`,`operator_id`,`user_id`,`ticket_status`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20;
 
 CREATE TABLE IF NOT EXISTS `razorphyn_support_list_messages` (
@@ -73,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_flag_tickets`(
 	`side` 				VARCHAR(20) 					NOT NULL,
 	`reason` 			VARCHAR(200) 					NOT NULL,
 	PRIMARY KEY (`id`),
-	UNIQUE KEY(`ref_id`,`tk_id`,`usr_id`)
+	UNIQUE KEY `flag_index` (`ref_id`,`tk_id`,`usr_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15;
 
 CREATE TABLE IF NOT EXISTS `razorphyn_support_departments` (
@@ -81,6 +84,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_departments` (
 	`department_name` 	VARCHAR(70) 			NOT NULL,
 	`active` 			ENUM('0','1') 			NOT NULL 	DEFAULT '1',
 	`public_view` 		ENUM('0','1') 			NOT NULL 	DEFAULT '1',
+	`free` 				ENUM('0','1') 			NOT NULL 	DEFAULT '1',
 	PRIMARY KEY (`id`),
 	UNIQUE KEY (`department_name`),
 	INDEX (`id`,`department_name`)
@@ -97,6 +101,22 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_user_departments` (
 	INDEX(`department_id`,`department_name`,`user_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;
 
+CREATE TABLE IF NOT EXISTS `razorphyn_support_sales` (
+	`id` 				BIGINT(11) 		UNSIGNED	NOT NULL 	AUTO_INCREMENT,
+	`gateway` 			VARCHAR(60) 				NOT NULL,
+	`payer_mail` 		VARCHAR(50) 				NOT NULL,
+	`status` 			ENUM('0','1','2','3') 		NOT NULL 	DEFAULT '2',
+	`transaction_id` 	VARCHAR(40) 				NOT NULL,
+	`tk_id` 			BIGINT(15) 		UNSIGNED,
+	`user_id` 			BIGINT(15) 		UNSIGNED,
+	`amount` 			FLOAT(10,2),
+	`support_time` 		VARCHAR(25) 				NOT NULL,
+	`payment_date` 		DATETIME  					NOT NULL,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY (`gateway`,`transaction_id`),
+	INDEX `sales_index` (`user_id`,`tk_id`,`support_time`,`status`,`transaction_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;
+
 CREATE TABLE IF NOT EXISTS `razorphyn_support_operator_rate`(
 	`id` 				BIGINT(15) 		UNSIGNED		NOT NULL AUTO_INCREMENT,
 	`ref_id` 			VARCHAR(18)						NOT NULL,
@@ -106,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_operator_rate`(
 	`note` 				VARCHAR(200) 					,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY(`tk_id`),
-	INDEX (`ref_id`,`tk_id`,`rate`)
+	INDEX `op_rate_index` (`ref_id`,`tk_id`,`rate`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15;
 
 CREATE TABLE IF NOT EXISTS `razorphyn_support_faq` (
@@ -131,3 +151,13 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_faq_rate`(
 	PRIMARY KEY (`id`),
 	UNIQUE KEY(`faq_id`,`usr_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15;
+
+CREATE TABLE IF NOT EXISTS `razorphyn_support_moneybooker`(
+	`mail` 				INT(5)			UNSIGNED		NOT NULL,
+	`usr_id` 			BIGINT(15) 		UNSIGNED		NOT NULL,
+	`rate` 				DECIMAL(4,2) 	UNSIGNED		NOT NULL	DEFAULT 0,
+	`updated` 			ENUM('0','1') 					NOT NULL 	DEFAULT '0',
+	`note` 				VARCHAR(200) 					,
+	UNIQUE KEY(`faq_id`,`usr_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+

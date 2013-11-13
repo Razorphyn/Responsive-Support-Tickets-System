@@ -161,24 +161,27 @@ else{
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
-		$_POST['active']=(is_numeric($_POST['active']))? $_POST['active']:exit();
-		$_POST['pubdep']=(is_numeric($_POST['pubdep']))? $_POST['pubdep']:exit();
+		$_POST['active']=($_POST['active']==1)? 1:0;
+		$_POST['pubdep']=($_POST['pubdep']==1)? 1:0;
+		$_POST['freedep']=($_POST['freedep']==1)? 1:0;
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			$query = "INSERT INTO ".$SupportDepaTable."(`department_name`,`active`,`public_view`) VALUES (?,?,?)";
+			$query = "INSERT INTO ".$SupportDepaTable."(`department_name`,`active`,`public_view`,`free`) VALUES (?,?,?)";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['tit'],PDO::PARAM_STR);
 			$STH->bindParam(2,$_POST['active'],PDO::PARAM_STR);
 			$STH->bindParam(3,$_POST['pubdep'],PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['freedep'],PDO::PARAM_STR);
 			$STH->execute();
 			$data=array();
 			$data['response']='Added';
 			$dpid=$DBH->lastInsertId();
 			$_POST['active']=($_POST['active']==0) ? 'No':'Yes';
 			$_POST['pubdep']=($_POST['pubdep']==0) ? 'No':'Yes';
-			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pubdep']);
+			$_POST['freedep']=($_POST['freedep']==0) ? 'No':'Yes';
+			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pubdep'],'free'=>$_POST['freedep']);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($data);
 		}
@@ -204,23 +207,26 @@ else{
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
 		}
-		$_POST['active']=(is_numeric($_POST['active'])) ? $_POST['active']:exit();
-		$_POST['pub']=(is_numeric($_POST['pub'])) ? $_POST['pub']:exit();
+		$_POST['active']=($_POST['active']==1) ? 1:0;
+		$_POST['pub']=($_POST['pub']==1) ? 1:0;
+		$_POST['free']=($_POST['free']==1) ? 1:0;
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			$query = "UPDATE ".$SupportDepaTable." SET `department_name`=?,`active`=?,`public_view`=? WHERE id=? ";
+			$query = "UPDATE ".$SupportDepaTable." SET `department_name`=?,`active`=?,`public_view`=?,`free`=? WHERE id=? ";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['name'],PDO::PARAM_STR);
 			$STH->bindParam(2,$_POST['active'],PDO::PARAM_STR);
 			$STH->bindParam(3,$_POST['pub'],PDO::PARAM_STR);
-			$STH->bindParam(4,$_POST['id'],PDO::PARAM_INT);
+			$STH->bindParam(4,$_POST['free'],PDO::PARAM_STR);
+			$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 			$_POST['active']=($_POST['active']==0) ? 'No':'Yes';
 			$_POST['pub']=($_POST['pub']==0) ? 'No':'Yes';
+			$_POST['free']=($_POST['free']==0) ? 'No':'Yes';
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Succeed',1=>array('id'=>$_POST['id'],'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pub'])));
+			echo json_encode(array(0=>'Succeed',1=>array('id'=>$_POST['id'],'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pub'],'free'=>$_POST['free'])));
 		}
 		catch(PDOException $e){
 			if ($e->errorInfo[1] == 1062) {
@@ -363,7 +369,13 @@ else{
 			echo json_encode(array(0=>'Invalid Mail'));
 			exit();
 		}
-		if(file_put_contents('config/setting.txt',$_POST['tit']."\n".$_POST['mail']."\n".$_POST['senrep']."\n".$_POST['senope']."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$_POST['maxsize']."\n".$_POST['enrat']."\n".$_POST['commlop']."\n".$_POST['faq'])){
+		$_POST['error_mail']= trim(preg_replace('/\s+/','',$_POST['error_mail']));
+		if(empty($_POST['error_mail']) || !filter_var($_POST['error_mail'], FILTER_VALIDATE_EMAIL)){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Error Mail'));
+			exit();
+		}
+		if(file_put_contents('config/setting.txt',$_POST['tit']."\n".$_POST['mail']."\n".$_POST['senrep']."\n".$_POST['senope']."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$_POST['maxsize']."\n".$_POST['enrat']."\n".$_POST['commlop']."\n".$_POST['faq']."\n".$_POST['error_mail'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
 		}
@@ -1588,6 +1600,6 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 
 function get_random_string($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ0123456789';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
-function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 
 ?>

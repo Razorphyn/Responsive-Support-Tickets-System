@@ -275,7 +275,7 @@ else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_acc
 					$_SESSION['ip']=retrive_ip();
 				}while ($a = $STH->fetch());
 
-				$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key=NULL WHERE `id`=?";
+				$query = "UPDATE ".$SupportUserTable." SET status='0',reg_key=NULL WHERE `id`=? LIMIT 1";
 				$STH = $DBH->prepare($query);
 				$STH->bindParam(1,$_SESSION['id'],PDO::PARAM_INT);
 				$STH->execute();
@@ -582,9 +582,22 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		
+			
+			$query = "SELECT `free` FROM ".$SupportDepaTable." WHERE `id`= ? LIMIT 1";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['dep'],PDO::PARAM_INT);
+			$STH->execute();
+			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
+			if(empty($a)){
+				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "Invalid Category",type:"error",timeout:9000})</script>';
+				exit();
+			}
+			$free=$a['free'];
+
 			//Create Ticket
-			$query = "INSERT INTO ".$SupportTicketsTable."(`department_id`,`user_id`,`title`,`priority`,`website`,`contype`,`ftp_user`,`ftp_password`,`created_time`,`last_reply`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+			$query = "INSERT INTO ".$SupportTicketsTable."(`department_id`,`user_id`,`title`,`priority`,`website`,`contype`,`ftp_user`,`ftp_password`,`created_time`,`last_reply`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+
 			$STH = $DBH->prepare($query);
 			$date=date("Y-m-d H:i:s");
 			$STH->bindParam(1,$_POST['dep'],PDO::PARAM_INT);
@@ -597,11 +610,15 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 			$STH->bindParam(8,$_POST['ftppass'],PDO::PARAM_STR);
 			$STH->bindParam(9,$date,PDO::PARAM_STR);
 			$STH->bindParam(10,$date,PDO::PARAM_STR);
+			if($free==1)
+				$STH->bindParam(11,'1',PDO::PARAM_STR);
+			else
+				$STH->bindParam(11,'0',PDO::PARAM_STR);
 			$STH->execute();
 
 			echo '<script>parent.$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});</script>';
 			//Assign Reference Number
-			
+
 			$tkid=$DBH->lastInsertId();
 			$ip=retrive_ip();
 			$randomref=get_random_string(6);
@@ -719,7 +736,74 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 				else
 					shell_exec($ex." > /dev/null 2>/dev/null &");
 			}
-			echo "<script>parent.$('.main').nimbleLoader('hide');parent.created();</script>";
+			if($free==1)
+				echo "<script>parent.$('.main').nimbleLoader('hide');parent.created(0,null);</script>";
+			else{
+				if($_POST['method']==0){
+					$paypal_setting=file('config/payment/paypal.txt',FILE_IGNORE_NEW_LINES);
+					//0=>mail,1=>currency,2=>sandbox,3=>curl
+
+					$url=curPageURL();
+					$return_url=$url.'/user/inedx.php?payment=1';
+					$cancel_url=$url.'/user/inedx.php?payment=0';
+					$notify_url=$url.'/php/payment_paypal.php';
+					$item_name=$_POST['minutes'].' of support for ticket number .'.$tkid;
+					$item_amount=1;
+					
+					$querystring .= "?business=".urlencode($paypal_setting[0])."&";
+					$querystring .= "item_name=".urlencode($item_name)."&";
+					$querystring .= "amount=".urlencode($item_amount)."&";
+
+					//Other Fields
+					$querystring .= "cmd=".urlencode('_xclick')."&";
+					$querystring .= "no_note=1&";
+					$querystring .= "currency_code=".urlencode($paypal_setting[1])."&";
+					$querystring .= "item_number=".urlencode($tkid)."&";
+					$querystring .= "custom=".urlencode($_POST['minutes'])."&";
+
+					// Append PayPal return addresses
+					$querystring .= "return=".urlencode(stripslashes($return_url))."&";
+					$querystring .= "cancel_return=".urlencode(stripslashes($cancel_url))."&";
+					$querystring .= "notify_url=".urlencode($notify_url);
+					
+					//String Output
+					if($paypal_setting[2]==1)
+						echo "<script>parent.$('.main').nimbleLoader('hide');parent.created(1,'".urlencode('https://www.sandbox.paypal.com/cgi-bin/webscr'.$querystring)."');</script>";
+					else
+						echo "<script>parent.$('.main').nimbleLoader('hide');parent.created(1,'".urlencode('https://www.paypal.com/cgi-bin/webscr'.$querystring)."');</script>";
+				}
+				else if($_POST['method']==1){
+					$file=file('config/payment/price.txt');
+					$moneybooker_setting=file('config/payment/moneybooker.txt');
+					//0=>merchant_id, 1=>payment_mail, 2=>currency,3=>company, 4=>secret word
+					if($file[0]==0){
+						$prices=json_decode($file[1]);
+						$amount=round($prices[$_POST['minutes']],2);
+					}
+					else if($file[0]==1){
+						$amount=round($file[1]*$_POST['minutes'],2);
+					}
+					$lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+					$url=curPageURL().'/php/payment_moneybooker.php';
+					$form='<form action="https://www.moneybookers.com/app/payment.pl" method="post">
+								<input type="hidden" name="merchant_id" value="'.$moneybooker_setting[0].'"/>
+								<input type="hidden" name="recipient_description" value="'.$moneybooker_setting[3].'"/>
+								<input type="hidden" name="status_url" value="'.$url.'"/> 
+								<input type="hidden" name="language" value="'.$lang.'"/>
+								<input type="hidden" name="amount" value="'.$amount.'"/>
+								<input type="hidden" name="currency" value="'.$moneybooker_setting[2].'"/>
+
+								<input type="hidden" name="merchant_fields" value="tkid, minutes">
+								<input type="hidden" name="tkid" value="'.$tkid.'" />
+								<input type="hidden" name="minutes" value="'.$minutes.'" />
+
+								<input type="hidden" name="detail1_description" value="Support:" />
+								<input type="hidden" name="detail1_text" value="Ticket ID:'.$tkid.' for '.$minutes.' minutes" />
+								<input type="submit" value="Pay"/>
+							</form>';
+					echo "<script>parent.$('.main').nimbleLoader('hide');parent.created(2,".json_encode($form)."');</script>";
+				}
+			}
 		}
 		catch(PDOException $e){
 			if ($e->errorInfo[1] == 1062)
@@ -1045,14 +1129,25 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_depart' && isset($_SESSION['
 		$a = $STH->fetch();
 		if(!empty($a)){
 			$dn=array('response'=>'ret','information'=>array());
+			$free=array("<option disabled>Free</option>");
+			$pay=array("<option disabled>Premium</option>");
 			if($_POST['sect']=='new'){
 				do{
-					$dn['information'][]="<option value='".$a['id']."'>".$a['department_name']."</option>";
+					if($a['free']==1)
+						$free[]="<option value='".$a['id']."'>".htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8')."</option>";
+					else
+						$pay[]="<option value='".$a['id']."'>".htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8')."</option>";
 				}while ($a = $STH->fetch());
+				if(count($pay)>1)
+					$dn['information']=array_merge($free,$pay);
+				else{
+					unset($free[0]);
+					$dn['information']=array_values($free);
+				}
 			}
 			else if($_POST['sect']=='admin' && $_SESSION['status']==2){
 				do{
-					$dn['information'][]=array('id'=>$a['id'],'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),'active'=>$a['active'],'public'=>$a['public']);
+					$dn['information'][]=array('id'=>$a['id'],'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),'active'=>$a['active'],'public'=>$a['public'],'free'=>$a['free']);
 				}while ($a = $STH->fetch());
 			}
 			header('Content-Type: application/json; charset=utf-8');
@@ -1088,10 +1183,10 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 			$_POST['stat']=($_POST['stat']==0)? 0:1;
 			$query = "SELECT 
 						a.id,
-						IF(b.department_name IS NOT NULL, b.department_name,'Unknown'),
-						IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')),
+						IF(b.department_name IS NOT NULL, b.department_name,'Unknown') AS dname,
+						IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) AS opname,
 						a.title,
-						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END,
+						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio, 
 						a.created_time,
 						a.last_reply
 					FROM ".$SupportTicketsTable." a
@@ -1118,11 +1213,11 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 			$_POST['stat']=($_POST['stat']==0)? 0:1;
 			$query = "SELECT 
 						a.id,
-						IF(b.department_name IS NOT NULL, b.department_name,'Unknown') as dname,
-						CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE (IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown'))) END as opname,
+						IF(b.department_name IS NOT NULL, b.department_name,'Unknown') AS dname,
+						CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE (IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown'))) END AS opname,
 						a.operator_id,
 						a.title,
-						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END as prio,
+						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
 						a.created_time,
 						a.last_reply
 					FROM ".$SupportTicketsTable." a
@@ -2431,6 +2526,6 @@ function retrive_mime($encname,$mustang){
 function covert_size($val){if(empty($val))return 0;$val = trim($val);preg_match('#([0-9]+)[\s]*([a-z]+)#i', $val, $matches);$last = '';if(isset($matches[2]))$last = $matches[2];if(isset($matches[1]))$val = (int) $matches[1];switch (strtolower($last)){case 'g':case 'gb':$val *= 1024;case 'm':case 'mb':$val *= 1024;case 'k':case 'kb':$val *= 1024;}return (int) $val;}
 function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])){$ip=$_SERVER['HTTP_CLIENT_IP'];}elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])){$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];}else{$ip=$_SERVER['REMOTE_ADDR'];}return $ip;}
 function get_random_string($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ0123456789';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
-function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return dirname(dirname($pageURL));}						
+function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return dirname(dirname($pageURL));}						
 
 ?>

@@ -211,19 +211,30 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			
-			$query = "SELECT `id`,`department_name` FROM ".$SupportDepaTable." WHERE id=? OR active='1'";
+			$query = "SELECT `id`,`department_name`,`free` FROM ".$SupportDepaTable." WHERE id=? OR active='1'";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$except,PDO::PARAM_INT);
 			$STH->execute();
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
-			$b=array();
+			$b=array("<option disabled>Free</option>");
 			$a = $STH->fetch();
 			if(!empty($a)){
+				$pay=array("<option disabled>Premium</option>");
 				do{
-					$b[$a['id']]=htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8');
+					if($a['free']==1)
+						$b[]="<option value='".$a['id']."'>".htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8')."</option>";
+					else
+						$pay[]="<option value='".$a['id']."'>".htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8')."</option>";
 				}while ($a = $STH->fetch());
+				if(count($pay)>1)
+					$b=array_merge($b,$pay);
+				else{
+					unset($b[0]);
+				}
+				return implode(' ',$b);
 			}
-			return json_encode($b);
+			else
+				return false;
 		}
 		catch(PDOException $e){  
 			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
@@ -272,7 +283,7 @@ function retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, 
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
-function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 
 ?>
 <!DOCTYPE html>
@@ -409,23 +420,23 @@ function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVE
 							<br/>
 						<?php } ?>
 					</div>
-					<?php if($_SESSION['status']==1){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid));?>
+					<?php if($_SESSION['status']==1){ $b=retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid);?>
 						<hr>
 						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department </p>
 						<div class='expande'>
 							<div class='row-fluid'>
 								<div class='span2'>Change Departement</div>
-								<div class='span3'><select id='departments'><?php foreach($b as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; ?></select></div>
+								<div class='span3'><select id='departments'><?php echo $b; ?></select></div>
 								<div class='span1'><input type='submit' class='btn btn-success' id='updtdpop' onclick='javascript:return false;' value='Update'/></div>
 							</div>
 						</div>
-					<?php } if($_SESSION['status']==2){ $b=json_decode(retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid));$c=json_decode(retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid));?>
+					<?php } if($_SESSION['status']==2){ $b=retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid);$c=json_decode(retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid));?>
 						<hr>
 						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department and Operator</p>
 						<div class='expande'>
 							<div class='row-fluid'>
 								<div class='span2'>Change Departement</div>
-								<div class='span3'><select id='departments'><?php if($b!=false){foreach($b as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>'; }?></select></div>
+								<div class='span3'><select id='departments'><?php if($b!=false)echo $b;?></select></div>
 							</div>
 							<div class='row-fluid'>
 								<div class='span2'>Change Operator</div>.

@@ -17,12 +17,7 @@ if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !
 }
 if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
 	setcookie(session_name(),'invalid',time()-3600);
-	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'sessionerror',0));
-	}
-	else
-		echo '<script>top.window.location.replace("'.curPageURL().'?e=invalid");</script>';
+	echo '<script>top.window.location.replace("'.curPageURL().'?e=invalid");</script>';
 	exit();
 }
 session_start(); 
@@ -33,39 +28,24 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'sessionerror',1));
-	}
-	else
-		echo '<script>top.window.location.replace("'.curPageURL().'?e=expired");</script>';
+	header("location: ../index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
-	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'sessionerror',2));
-	}
-	else
-		echo '<script>top.window.location.replace("'.curPageURL().'?e=local");</script>';
+	header("location: ../index.php?e=local");
 	exit();
 }
 else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
 	session_unset();
 	session_destroy();
-	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(array(0=>'sessionerror',3));
-	}
-	else
-		echo '<script>top.window.location.replace("'.curPageURL().'?e=token");</script>';
+	header("location: ../index.php?e=token");
 	exit();
 }
 else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(array('Access Denied'));
+	header("location: ../index.php");
 	exit();
 }
 
@@ -80,7 +60,7 @@ if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/log
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
-function curPageURL() {$pageURL = 'http';if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $pageURL .= "s";$pageURL .= "://";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 
 
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
@@ -184,6 +164,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<div class='row-fluid'>
 						<div class='span2'><label>Notifier Mail</label></div>
 						<div class='span4'><input type="text" name='notmail' id="notmail" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='span2'><label>Error Mail</label></div>
+						<div class='span4'><input type="text" name='errmail' id="errmail" <?php if(isset($setting[10])) echo 'value="'.$setting[10].'"';?> placeholder="Error Email" required /></div>
 					</div>
 					<div class='row-fluid'>
 						<div class='span2'><label>Send Message on Reply</label></div>
@@ -460,7 +442,9 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		$("#saveopt").click(function(){
 			var a=$("#titsite").val().replace(/\s+/g," "),
-				c=$("#notmail").val(),d=$("#senrep").val(),
+				c=$("#notmail").val(),
+				d=$("#senrep").val(),
+				error_mail=$("#errmail").val(),
 				e=$("#senope").val(),
 				f=$("#timezone").val(),
 				g=$("#maxsize").val(),
@@ -471,7 +455,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			$.ajax({
 				type:"POST",
 				url:"../php/admin_function.php",
-				data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r},
+				data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,error_mail:error_mail,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r},
 				dataType:"json",
 				success:function(b){
 					if("Saved"==b[0])
