@@ -1817,7 +1817,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESS
 	exit();
 }
 
-else if($_POST[$_SESSION['token']['act']]=='rating' && isset($_SESSION['status']) && $_SESSION['status']<3){//deep check
+else if($_POST['act']=='rating' && isset($_SESSION['status']) && $_SESSION['status']<3){//deep check
 	$_POST['rate']=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$_POST['tkid']=trim(preg_replace('/\s+/','',$_POST['tkid']));
 	if(!preg_match('/^[0-9]{1,15}$/',$_POST['tkid'])){
