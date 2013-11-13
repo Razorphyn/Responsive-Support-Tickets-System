@@ -1178,7 +1178,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 							ON	b.id=a.department_id
 						LEFT JOIN ".$SupportUserTable." c
 							ON c.id=a.operator_id
-						WHERE a.ticket_status='?'
+						WHERE a.ticket_status=?
 						ORDER BY a.last_reply DESC 
 						LIMIT 350";
 			$STH = $DBH->prepare($query);
