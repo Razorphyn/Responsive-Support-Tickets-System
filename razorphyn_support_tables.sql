@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_list_tickets` (
 	`created_time` 		DATETIME 									NOT NULL,
 	`last_reply` 		DATETIME  									NOT NULL,
 	`closed_date` 		DATETIME  									NULL,
-	`ticket_status` 	ENUM('0','1','2','3') 						NOT NULL 	DEFAULT '2',
+	`ticket_status` 	ENUM('0','1','2','3','4') 					NOT NULL 	DEFAULT '2',
 	`operator_rate`		DECIMAL(4,2) 				UNSIGNED,
 	`support_time`		INT(5) 						UNSIGNED		NULL,
 	PRIMARY KEY (`id`),

@@ -9,7 +9,7 @@ $DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 $adminmail=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);	
 $paypal_setting=(is_file('config/payment/paypal.txt'))? file('config/payment/paypal.txt',FILE_IGNORE_NEW_LINES):exit();
-//0=>mail,1=>currency,2=>sandbox,3=>curl
+//0=>enabled,1=>mail,2=>currency,3=>sandbox,4=>curl
 
 $headers = "MIME-Version: 1.0" . "\r\n";
 $headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
@@ -26,8 +26,8 @@ $header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
 $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
 $header .= "Content-Length: ".strlen($req)."\r\n\r\n";
 
-if(isset($paypal_setting[3]) && $paypal_setting[3]==1){
-	if($paypal_setting[2]==1)
+if(isset($paypal_setting[4]) && $paypal_setting[4]==1){
+	if($paypal_setting[3]==1)
 		$fp = curl_init('https://www.sandbox.paypal.com/cgi-bin/webscr');
 	else
 		$fp = curl_init('https://www.paypal.com/cgi-bin/webscr');
@@ -40,40 +40,48 @@ if(isset($paypal_setting[3]) && $paypal_setting[3]==1){
 	$response_code = curl_getinfo($fp, CURLINFO_HTTP_CODE);
 }
 else{
-	if($paypal_setting[2]==1)
+	if($paypal_setting[3]==1)
 		$fp = fsockopen ('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
 	else
 		$fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 }
 
 if(!$fp){
-$message="An error has been occurred during payment elaboration(PAYPAL_CONNECTION_ERROR).";
-mail($adminmail[10],'Payment Error',$message,$headers);
+	$message="An error has been occurred during payment elaboration(PAYPAL_CONNECTION_ERROR).";
+	mail($adminmail[10],'Payment Error',$message,$headers);
 }
 else {
+	list($minutes,$userid)=explode(':',$_POST['custom']);
+	$minutes=(int)$minutes;
+	$userid=(int)$userid;
 	fputs ($fp, $header.$req);
 	while (!feof($fp)){
 		$res = fgets ($fp, 1024);
 		if (strcmp ($res, 'VERIFIED') == 0) {
-			if(check_txnid($_POST['txn_id']) && check_price($_POST['mc_gross'],$_POST['custom']) && $paypal_setting[1]==$_POST['mc_currency'] && $_POST['receiver_email']==$paypal_setting[0]){
+			if(check_txnid($_POST['txn_id']) && check_price($_POST['mc_gross'],$_POST['custom']) && $paypal_setting[2]==$_POST['mc_currency'] && $_POST['receiver_email']==$paypal_setting[1]){
 					$date= date("Y-m-d H:i:s");
 					$query = "INSERT INTO ".$SupportSalesTable."(`gateway`,`payer_mail`,`status`,`transaction_id`,`tk_id`,`user_id`,`amount`,`support_time`,`payment_date`) VALUES ('PayPal',?,?,?,?,(SELECT user_id FROM ".$SupportTicketsTable." WHERE id=?),?,?,?)";
-					switch($_POST['payment_status']){
-						case 'Completed':
+					switch(strtolower($_POST['payment_status'])){
+						case 'completed':
 							$st=2;
 							break;
-						case 'Failed':
+						case 'failed':
 							$st=1;
 							break;
-						case 'Expired':
+						case 'expired':
 							$st=1;
 							break;
-						case 'Pending':
+						case 'pending':
 							$st=0;
+							break;
+						case 'partially_refunded':
+						case 'refunded':
+							$st=3;
 							break;
 						default:
 							$st=1;
-							//Send error admin
+							$message="An error has been occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Paypal\nTransition ID:".$_POST['txn_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email']."\nStatus: ".$_POST['payment_status'];
+							mail($adminmail[10],'Payment Error',$message,$headers);
 					}
 					try{
 						$STH = $DBH->prepare($query);
@@ -81,7 +89,7 @@ else {
 						$STH->bindParam(2,$st,PDO::PARAM_STR);
 						$STH->bindParam(3,$_POST['txn_id'],PDO::PARAM_STR);
 						$STH->bindParam(4,$_POST['item_number'],PDO::PARAM_STR);
-						$STH->bindParam(5,$_POST['item_number'],PDO::PARAM_INT);
+						$STH->bindParam(5,$userid,PDO::PARAM_INT);
 						$STH->bindParam(6,$_POST['mc_gross'],PDO::PARAM_STR);
 						$STH->bindParam(7,$minutes,PDO::PARAM_INT);
 						$STH->bindParam(8,$date,PDO::PARAM_STR);
@@ -98,19 +106,19 @@ else {
 					catch(PDOException $e){
 						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
-						$message="An error has been occurred during payment elaboration(PDO_ERROR).\n PDO ERROR:\nFile: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\nPayment Information:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
+						$message="An error has been occurred during payment elaboration(PDO_ERROR).\n PDO ERROR:\nFile: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\nPayment Information:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
 						mail($adminmail[10],'Payment Error',$message,$headers);
 						exit();
 					}
 			}
 			else{
-				$message="An error has been occurred during payment elaboration(EDITED_INFORMATION_MAIL_ERROR).\nInformation:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
+				$message="An error has been occurred during payment elaboration(EDITED_INFORMATION_MAIL_ERROR).\nInformation:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
 				mail($adminmail[10],'Payment Error',$message,$headers);
 				exit();
 			}
 		}
 		else if (strcmp ($res, "INVALID") == 0) {
-			$message="An error has been occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
+			$message="An error has been occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
 			mail($adminmail[10],'Payment Error',$message,$headers);
 			exit();
 		}

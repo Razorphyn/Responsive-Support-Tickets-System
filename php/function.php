@@ -759,7 +759,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 					$querystring .= "no_note=1&";
 					$querystring .= "currency_code=".urlencode($paypal_setting[1])."&";
 					$querystring .= "item_number=".urlencode($tkid)."&";
-					$querystring .= "custom=".urlencode($_POST['minutes'])."&";
+					$querystring .= "custom=".urlencode($_POST['minutes']).':'.urlencode($_SESSION['id'])."&";
 
 					// Append PayPal return addresses
 					$querystring .= "return=".urlencode(stripslashes($return_url))."&";

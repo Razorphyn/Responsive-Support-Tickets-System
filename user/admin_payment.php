@@ -50,8 +50,9 @@ else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
 }
 
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
-if(is_file('../php/config/privacy.txt')) $privacy=file('../php/config/privacy.txt',FILE_IGNORE_NEW_LINES);
-if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/logo.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+if(is_file('../php/config/payment/paypal.txt')) $ppsetting=file('../php/config/payment/moneybooker.txt',FILE_IGNORE_NEW_LINES);
+if(is_file('../php/config/payment/moneybooker.txt')) $mbsetting=file('../php/config/payment/moneybooker.txt',FILE_IGNORE_NEW_LINES);
 
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
@@ -66,7 +67,7 @@ try{
 	$query = "SELECT 
 				`id`,
 				`gateway`,
-				CASE `status` WHEN '0' THEN 'Completed'  WHEN '1' THEN 'Operator'  WHEN '2' THEN 'Administrator'  WHEN '3' THEN 'Activation'  ELSE `status` END AS sale_stat,
+				CASE `status` WHEN '0' THEN '<span class=\'label label-warning\'>Pending</span>'  WHEN '1' THEN '<span class=\'label label-important\'>Cancelled</span>'  WHEN '2' THEN '<span class=\'label label-success\'>Processed</span>'  WHEN '3' THEN '<span class=\'label label-inverse\'>Refund</span>'  ELSE `status` END AS sale_stat,
 				`payer_mail`,
 				`transaction_id`,
 				`tk_id`,
@@ -206,21 +207,21 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					</div>
 					<div class='row-fluid'>
 						<div class='span2'><label>Merchant Mail</label></div>
-						<div class='span4'><input type="email" name='ppmail' id="ppmail" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='span4'><input type="email" name='ppmail' id="ppmail" <?php if(isset($ppsetting[1])) echo 'value="'.$ppsetting[1].'"';?> placeholder="Merchant Email" required /></div>
 						<div class='span2'><label>Currency</label></div>
-						<div class='span4'><input type="text" name='ppcurrency' id="ppcurrency" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='span4'><input type="text" name='ppcurrency' id="ppcurrency" <?php if(isset($ppsetting[2])) echo 'value="'.$ppsetting[2].'"';?> placeholder="Currency" required /></div>
 					</div>
 					<div class='row-fluid'>
 						<div class='span2'><label>Enable Sandbox</label></div>
 						<div class='span4'>
-							<select name='ensand' id='ensand'>
+							<select name='enppsand' id='enppsand'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
 						</div>
 						<div class='span2'><label>Enable CURL</label></div>
 						<div class='span4'>
-							<select name='encurl' id='encurl'>
+							<select name='enppcurl' id='encurl'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
@@ -233,7 +234,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<form id='moneybookers_payment' action=''>
 					<h3 class='sectname'>MoneyBookers Setting</h3>
 					<div class='row-fluid'>
-						<div class='span2'><label>Enabled *</label></div>
+						<div class='span2'><label>Enabled</label></div>
 						<div class='span4'>
 							<select name='enmb' id='enmb'>
 								<option value='0'>No</option>
@@ -242,16 +243,20 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						</div>
 					</div>
 					<div class='row-fluid'>
-						<div class='span2'><label>Merchant ID *</label></div>
-						<div class='span4'><input type="text" name='mbmercid' id="mbmercid" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
-						<div class='span2'><label>Merchant Mail *</label></div>
-						<div class='span4'><input type="email" name='mbmail' id="mbmail" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='span2'><label>Merchant ID</label></div>
+						<div class='span4'><input type="text" name='mbmercid' id="mbmercid" <?php if(isset($mbsetting[1])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Merchant ID" required /></div>
+						<div class='span2'><label>Merchant Mail</label></div>
+						<div class='span4'><input type="email" name='mbmail' id="mbmail" <?php if(isset($mbsetting[2])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Merchant Email" required /></div>
 					</div>
 					<div class='row-fluid'>
-						<div class='span2'><label>Currency *</label></div>
-						<div class='span4'><input type="text" name='mbcurrency' id="mbcurrency" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='span2'><label>Secret Word</label></div>
+						<div class='span4'><input type="text" name='mbsword' id="mbsword" <?php if(isset($mbsetting[5])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Secret Word" required /></div>
+					</div>
+					<div class='row-fluid'>
+						<div class='span2'><label>Currency</label></div>
+						<div class='span4'><input type="text" name='mbcurrency' id="mbcurrency" <?php if(isset($mbsetting[3])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Currency" required /></div>
 						<div class='span2'><label>Company Name</label></div>
-						<div class='span4'><input type="text" name='mbcompanyname' id="mbcompanyname" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" /></div>
+						<div class='span4'><input type="text" name='mbcompanyname' id="mbcompanyname" <?php if(isset($mbsetting[4])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Company Name" /></div>
 					</div>
 					<input type="submit" class="btn btn-success" value='Save' id='saveoptmoney'/>
 				</form>
@@ -262,14 +267,15 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				</div>
 				<hr>
 				<div class='row-fluid'>
-						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="payment_table">
-							<tbody>
-								<?php
-									for($i=0;$i<$c;$i++)
-										echo '<tr><td>'.$users[$i]['id'].'</td><td>'.$users[$i]['payment_date'].'</td><td>'.$users[$i]['gateway'].'</td><td>'.$users[$i]['status'].'</td><td>'.$users[$i]['payer_mail'].'</td><td>'.$users[$i]['transaction_id'].'</td><td>'.$users[$i]['amount'].'</td><td>'.$users[$i]['support_time'].'</td></tr>';
-								?>
-							</tbody>
-						</table>
+					<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+					<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="payment_table">
+						<tbody>
+							<?php
+								for($i=0;$i<$c;$i++)
+									echo '<tr><td>'.$users[$i]['id'].'</td><td>'.$users[$i]['payment_date'].'</td><td>'.$users[$i]['gateway'].'</td><td>'.$users[$i]['status'].'</td><td>'.$users[$i]['payer_mail'].'</td><td>'.$users[$i]['transaction_id'].'</td><td>'.$users[$i]['amount'].'</td><td>'.$users[$i]['support_time'].'</td></tr>';
+							?>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -277,18 +283,18 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
-	
+
 	<script type="text/javascript">
 	$(document).ready(function() {
 
-		<?php if(isset($setting[2])){?>
-			$("#senrep > option[value='<?php echo $setting[2];?>']").attr('selected','selected');
-		<?php } if(isset($setting[3])){?>
-			$("#senope > option[value='<?php echo $setting[3];?>']").attr('selected','selected');
-		<?php } if(isset($setting[5])){?>
-			$("#allup > option[value='<?php echo $setting[5];?>']").attr('selected','selected');
-		<?php } if(isset($setting[7])){?>
-			$("#allrat > option[value='<?php echo $setting[7];?>']").attr('selected','selected');
+		<?php if(isset($ppsetting[0])){?>
+			$("#enpp > option[value='<?php echo $ppsetting[0];?>']").attr('selected','selected');
+		<?php } if(isset($ppsetting[3])){?>
+			$("#enppsand > option[value='<?php echo $ppsetting[3];?>']").attr('selected','selected');
+		<?php } if(isset($ppsetting[4])){?>
+			$("#enppcurl > option[value='<?php echo $ppsetting[4];?>']").attr('selected','selected');
+		<?php } if(isset($mbsetting[0])){?>
+			$("#enmb > option[value='<?php echo $mbsetting[0];?>']").attr('selected','selected');
 		<?php } ?>
 
 		var table = $("#payment_table").dataTable({
@@ -297,18 +303,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						bProcessing: !0,
 						oLanguage: {sEmptyTable: "No Payments"},
 						aoColumns: [
-							{sTitle: "ID",			mDataProp: "id",				sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
+							{sTitle: "ID",			mDataProp: "id",				sWidth: "50px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
 							{sTitle: "Date",		mDataProp: "payment_date",		sWidth: "80px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Date: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
 							{sTitle: "Gateway",		mDataProp: "gateway",																fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Gateway: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Status",		mDataProp: "status",																fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Status",		mDataProp: "status",			sWidth: "50px",												fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
 							{sTitle: "Mail",		mDataProp: "payer_mail",															fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
 							{sTitle: "Payment ID",	mDataProp: "transaction_id",														fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Payment ID: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Amount",		mDataProp: "amount",			sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Amount: </strong></span><span> " + $(nTd).html() + '</span>');}
-							{sTitle: "Time",		mDataProp: "support_time",		sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Time: </strong></span><span> " + $(nTd).html() + '</span>');}
-							{sTitle: "Tooggle",		mDataProp: "action",			sWidth: "60px",	bSortable: !1,	bSearchable: !1,	fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
-						}]
+							{sTitle: "Amount",		mDataProp: "amount",			sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Amount: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle: "Time",		mDataProp: "support_time",		sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Time: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle: "Tooggle",		mDataProp: "action",			sWidth: "60px",	bSortable: !1,	bSearchable: !1,	fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
+						]
 					});
-
+		$('.loading').remove();
+		$('table:hidden').each(function(){
+			$(this).show(400);
+		});
+		
 		$("#payment_table").on("click", ".edituser", function () {
 			$(this).val();
 			var b = this.parentNode.parentNode.parentNode.parentNode,
@@ -480,8 +490,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			var a=$("#enpp").val().replace(/\s+/g,""),
 				c=$("#ppmail").val().replace(/\s+/g,""),
 				d=$("#ppcurrency").val().replace(/\s+/g,""),
-				e=$("#ensand").val(),
-				f=$("#encurl").val();
+				e=$("#enppsand").val(),
+				f=$("#enppcurl").val();
 			if(""!=a && ""!=c &&""!=d &&""!=e){
 				$.ajax({
 					type:"POST",
