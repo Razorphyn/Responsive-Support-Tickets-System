@@ -1,7 +1,14 @@
 <?php
-
 /* *******************************************
 // Copyright 2010-2013, Anthony Hand
+//
+// File version 2013.10.27 (October 27, 2013)
+//      Updates:
+//      - Made minor update to the InitDeviceScan. Should check Tablet Tier first, then iPhone Tier, then Quick Mobile.
+//
+// File version 2013.08.01 (August 1, 2013)
+//      Updates:
+//      - Updated DetectMobileQuick(). Moved the 'Exclude Tablets' logic to the top of the method to fix a logic bug.
 //
 // File version 2013.07.13 (July 13, 2013)
 //      Updates:
@@ -213,9 +220,9 @@ class uagent_info
        
         //These tiers are the most useful for web development
         global $isMobilePhone, $isTierTablet, $isTierIphone;
-        $this->isMobilePhone = $this->DetectMobileQuick();
-        $this->isTierIphone = $this->DetectTierIphone();
-        $this->isTierTablet = $this->DetectTierTablet();
+        $this->isTierTablet = $this->DetectTierTablet(); //Do first
+        $this->isTierIphone = $this->DetectTierIphone(); //Do second
+        $this->isMobilePhone = $this->DetectMobileQuick(); //Do third
        
         //Optional: Comment these out if you NEVER use them.
         global $isTierRichCss, $isTierGenericMobile;
@@ -417,8 +424,8 @@ class uagent_info
    // Windows Phone 7.x OR 8 device.
    function DetectWindowsPhone()
    {
-      if (($this->DetectWindowsPhone7() == $this->true)
-                        || ($this->DetectWindowsPhone8() == $this->true))
+      if (($this->DetectWindowsPhone8() == $this->true)
+                        || ($this->DetectWindowsPhone7() == $this->true))
          return $this->true;
       else
          return $this->false;
@@ -934,14 +941,14 @@ class uagent_info
    //   as well as smartphone-class devices. Excludes Apple iPads and other modern tablets.
    function DetectMobileQuick()
    {
-      if ($this->initCompleted == $this->true ||
-          $this->isMobilePhone == $this->true)
-         return $this->isMobilePhone;
-
       //Let's exclude tablets
       if ($this->isTierTablet == $this->true)
          return $this->false;
      
+      if ($this->initCompleted == $this->true ||
+          $this->isMobilePhone == $this->true)
+         return $this->isMobilePhone;
+
       //Most mobile browsing is done on smartphones
       if ($this->DetectSmartphone() == $this->true)
          return $this->true;
@@ -1136,4 +1143,9 @@ class uagent_info
      
 
 }
+
+
+//Was informed by a MobileESP user that it's a best practice
+//  to omit the closing ?&gt; marks here. They can sometimes
+//  cause errors with HTML headers.
 ?>

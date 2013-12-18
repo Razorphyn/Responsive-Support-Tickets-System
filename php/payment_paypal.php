@@ -11,6 +11,10 @@ $adminmail=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 $paypal_setting=(is_file('config/payment/paypal.txt'))? file('config/payment/paypal.txt',FILE_IGNORE_NEW_LINES):exit();
 //0=>mail,1=>currency,2=>sandbox,3=>curl
 
+$headers = "MIME-Version: 1.0" . "\r\n";
+$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
+$headers .= 'From: '.$adminmail[1]."\r\n";
+
 $req = 'cmd=_notify-validate';
 foreach ($_POST as $key => $value){
 	$value = urlencode(stripslashes($value));
@@ -44,9 +48,6 @@ else{
 
 if(!$fp){
 $message="An error has been occurred during payment elaboration(PAYPAL_CONNECTION_ERROR).";
-$headers = "MIME-Version: 1.0" . "\r\n";
-$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
-$headers .= 'From: '.$adminmail[1]."\r\n";
 mail($adminmail[10],'Payment Error',$message,$headers);
 }
 else {
@@ -98,27 +99,18 @@ else {
 						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 						$message="An error has been occurred during payment elaboration(PDO_ERROR).\n PDO ERROR:\nFile: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\nPayment Information:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
-						$headers = "MIME-Version: 1.0" . "\r\n";
-						$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
-						$headers .= 'From: '.$adminmail[1]."\r\n";
 						mail($adminmail[10],'Payment Error',$message,$headers);
 						exit();
 					}
 			}
 			else{
 				$message="An error has been occurred during payment elaboration(EDITED_INFORMATION_MAIL_ERROR).\nInformation:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
-				$headers = "MIME-Version: 1.0" . "\r\n";
-				$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
-				$headers .= 'From: '.$adminmail[1]."\r\n";
 				mail($adminmail[10],'Payment Error',$message,$headers);
 				exit();
 			}
 		}
 		else if (strcmp ($res, "INVALID") == 0) {
 			$message="An error has been occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
-			$headers = "MIME-Version: 1.0" . "\r\n";
-			$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
-			$headers .= 'From: '.$adminmail[1]."\r\n";
 			mail($adminmail[10],'Payment Error',$message,$headers);
 			exit();
 		}

@@ -17,7 +17,7 @@ if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !
 }
 if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
 	setcookie(session_name(),'invalid',time()-3600);
-	header("location: ../index.php?e=invalid");
+	echo '<script>top.window.location.replace("'.curPageURL().'?e=invalid");</script>';
 	exit();
 }
 session_start(); 
@@ -37,10 +37,27 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	header("location: ../index.php?e=local");
 	exit();
 }
-else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
-	 header("location: ../index.php");
-	 exit();
+else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
+	session_unset();
+	session_destroy();
+	header("location: ../index.php?e=token");
+	exit();
 }
+else if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
+	header('Content-Type: application/json; charset=utf-8');
+	header("location: ../index.php");
+	exit();
+}
+
+if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
+if(is_file('../php/config/privacy.txt')) $privacy=file('../php/config/privacy.txt',FILE_IGNORE_NEW_LINES);
+if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/logo.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+$siteurl=dirname(dirname(curPageURL()));
+$siteurl=explode('?',$siteurl);
+$siteurl=$siteurl[0];
+function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+
 include_once '../php/config/database.php';
 try{
 	$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -48,12 +65,15 @@ try{
 
 	$query = "SELECT 
 				`id`,
-				`name`,
-				`mail`,
-				CASE `status` WHEN '0' THEN 'User'  WHEN '1' THEN 'Operator'  WHEN '2' THEN 'Administrator'  WHEN '3' THEN 'Activation'  WHEN '4' THEN 'Banned' ELSE 'Error' END AS ustat,
-				CASE `holiday` WHEN '0' THEN 'No' ELSE 'Yes' END AS hol, 
-				CASE WHEN `number_rating`='0' THEN 'No Rating' WHEN `number_rating`!='0' THEN `rating` ELSE 'Error' END AS rt
-			FROM ".$SupportUserTable." LIMIT 700";
+				`gateway`,
+				CASE `status` WHEN '0' THEN 'Completed'  WHEN '1' THEN 'Operator'  WHEN '2' THEN 'Administrator'  WHEN '3' THEN 'Activation'  ELSE `status` END AS sale_stat,
+				`payer_mail`,
+				`transaction_id`,
+				`tk_id`,
+				`amount`,
+				`support_time`,
+				`payment_date`,
+			FROM ".$SupportSalesTable." LIMIT 700 ORDER BY `payment_date`";
 			
 	$STH = $DBH->prepare($query);
 	$STH->execute();
@@ -64,13 +84,16 @@ try{
 	if(!empty($a)){
 		$users=array();
 		do{
-			$a['id']=$a['id']-54;
-			$users[]=array(	'num'=>$a['id'],
-							'name'=>htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),
-							'mail'=>htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'),
-							'status'=>$a['ustat'],
-							'holiday'=>$a['hol'],
-							'rating'=>$a['rt'],
+			$a['id']=$a['id']+1;
+			$users[]=array(	'ID'=>$a['id'],
+							'gateway'=>htmlspecialchars($a['gateway'],ENT_QUOTES,'UTF-8'),
+							'payer_mail'=>htmlspecialchars($a['payer_mail'],ENT_QUOTES,'UTF-8'),
+							'status'=>$a['sale_stat'],
+							'transaction_id'=>$a['transaction_id'],
+							'tk_id'=>$a['tk_id'],
+							'amount'=>$a['amount'],
+							'support_time'=>$a['support_time'],
+							'payment_date'=>$a['payment_date'],
 							'action'=>'<div class="btn-group"><button class="btn btn-info edituser" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
 						);
 			$c++;
@@ -81,27 +104,24 @@ catch(PDOException $e){
 	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 	$error='An Error has occurred, please read the PDOErrors file and contact a programmer';
 }
-if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
-$siteurl=dirname(dirname(curPageURL()));
-$siteurl=explode('?',$siteurl);
-$siteurl=$siteurl[0];
-function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
-
+				
 ?>
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<meta name="robots" content="noindex,nofollow">
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-		<title><?php if(isset($setting[0])) echo $setting[0];?> - Users</title>
+		<title><?php if(isset($setting[0])) echo $setting[0];?> - Admin</title>
 		<meta name="viewport" content="width=device-width">
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-
+		
 		<!--[if lt IE 9]><script src="../js/html5shiv-printshiv.js"></script><![endif]-->
+
 		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_i&amp;5259487' ?>"/>
 		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_d&amp;5259487' ?>"/>
-		
 	</head>
 	<body>
 		<div class="container">
@@ -134,14 +154,14 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<li class="active"><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown" role='button'>
+								<li><a href="setting.php"><i class="icon-cog"></i>Settings</a></li>
+								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
+								<li class="dropdown active" role='button' >
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
 										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
+										<li role="presentation" class='active'>
 											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
 										</li>
 										<li role="presentation">
@@ -170,135 +190,126 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			<div class='daddy'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Users Administration Tools</h2>
+					<h2 class='pagefun'>Administration - Payment Setting</h2>
 				</div>
 				<hr>
-				<?php if(!isset($error)){ ?>
-					<h3 class='sectname'>Users</h3>
-					<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-					<div class='row-fluid' id='userlist'>
-						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
+				<form id='paypal_setting' action=''>
+					<h3 class='sectname'>Paypal Setting</h3>
+					<div class='row-fluid'>
+						<div class='span2'><label>Enabled</label></div>
+						<div class='span4'>
+							<select name='enpp' id='enpp'>
+								<option value='0'>No</option>
+								<option value='1'>Yes</option>
+							</select>
+						</div>
+					</div>
+					<div class='row-fluid'>
+						<div class='span2'><label>Merchant Mail</label></div>
+						<div class='span4'><input type="email" name='ppmail' id="ppmail" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='span2'><label>Currency</label></div>
+						<div class='span4'><input type="text" name='ppcurrency' id="ppcurrency" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+					</div>
+					<div class='row-fluid'>
+						<div class='span2'><label>Enable Sandbox</label></div>
+						<div class='span4'>
+							<select name='ensand' id='ensand'>
+								<option value='0'>No</option>
+								<option value='1'>Yes</option>
+							</select>
+						</div>
+						<div class='span2'><label>Enable CURL</label></div>
+						<div class='span4'>
+							<select name='encurl' id='encurl'>
+								<option value='0'>No</option>
+								<option value='1'>Yes</option>
+							</select>
+						</div>
+					</div>
+					<input type="submit" class="btn btn-success" value='Save' id='saveoptpay'/>
+				</form>
+				<br/><br/>
+				<hr>
+				<form id='moneybookers_payment' action=''>
+					<h3 class='sectname'>MoneyBookers Setting</h3>
+					<div class='row-fluid'>
+						<div class='span2'><label>Enabled *</label></div>
+						<div class='span4'>
+							<select name='enmb' id='enmb'>
+								<option value='0'>No</option>
+								<option value='1'>Yes</option>
+							</select>
+						</div>
+					</div>
+					<div class='row-fluid'>
+						<div class='span2'><label>Merchant ID *</label></div>
+						<div class='span4'><input type="text" name='mbmercid' id="mbmercid" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='span2'><label>Merchant Mail *</label></div>
+						<div class='span4'><input type="email" name='mbmail' id="mbmail" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+					</div>
+					<div class='row-fluid'>
+						<div class='span2'><label>Currency *</label></div>
+						<div class='span4'><input type="text" name='mbcurrency' id="mbcurrency" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='span2'><label>Company Name</label></div>
+						<div class='span4'><input type="text" name='mbcompanyname' id="mbcompanyname" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" /></div>
+					</div>
+					<input type="submit" class="btn btn-success" value='Save' id='saveoptmoney'/>
+				</form>
+				<br/><br/>
+				<hr>
+				<div class="jumbotron" >
+					<h2 class='pagefun'>Administration - Payment List</h2>
+				</div>
+				<hr>
+				<div class='row-fluid'>
+						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="payment_table">
 							<tbody>
 								<?php
 									for($i=0;$i<$c;$i++)
-										echo '<tr><td>'.$users[$i]['num'].'</td><td>'.$users[$i]['name'].'</td><td>'.$users[$i]['mail'].'</td><td>'.$users[$i]['status'].'</td><td>'.$users[$i]['holiday'].'</td><td>'.$users[$i]['rating'].'</td><td>'.$users[$i]['action'].'</td></tr>';
-
+										echo '<tr><td>'.$users[$i]['id'].'</td><td>'.$users[$i]['payment_date'].'</td><td>'.$users[$i]['gateway'].'</td><td>'.$users[$i]['status'].'</td><td>'.$users[$i]['payer_mail'].'</td><td>'.$users[$i]['transaction_id'].'</td><td>'.$users[$i]['amount'].'</td><td>'.$users[$i]['support_time'].'</td></tr>';
 								?>
 							</tbody>
 						</table>
-					</div>
-					<br/><br/>
-					<hr>
-					<p class='cif'><i class='icon-plus-sign'></i> Create New User</p>
-					<form style='display:none'>
-						<h3 class='sectname'>New Users</h3>
-						<small><p>Every created user through this function is automatically activated</p></small>
-						<div class='row-fluid'>
-							<div class='span2'><label for='new_rname'>Name</label></div>
-							<div class='span4'><input type="text" id="new_rname" placeholder="Name" required></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='new_rmail'>Email</label></div>
-							<div class='span4'><input type="email" id="new_rmail" placeholder="Email" required></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='new_rmail'>User Role/Status</label></div>
-							<div class='span4'>
-								<select id='new_usr_role'>
-									<option value='0'>User</option>
-									<option value='1'>Operator</option>
-									<option value='2'>Administrator</option>
-								</select>
-							</div>
-						</div>
-						<input type="submit" id='new_user' onclick='javascript:return !1;' class="btn btn-success" value='Register'/>
-					</form>
-					<br/>
-					<hr>
-				<?php 
-					} 
-					else
-						echo '<p>'.$error.'</p>';
-				?>
+				</div>
 			</div>
 		</div>
-			<div id='delusr' style='display:none;height:40px' title="Delete this User?">
-				<p>Every information will be irreversibly deleted.</p>
-			</div>
+		<iframe name='hidden_frame' style='display:none;width:0;height:0' src="about:blank" ></iframe>
 	
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js,js/jquery-ui-1.10.3.custom.min.js&amp;5259487' ?>"></script>
-	<script>
-	 $(document).ready(function() {
-		var table = $("#usertable").dataTable({
+	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
+	
+	<script type="text/javascript">
+	$(document).ready(function() {
+
+		<?php if(isset($setting[2])){?>
+			$("#senrep > option[value='<?php echo $setting[2];?>']").attr('selected','selected');
+		<?php } if(isset($setting[3])){?>
+			$("#senope > option[value='<?php echo $setting[3];?>']").attr('selected','selected');
+		<?php } if(isset($setting[5])){?>
+			$("#allup > option[value='<?php echo $setting[5];?>']").attr('selected','selected');
+		<?php } if(isset($setting[7])){?>
+			$("#allrat > option[value='<?php echo $setting[7];?>']").attr('selected','selected');
+		<?php } ?>
+
+		var table = $("#payment_table").dataTable({
 						sDom: "<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
 						sWrapper: "dataTables_wrapper form-inline",
 						bProcessing: !0,
-						oLanguage: {sEmptyTable: "No Users"},
+						oLanguage: {sEmptyTable: "No Payments"},
 						aoColumns: [
-							{sTitle: "Number",mDataProp:"num",sWidth: "60px",sClass: "visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Number: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Status/Role",mDataProp:"status",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status/Role: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Holiday",mDataProp:"holiday",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Rating",mDataProp:"rating",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Tooggle",mDataProp:"action",bSortable: !1,bSearchable: !1,sWidth: "60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
+							{sTitle: "ID",			mDataProp: "id",				sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Date",		mDataProp: "payment_date",		sWidth: "80px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Date: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Gateway",		mDataProp: "gateway",																fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Gateway: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Status",		mDataProp: "status",																fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Mail",		mDataProp: "payer_mail",															fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Payment ID",	mDataProp: "transaction_id",														fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Payment ID: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Amount",		mDataProp: "amount",			sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Amount: </strong></span><span> " + $(nTd).html() + '</span>');}
+							{sTitle: "Time",		mDataProp: "support_time",		sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Time: </strong></span><span> " + $(nTd).html() + '</span>');}
+							{sTitle: "Tooggle",		mDataProp: "action",			sWidth: "60px",	bSortable: !1,	bSearchable: !1,	fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
 						}]
 					});
-			
-			$('.loading').remove(),$('#usertable').show(800);
-		
-		<?php if(isset($setting[2])){?>
-		$("#senrep option[value="+<?php echo $setting[2];?>+"]").attr('selected','selected');
-		<?php } if(isset($setting[3])){?>
-		$("#senope option[value="+<?php echo $setting[3];?>+"]").attr('selected','selected');
-		<?php } ?>
-		
-		$('#new_user').click(function(){
-			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
-			var name=$('#new_rname').val();
-			var mail=$('#new_rmail').val();
-			var role=$('#new_usr_role').val();
-			if(name.replace(/\s+/g,'')!='' && mail.replace(/\s+/g,'')!=''){
-				$.ajax({
-					type: 'POST',
-					url: '../php/admin_function.php',
-					data: {<?php echo $_SESSION['token']['act']; ?>:'admin_user_add',name: name,mail: mail,role:role},
-					dataType : 'json',
-					success : function (a) {
-						$(".main").nimbleLoader("hide");
-						if(a[0]=='Registred'){
-							a[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a[1]['num'] + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + a[1]['num'] + '"><i class="icon-remove"></i></button></div>';
-							table.fnAddData(a[1]);
-						}
-						else if(a[0]=='sessionerror'){
-							switch(a[1]){
-								case 0:
-									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-									break;
-								case 1:
-									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-									break;
-								case 2:
-									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-									break;
-								case 3:
-									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-									break;
-							}
-						}
-						else
-							noty({text: data[0],type:'error',timeout:9E3});
-					}
-				}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
-			}
-			else{
-				$(".main").nimbleLoader("hide");
-				noty({text: 'Empty Field or Password mismatch',type:'error',timeout:9E3});
-			}
-		});
-		
-		$("#usertable").on("click", ".edituser", function () {
+
+		$("#payment_table").on("click", ".edituser", function () {
 			$(this).val();
 			var b = this.parentNode.parentNode.parentNode.parentNode,
 				c = table.fnGetPosition(b, null, !0),
@@ -337,7 +348,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			"" != e.replace(/\s+/g, "") && "" != f.replace(/\s+/g, "") ? ($.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {<?php echo $_SESSION['token']['act']; ?>: "update_user_info",id: b,name: e,mail: f,status: g,holiday: c,seldepa: h},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "edit_sale_info",id: b,name: e,mail: f,status: g,holiday: c,seldepa: h},
 				dataType: "json",
 				success: function (d) {
 					if("Updated" == d[0]){
@@ -372,8 +383,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})
 			})) : noty({text: data[0],type: "Empty Field",timeout: 9E3});
 			return !1
-		});	
-		
+		});
+
 		$('#usertable').on('click','.remuser',function(){
 			var id=$(this).val();
 			var pos=table.fnGetPosition(this.parentNode.parentNode.parentNode.parentNode,null,true);
@@ -386,7 +397,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						$.ajax({
 							type: 'POST',
 							url: '../php/admin_function.php',
-							data: {<?php echo $_SESSION['token']['act']; ?>:'del_usr',id:id},
+							data: {<?php echo $_SESSION['token']['act']; ?>:'del_sale',id:id},
 							dataType : 'json',
 							success : function (data) {
 								if(data[0]=='Deleted')
@@ -423,72 +434,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					$("#delusr").dialog("option", "position", "center");
 			});
 		});
-		
-		$(document).on("change",'select[name="usr_role"]',function(){"1"==$(this).children("option:selected").val()?$(this).parent().parent().parent().find(".load_usr_depa").css("display","block"):($(this).parent().parent().parent().find(".load_usr_depa").css("display","none"),$(this).parent().parent().parent().find(".user_depa_container").remove())});
 
-		$(document).on("click", ".load_usr_depa", function () {
-			$(this).attr('disabled','disabled');
-			$(this).after("<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
-			var c = $(this).val(),
-				a = $(this);
-			$.ajax({
-				type: "POST",
-				url: "../php/admin_function.php",
-				data: {<?php echo $_SESSION['token']['act']; ?>: "select_depa_usr",id: c},
-				dataType: "json",
-				success: function (b) {
-					if("ok" == b.res){
-						a.parent().find(".loading").remove(), 
-						a.after(b.depa.join(""))
-					}
-					else if(b[0]=='sessionerror'){
-						switch(b[1]){
-							case 0:
-								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-								break;
-							case 1:
-								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-								break;
-							case 2:
-								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-								break;
-							case 3:
-								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-								break;
-						}
-					}
-					else
-						noty({text: b[0],type: "error",timeout: 9E3})
-				}
-			}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3});$(this).removeAttr('disabled');})
-		});
-		
-		$(document).on("click", ".load_usr_rate", function () {
-			var a=$(this),
-				e = a.parent().find('input[name="usr_old_stat"]').val().replace(/\s+/g,"");
-			$(this).attr('disabled','disabled');
-			if(e=='Operator' || e=='Administrator'){
-				$(this).after("<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
-				var c = $(this).val();
+		$("#saveoptmoney").click(function(){
+			var a=$("#enmb").val(),
+				c=$("#mbmercid").val().replace(/\s+/g,""),
+				d=$("#mbmail").val().replace(/\s+/g,""),
+				e=$("#mbcurrency").val().replace(/\s+/g,""),
+				f=$("#mbcompanyname").val();
+			if(""!=a && ""!=c &&""!=d &&""!=e){
 				$.ajax({
-					type: "POST",
-					url: "../php/admin_function.php",
-					data: {<?php echo $_SESSION['token']['act']; ?>: "select_usr_rate",id: c},
-					dataType: "json",
-					success: function (b) {
-						if(b.res=='ok'){
-							a.parent().find(".loading").remove();
-							var count=b.rate.length;
-							if(count>0){
-								var tail=new Array();
-								for(i=0;i<count;i++)
-									tail.push("<div class='row-fluid'><div class='span3'>"+b.rate[i][3]+"</div><div class='span3'><a href='view?id="+b.rate[i][2]+"'>View Ticket</a></div><div class='span3'>"+b.rate[i][0]+"</div></div><div class='row-fluid info_rate'><div class='span11'>"+b.rate[i][1]+"</div></div>");
-								tail=tail.join("");
-								a.after("<br/><div class='rate_container'>"+tail+"</div>");
-							}
-							else
-								a.after("<br/><p>This user hasn't got any rating");
-						}
+					type:"POST",
+					url:"../php/admin_function.php",
+					data:{<?php echo $_SESSION['token']['act']; ?>:"save_moneybookers",en:a,mer_id:c,mail:d,currency:e,compname:f},
+					dataType:"json",
+					success:function(b){
+						if("Saved"==b[0])
+							noty({text:"Saved",type:"success",timeout:9E3})
 						else if(b[0]=='sessionerror'){
 							switch(b[1]){
 								case 0:
@@ -505,35 +466,60 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									break;
 							}
 						}
-						else{
-							noty({text: b[0],type: "error",timeout: 9E3})
-						}
+						else
+							noty({text:"Options cannot be saved. Error: "+ b[0],type:"error",timeout:9E3})
 					}
-				}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3});$(this).removeAttr('disabled');})
+				}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});
 			}
-			else{
-				a.css('display','none');
-			}
+			else
+				noty({text:"Please complete all the required fields",type:"error",timeout:9E3})
+			return!1
 		});
 		
-		$('.cif').click(function(){
-			el=$(this).children('i');
-			if(el.hasClass('icon-plus-sign')){
-				el.removeClass('icon-plus-sign');
-				el.addClass('icon-minus-sign');
-				$(this).next('form').slideToggle(800);
+		$("#saveoptpay").click(function(){
+			var a=$("#enpp").val().replace(/\s+/g,""),
+				c=$("#ppmail").val().replace(/\s+/g,""),
+				d=$("#ppcurrency").val().replace(/\s+/g,""),
+				e=$("#ensand").val(),
+				f=$("#encurl").val();
+			if(""!=a && ""!=c &&""!=d &&""!=e){
+				$.ajax({
+					type:"POST",
+					url:"../php/admin_function.php",
+					data:{<?php echo $_SESSION['token']['act']; ?>:"save_moneybookers",en:a,mer_id:c,mail:d,currency:e,compname:f},
+					dataType:"json",
+					success:function(b){
+						if("Saved"==b[0])
+							noty({text:"Saved",type:"success",timeout:9E3})
+						else if(b[0]=='sessionerror'){
+							switch(b[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else
+							noty({text:"Options cannot be saved. Error: "+ b[0],type:"error",timeout:9E3})
+					}
+				}).fail(function(b,a){noty({text:a,type:"error",timeout:9E3})});
 			}
-			else{
-				el.removeClass('icon-minus-sign');
-				el.addClass('icon-plus-sign');
-				$(this).next('form').slideToggle(800);
-			}
+			else
+				noty({text:"Please complete all the required fields",type:"error",timeout:9E3})
+			return!1
 		});
-		
-		$(document).on('click','.btn_close_form',function(){if(confirm('Do you want to close this edit form?')){$(this).parent().prev().remove();$(this).parent().remove();}return false;});
-		
+
 	});
-	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():alert(a[0])}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
+
+	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text: a[0],type:'error',timeout:9E3})}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
   </body>
 </html>

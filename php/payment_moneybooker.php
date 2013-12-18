@@ -9,6 +9,10 @@ $adminmail=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 // Validate the Moneybookers signature
 $concatFields = $_POST['merchant_id'].$_POST['transaction_id'].strtoupper(md5($moneybooker_setting[4])).$_POST['mb_amount'].$_POST['mb_currency'].$_POST['status'];
 
+$headers = "MIME-Version: 1.0" . "\r\n";
+$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
+$headers .= 'From: '.$adminmail[1]."\r\n";
+
 if (strtoupper(md5($concatFields)) == $_POST['md5sig'] && $_POST['pay_to_email'] == $moneybooker_setting[1])
 {
 	if($file[0]==0){
@@ -34,9 +38,6 @@ if (strtoupper(md5($concatFields)) == $_POST['md5sig'] && $_POST['pay_to_email']
 			default:
 				$st=1;
 				$message="An error has been occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
-				$headers = "MIME-Version: 1.0" . "\r\n";
-				$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
-				$headers .= 'From: '.$adminmail[1]."\r\n";
 				mail($adminmail[10],'Payment Error',$message,$headers);
 		}
 		try{
@@ -62,18 +63,12 @@ if (strtoupper(md5($concatFields)) == $_POST['md5sig'] && $_POST['pay_to_email']
 		catch(PDOException $e){
 			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 			$message="An error has been occurred during payment elaboration(PDO_ERROR).\n PDO ERROR:\nFile: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\nPayment Information:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
-			$headers = "MIME-Version: 1.0" . "\r\n";
-			$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
-			$headers .= 'From: '.$adminmail[1]."\r\n";
 			mail($adminmail[10],'Payment Error',$message,$headers);
 			exit(),
 		}
 	}
 	else{
 		$message="An error has been occurred during payment elaboration(USER_INFORMATION_ERROR).\nInformation:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
-		$headers = "MIME-Version: 1.0" . "\r\n";
-		$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
-		$headers .= 'From: '.$adminmail[1]."\r\n";
 		mail($adminmail[10],'Payment Error',$message,$headers);
 		exit();
 	}
@@ -81,9 +76,6 @@ if (strtoupper(md5($concatFields)) == $_POST['md5sig'] && $_POST['pay_to_email']
 else
 {
 	$message="An error has been occurred during payment elaboration(FIELD_OR_RECEIVER_MAIL_ERROR).\nInformation:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nPayer Mail: ".$_POST['payer_email'];
-	$headers = "MIME-Version: 1.0" . "\r\n";
-	$headers .= "Content-type:text/plain;charset=UTF-8" . "\r\n";
-	$headers .= 'From: '.$adminmail[1]."\r\n";
 	mail($adminmail[10],'Payment Error',$message,$headers);
     exit();
 }

@@ -96,7 +96,7 @@ else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_
 if($_POST[$_SESSION['token']['act']]=='register'){
 	if($_POST['pwd']==$_POST['rpwd']){
 		
-		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
+		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9À-ÿ\/\s\'-]+$/',$_POST['name'])) 
 			$_POST['name']=trim(preg_replace('/\s+/',' ',$_POST['name']));
 		else{
 			header('Content-Type: application/json; charset=utf-8');
@@ -1394,7 +1394,7 @@ else if($_POST['action']=='scrollpagination' && isset($_POST['action']) && isset
 }
 
 else if($_POST[$_SESSION['token']['act']]=='save_setting' && isset($_SESSION['status']) && $_SESSION['status']<3){
-	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9\/\s\'-]+$/',$_POST['name'])) 
+	if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9À-ÿ\/\s\'-]+$/',$_POST['name'])) 
 		$_POST['name']=trim(preg_replace('/\s+/',' ',$_POST['name']));
 	else{
 		header('Content-Type: application/json; charset=utf-8');
