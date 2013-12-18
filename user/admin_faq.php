@@ -66,7 +66,7 @@ try{
 							'position'=>$a['position'],
 							'active'=>$a['ac'],
 							'rate'=>$a['rat'],
-							'action'=>'<div class="btn-group"><button class="btn btn-info editdep" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+							'action'=>'<div class="btn-group"><button class="btn btn-info editdep" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remdep" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 						);
 		}while ($a = $STH->fetch());
 	}
@@ -109,77 +109,81 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	</head>
 	<body>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
 										</li>
 										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown active" role='button' >
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation" class='active'>
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							</ul>
-						</div>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="active dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li class="active" role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+								<?php } ?>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Administration - FAQs</h2>
+					<h1 class='pagefun'>Administration - FAQs</h1>
 				</div>
 				<hr>
 				<?php if(!isset($error)){ ?>
 					<h3 class='sectname'>FAQs</h3>
-					<div class='row-fluid' id='deplist'>
+					<div id='deplist'>
 						<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
 						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="faqtable">
 							<tbody>
@@ -198,20 +202,20 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							Edit FAQ with ID:<span id='faq_id'></span><button  class='btn btn-link btn_close_form'>Close</button>
 							<input type='hidden' id='faq_edit_id' name='faq_edit_id'/>
 							<input type='hidden' id='faq_edit_pos' name='faq_edit_pos' />
-							<div class='row-fluid'>
-								<div class='span2'><label for='edit_faq_question'>Question:</label></div>
-								<div class='span9'><input type='text' id='edit_faq_question' /></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='edit_faq_question'>Question:</label></div>
+								<div class='col-md-9'><input type='text' id='edit_faq_question' /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label for='edit_faq_answer'>Answer:</label></div>
-								<div class='span9'><textarea type='text' id='edit_faq_answer' name='edit_faq_answer' placeholder='Answer'></textarea></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='edit_faq_answer'>Answer:</label></div>
+								<div class='col-md-9'><textarea type='text' id='edit_faq_answer' name='edit_faq_answer' placeholder='Answer'></textarea></div>
 							</div>
 							<br/>
-							<div class='row-fluid'>
-								<div class='span2'><label for='edit_faq_position'>Position</label></div>
-								<div class='span4'><input type='number' id='edit_faq_position' name='edit_faq_position' placeholder='Position, leave blank for last'/></div>
-								<div class='span2'><label for='activedep'>Is Active?</label></div>
-								<div class='span4'><select name='edit_faq_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='edit_faq_position'>Position</label></div>
+								<div class='col-md-4'><input class='form-control' type='number' id='edit_faq_position' name='edit_faq_position' placeholder='Position, leave blank for last'/></div>
+								<div class='col-md-2'><label for='activedep'>Is Active?</label></div>
+								<div class='col-md-4'><select class='form-control'  name='edit_faq_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div>
 							</div>
 							<input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' />
 						</form>
@@ -220,20 +224,20 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<hr>
 					<h4 class='sectname'>Add New FAQ</h4>
 					<form id='newfaqform' action='' method='post'>
-							<div class='row-fluid'>
-								<div class='span2'><label for='question'>Question:</label></div>
-								<div class='span4'><input type="text" name='question' id="question" placeholder="Question" required /></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='question'>Question:</label></div>
+								<div class='col-md-10'><input type="text" class='form-control'  name='question' id="question" placeholder="Question" required /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label for='answer'>Answer:</label></div>
-								<div class='span9'><textarea class='mailmessage' id='answer' rows="5" placeholder='Answer' required></textarea></div>	
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='answer'>Answer:</label></div>
+								<div class='col-md-10'><textarea class='mailmessage form-control' id='answer' rows="5" placeholder='Answer' required></textarea></div>	
 							</div>
 							<br/>
-							<div class='row-fluid'>
-								<div class='span2'><label for='position'>Position:</label></div>
-								<div class='span4'><input type="number" name='position' id="position" placeholder="Position, leave blank for last"/></div>
-								<div class='span2'><label for='activefaq'>Is Active?</label></div>
-								<div class='span4'><select name='activefaq' id='activefaq'><option value='1'>Yes</option><option value='0'>No</option></select>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='position'>Position:</label></div>
+								<div class='col-md-4'><input type="number" class='form-control'  name='position' id="position" placeholder="Position, leave blank for last"/></div>
+								<div class='col-md-2'><label for='activefaq'>Is Active?</label></div>
+								<div class='col-md-4'><select class='form-control'  name='activefaq' id='activefaq'><option value='1'>Yes</option><option value='0'>No</option></select>
 								</div>
 							</div>
 						<input type="submit" class="btn btn-success" value='Add New FAQ' onclick='javascript:return false;' id='btnaddfaq'/>
@@ -259,17 +263,17 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script>
 	 $(document).ready(function() {
 		var table = $("#faqtable").dataTable({
-									sDom: "<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+									sDom: "<<'col-md-6'l><'col-md-6'f>r>t<<'col-md-6'i><'col-md-6'p>>",
 									sWrapper: "dataTables_wrapper form-inline",
 									bProcessing: !0,
 									oLanguage: {sEmptyTable: "No FAQs"},
 									aoColumns: [
-										{sTitle: "ID",mDataProp: "id",sWidth: "60px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(a).html() + "</span>")}}, 
-										{sTitle: "Question",mDataProp: "question",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Question: </strong></span><span> " + $(a).html() + "</span>")}}, 
-										{sTitle: "Position",mDataProp: "position",sWidth: "50px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Position: </strong></span><span> " + $(a).html() + "</span>")}}, 
-										{sTitle: "Active",mDataProp: "active",sWidth: "60px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(a).html() + "</span>")}}, 
-										{sTitle: "Rate",mDataProp: "rate",sWidth: "40px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Rate: </strong></span><span> " + $(a).html() + "</span>")}}, 
-										{sTitle: "Toogle",mDataProp: "action",sWidth: "60px",bSortable: !1,bSearchable: !1,fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(a).html() + "</span>")}}
+										{sTitle: "ID",mDataProp: "id",sWidth: "60px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-xs'>ID: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Question",mDataProp: "question",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-xs'>Question: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Position",mDataProp: "position",sWidth: "50px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-xs'>Position: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Active",mDataProp: "active",sWidth: "60px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-xs'>Active: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Rate",mDataProp: "rate",sWidth: "40px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-xs'>Rate: </strong></span><span> " + $(a).html() + "</span>")}}, 
+										{sTitle: "Toogle",mDataProp: "action",sWidth: "100px",bSortable: !1,bSearchable: !1,fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-xs'>Toogle: </strong></span><span> " + $(a).html() + "</span>")}}
 									]
 								});
 		$("#loading").remove();
@@ -367,7 +371,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		$("#faqtable").on("click", ".remdep", function() { var a = $(this).val(), c = table.fnGetPosition(this.parentNode.parentNode.parentNode.parentNode, null, !0); confirm("Do you realy want to delete this FAQ?") && $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"del_faq", id:a}, dataType:"json", success:function(b) { "Deleted" == b[0] ? table.fnDeleteRow(c) : noty({text:"FAQ cannot be deleted. Error: " + b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
 
 		//Add redirect
-		$("#btnaddfaq").click(function () {var b = $("#question").val().replace(/\s+/g, " "),<?php if (!$isMob) { ?> c = CKEDITOR.instances.answer.getData().replace(/\s+/g, " ") <?php } else { ?> c = $("#answer").val().replace(/\s+/g, ' ') <?php } ?>, d = $("#position").val().replace(/\s+/g, ""); e = $("#activefaq").val(); "" != b.replace(/\s+/g, "") && "" != c.replace(/\s+/g, "") ? $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"add_faq", question:b, answer:c, pos:d, active:e}, dataType:"json", success:function(a) { "Added" == a.response ? ($("#question").val(""), a.information.rate = "Unrated", a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>', table.fnAddData(a.information), $("#faqtable").val(""),<?php if(!$isMob) { ?> CKEDITOR.instances.answer.setData('') <?php }else { ?>$("#answer").val('') <?php } ?>) : noty({text:a[0], type:"error", timeout:9E3}) }}).fail(function(a, f) { noty({text:f, type:"error", timeout:9E3}) }) : noty({text:"Form Error - Empty Field", type:"error", timeout:9E3});});		
+		$("#btnaddfaq").click(function () {var b = $("#question").val().replace(/\s+/g, " "),<?php if (!$isMob) { ?> c = CKEDITOR.instances.answer.getData().replace(/\s+/g, " ") <?php } else { ?> c = $("#answer").val().replace(/\s+/g, ' ') <?php } ?>, d = $("#position").val().replace(/\s+/g, ""); e = $("#activefaq").val(); "" != b.replace(/\s+/g, "") && "" != c.replace(/\s+/g, "") ? $.ajax({type:"POST", url:"../php/admin_function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"add_faq", question:b, answer:c, pos:d, active:e}, dataType:"json", success:function(a) { "Added" == a.response ? ($("#question").val(""), a.information.rate = "Unrated", a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="glyphicon glyphicon-remove"></i></button></div>', table.fnAddData(a.information), $("#faqtable").val(""),<?php if(!$isMob) { ?> CKEDITOR.instances.answer.setData('') <?php }else { ?>$("#answer").val('') <?php } ?>) : noty({text:a[0], type:"error", timeout:9E3}) }}).fail(function(a, f) { noty({text:f, type:"error", timeout:9E3}) }) : noty({text:"Form Error - Empty Field", type:"error", timeout:9E3});});		
 		
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($('#faq_div').slideToggle(600),$('#edit_faq').removeClass('open'));return!1});
 
@@ -391,7 +395,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					dataType : 'json',
 					success : function (a){
 						if(a[0]=='Succeed'){
-							a[1]['action']='<div class="btn-group"><button class="btn btn-info editdep" value="'+a[1]['id']+'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'+a[1]['id']+'"><i class="icon-remove"></i></button></div>';
+							a[1]['action']='<div class="btn-group"><button class="btn btn-info editdep" value="'+a[1]['id']+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remdep" value="'+a[1]['id']+'"><i class="glyphicon glyphicon-remove"></i></button></div>';
 
 							table.fnDeleteRow(pos, function(){table.fnAddData(a[1])});
 							<?php if(!$isMob) { ?>

@@ -65,118 +65,119 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 	</head>
 	<body>
-	<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+		<div class="container">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
+								<li class="dropdown" role='button'>
+									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
+									</a>
+									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+										<li role="presentation">
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
+										</li>
+										<li role="presentation">
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
+										</li>
+									</ul>
+								</li>
+								<li class="active" ><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
 								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
-										</li>
-										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li class="active"><a href="#"><i class="icon-edit"></i>Settings</a></li>
-							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-							<?php } if(isset($_SESSION['status'])){ ?>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							<?php } ?>
-							</ul>
-						</div>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
-			<hr>
-			<div class="jumbotron" >
-				<h2 class='pagefun'>Edit Information</h2>
-			</div>
-			<hr>
-				<form>
-					<h3 class='sectname'>Main Information</h3>
-					<div class='row-fluid'>
-						<div class='span2'><label for='usrname'>Name</label></div>
-						<div class='span4'><input type="text" name='usrname' id="usrname" value='<?php echo htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8'); ?>' placeholder="Name" required/></div>
+				<hr>
+				<div class="jumbotron" >
+					<h1 class='pagefun'>Edit Information</h1>
+				</div>
+				<hr>
+					<form>
+						<h3 class='sectname'>Main Information</h3>
+						<div class='row form-group'>
+							<div class='col-md-2'><label for='usrname'>Name</label></div>
+							<div class='col-md-4'><input type="text" class='form-control'  name='usrname' id="usrname" value='<?php echo htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8'); ?>' placeholder="Name" required/></div>
+						</div>
+						<div class='row form-group'>
+							<div class='col-md-2'><label for='usrname'>Mail</label></div>
+							<div class='col-md-4'><input type="text" class='form-control'  id="gna" value='<?php echo $_SESSION['mail']; ?>' placeholder="Mail" required/></div>
+							<div class='col-md-2'><label for='enablealert'>Mail Alerts</label></div>
+							<div class='col-md-4'><select class='form-control'  id='enablealert'><option value='yes'>Yes</option><option value='no'>No</option></select></div>
+						</div>
+						<h3 class='sectname'>Change Password</h3>
+						<div class='row form-group'>
+							<div class='col-md-2'><label for='npass'>Old Password</label></div>
+							<div class='col-md-4'><input type="password" class='form-control'  name='opass' id="opass" placeholder="Old Password" autocomplete="off" /></div>
+						</div>
+						<div class='row form-group'>
+							<div class='col-md-2'><label for='npass'>New Password</label></div>
+							<div class='col-md-4'><input type="password" class='form-control'  name='npass' id="npass" placeholder="New Password" autocomplete="off" /></div>
+							<div class='col-md-2'><label for='ckpass'>Repeat New Password</label></div>
+							<div class='col-md-4'><input type="password" class='form-control'  name='ckpass' id="ckpass" placeholder="Repeat New Password" autocomplete="off" /></div>
+						</div>
+						<br/><br/>
+						<input type='submit' onclick='javascript:return false;' class='btn btn-success' id='savesett' value='Save'/>
+					</form>
+				<hr><br/><br/>
+				<div class='row form-group'>
+					<div class='col-md-2 col-md-offset-5'><button id='dela' class='btn btn-danger' >Delete Account</button></div>
+				</div>
+				<br/>
+				<div id='delaccform' style='display:none'>
+					<div class='row form-group' >
+						<div class='col-md-2'><label for='delpass'>Password</label></div>
+						<div class='col-md-4'><input type="password" class='form-control'  name='delpass' id="delpass" placeholder="Password" autocomplete="off" required/></div>
+						<input type='submit' onclick='javascript:return false;' class='btn btn-danger' id='delacc' value='Delete Account'/>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label for='usrname'>Mail</label></div>
-						<div class='span4'><input type="text" id="gna" value='<?php echo $_SESSION['mail']; ?>' placeholder="Mail" required/></div>
-						<div class='span2'><label for='enablealert'>Mail Alerts</label></div>
-						<div class='span4'><select id='enablealert'><option value='yes'>Yes</option><option value='no'>No</option></select></div>
-					</div>
-					<h3 class='sectname'>Change Password</h3>
-					<div class='row-fluid'>
-						<div class='span2'><label for='npass'>Old Password</label></div>
-						<div class='span4'><input type="password" name='opass' id="opass" placeholder="Old Password" autocomplete="off" /></div>
-					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label for='npass'>New Password</label></div>
-						<div class='span4'><input type="password" name='npass' id="npass" placeholder="New Password" autocomplete="off" /></div>
-						<div class='span2'><label for='ckpass'>Repeat New Password</label></div>
-						<div class='span4'><input type="password" name='ckpass' id="ckpass" placeholder="Repeat New Password" autocomplete="off" /></div>
-					</div>
-					<br/><br/>
-					<input type='submit' onclick='javascript:return false;' class='btn btn-success' id='savesett' value='Save'/>
-				</form>
-			<hr><br/><br/>
-			<div class='row-fluid'>
-				<div class='span2 offset5'><button id='dela' class='btn btn-danger' >Delete Account</button></div>
-			</div>
-			<br/>
-			<div id='delaccform' style='display:none'>
-				<div class='row-fluid'>
-					<div class='span2'><label for='delpass'>Password</label></div>
-					<div class='span4'><input type="password" name='delpass' id="delpass" placeholder="Password" autocomplete="off" required/></div>
-					<input type='submit' onclick='javascript:return false;' class='btn btn-danger' id='delacc' value='Delete Account'/>
 				</div>
 			</div>
 		</div>
-	</div>
 
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>

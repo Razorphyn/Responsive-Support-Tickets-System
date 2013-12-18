@@ -181,7 +181,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 						if(!empty($a)){
 							do{
 								if($_SESSION['id']==$a['uploader'])
-									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['id'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"> &nbsp;&nbsp; <i class="icon-remove-sign remfile" title="Delete File" alt="Delete File"></i></form>';
+									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['id'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"> &nbsp;&nbsp; <i class="glyphicon glyphicon-remove-sign remfile" title="Delete File" alt="Delete File"></i></form>';
 								else
 									$list[$a['message_id']][]=' <form class="download_form" method="POST" action="../php/function.php" target="hidden_upload" enctype="multipart/form-data"><input type="hidden" name="ticket_id" value="'.$_GET['id'].'"/><input type="hidden" name="file_download" value="'.$a['id'].'"/><input type="submit" class="btn btn-link download" value="'.htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8').'"></form>';
 							}while ($a = $STH->fetch());
@@ -306,210 +306,213 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 	<body>
 		<?php if(isset($error)) echo '<script>alert("'.$error.'");</script>'; ?>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
+								<li class="dropdown" role='button'>
+									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
+									</a>
+									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+										<li role="presentation">
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
+										</li>
+										<li role="presentation">
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
+										</li>
+									</ul>
+								</li>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
 								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
-										</li>
-										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-							<?php } if(isset($_SESSION['status'])){ ?>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							<?php } ?>
-							</ul>
-						</div>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy main'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'><?php echo $title; ?></h2>
-					</div>
-					<hr>
-					<div class='row-fluid refid'>
-						<div class='span2'><strong>Reference ID</strong></div>
-						<div class='span10' ><span id='reference_id'><?php echo $refid; ?></span></div>
-					</div>
-					<div class='row-fluid'>
-						<div class='span2'><strong>Website</strong></div>
-						<div class='span4'><input type='text' id='webs' value="<?php echo $cweb; ?>"/></div>
-						<div class='span2'><strong>Connection Type</strong></div>
-						<div class='span4'><select id='contype'><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
-					</div>
-					<div class='row-fluid'>
-						<div class='span2'><strong>Username</strong></div>
-						<div class='span4'><input type='text' id='conuser' value="<?php echo addslashes($usercred); ?>"/></div>
-						<div class='span2'><div class='span7'><strong>Password</strong></div><div class='span5'><button id='showhide' class='btn btn-info'>Show</button></div></div>
-						<div class='span4' id='passcont'><input type='password' id='conpass' value="<?php echo addslashes($conpass); ?>" autocomplete="off" /></div>
-					</div>
-					<input type='submit' class='btn btn-success' id='updtconn' onclick='javascript:return false;' value='Update'/>
-					<hr>
-					<p class='cif'><i class='icon-plus-sign'></i> Edit Ticket Title and Status </p>
-					<div class='expande'>
-						<div class='row-fluid'>
-							<div class='span2'>Update Title</div>
-							<div class='span3'><input type='text' id='nwtittk' value='<?php echo $title; ?>' required/></div>
-							<div class='span1'><input type='submit' class='btn btn-success' id='updtitle' onclick='javascript:return false;' value='Update'/></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'>Update Status</div>
-							<div class='span3'><select id='statustk'><option value='1'>Open</option><option value='0'>Closed</option></select></div>
-							<div class='span1'><input type='submit' class='btn btn-success' id='updstatus' onclick='javascript:return false;' value='Update'/></div>
-						</div>
-						<?php if($_SESSION['tickets'][$_GET['id']]['usr_id']==$_SESSION['id'] && $setting[7]==1){ ?>
-							<div class='ratingsect row-fluid' <?php if($stat!=0) echo 'style="display:none"' ;?>>
-								<div class='row-fluid'>
-									<div class='span2'>Rate Operator</div>
-									<div class='span4'><input type='hidden' id='tkid' value='<?php echo $_GET['id'];?>' /><div class="razorate" data-average="<?php echo ($rate!='')? $rate:0;?>" data-id="<?php echo ($opid*3823);?>"></div></div>
-								</div>
-									<div class='row-fluid'>
-									<div class='span6'><textarea id='rcomment' rows='7' placeholder='Add a comment' required><?php if(isset($note))echo $note; ?></textarea></div>
-								</div>
-								<div class='row-fluid'>
-								<div class='span2 offset2'><input id='submitrate' type='submit' class='btn btn-success' onclick='javascript:return false;' value='Rate'/></div>
-								</div>
-							</div>
-							<br/>
-						<?php } ?>
-					</div>
-					<?php if($_SESSION['status']==1){ $b=retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid);?>
-						<hr>
-						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department </p>
-						<div class='expande'>
-							<div class='row-fluid'>
-								<div class='span2'>Change Departement</div>
-								<div class='span3'><select id='departments'><?php echo $b; ?></select></div>
-								<div class='span1'><input type='submit' class='btn btn-success' id='updtdpop' onclick='javascript:return false;' value='Update'/></div>
-							</div>
-						</div>
-					<?php } if($_SESSION['status']==2){ $b=retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid);$c=json_decode(retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid));?>
-						<hr>
-						<p class='cif'><i class='icon-plus-sign'></i> Change Ticket Department and Operator</p>
-						<div class='expande'>
-							<div class='row-fluid'>
-								<div class='span2'>Change Departement</div>
-								<div class='span3'><select id='departments'><?php if($b!=false)echo $b;?></select></div>
-							</div>
-							<div class='row-fluid'>
-								<div class='span2'>Change Operator</div>.
-								<div class='span3'><label class="checkbox inline"><input type='checkbox' id='autass' value='yes'/> Automatic Assignment</label></div>
-							</div>
-							<div class='row-fluid'>
-								<div class='span2'></div>
-								<div class='span3'><select id='operat'><option value="0">---</option><?php if($c!=false){foreach($c as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>';} ?></select></div>
-								<div class='span1'><input type='submit' class='btn btn-success' id='updtdpadmin' onclick='javascript:return false;' value='Update'/></div>
-							</div>
-						</div>
-					<?php } ?>
-						<hr>
-						<p class='cif'><i class="icon-plus-sign"></i> Report a Problem with this ticket</p>
-						<div class='expande' >
-							<div class='row-fluid'>
-								<div class='span2'>Report Ticket</div>
-								<div class='span8'><textarea id='problem' rows='7' placeholder='Write your complaint' required><?php if(isset($reason))echo $reason; ?></textarea></div>
-							</div>
-							<div class='row-fluid'>
-								<div class='span2 offset5'><input type='submit' class='btn btn-warning' id='subrepo' onclick='javascript:return false;' value='Submit your Complaint'/></div>
-							</div>
-						</div>
+					<h1 class='pagefun'><?php echo $title; ?></h1>
+				</div>
 				<hr>
-					<?php 
-					if(!isset($error)){?>
-						<h3 class='sectname'>Reply</h3>
-						<form id='formreply' method="POST" action="../php/function.php" target='hidden_upload' enctype="multipart/form-data">
-							<input type='hidden' name='id' value='<?php echo $_GET['id']; ?>' />
-							<input type='hidden' name='<?php echo $_SESSION['token']['act']; ?>' value='Night' />
-							<div class='row-fluid'>
-								<div class='span12'><textarea name='message' id='message' rows="5" placeholder='Your Reply'> </textarea></div>
+				<div class='row form-group refid'>
+					<div class='col-md-2'><strong>Reference ID</strong></div>
+					<div class='col-md-10' ><span id='reference_id'><?php echo $refid; ?></span></div>
+				</div>
+				<div class='row form-group'>
+					<div class='col-md-2'><strong>Website</strong></div>
+					<div class='col-md-4'><input type='text' class='form-control'  id='webs' value="<?php echo $cweb; ?>"/></div>
+					<div class='col-md-2'><strong>Connection Type</strong></div>
+					<div class='col-md-4'><select class='form-control'  id='contype'><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
+				</div>
+				<div class='row form-group'>
+					<div class='col-md-2'><strong>Username</strong></div>
+					<div class='col-md-4'><input type='text' class='form-control' id='conuser' value="<?php echo addslashes($usercred); ?>"/></div>
+					<div class='col-md-2'><div class='col-md-7'><strong>Password</strong></div><div class='col-md-5'><button id='showhide' class='btn btn-info'>Show</button></div></div>
+					<div class='col-md-4' id='passcont'><input class='form-control'  type='password' id='conpass' value="<?php echo addslashes($conpass); ?>" autocomplete="off" /></div>
+				</div>
+				<input type='submit' class='btn btn-success' id='updtconn' onclick='javascript:return false;' value='Update'/>
+				<hr>
+				<p class='cif'><i class='glyphicon glyphicon-plus-sign'></i> Edit Ticket Title and Status </p>
+				<div class='expande'>
+					<div class='row form-group'>
+						<div class='col-md-2'>Update Title</div>
+						<div class='col-md-3'><input type='text' class='form-control' id='nwtittk' value='<?php echo $title; ?>' required/></div>
+						<div class='col-md-1'><input type='submit' class='btn btn-success' id='updtitle' onclick='javascript:return false;' value='Update'/></div>
+					</div>
+					<div class='row form-group'>
+						<div class='col-md-2'>Update Status</div>
+						<div class='col-md-3'><select class='form-control'  id='statustk'><option value='1'>Open</option><option value='0'>Closed</option></select></div>
+						<div class='col-md-1'><input type='submit' class='btn btn-success' id='updstatus' onclick='javascript:return false;' value='Update'/></div>
+					</div>
+					<?php if($_SESSION['tickets'][$_GET['id']]['usr_id']==$_SESSION['id'] && $setting[7]==1){ ?>
+						<div class='ratingsect row form-group' <?php if($stat!=0) echo 'style="display:none"' ;?>>
+							<div class='row form-group'>
+								<div class='col-md-2'>Rate Operator</div>
+								<div class='col-md-4'><input type='hidden' id='tkid' value='<?php echo $_GET['id'];?>' /><div class="razorate" data-average="<?php echo ($rate!='')? $rate:0;?>" data-id="<?php echo ($opid*3823);?>"></div></div>
 							</div>
-							<?php if(isset($setting[5]) && $setting[5]==1){ ?>
+								<div class='row form-group'>
+								<div class='col-md-6'><textarea id='rcomment' rows='7' placeholder='Add a comment' required><?php if(isset($note))echo $note; ?></textarea></div>
+							</div>
+							<div class='row form-group'>
+							<div class='col-md-2 col-md-offset-2'><input id='submitrate' type='submit' class='btn btn-success' onclick='javascript:return false;' value='Rate'/></div>
+							</div>
+						</div>
+						<br/>
+					<?php } ?>
+				</div>
+				<?php if($_SESSION['status']==1){ $b=retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid);?>
+					<hr>
+					<p class='cif'><i class='glyphicon glyphicon-plus-sign'></i> Change Ticket Department </p>
+					<div class='expande'>
+						<div class='row form-group'>
+							<div class='col-md-2'>Change Departement</div>
+							<div class='col-md-3'><select class='form-control'  id='departments'><?php echo $b; ?></select></div>
+							<div class='col-md-1'><input type='submit' class='btn btn-success' id='updtdpop' onclick='javascript:return false;' value='Update'/></div>
+						</div>
+					</div>
+				<?php } if($_SESSION['status']==2){ $b=retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable, $departmentid);$c=json_decode(retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, $SupportUserTable, $SupportUserPerDepaTable, $departmentid, $opid));?>
+					<hr>
+					<p class='cif'><i class='glyphicon glyphicon-plus-sign'></i> Change Ticket Department and Operator</p>
+					<div class='expande'>
+						<div class='row form-group'>
+							<div class='col-md-2'>Change Departement</div>
+							<div class='col-md-3'><select class='form-control'  id='departments'><?php if($b!=false)echo $b;?></select></div>
+						</div>
+						<div class='row form-group'>
+							<div class='col-md-2'>Change Operator</div>.
+							<div class='col-md-3'><label class="checkbox inline"><input type='checkbox' id='autass' value='yes'/> Automatic Assignment</label></div>
+						</div>
+						<div class='row form-group'>
+							<div class='col-md-2'></div>
+							<div class='col-md-3'><select class='form-control'  id='operat'><option value="0">---</option><?php if($c!=false){foreach($c as $key=>$val) echo '<option value="'.$key.'">'.$val.'</option>';} ?></select></div>
+							<div class='col-md-1'><input type='submit' class='btn btn-success' id='updtdpadmin' onclick='javascript:return false;' value='Update'/></div>
+						</div>
+					</div>
+				<?php } ?>
+					<hr>
+					<p class='cif'><i class="glyphicon glyphicon-plus-sign"></i> Report a Problem with this ticket</p>
+					<div class='expande' >
+						<div class='row form-group'>
+							<div class='col-md-2'>Report Ticket</div>
+							<div class='col-md-8'><textarea class='form-control' id='problem' rows='7' placeholder='Write your complaint' required><?php if(isset($reason))echo $reason; ?></textarea></div>
+						</div>
+						<div class='row form-group'>
+							<div class='col-md-2 col-md-offset-5'><input type='submit' class='btn btn-warning' id='subrepo' onclick='javascript:return false;' value='Submit your Complaint'/></div>
+						</div>
+					</div>
+				<hr>
+				<?php 
+				if(!isset($error)){?>
+					<h3 class='sectname'>Reply</h3>
+					<form id='formreply' method="POST" action="../php/function.php" target='hidden_upload' enctype="multipart/form-data">
+						<input type='hidden' name='id' value='<?php echo $_GET['id']; ?>' />
+						<input type='hidden' name='<?php echo $_SESSION['token']['act']; ?>' value='Night' />
+						<div class='row form-group'>
+							<div class='col-md-12'><textarea name='message' id='message' rows="5" placeholder='Your Reply'> </textarea></div>
+						</div>
+						<?php if(isset($setting[5]) && $setting[5]==1){ ?>
 							<h3 class='sectname'>Attachments</h3>
 							<span class='attlist'></span>
 							<br/>
 							<p>To select multiple files: press ctrl+click on the chosen file</p>
-							<!--<div class="row-fluid uploadfilebox"><div class="span4"><input id='fielduploadinput' type="file" name="filename[]" multiple /></div></div>-->
-							<input id='fielduploadinput' type="file" name="filename[]" multiple /> <span id='resetfile' class='btn btn-danger'>Reset</span>
-							<?php } ?>
-							<br/><br/>
-							<input type='submit' name='post_reply' id='post_reply' value='Post Reply' class='btn btn-success'/>
-						</form>
-						<hr>
-						<h3 class='sectname'>Messages</h3>
-						<div id="messages">
-							<?php 
-								for($i=0;$i<$count;$i++){
-									if($i==0)
-										echo '<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p><span class="label label-important newest">Newest</span></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
-									else if($i%2==0)
-										echo '<div class="row-fluid evenmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
-									else
-										echo '<div class="row-fluid oddmessage"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="span8 messagecell">'.$list[$i][1].'</div></div>';
-									$upcount=count($list[$i]);
-									if($upcount>4){
-										echo '<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">';
-										for($j=4;$j<$upcount;$j++)
-											echo $list[$i][$j];
-										echo'</div></div>';
-									}
-									echo '</div>';
-								 } 
-							?>
-						</div>
-					<?php } else { ?>
-						<p><?php echo $error; ?></p>
-					<?php } ?>
-			</div>
+							<div class='row form-group'>
+								<!--<div class="row uploadfilebox"><div class="col-md-4"><input id='fielduploadinput' type="file" name="filename[]" multiple /></div></div>-->
+								<div class='col-md-4'><input id='fielduploadinput' type="file" name="filename[]" multiple /></div><div class='col-md-3'><span id='resetfile' class='btn btn-danger'>Reset</span></div>
+							</div>
+						<?php } ?>
+						<br/><br/>
+						<input type='submit' name='post_reply' id='post_reply' value='Post Reply' class='btn btn-success'/>
+					</form>
+					<hr>
+					<h3 class='sectname'>Messages</h3>
+					<div id="messages">
+						<?php 
+							for($i=0;$i<$count;$i++){
+								if($i==0)
+									echo '<div class="row evenmessage"><div class="row"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p><span class="label label-important newest">Newest</span></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
+								else if($i%2==0)
+									echo '<div class="row evenmessage"><div class="row"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
+								else
+									echo '<div class="row oddmessage"><div class="row"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
+								$upcount=count($list[$i]);
+								if($upcount>4){
+									echo '<div class="row form-group attachment"><div class="span2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">';
+									for($j=4;$j<$upcount;$j++)
+										echo $list[$i][$j];
+									echo'</div></div>';
+								}
+								echo '</div>';
+							 } 
+						?>
+					</div>
+				<?php } else { ?>
+					<p><?php echo $error; ?></p>
+				<?php } ?>
+					</div>
 		</div>
 	<iframe style='display:none' name='hidden_upload' id='hidden_upload' src="about:blank"></iframe>
 	<?php if(!$isMob) { ?>
@@ -565,7 +568,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 			else
 				noty({text: "The message cannot be empty",type: "error",timeout: 9E3})
 		});		
-		$("#showhide").click(function(){var a=$("#conpass").val()+"";$("#conpass").is(":password")?($("#passcont").html('<input type="text" id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Hide")):($("#passcont").html('<input type="password" id="conpass" autocomplete="off" />'),$("#conpass").val(a),$("#showhide").text("Show"))});
+		$("#showhide").click(function(){var a=$("#conpass").val()+"";$("#conpass").is(":password")?($("#passcont").html('<input type="text" class="form-control"  id="conpass" />'),$("#conpass").val(a),$("#showhide").text("Hide")):($("#passcont").html('<input type="password" class="form-control"  id="conpass" autocomplete="off" />'),$("#conpass").val(a),$("#showhide").text("Show"))});
 		
 		//Add redirect
 		$("#updstatus").click(function() { var a = $("#statustk").val(); $.ajax({type:"POST", url:"../php/function.php", data:{<?php echo $_SESSION['token']['act']; ?>:"update_status", status:a, id:"<?php echo $_GET['id'];?>"}, dataType:"json", success:function(b) { "Saved" == b[0] ? (0 == a ? $(".ratingsect").slideToggle(800) : $(".ratingsect").slideToggle(800), noty({text:"Updated", type:"success", timeout:9E3})) : noty({text:b[0], type:"error", timeout:9E3}) }}).fail(function(b, a) { noty({text:a, type:"error", timeout:9E3}) }) });
@@ -642,14 +645,14 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 		//Show Hidden Form
 		$('.cif').click(function(){
 			el=$(this).children('i');
-			if(el.hasClass('icon-plus-sign')){
-				el.removeClass('icon-plus-sign');
-				el.addClass('icon-minus-sign');
+			if(el.hasClass('glyphicon glyphicon-plus-sign')){
+				el.removeClass('glyphicon glyphicon-plus-sign');
+				el.addClass('glyphicon glyphicon-minus-sign');
 				$(this).next('div').slideToggle(800);
 			}
 			else{
-				el.removeClass('icon-minus-sign');
-				el.addClass('icon-plus-sign');
+				el.removeClass('glyphicon glyphicon-minus-sign');
+				el.addClass('glyphicon glyphicon-plus-sign');
 				$(this).next('div').slideToggle(800);
 			}
 		});
@@ -762,20 +765,20 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 		$(".uploadfilebox").each(function () {
 			$(this).remove()
 		});
-		$(".attlist").append("<div class='row-fluid uploadfilebox'></div>");
+		$(".attlist").append("<div class='row uploadfilebox'></div>");
 		tail = [];
-		$("#messages").children(".row-fluid:first").hasClass("oddmessage") ? tail.push('<div class="row-fluid evenmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="span8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row-fluid oddmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="span8 messagecell">' + mess + "</div></div>");
+		$("#messages").children(".row:first").hasClass("oddmessage") ? tail.push('<div class="row evenmessage" style="display:none"><div class="row"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row oddmessage" style="display:none"><div class="row"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>");
 		if (null != up){
-			tail.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">');
+			tail.push('<div class="row attachment"><div class="span2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">');
 			var count= up.length;
 			for (i=0; i < count; i++) 
-				tail.push("<form class='download_form' method='POST' action='../php/function.php' target='hidden_upload' enctype='multipart/form-data'><input type='hidden' name='ticket_id' value='" + up[i][0] + "'/><input type='hidden' name='file_download' value='" + up[i][1] + "'/><input type='submit' class='btn btn-link download' value='" + up[i][2] + "'> &nbsp;&nbsp; <i class='icon-remove-sign remfile' title='Delete File' alt='Delete File'></i></form>");
+				tail.push("<form class='download_form' method='POST' action='../php/function.php' target='hidden_upload' enctype='multipart/form-data'><input type='hidden' name='ticket_id' value='" + up[i][0] + "'/><input type='hidden' name='file_download' value='" + up[i][1] + "'/><input type='submit' class='btn btn-link download' value='" + up[i][2] + "'> &nbsp;&nbsp; <i class='glyphicon glyphicon-remove-sign remfile' title='Delete File' alt='Delete File'></i></form>");
 			tail.push("</div></div>");
 		}
 		tail.push("</div>");
 		$(".newest").remove();
-		$("#messages").children(".row-fluid:first").before(tail.join(""));
-		$("#messages").children(".row-fluid:first").delay(300).show('scale');
+		$("#messages").children(".row:first").before(tail.join(""));
+		$("#messages").children(".row:first").delay(300).show('scale');
 		$('#fielduploadinput').wrap('<form>').closest('form').get(0).reset();
 		$('#fielduploadinput').unwrap();
 		add++;

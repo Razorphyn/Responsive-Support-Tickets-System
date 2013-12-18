@@ -57,157 +57,164 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 		
 		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'min/?g=css_i&amp;5259487' ?>"/>
 		<!--[if lt IE 9]><script src="js/html5shiv-printshiv.js"></script><![endif]-->
-  </head>
+	</head>
 	<body>
-	<div class="container">
-		<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+		<div class="container">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li class="active"><a href="index.php"><i class="icon-home"></i>Home</a></li>
-								<li><a href="user/faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
-									<li><a href="user/newticket.php"><i class="icon-file"></i>New Ticket</a></li>
-									<li class="dropdown" role='button'>
+							</button>
+							<a class="navbar-brand" href='index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li class="active"><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="user/newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
+								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
-											<a href="user/" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
+											<a href="user/" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
 										</li>
 										<li role="presentation">
-											<a href="user/search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
+											<a href="user/search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
 										</li>
 									</ul>
 								</li>
-									<li><a href="user/setting.php"><i class="icon-edit"></i>Settings</a></li>
+								<li><a href="user/setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
 								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
-									<li><a href="user/users.php"><i class="icon-user"></i>Users</a></li>
+									<li><a href="user/users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
 									<li class="dropdown" role='button'>
 										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-											<i class="icon-eye-open"></i>Administration<b class="caret"></b>
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
 										</a>
 										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 											<li role="presentation">
-												<a href="user/admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
+												<a href="user/admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
+												<a href="user/admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
+												<a href="user/admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
+												<a href="user/admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
+												<a href="user/admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
+												<a href="user/admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
 											</li>
 										</ul>
 									</li>
-							<?php }} if(isset($_SESSION['name'])){ ?>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+								<?php } ?>
+						</ul>
+					</div>
+				</div>
+			</nav>
+			<div class='daddy'>
+				<div class="jumbotron" >
+					<h1 class="muted pagefun"><img id='logo' src='<?php if(isset($logo) && !empty($logo)) echo $logo; else echo 'css/images/logo.png'; ?>' alt='<?php if(isset($setting[0])) echo $setting[0];?>' title='<?php if(isset($setting[0])) echo $setting[0];?>'/></h1>
+					<h1 class='pagefun'>Welcome to the support center</h1>
+				</div>
+				<hr>
+				<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+					<div class='row form-group main'>
+						<h1 class='titlesec'>Hello <?php echo htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8'); ?>!</h1>
+						<p>You are already logged in, you can start to ask for support.</p>
+					</div>
+				<?php } else if(isset($_SESSION['status']) && $_SESSION['status']==4){ ?>
+					<div class='row form-group main'>
+						<h1 class='titlesec'>You Are Banned</h1>
+						<p>Sorry,but your behaviour wasn't acceptable.</p>
+					</div>
+				<?php } else if(isset($_SESSION['status']) && $_SESSION['status']==3){ ?>
+					<div class='row form-group main'>
+						<h1 class='titlesec'>Activation</h1>
+						<p>You must activate your account to proceed, please check your inbox.</p>
+						<button class='btn btn-info verify' onclick='javascript:veirfy();return !1;'>Verify Status</button>
+						<button class='btn' onclick='javascript:resend();return !1;'>Send Mail Again</button>
+					</div>
+				<?php } else { ?>
+					<div class='row form-group main'>
+						<form id='passwordform' class='login activesec' role='form'>
+							<h1 class='titlesec'>Login</h1>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='mail'>Email</label></div>
+								<div class='col-md-3'><input type="email" class='form-control' id="mail" placeholder="Email" required></div>
+							</div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='pwd'>Password</label></div>
+								<div class='col-md-3'><input type="password" class='form-control' id="pwd" placeholder="Password" autocomplete="off" required></div>
+							</div>
+							<input type="submit" onclick='javascript:login();return false;' class="btn btn-success" value='Login'/>
+							<br/><br/>
+						</form>
+						<form class='register' role='form'>
+							<h1 class='titlesec'>New User</h1>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='rname'>Name</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  class='form-control' id="rname" placeholder="Name" autocomplete="off" required></div>
+							</div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='rmail'>Email</label></div>
+								<div class='col-md-4'><input type="email" class='form-control' id="rmail" placeholder="Email" autocomplete="off" required></div>
+							</div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='rpwd'>Password</label></div>
+								<div class='col-md-4'><input type="password" class='form-control' id="rpwd" placeholder="Password" autocomplete="off" required></div>
+								<div class='col-md-2'><label for='rrpwd'>Repeat Password</label></div>
+								<div class='col-md-4'><input type="password" class='form-control' id="rrpwd" placeholder="Repeat Password" autocomplete="off" required></div>
+							</div>
+							<?php if(isset($privacy[0]) && $privacy[0]==1){ ?>
+								Privacy Policy
+								<div class='row'>
+									<div class='col-md-12 privacycont'><?php echo $privacy[1]; ?></div>
+								</div>
+								<div class='row form-group'>
+									<div class='col-md-3'><label for='privacy'>Do you accept the Privacy policy?</label></div>
+									<div class='col-md-3'><input type="checkbox" name="privacy" id="privacy" value="1"> Yes</div>
+								</div>
 							<?php } ?>
-							</ul>
+							<input type="submit" onclick='javascript:register();return false;' class="btn btn-success" value='Register'/>
+							<br/><br/>
+						</form>
+						<form class='sect pwdres' role='form'>
+							<h1 class='titlesec'>Reset Password</h1>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='fname'>Name</label></div>
+								<div class='col-md-3'><input type="text"  class='form-control' id="fname" placeholder="Name" autocomplete="off" required></div>
+							</div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label for='fmail'>Email</label></div>
+								<div class='col-md-3'><input type="email" class='form-control' id="fmail" placeholder="Email" autocomplete="off" required></div>
+							</div>
+							<input type="submit" id='resetpwd' onclick='javascript:return false;' class="btn btn-success" value='Reset Password'/>
+							<br/><br/>
+						</form>
+						
+						<div class='row form-group act'>
+							<div class='col-md-2' ><span class='opthome' name='login'>Login</span></div><div class='col-md-2'><span class='opthome' name='register'>New User</span></div><div class='col-md-2'><span class='opthome' name='pwdres'>Reset Password?</span></div>
 						</div>
 					</div>
-				</div>
+				<?php } ?>
+				<hr>
 			</div>
-		<div class='daddy'>
-			<div class="jumbotron" >
-				<h1 class="muted pagefun"><img id='logo' src='<?php if(isset($logo) && !empty($logo)) echo $logo; else echo 'css/images/logo.png'; ?>' alt='<?php if(isset($setting[0])) echo $setting[0];?>' title='<?php if(isset($setting[0])) echo $setting[0];?>'/></h1>
-				<h3 class='pagefun'>Welcome to the support center</h3>
-			</div>
-			<hr>
-			<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
-				<div class='row-fluid main'>
-					<h2 class='titlesec'>Hello <?php echo htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8'); ?>!</h2>
-					<p>You are already logged in, you can start to ask for support.</p>
-				</div>
-			<?php } else if(isset($_SESSION['status']) && $_SESSION['status']==4){ ?>
-				<div class='row-fluid main'>
-					<h2 class='titlesec'>You Are Banned</h2>
-					<p>Sorry,but your behaviour wasn't acceptable.</p>
-				</div>
-			<?php } else if(isset($_SESSION['status']) && $_SESSION['status']==3){ ?>
-				<div class='row-fluid main'>
-					<h2 class='titlesec'>Activation</h2>
-					<p>You must activate your account to proceed, please check your inbox.</p>
-					<button class='btn btn-info verify' onclick='javascript:veirfy();return !1;'>Verify Status</button>
-					<button class='btn' onclick='javascript:resend();return !1;'>Send Mail Again</button>
-				</div>
-			<?php } else { ?>
-				<div class='row-fluid main'>
-					<form id='passwordform' class='login activesec'>
-						<h2 class='titlesec'>Login</h2>
-						<div class='row-fluid'>
-							<div class='span2'><label for='mail'>Email</label></div>
-							<div class='span3'><input type="email" id="mail" placeholder="Email" required></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='pwd'>Password</label></div>
-							<div class='span3'><input type="password" id="pwd" placeholder="Password" autocomplete="off" required></div>
-						</div>
-						<input type="submit" onclick='javascript:login();return false;' class="btn btn-success" value='Login'/>
-					</form>
-					<form class='register'>
-						<h2 class='titlesec'>New User</h2>
-						<div class='row-fluid'>
-							<div class='span2'><label for='rname'>Name</label></div>
-							<div class='span4'><input type="text" id="rname" placeholder="Name" autocomplete="off" required></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='rmail'>Email</label></div>
-							<div class='span4'><input type="email" id="rmail" placeholder="Email" autocomplete="off" required></div>
-						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='rpwd'>Password</label></div>
-							<div class='span4'><input type="password" id="rpwd" placeholder="Password" autocomplete="off" required></div>
-							<div class='span2'><label for='rrpwd'>Repeat Password</label></div>
-							<div class='span4'><input type="password" id="rrpwd" placeholder="Repeat Password" autocomplete="off" required></div>
-						</div>
-						<?php if(isset($privacy[0]) && $privacy[0]==1){ ?>
-							Privacy Policy
-							<div class='row-fluid'>
-								<div class='span12 privacycont'><?php echo $privacy[1]; ?></div>
-							</div>
-							<div class='row-fluid'>
-								<div class='span3'><label for='privacy'>Do you accept the Privacy policy?</label></div>
-								<div class='span3'><input type="checkbox" name="privacy" id="privacy" value="1"> Yes</div>
-							</div>
-						<?php } ?>
-						<input type="submit" onclick='javascript:register();return false;' class="btn btn-success" value='Register'/>
-					</form>
-					<form class='sect pwdres'>
-						<h2 class='titlesec'>Reset Password</h2>
-						<div class='row-fluid'>
-							<div class='span2'><label for='fname'>Name</label></div>
-							<div class='span3'><input type="text" id="fname" placeholder="Name" autocomplete="off" required></div>
-						</div><div class='row-fluid'>
-							<div class='span2'><label for='fmail'>Email</label></div>
-							<div class='span3'><input type="email" id="fmail" placeholder="Email" autocomplete="off" required></div>
-						</div>
-						<input type="submit" id='resetpwd' onclick='javascript:return false;' class="btn btn-success" value='Reset Password'/>
-					</form>
-					<div class='row-fluid act'>
-						<div class='span2' ><span class='opthome' name='login'>Login</span></div><div class='span2'><span class='opthome' name='register'>New User</span></div><div class='span2'><span class='opthome' name='pwdres'>Reset Password?</span></div>
-					</div>
-				</div>
-			<?php } ?>
-			<hr>
 		</div>
-	</div>
 
 	<script type="text/javascript"  src="<?php echo $siteurl.'min/?g=js_i&amp;5259487' ?>"></script>
 	

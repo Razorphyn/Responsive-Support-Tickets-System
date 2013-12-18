@@ -1,24 +1,32 @@
 /* ---------- Frontend ---------- */
 
+*{position:relative}
+
 body {margin:0;padding:0 20px 20px!important;background:#f2f2f2 url('images/bk.jpg')!important;transition: all 400ms ease;-webkit-transition: all 400ms ease}
 
 textarea{width:100% !important;max-width:100%;display:block;word-wrap: break-word!important}
 table{text-align:center!important;position:relaitve!important}
 table td,table th{text-align:center!important;display:table-cell!important;word-wrap: break-word!important}
 table tr{text-align:center!important}
-.navbar{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)!important}
+.navbar{-webkit-box-shadow: 5px 1px 5px 5px rgba(0, 0, 0, 0.3) !important!important;box-shadow: 5px 1px 5px 5px rgba(0, 0, 0, 0.3) !important!important;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)!important}
 
 .container > hr {margin: 60px 0;border-color:#ccc}
 
-.daddy{background:#fff;padding: 15px 30px;-webkit-border-radius: 10px;border-radius: 10px;behavior: url(../css/PIE.htc);margin-top:2.7%}
+.daddy{
+	background:#fff!important;
+	padding: 15px 30px!important;
+	-webkit-border-radius: 0 0 10px 10px!important;
+	border-radius: 0 0 10px 10px!important;
+	margin-top:2.7%;
+	behavior: url(../css/PIE.htc);
+}
 
-.jumbotron {text-align: center;}
-.jumbotron h1 {font-size: 6.25em;line-height: 1;}
-.jumbotron .lead {font-size: 1.5em;line-height: 1.25;}
-.jumbotron .btn {font-size: 1.31em;padding: 1.30% 1.25%;}
-
-.marketing {margin: 5.6% 0;}
-.marketing p + h4 {margin-top: 2.6%;}
+.row{
+	margin-left: 0px!important;
+	margin-right: 0px!important;
+}
+.jumbotron {text-align: center!important;}
+.jumbotron h1 {font-size: 2.3em!important;line-height: 1!important;font-weight: 700!important}.
 
 .register{display:none}
 .privacycont{max-height:200px;overflow:auto;padding:20px;border: 1px solid #ccc}
@@ -31,7 +39,7 @@ table tr{text-align:center!important}
 .loading{position:relative;display:block;margin:0 auto}
 
 .user_depa_container{margin:2.8% 0;padding:0.93% 0.52%;width:100%;border:1px solid #000;-webkit-border-radius: 5px;border-radius: 5px;behavior: url(../css/PIE.htc)}
-.pagefun{color:#CC3333}
+.pagefun{color:#CC3333!important}
 .sectname{color:#f2860a}
 
 #deptable {text-align:center}
@@ -71,5 +79,8 @@ table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
 
 .rate_container{height:250px;overflow:auto}
 .info_rate{border-bottom:1px solid #222}
+
+
+.razorate{width: 100%!important}
 
 .remfile{cursor:pointer}

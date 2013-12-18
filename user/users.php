@@ -71,7 +71,7 @@ try{
 							'status'=>$a['ustat'],
 							'holiday'=>$a['hol'],
 							'rating'=>$a['rt'],
-							'action'=>'<div class="btn-group"><button class="btn btn-info edituser" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+							'action'=>'<div class="btn-group"><button class="btn btn-info edituser" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remuser" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 						);
 			$c++;
 		}while ($a = $STH->fetch());
@@ -105,78 +105,82 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	</head>
 	<body>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
+								<li class="dropdown" role='button'>
+									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
+									</a>
+									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+										<li role="presentation">
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
+										</li>
+										<li role="presentation">
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
+										</li>
+									</ul>
+								</li>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li class="active" ><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
 								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
-										</li>
-										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<li class="active"><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							</ul>
-						</div>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Users Administration Tools</h2>
+					<h1 class='pagefun'>Users Administration Tools</h1>
 				</div>
 				<hr>
 				<?php if(!isset($error)){ ?>
 					<h3 class='sectname'>Users</h3>
 					<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-					<div class='row-fluid' id='userlist'>
+					<div class='row' id='userlist'>
 						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
 							<tbody>
 								<?php
@@ -189,22 +193,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					</div>
 					<br/><br/>
 					<hr>
-					<p class='cif'><i class='icon-plus-sign'></i> Create New User</p>
+					<p class='cif'><i class='glyphicon glyphicon-plus-sign'></i> Create New User</p>
 					<form style='display:none'>
 						<h3 class='sectname'>New Users</h3>
 						<small><p>Every created user through this function is automatically activated</p></small>
-						<div class='row-fluid'>
-							<div class='span2'><label for='new_rname'>Name</label></div>
-							<div class='span4'><input type="text" id="new_rname" placeholder="Name" required></div>
+						<div class='row'>
+							<div class='col-md-2'><label for='new_rname'>Name</label></div>
+							<div class='col-md-4'><input type="text" class='form-control'  id="new_rname" placeholder="Name" required></div>
 						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='new_rmail'>Email</label></div>
-							<div class='span4'><input type="email" id="new_rmail" placeholder="Email" required></div>
+						<div class='row'>
+							<div class='col-md-2'><label for='new_rmail'>Email</label></div>
+							<div class='col-md-4'><input type="email" class='form-control'  id="new_rmail" placeholder="Email" required></div>
 						</div>
-						<div class='row-fluid'>
-							<div class='span2'><label for='new_rmail'>User Role/Status</label></div>
-							<div class='span4'>
-								<select id='new_usr_role'>
+						<div class='row'>
+							<div class='col-md-2'><label for='new_rmail'>User Role/Status</label></div>
+							<div class='col-md-4'>
+								<select class='form-control'  id='new_usr_role'>
 									<option value='0'>User</option>
 									<option value='1'>Operator</option>
 									<option value='2'>Administrator</option>
@@ -222,27 +226,27 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				?>
 			</div>
 		</div>
-			<div id='delusr' style='display:none;height:40px' title="Delete this User?">
-				<p>Every information will be irreversibly deleted.</p>
-			</div>
+		<div id='delusr' style='display:none;height:40px' title="Delete this User?">
+			<p>Every information will be irreversibly deleted.</p>
+		</div>
 	
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js,js/jquery-ui-1.10.3.custom.min.js&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
 		var table = $("#usertable").dataTable({
-						sDom: "<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+						sDom: "<<'col-md-6'l><'col-md-6'f>r>t<<'col-md-6'i><'col-md-6'p>>",
 						sWrapper: "dataTables_wrapper form-inline",
 						bProcessing: !0,
 						oLanguage: {sEmptyTable: "No Users"},
 						aoColumns: [
-							{sTitle: "Number",mDataProp:"num",sWidth: "60px",sClass: "visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Number: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Status/Role",mDataProp:"status",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status/Role: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Holiday",mDataProp:"holiday",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Rating",mDataProp:"rating",sWidth: "60px",sClass: "hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Tooggle",mDataProp:"action",bSortable: !1,bSearchable: !1,sWidth: "60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
+							{sTitle: "Number",mDataProp:"num",sWidth: "60px",sClass: "visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Number: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Status/Role",mDataProp:"status",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status/Role: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Holiday",mDataProp:"holiday",sWidth: "60px",sClass: "hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Rating",mDataProp:"rating",sWidth: "60px",sClass: "hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Tooggle",mDataProp:"action",bSortable: !1,bSearchable: !1,sWidth: "100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
 						}]
 					});
 			
@@ -268,7 +272,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					success : function (a) {
 						$(".main").nimbleLoader("hide");
 						if(a[0]=='Registred'){
-							a[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a[1]['num'] + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + a[1]['num'] + '"><i class="icon-remove"></i></button></div>';
+							a[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + a[1]['num'] + '"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remuser" value="' + a[1]['num'] + '"><i class="glyphicon glyphicon-remove"></i></button></div>';
 							table.fnAddData(a[1]);
 						}
 						else if(a[0]=='sessionerror'){
@@ -306,12 +310,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			if(0 < $("#" + a.num).length)
 				$("html,body").animate({scrollTop: $("#" + a.num).offset().top}, 1500)
 			else{
-				var b = "<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><input type='hidden' name='usr_old_stat' value='"+a.status+"'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='usr_edit_name' placeholder='Department Name' value='" + a.name + "'required /></div><div class='span2'>Role/Status</div><div class='span4'><select class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row-fluid'><div class='span2'>Mail</div><div class='span4'><input type='text' name='usr_edit_mail' value='" + a.mail + "' required/></div><div class='span2'><label>On Holiday?</label></div><div class='span4'><select name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><button style='display:none' class='btn btn-info load_usr_rate' value='" + a.num + "' onclick='javascript:return false;'>Load Rates</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; 
+				var b = "<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><input type='hidden' name='usr_old_stat' value='"+a.status+"'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='usr_edit_name' placeholder='Department Name' value='" + a.name + "'required /></div><div class='col-md-2'>Role/Status</div><div class='col-md-4'><select class='form-control'  class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row form-group'><div class='col-md-2'>Mail</div><div class='col-md-4'><input type='text' class='form-control' name='usr_edit_mail' value='" + a.mail + "' required/></div><div class='col-md-2'><label>On Holiday?</label></div><div class='col-md-4'><select class='form-control'  name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><button style='display:none' class='btn btn-info load_usr_rate' value='" + a.num + "' onclick='javascript:return false;'>Load Rates</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; 
 				$("#userlist").after(b);
 				$('select[name="usr_role"]:first option').filter(function(){return $(this).html() == a.status}).attr("selected", "selected");
 				$('select[name="usr_holiday"]:first option').filter(function () {return $(this).html() == a.holiday}).attr("selected", "selected");
 				if("Operator" == a.status) $(".load_usr_depa:first").css("display", "block");
 				if("Operator" == a.status || "Administrator" == a.status) $(".load_usr_rate:first").css("display", "block");
+				$("html,body").animate({scrollTop: $("#" + a.num).offset().top}, 1500)
 			}
 		});
 
@@ -341,7 +346,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				dataType: "json",
 				success: function (d) {
 					if("Updated" == d[0]){
-						d[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + b + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + b + '"><i class="icon-remove"></i></button></div>', 
+						d[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + b + '"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remuser" value="' + b + '"><i class="glyphicon glyphicon-remove"></i></button></div>', 
 						d[1]['rating']=($.isNumeric(l))? l:'Unrated',
 						table.fnDeleteRow(k, function(){table.fnAddData(d[1])}),
 						a.prev().remove(),
@@ -482,7 +487,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							if(count>0){
 								var tail=new Array();
 								for(i=0;i<count;i++)
-									tail.push("<div class='row-fluid'><div class='span3'>"+b.rate[i][3]+"</div><div class='span3'><a href='view?id="+b.rate[i][2]+"'>View Ticket</a></div><div class='span3'>"+b.rate[i][0]+"</div></div><div class='row-fluid info_rate'><div class='span11'>"+b.rate[i][1]+"</div></div>");
+									tail.push("<div class='row'><div class='col-md-3'>"+b.rate[i][3]+"</div><div class='col-md-3'><a href='view?id="+b.rate[i][2]+"'>View Ticket</a></div><div class='col-md-3'>"+b.rate[i][0]+"</div></div><div class='row info_rate'><div class='col-md-11'>"+b.rate[i][1]+"</div></div>");
 								tail=tail.join("");
 								a.after("<br/><div class='rate_container'>"+tail+"</div>");
 							}
@@ -518,14 +523,14 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		$('.cif').click(function(){
 			el=$(this).children('i');
-			if(el.hasClass('icon-plus-sign')){
-				el.removeClass('icon-plus-sign');
-				el.addClass('icon-minus-sign');
+			if(el.hasClass('glyphicon glyphicon-plus-sign')){
+				el.removeClass('glyphicon glyphicon-plus-sign');
+				el.addClass('glyphicon glyphicon-minus-sign');
 				$(this).next('form').slideToggle(800);
 			}
 			else{
-				el.removeClass('icon-minus-sign');
-				el.addClass('icon-plus-sign');
+				el.removeClass('glyphicon glyphicon-minus-sign');
+				el.addClass('glyphicon glyphicon-plus-sign');
 				$(this).next('form').slideToggle(800);
 			}
 		});

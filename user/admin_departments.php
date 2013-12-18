@@ -64,7 +64,7 @@ try{
 						'active'=>$a['active'],
 						'public'=>$a['public'],
 						'free'=>$a['free'],
-						'action'=>'<div class="btn-group"><button class="btn btn-info editdep" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+						'action'=>'<div class="btn-group"><button class="btn btn-info editdep" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remdep" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 			);
 		}while ($a = $STH->fetch());
 	}
@@ -99,127 +99,133 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 	</head>
 	<body>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-							<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
 										</li>
 										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown active" role='button' >
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation" class='active'>
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							</ul>
-						</div>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+								<?php } ?>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
-				<hr>
-				<div class="jumbotron" >
-					<h2 class='pagefun'>Administration - Departments</h2>
-				</div>
-				<hr>
-				<?php if(!isset($error)){ ?>
-					<h3 class='sectname'>Departments</h3>
-					<div class='row-fluid' id='deplist'>
-						<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="deptable">
-						<tbody>
-						<?php
-							$c=count($dn);
-							for($i=0;$i<$c;$i++)
-								echo '<tr><td>'.$dn[$i]['id'].'</td><td>'.$dn[$i]['name'].'</td><td>'.$dn[$i]['active'].'</td><td>'.$dn[$i]['public'].'</td><td>'.$dn[$i]['free'].'</td><td>'.$dn[$i]['action'].'</td></tr>';
-						?>
-						</tbody>
-						</table>
-					</div>
-					<br/><br/>
 					<hr>
-					<h4 class='sectname'>Add New Department</h4>
-					<form action='' method='post'>
-							<div class='row-fluid'>
-								<div class='span1'><label for='depname'>Name</label></div>
-								<div class='span3'><input type="text" name='depname' id="depname" placeholder="Department Name" required /></div>
-							</div>
-							<div class='row-fluid'>
-								<div class='span1'><label for='activedep'>Is Active?</label></div>
-								<div class='span3'>
-									<select name='activedep' id='activedep'>
-										<option value='1'>Yes</option>
-										<option value='0'>No</option>
-									</select>
+					<div class="jumbotron" >
+						<h1 class='pagefun'>Administration - Departments</h1>
+					</div>
+					<hr>
+					<?php if(!isset($error)){ ?>
+						<h3 class='sectname'>Departments</h3>
+						<div class='row' id='deplist'>
+							<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+							<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="deptable">
+							<tbody>
+							<?php
+								$c=count($dn);
+								for($i=0;$i<$c;$i++)
+									echo '<tr><td>'.$dn[$i]['id'].'</td><td>'.$dn[$i]['name'].'</td><td>'.$dn[$i]['active'].'</td><td>'.$dn[$i]['public'].'</td><td>'.$dn[$i]['free'].'</td><td>'.$dn[$i]['action'].'</td></tr>';
+							?>
+							</tbody>
+							</table>
+						</div>
+						<br/><br/>
+						<hr>
+						<h4 class='sectname'>Add New Department</h4>
+						<form action='' method='post'>
+								<div class='row form-group'>
+									<div class='col-md-2'><label for='depname'>Name</label></div>
+									<div class='col-md-4'><input type="text" class='form-control'  name='depname' id="depname" placeholder="Department Name" required /></div>
 								</div>
-								<div class='span1'><label for='publicdep'>Is Public?</label></div>
-								<div class='span3'>
-									<select name='publicdep' id='publicdep'>
-										<option value='1'>Yes</option>
-										<option value='0'>No</option>
-									</select>
+								<div class='row form-group'>
+									<div class='col-md-2'><label for='activedep'>Is Active?</label></div>
+									<div class='col-md-4'>
+										<select class='form-control'  name='activedep' id='activedep'>
+											<option value='1'>Yes</option>
+											<option value='0'>No</option>
+										</select>
+									</div>
+									<div class='col-md-2'><label for='publicdep'>Is Public?</label></div>
+									<div class='col-md-4'>
+										<select class='form-control'  name='publicdep' id='publicdep'>
+											<option value='1'>Yes</option>
+											<option value='0'>No</option>
+										</select>
+									</div>
 								</div>
-								<div class='span1'><label for='freedep'>Is Free?</label></div>
-								<div class='span3'>
-									<select name='freedep' id='freedep'>
-										<option value='1'>Yes</option>
-										<option value='0'>No</option>
-									</select>
+								<div class='row form-group'>
+									<div class='col-md-2'><label for='freedep'>Is Free?</label></div>
+									<div class='col-md-4'>
+										<select class='form-control'  name='freedep' id='freedep'>
+											<option value='1'>Yes</option>
+											<option value='0'>No</option>
+										</select>
+									</div>
 								</div>
-							</div>
-						<input type="submit" class="btn btn-success" value='Add New Department' onclick='javascript:return false;' id='btnadddep'/>
-					</form>
-				<?php
-					}
-					else
-						echo '<p>'.$error.'</p>';
-				?>
-				<br/><br/>
+							<input type="submit" class="btn btn-success" value='Add New Department' onclick='javascript:return false;' id='btnadddep'/>
+						</form>
+					<?php
+						}
+						else
+							echo '<p>'.$error.'</p>';
+					?>
+					<br/><br/>
 			</div>
 		</div>
 		<div id='delcat' style='display:none' title="Delete Department?">
@@ -232,18 +238,18 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 	<script>
 	 $(document).ready(function() {
 		var table=$("#deptable").dataTable({
-											sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+											sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 											sWrapper:"dataTables_wrapper form-inline",
 											bDestroy:!0,
 											bProcessing:!0,
 											oLanguage:{sEmptyTable:"No Departments"},
 											aoColumns:[
-												{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},
-												{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},
-												{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},
-												{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},
-												{sTitle:"Free",mDataProp:"free",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Free: </strong></span><span> " + $(nTd).html() + '</span>');}},
-												{sTitle:"Toogle",mDataProp:"action",sWidth:"60px",bSortable:!1,bSearchable:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
+												{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Free",mDataProp:"free",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Free: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Toogle",mDataProp:"action",sWidth:"100px",bSortable:!1,bSearchable:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
 											]
 								});
 		$("#loading").remove(),
@@ -258,11 +264,12 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 				$("html,body").animate({scrollTop: $("#" + a.id).offset().top}, 1500)
 			}
 			else{
-				b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row-fluid'><div class='span1'><label>Is Active?</label></div><div class='span3'><select name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='span1'><label>Is Public?</label></div><div class='span3'><select name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='span1'><label>Is Free?</label></div><div class='span3'><select name='edit_depa_free'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>",
+				b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row form-group'><div class='col-md-2'><label>Is Active?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='col-md-2'><label>Is Public?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><div class='row form-group'><div class='col-md-2'><label>Is Free?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_free'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>",
 				$("#deplist").after(b),
 				$('select[name="edit_depa_active"]:first option[value=' + ("Yes" == a.active ? 1 : 0) + "]").attr("selected", "selected"),
 				$('select[name="edit_depa_free"]:first option[value=' + ("Yes" == a.free ? 1 : 0) + "]").attr("selected", "selected"),
-				$('select[name="edit_depa_public"]:first option[value=' + ("Yes" == a.public ? 1 : 0) + "]").attr("selected", "selected")
+				$('select[name="edit_depa_public"]:first option[value=' + ("Yes" == a.public ? 1 : 0) + "]").attr("selected", "selected"),
+				$("html,body").animate({scrollTop: $("#" + a.id).offset().top}, 1500)
 			}
 		});
 		
@@ -360,7 +367,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 					dataType: "json",
 					success: function (a) {
 						if("Added" == a.response){
-							a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="icon-remove"></i></button></div>',
+							a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="glyphicon glyphicon-remove"></i></button></div>',
 							table.fnAddData(a.information),
 							$("#depname").val("")
 						}
@@ -404,7 +411,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 				dataType: "json",
 				success: function (e) {
 					if("Succeed" == e[0]){
-						e[1]['action'] = '<div class="btn-group"><button class="btn btn-info editdep" value="' + e[1]['id'] + '"><i class="icon-edit"></i></button><button class="btn btn-danger remdep" value="' + e[1]['id'] + '"><i class="icon-remove"></i></button></div>', 
+						e[1]['action'] = '<div class="btn-group"><button class="btn btn-info editdep" value="' + e[1]['id'] + '"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remdep" value="' + e[1]['id'] + '"><i class="glyphicon glyphicon-remove"></i></button></div>', 
 						table.fnDeleteRow(g, function () {table.fnAddData(e[1])}), 
 						a.prev().remove(), 
 						a.remove()

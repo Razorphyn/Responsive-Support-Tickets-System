@@ -79,7 +79,7 @@ try{
 													'date'=>$a['created_time'],
 													'reply'=>$a['last_reply'],
 													'free'=>$a['last_reply'],
-													'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+													'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 												);
 			}while ($a = $STH->fetch());
 		}
@@ -117,7 +117,7 @@ try{
 													'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
 													'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
 													'priority'=>$a['prio'],
-													'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+													'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 												);
 				else
 					$list['tickets']['user'][]=array(
@@ -127,7 +127,7 @@ try{
 														'priority'=>$a['prio'],
 														'date'=>$a['created_time'],
 														'reply'=>$a['last_reply'],
-														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 													);
 			}while ($a = $STH->fetch());
 		}
@@ -166,7 +166,7 @@ try{
 														'priority'=>$a['prio'],
 														'date'=>$a['created_time'],
 														'reply'=>$a['last_reply'],
-														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 												);
 				else if($a['user_id']==$_SESSION['id'])
 					$list['tickets']['user'][]=array(
@@ -176,7 +176,7 @@ try{
 														'priority'=>$a['prio'],
 														'date'=>$a['created_time'],
 														'reply'=>$a['last_reply'],
-														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 													);
 				else
 					$list['tickets']['admin'][]=array(
@@ -186,7 +186,7 @@ try{
 														'priority'=>$a['prio'],
 														'date'=>$a['created_time'],
 														'reply'=>$a['last_reply'],
-														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 													);
 			}while ($a = $STH->fetch());
 		}
@@ -226,175 +226,176 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	</head>
 	<body>
 		<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){?>
+		
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
+								<li class="active dropdown" role='button'>
+									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
+									</a>
+									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+										<li class="active" role="presentation">
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
+										</li>
+										<li role="presentation">
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
+										</li>
+									</ul>
+								</li>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
 								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
-								<li class="dropdown active" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation" class='active'>
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
-										</li>
-										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-							<?php } if(isset($_SESSION['status'])){ ?>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							<?php } ?>
-							</ul>
-						</div>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
-			<hr>
-			<div class="jumbotron" >
-				<h2 class='pagefun'>Ticket List</h2>
+				<hr>
+				<div class="jumbotron" >
+					<h1 class='pagefun'>Ticket List</h1>
+				</div>
+				<hr>
+					<?php if(!isset($error)){ ?>
+						<div class='row main'>
+
+							<ul id='tkstatnav' class="nav nav-tabs">
+								<li class="active" id='tkopen' value='1' ><a href="#">Open</a></li>
+								<li id='tkclosed' value='0'><a href="#">Closed</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li id='tkassi' value='2'><a href="#">To Assign</a></li>
+								<?php } ?>
+									<li><a href="newticket.php">New Ticket</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li id='aut_ass_tk' onclick='javascript:return false;'><a href="#">Automatic Tickets Assigment</a></li>
+								<?php } ?>
+							</ul>
+
+							<h3 class='sectname'>Your Tickets</h3>
+							<div class='row'>
+								<div class='col-md-12'>
+									<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+									<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
+										<tbody>
+										<?php
+											if(isset($list['tickets']['user'])){
+												$c=count($list['tickets']['user']);
+												for($i=0;$i<$c;$i++)
+													echo '<tr><td>'.$list['tickets']['user'][$i]['title'].'</td><td>'.$list['tickets']['user'][$i]['date'].'</td><td>'.$list['tickets']['user'][$i]['reply'].'</td><td>'.$list['tickets']['user'][$i]['dname'].'</td><td>'.$list['tickets']['user'][$i]['opname'].'</td><td>'.$list['tickets']['user'][$i]['priority'].'</td><td>'.$list['tickets']['user'][$i]['action'].'</td></tr>';
+											}
+										?>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<?php if($_SESSION['status']==1){ ?>
+							<h3 class='sectname'>Assigned Tickets</h3>
+							<div class='row'>
+								<div class='col-md-12'>
+									<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+									<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
+										<tbody>
+										<?php
+											if(isset($list['tickets']['op'])){
+												$c=count($list['tickets']['op']);
+												for($i=0;$i<$c;$i++)
+													echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
+											}
+										?>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<?php } else if($_SESSION['status']==2){ ?>
+							<h3 class='sectname'>Assigned Tickets</h3>
+							<div class='row'>
+								<div class='col-md-12'>
+									<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+									<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
+										<tbody>
+										<?php
+											if(isset($list['tickets']['op'])){
+												$c=count($list['tickets']['op']);
+												for($i=0;$i<$c;$i++)
+													echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
+											}
+										?>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<h3 class='sectname admin_ticket'>Tickets Adminsitration</h3>
+							<div class='row'>
+								<div class='col-md-12'>
+									<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+									<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="admintable">
+									<tbody>
+									<?php
+										if(isset($list['tickets']['admin'])){
+											$c=count($list['tickets']['admin']);
+											for($i=0;$i<$c;$i++)
+												echo '<tr><td>'.$list['tickets']['admin'][$i]['title'].'</td><td>'.$list['tickets']['admin'][$i]['date'].'</td><td>'.$list['tickets']['admin'][$i]['reply'].'</td><td>'.$list['tickets']['admin'][$i]['dname'].'</td><td>'.$list['tickets']['admin'][$i]['opname'].'</td><td>'.$list['tickets']['admin'][$i]['priority'].'</td><td>'.$list['tickets']['admin'][$i]['action'].'</td></tr>';
+										}
+									?>
+									</tbody>
+									</table>
+								</div>
+							</div>
+							<?php } ?>
+							<br/><br/>
+						</div>
+					<?php
+						}
+						else
+							echo '<p>'.$error.'</p>';
+					?>
+				<hr>
 			</div>
-			<hr>
-				<?php if(!isset($error)){ ?>
-					<div class='row-fluid main'>
-
-						<ul id='tkstatnav' class="nav nav-tabs">
-							<li class="active" id='tkopen' value='1' ><a href="#">Open</a></li>
-							<li id='tkclosed' value='0'><a href="#">Closed</a></li>
-							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
-								<li id='tkassi' value='2'><a href="#">To Assign</a></li>
-							<?php } ?>
-								<li><a href="newticket.php">New Ticket</a></li>
-							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
-								<li id='aut_ass_tk' onclick='javascript:return false;'><a href="#">Automatic Tickets Assigment</a></li>
-							<?php } ?>
-						</ul>
-
-						<h3 class='sectname'>Your Tickets</h3>
-						<div class='row-fluid'>
-							<div class='span12'>
-								<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-								<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
-									<tbody>
-									<?php
-										if(isset($list['tickets']['user'])){
-											$c=count($list['tickets']['user']);
-											for($i=0;$i<$c;$i++)
-												echo '<tr><td>'.$list['tickets']['user'][$i]['title'].'</td><td>'.$list['tickets']['user'][$i]['date'].'</td><td>'.$list['tickets']['user'][$i]['reply'].'</td><td>'.$list['tickets']['user'][$i]['dname'].'</td><td>'.$list['tickets']['user'][$i]['opname'].'</td><td>'.$list['tickets']['user'][$i]['priority'].'</td><td>'.$list['tickets']['user'][$i]['action'].'</td></tr>';
-										}
-									?>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<?php if($_SESSION['status']==1){ ?>
-						<h3 class='sectname'>Assigned Tickets</h3>
-						<div class='row-fluid'>
-							<div class='span12'>
-								<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-								<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
-									<tbody>
-									<?php
-										if(isset($list['tickets']['op'])){
-											$c=count($list['tickets']['op']);
-											for($i=0;$i<$c;$i++)
-												echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
-										}
-									?>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<?php } else if($_SESSION['status']==2){ ?>
-						<h3 class='sectname'>Assigned Tickets</h3>
-						<div class='row-fluid'>
-							<div class='span12'>
-								<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-								<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
-									<tbody>
-									<?php
-										if(isset($list['tickets']['op'])){
-											$c=count($list['tickets']['op']);
-											for($i=0;$i<$c;$i++)
-												echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
-										}
-									?>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<h3 class='sectname admin_ticket'>Tickets Adminsitration</h3>
-						<div class='row-fluid'>
-							<div class='span12'>
-								<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-								<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="admintable">
-								<tbody>
-								<?php
-									if(isset($list['tickets']['admin'])){
-										$c=count($list['tickets']['admin']);
-										for($i=0;$i<$c;$i++)
-											echo '<tr><td>'.$list['tickets']['admin'][$i]['title'].'</td><td>'.$list['tickets']['admin'][$i]['date'].'</td><td>'.$list['tickets']['admin'][$i]['reply'].'</td><td>'.$list['tickets']['admin'][$i]['dname'].'</td><td>'.$list['tickets']['admin'][$i]['opname'].'</td><td>'.$list['tickets']['admin'][$i]['priority'].'</td><td>'.$list['tickets']['admin'][$i]['action'].'</td></tr>';
-									}
-								?>
-								</tbody>
-								</table>
-							</div>
-						</div>
-						<?php } ?>
-						<br/><br/>
-					</div>
-				<?php
-					}
-					else
-						echo '<p>'.$error.'</p>';
-				?>
-			<hr>
 		</div>
-		</div>
-
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js&amp;5259487' ?>"></script>
 	<script>
@@ -404,116 +405,114 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<?php if($_SESSION['status']==0){ ?>
 					
 						var utab=$("#usertable").dataTable({
-								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
 								bProcessing:true,
 								aaSorting:[[2,"desc"]],
 								oLanguage:{sEmptyTable:"No Tickets"},
 									aoColumns:[
-										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 									]
 						});
 						
 					<?php } else if($_SESSION['status']==1){ ?>
 					
 						var utab=$("#usertable").dataTable({
-										sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+										sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 										sWrapper:"dataTables_wrapper form-inline",
 										bDestroy:true,
 										bProcessing:true,
 										aaSorting:[[2,"desc"]],
 										oLanguage:{sEmptyTable:"No Tickets"},
 											aoColumns:[
-												{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-												{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"User",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+												{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"User",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+												{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 											]
 									}),
 						
 							otab=$("#operatortable").dataTable({
-										sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+										sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 										sWrapper:"dataTables_wrapper form-inline",
 										bDestroy:true,
 										bProcessing:true,
 										aaSorting:[[2,"desc"]],
 										oLanguage:{sEmptyTable:"No Tickets"},
 										aoColumns:[
-											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Operator",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 										]
 									});
 						
 					<?php } else if($_SESSION['status']==2){ ?>
 
 						var utab=$("#usertable").dataTable({
-								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
 								bProcessing:true,
 								aaSorting:[[2,"desc"]],
 								oLanguage:{sEmptyTable:"No Tickets"},
 									aoColumns:[
-										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 									]
 							}),
 						
 						otab=$("#operatortable").dataTable({
-								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
 								bProcessing:true,
 								aaSorting:[[2,"desc"]],
 								oLanguage:{sEmptyTable:"No Tickets"},
 								aoColumns:[
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"User",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"User",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 								]
 							}),
 						
 						atab=$("#admintable").dataTable({
-								sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+								sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
 								bProcessing:true,
 								aaSorting:[[2,"desc"]],
 								oLanguage:{sEmptyTable:"No Tickets"},
 								aoColumns:[
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Operator",mDataProp:"opname", sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 								]
 							});
 
@@ -537,23 +536,23 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						if(a.response=='ret'){
 							<?php if($_SESSION['status']==0){ ?>
 					
-								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 									$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
 									
 							<?php } else if($_SESSION['status']==1){ ?>								
 							
-								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 									$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
-								var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+								var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 									$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
 							
 							<?php } else if($_SESSION['status']==2){ ?>
 
-								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+								var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 									$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
-								var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+								var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 									$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
-								var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.admin[i].id+'">'+a.tickets.admin[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+								var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.admin[i].id+'">'+a.tickets.admin[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 									$.when(atab.fnClearTable()).then(atab.fnAddData(a.tickets.admin));
 								
 							<?php } ?>
@@ -595,23 +594,23 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							if(a.response=='ret'){
 								<?php if($_SESSION['status']==0){ ?>
 					
-									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
 									
 								<?php } else if($_SESSION['status']==1){ ?>
 								
-									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
-									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
 									
 								<?php } else if($_SESSION['status']==2){ ?>
 								
-									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
-									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
-									var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.admin[i].id+'">'+a.tickets.admin[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.admin[i].id+'">'+a.tickets.admin[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(atab.fnClearTable()).then(atab.fnAddData(a.tickets.admin));
 								
 								<?php } ?>
@@ -657,23 +656,23 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							if(a.response=='ret'){
 								<?php if($_SESSION['status']==0){ ?>
 								
-									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
 								
 								<?php } else if($_SESSION['status']==1){ ?>
 									
-									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
-									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
 								
 								<?php } else if($_SESSION['status']==2){ ?>
 									
-									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.user.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.user[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.user[i].id+'">'+a.tickets.user[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.user[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(utab.fnClearTable()).then(utab.fnAddData(a.tickets.user));
-									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.op.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.op[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.op[i].id+'">'+a.tickets.op[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.op[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(otab.fnClearTable()).then(otab.fnAddData(a.tickets.op));
-									var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.admin[i].id+'">'+a.tickets.admin[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="icon-remove"></i></button></div>'});} 
+									var l=a.tickets.admin.length;if(l>0){for(i=0;i<l;i++)$.extend(a.tickets.admin[i],{title:'<button class="btn btn-link viewtk" value="'+a.tickets.admin[i].id+'">'+a.tickets.admin[i].title+"</button>",action:'<div class="btn-group"><button class="btn btn-warning editusr" value="'+a.tickets.admin[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+a.tickets.admin[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});} 
 										$.when(atab.fnClearTable()).then(atab.fnAddData(a.tickets.admin));
 								
 								<?php } ?>
@@ -803,7 +802,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					$("html,body").animate({scrollTop: $("#" + b).offset().top}, 1500);
 				else {
 					var f = $(a.title).text(),
-						d = "<hr><form action='' method='post' class='submit_changes_depa' id='"+b+"'><span>Edit " + encodeHTML(f) + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + encodeHTML(d) + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><input type='hidden' id='tablename' value='" + encodeHTML(e) + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + encodeHTML(f) + "' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assign</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
+						d = "<hr><form action='' method='post' class='submit_changes_depa' id='"+b+"'><span>Edit " + encodeHTML(f) + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + encodeHTML(d) + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><input type='hidden' id='tablename' value='" + encodeHTML(e) + "'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='edit_depa_name' placeholder='Ticket Title' value='" + encodeHTML(f) + "' required /></div></div><div class='row form-group'><div class='col-md-2'><label>Status</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assign</option></select></div><div class='col-md-2'><label>Priority</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 					$("table:last").parent().parent().after(d);
 					c=parseInt($('#tkstatnav > li.active').val());
 					
@@ -832,7 +831,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					$("html,body").animate({scrollTop: $("#" + c).offset().top}, 500);
 				else {
 					var f = $(a.title).text(),
-						d = "<hr><form action='' method='post' class='submit_changes_depa' id='" + c + "'><span>Edit " + encodeHTML(f) + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + encodeHTML(d) + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + encodeHTML(f) + "' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
+						d = "<hr><form action='' method='post' class='submit_changes_depa' id='" + c + "'><span>Edit " + encodeHTML(f) + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + encodeHTML(d) + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><div class='row'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + encodeHTML(f) + "' required /></div></div><div class='row'><div class='col-md-2'><label>Status</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option></select></div><div class='col-md-2'><label>Priority</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 					$("table:last").parent().parent().after(d);
 					e=parseInt($('#tkstatnav > li.active').val());
 					e=(e==0)?0:1;
@@ -864,7 +863,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							if(parseInt($('#tkstatnav > li.active').val())==data[1][3]){
 								tit='<button class="btn btn-link viewtk" value="'+data[1][0]+'">'+data[1][1]+"</button>";
 								switch(data[1][2]){case "0":prio="Low";break;case "1":prio="Medium";break;case "2":prio="High";break;case "3":prio="Urgent";break;case "4":prio="Critical";default:prio='Error'}
-								var action='<div class="btn-group"><button class="btn btn-warning editusr" value="'+data[1][0]+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+data[1][0]+'"><i class="icon-remove"></i></button></div>';
+								var action='<div class="btn-group"><button class="btn btn-warning editusr" value="'+data[1][0]+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+data[1][0]+'"><i class="glyphicon glyphicon-remove"></i></button></div>';
 								$('button.editusr[value="'+data[1][0]+'"]').each(function(){
 									var table=$(this).parent().parent().parent().parent().parent().parent().attr('id');
 									table=$('#'+table).dataTable();

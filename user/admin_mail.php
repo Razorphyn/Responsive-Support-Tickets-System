@@ -100,107 +100,111 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	</head>
 	<body>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
 										</li>
 										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown active" role='button' >
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation" class='active'>
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							</ul>
-						</div>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="active dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li class="active" role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+								<?php } ?>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Administration - Mail</h2>
+					<h1 class='pagefun'>Administration - Mail</h1>
 				</div>
 				<hr>
 				<h4 class='sectname'>Mail Setting</h4>
 				<form>
-					<div class='row-fluid stmpinfo' >
-						<div class='span12'><label><strong>SMTP Setting</strong></label></div>
-						<div class='row-fluid'>
-							<div class='span2'><label>STMP Service</label></div>
-							<div class='span4'><select id='stmpserv' ><option value='0'>This Server</option><option value='1'>External Service</option></select></div>
+					<div class='row  form-group stmpinfo' >
+						<div class='col-md-12'><label><strong>SMTP Setting</strong></label></div>
+						<div class='row form-group'>
+							<div class='col-md-2'><label>Service</label></div>
+							<div class='col-md-4'><select class='form-control'  id='stmpserv' ><option value='0'>This Server</option><option value='1'>External Service</option></select></div>
 						</div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='stmpname'>Name</label></div>
-								<div class='span4'><input id='stmpname' type='text' value='<?php if(isset($smailname)) echo htmlspecialchars($smailname,ENT_QUOTES,'UTF-8');?>' required/></div>
-								<div class='span2'><label for='stmpmail'>Mail Address</label></div>
-								<div class='span4'><input id='stmpmail' type='email' value='<?php if(isset($settingmail)) echo htmlspecialchars($settingmail,ENT_QUOTES,'UTF-8'); ?>' required /></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='stmpname'>Name</label></div>
+								<div class='col-md-4'><input class='form-control' id='stmpname' type='text' value='<?php if(isset($smailname)) echo htmlspecialchars($smailname,ENT_QUOTES,'UTF-8');?>' required/></div>
+								<div class='col-md-2'><label for='stmpmail'>Mail Address</label></div>
+								<div class='col-md-4'><input class='form-control' id='stmpmail' type='email' value='<?php if(isset($settingmail)) echo htmlspecialchars($settingmail,ENT_QUOTES,'UTF-8'); ?>' required /></div>
 						</div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='stmphost'>Hostname</label></div>
-								<div class='span4'><input id='stmphost' type='text' value='<?php if(isset($smailhost)) echo htmlspecialchars($smailhost,ENT_QUOTES,'UTF-8'); ?>' /></div>
-								<div class='span2'><label for='stmpport'>Port</label></div>
-								<div class='span4'><input id='stmpport' type='number' value='<?php if(isset($smailport)) echo $smailport; ?>' required/></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='stmphost'>Hostname</label></div>
+								<div class='col-md-4'><input class='form-control' id='stmphost' type='text' value='<?php if(isset($smailhost)) echo htmlspecialchars($smailhost,ENT_QUOTES,'UTF-8'); ?>' /></div>
+								<div class='col-md-2'><label for='stmpport'>Port</label></div>
+								<div class='col-md-4'><input class='form-control' id='stmpport' type='number' value='<?php if(isset($smailport)) echo $smailport; ?>' required/></div>
 						</div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='stmpsec'>SSL/TLS</label></div>
-								<div class='span4'><select id='stmpsec' ><option value='0'>No</option><option value='1'>SSL</option><option value='2'>TLS</option></select></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='stmpsec'>SSL/TLS</label></div>
+								<div class='col-md-4'><select class='form-control'  id='stmpsec' ><option value='0'>No</option><option value='1'>SSL</option><option value='2'>TLS</option></select></div>
 						</div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='stmpaut'>Authentication</label></div>
-								<div class='span4'><select id='stmpaut' ><option value='0'>No</option><option value='1'>Yes</option></select></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='stmpaut'>Authentication</label></div>
+								<div class='col-md-4'><select class='form-control'  id='stmpaut' ><option value='0'>No</option><option value='1'>Yes</option></select></div>
 						</div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='stmpusr'>Username</label></div>
-								<div class='span4'><input id='stmpusr' type='text' value='<?php if(isset($smailuser)) echo htmlspecialchars($smailuser,ENT_QUOTES,'UTF-8'); ?>' /></div>
-								<div class='span2'><label for='stmppas'>Password</label></div>
-								<div class='span4'><input id='stmppas' type='password' value='<?php if(isset($smailpassword)) echo htmlspecialchars($smailpassword,ENT_QUOTES,'UTF-8'); ?>' autocomplete="off" /></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='stmpusr'>Username</label></div>
+								<div class='col-md-4'><input class='form-control' id='stmpusr' type='text' value='<?php if(isset($smailuser)) echo htmlspecialchars($smailuser,ENT_QUOTES,'UTF-8'); ?>' /></div>
+								<div class='col-md-2'><label for='stmppas'>Password</label></div>
+								<div class='col-md-4'><input class='form-control' id='stmppas' type='password' value='<?php if(isset($smailpassword)) echo htmlspecialchars($smailpassword,ENT_QUOTES,'UTF-8'); ?>' autocomplete="off" /></div>
 						</div>
 						<br/>
 						<input type='submit' id='savestmp' onclick='javascript:return false;' value='Save' class='btn btn-success'/>
@@ -209,14 +213,14 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<br/><br/>
 				<h4 class='sectname'>Mail Template</h4>
 				<form>
-					<div class='row-fluid'>
-						<div class='span12'><label><strong>New Member</strong></label></div>
-						<div class='row-fluid'>
-								<div class='span2'><label  for='nmsub'>Subject</label></div>
-								<div class='span4'><input id='nmsub' class='mailsubject' type='text' value='<?php if(isset($nu[0])) echo htmlspecialchars($nu[0],ENT_QUOTES,'UTF-8');?>' required /></div>
+					<div class='row form-group'>
+						<div class='col-md-12'><label><strong>New Member</strong></label></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label  for='nmsub'>Subject</label></div>
+								<div class='col-md-4'><input id='nmsub' class='form-control mailsubject' type='text' value='<?php if(isset($nu[0])) echo htmlspecialchars($nu[0],ENT_QUOTES,'UTF-8');?>' required /></div>
 						</div>
-						<div class='row-fluid'>
-							<div class='span12'><textarea class='mailmessage' id='newmememess' rows="5" placeholder='Welcome Message' required><?php if(isset($nu[1])) echo $nu[1];?></textarea></div>	
+						<div class='row form-group'>
+							<div class='col-md-12'><textarea class='mailmessage' id='newmememess' rows="5" placeholder='Welcome Message' required><?php if(isset($nu[1])) echo $nu[1];?></textarea></div>	
 						</div>
 						<br/>
 						<input type='submit' onclick='javascript:return false;' value='Save' class='btn btn-success newuser submailbody'/>
@@ -224,14 +228,14 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				</form>
 				<br/><br/>
 				<form>
-					<div class='row-fluid'>
-						<div class='span12'><label><strong>New Reply</strong></label></div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='nrsub'>Subject</label></div>
-								<div class='span4'><input id='nrsub' class='mailsubject' type='text' value='<?php if(isset($nr[0])) echo htmlspecialchars($nr[0],ENT_QUOTES,'UTF-8');?>' required/></div>
+					<div class='row form-group'>
+						<div class='col-md-12'><label><strong>New Reply</strong></label></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='nrsub'>Subject</label></div>
+								<div class='col-md-4'><input id='nrsub' class='form-control mailsubject' type='text' value='<?php if(isset($nr[0])) echo htmlspecialchars($nr[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
-						<div class='row-fluid'>
-							<div class='span12'><textarea class='mailmessage' id='newreplymess' rows="5" placeholder='New Reply Message' required><?php if(isset($nr[1])) echo $nr[1];?></textarea></div>	
+						<div class='row form-group'>
+							<div class='col-md-12'><textarea class='mailmessage' id='newreplymess' rows="5" placeholder='New Reply Message' required><?php if(isset($nr[1])) echo $nr[1];?></textarea></div>	
 						</div>
 						<br/>
 						<input type='submit' onclick='javascript:return false;' value='Save' class='btn btn-success newreply submailbody'/>
@@ -239,14 +243,14 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				</form>
 				<br/><br/>
 				<form>
-					<div class='row-fluid'>
-						<div class='span12'><label><strong>New Ticket</strong></label></div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='ntsub'>Subject</label></div>
-								<div class='span4'><input id='ntsub' class='mailsubject' type='text' value='<?php if(isset($nt[0])) echo  htmlspecialchars($nt[0],ENT_QUOTES,'UTF-8');?>' required/></div>
+					<div class='row form-group'>
+						<div class='col-md-12'><label><strong>New Ticket</strong></label></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='ntsub'>Subject</label></div>
+								<div class='col-md-4'><input id='ntsub' class='form-control mailsubject' type='text' value='<?php if(isset($nt[0])) echo  htmlspecialchars($nt[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
-						<div class='row-fluid'>
-							<div class='span12'><textarea class='mailmessage' id='newticketmess' rows="5" placeholder='New Ticket Message' required><?php if(isset($nt[1])) echo $nt[1];?></textarea></div>	
+						<div class='row form-group'>
+							<div class='col-md-12'><textarea class='mailmessage' id='newticketmess' rows="5" placeholder='New Ticket Message' required><?php if(isset($nt[1])) echo $nt[1];?></textarea></div>	
 						</div>
 						<br/>
 						<input type='submit' onclick='javascript:return false;' value='Save' class='btn btn-success newticket submailbody'/>
@@ -255,28 +259,28 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				</form>
 				<br/><br/>
 				<form>
-					<div class='row-fluid'>
-						<div class='span12'><label><strong>Assigned Ticket</strong></label></div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='atsub'>Subject</label></div>
-								<div class='span4'><input id='atsub' class='mailsubject' type='text' value='<?php if(isset($as[0])) echo  htmlspecialchars($as[0],ENT_QUOTES,'UTF-8');?>' required/></div>
+					<div class='row form-group'>
+						<div class='col-md-12'><label><strong>Assigned Ticket</strong></label></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='atsub'>Subject</label></div>
+								<div class='col-md-4'><input id='atsub' class='form-control mailsubject' type='text' value='<?php if(isset($as[0])) echo  htmlspecialchars($as[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
-						<div class='row-fluid'>
-							<div class='span12'><textarea class='mailmessage' id='assignedmess' rows="5" placeholder='Assigned Ticket Message' required><?php if(isset($as[1])) echo $as[1];?></textarea></div>	
+						<div class='row form-group'>
+							<div class='col-md-12'><textarea class='mailmessage' id='assignedmess' rows="5" placeholder='Assigned Ticket Message' required><?php if(isset($as[1])) echo $as[1];?></textarea></div>	
 						</div>
 						<br/>
 						<input type='submit' onclick='javascript:return false;' value='Save' class='btn btn-success newassignment submailbody'/>
 					</div>
 				</form>
 				<form>
-					<div class='row-fluid'>
-						<div class='span12'><label><strong>Password Forgot</strong></label></div>
-						<div class='row-fluid'>
-								<div class='span2'><label for='pfsub'>Subject</label></div>
-								<div class='span4'><input id='pfsub' class='mailsubject' type='text' value='<?php if(isset($fo[0])) echo  htmlspecialchars($fo[0],ENT_QUOTES,'UTF-8');?>' required/></div>
+					<div class='row form-group'>
+						<div class='col-md-12'><label><strong>Password Forgot</strong></label></div>
+						<div class='row form-group'>
+								<div class='col-md-2'><label for='pfsub'>Subject</label></div>
+								<div class='col-md-4'><input id='pfsub' class='form-control mailsubject' type='text' value='<?php if(isset($fo[0])) echo  htmlspecialchars($fo[0],ENT_QUOTES,'UTF-8');?>' required/></div>
 						</div>
-						<div class='row-fluid'>
-							<div class='span12'><textarea class='mailmessage' id='forgotmess' rows="5" placeholder='Assigned Ticket Message' required><?php if(isset($fo[1])) echo $fo[1];?></textarea></div>	
+						<div class='row form-group'>
+							<div class='col-md-12'><textarea class='mailmessage' id='forgotmess' rows="5" placeholder='Assigned Ticket Message' required><?php if(isset($fo[1])) echo $fo[1];?></textarea></div>	
 						</div>
 						<br/>
 						<input type='submit' onclick='javascript:return false;' value='Save' class='btn btn-success forgotmess submailbody'/>

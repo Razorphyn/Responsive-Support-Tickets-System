@@ -126,102 +126,106 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	</head>
 	<body>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
+							</button>
+							<a class="navbar-brand" href='../'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="../"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
 										</li>
 										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="icon-cog"></i>Settings</a></li>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown active" role='button' >
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation" class='active'>
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							</ul>
-						</div>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown active" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li class='active' role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+								<?php } ?>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Administration - Payment Setting</h2>
+					<h1 class='pagefun'>Administration - Payment Setting</h1>
 				</div>
 				<hr>
 				<form id='paypal_setting' action=''>
 					<h3 class='sectname'>Paypal Setting</h3>
-					<div class='row-fluid'>
-						<div class='span2'><label>Enabled</label></div>
-						<div class='span4'>
-							<select name='enpp' id='enpp'>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Enabled</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='enpp' id='enpp'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
 						</div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Merchant Mail</label></div>
-						<div class='span4'><input type="email" name='ppmail' id="ppmail" <?php if(isset($ppsetting[1])) echo 'value="'.$ppsetting[1].'"';?> placeholder="Merchant Email" required /></div>
-						<div class='span2'><label>Currency</label></div>
-						<div class='span4'><input type="text" name='ppcurrency' id="ppcurrency" <?php if(isset($ppsetting[2])) echo 'value="'.$ppsetting[2].'"';?> placeholder="Currency" required /></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Merchant Mail</label></div>
+						<div class='col-md-4'><input type="email" class='form-control'  name='ppmail' id="ppmail" <?php if(isset($ppsetting[1])) echo 'value="'.$ppsetting[1].'"';?> placeholder="Merchant Email" required /></div>
+						<div class='col-md-2'><label>Currency</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='ppcurrency' id="ppcurrency" <?php if(isset($ppsetting[2])) echo 'value="'.$ppsetting[2].'"';?> placeholder="Currency" required /></div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Enable Sandbox</label></div>
-						<div class='span4'>
-							<select name='enppsand' id='enppsand'>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Enable Sandbox</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='enppsand' id='enppsand'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
 						</div>
-						<div class='span2'><label>Enable CURL</label></div>
-						<div class='span4'>
-							<select name='enppcurl' id='encurl'>
+						<div class='col-md-2'><label>Enable CURL</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='enppcurl' id='encurl'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
@@ -233,40 +237,40 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<hr>
 				<form id='moneybookers_payment' action=''>
 					<h3 class='sectname'>MoneyBookers Setting</h3>
-					<div class='row-fluid'>
-						<div class='span2'><label>Enabled</label></div>
-						<div class='span4'>
-							<select name='enmb' id='enmb'>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Enabled</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='enmb' id='enmb'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
 						</div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Merchant ID</label></div>
-						<div class='span4'><input type="text" name='mbmercid' id="mbmercid" <?php if(isset($mbsetting[1])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Merchant ID" required /></div>
-						<div class='span2'><label>Merchant Mail</label></div>
-						<div class='span4'><input type="email" name='mbmail' id="mbmail" <?php if(isset($mbsetting[2])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Merchant Email" required /></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Merchant ID</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='mbmercid' id="mbmercid" <?php if(isset($mbsetting[1])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Merchant ID" required /></div>
+						<div class='col-md-2'><label>Merchant Mail</label></div>
+						<div class='col-md-4'><input type="email" class='form-control'  name='mbmail' id="mbmail" <?php if(isset($mbsetting[2])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Merchant Email" required /></div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Secret Word</label></div>
-						<div class='span4'><input type="text" name='mbsword' id="mbsword" <?php if(isset($mbsetting[5])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Secret Word" required /></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Secret Word</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='mbsword' id="mbsword" <?php if(isset($mbsetting[5])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Secret Word" required /></div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Currency</label></div>
-						<div class='span4'><input type="text" name='mbcurrency' id="mbcurrency" <?php if(isset($mbsetting[3])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Currency" required /></div>
-						<div class='span2'><label>Company Name</label></div>
-						<div class='span4'><input type="text" name='mbcompanyname' id="mbcompanyname" <?php if(isset($mbsetting[4])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Company Name" /></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Currency</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='mbcurrency' id="mbcurrency" <?php if(isset($mbsetting[3])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Currency" required /></div>
+						<div class='col-md-2'><label>Company Name</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='mbcompanyname' id="mbcompanyname" <?php if(isset($mbsetting[4])) echo 'value="'.$mbsetting[1].'"';?> placeholder="Company Name" /></div>
 					</div>
 					<input type="submit" class="btn btn-success" value='Save' id='saveoptmoney'/>
 				</form>
 				<br/><br/>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Administration - Payment List</h2>
+					<h1 class='pagefun'>Administration - Payment List</h1>
 				</div>
 				<hr>
-				<div class='row-fluid'>
+				<div class='row form-group'>
 					<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
 					<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="payment_table">
 						<tbody>
@@ -277,6 +281,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						</tbody>
 					</table>
 				</div>
+				<br/><br/>
 			</div>
 		</div>
 		<iframe name='hidden_frame' style='display:none;width:0;height:0' src="about:blank" ></iframe>
@@ -298,20 +303,20 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		<?php } ?>
 
 		var table = $("#payment_table").dataTable({
-						sDom: "<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+						sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 						sWrapper: "dataTables_wrapper form-inline",
 						bProcessing: !0,
 						oLanguage: {sEmptyTable: "No Payments"},
 						aoColumns: [
-							{sTitle: "ID",			mDataProp: "id",				sWidth: "50px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>ID: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Date",		mDataProp: "payment_date",		sWidth: "80px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Date: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Gateway",		mDataProp: "gateway",																fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Gateway: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Status",		mDataProp: "status",			sWidth: "50px",												fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Mail",		mDataProp: "payer_mail",															fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Payment ID",	mDataProp: "transaction_id",														fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Payment ID: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Amount",		mDataProp: "amount",			sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Amount: </strong></span><span> " + $(nTd).html() + '</span>');}},
-							{sTitle: "Time",		mDataProp: "support_time",		sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Time: </strong></span><span> " + $(nTd).html() + '</span>');}},
-							{sTitle: "Tooggle",		mDataProp: "action",			sWidth: "60px",	bSortable: !1,	bSearchable: !1,	fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
+							{sTitle: "ID",			mDataProp: "id",				sWidth: "25px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>ID: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Date",		mDataProp: "payment_date",		sWidth: "100px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Date: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Gateway",		mDataProp: "gateway",			sWidth: "120px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Gateway: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Status",		mDataProp: "status",			sWidth: "50px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Mail",		mDataProp: "payer_mail",		sWidth: "100px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Payment ID",	mDataProp: "transaction_id",	sWidth: "150px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Payment ID: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Amount",		mDataProp: "amount",			sWidth: "50px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Amount: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle: "Time",		mDataProp: "support_time",		sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Time: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle: "Tooggle",		mDataProp: "action",			sWidth: "100px",bSortable: !1,	bSearchable: !1,	fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
 						]
 					});
 		$('.loading').remove();
@@ -327,7 +332,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			if(0 < $("#" + a.num).length)
 				$("html,body").animate({scrollTop: $("#" + a.num).offset().top}, 1500)
 			else{
-				var b = "<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><input type='hidden' name='usr_old_stat' value='"+a.status+"'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='usr_edit_name' placeholder='Department Name' value='" + a.name + "'required /></div><div class='span2'>Role/Status</div><div class='span4'><select class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row-fluid'><div class='span2'>Mail</div><div class='span4'><input type='text' name='usr_edit_mail' value='" + a.mail + "' required/></div><div class='span2'><label>On Holiday?</label></div><div class='span4'><select name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><button style='display:none' class='btn btn-info load_usr_rate' value='" + a.num + "' onclick='javascript:return false;'>Load Rates</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; 
+				var b = "<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><input type='hidden' name='usr_old_stat' value='"+a.status+"'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='usr_edit_name' placeholder='Department Name' value='" + a.name + "'required /></div><div class='span2'>Role/Status</div><div class='span4'><select class='form-control'  class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row-fluid'><div class='span2'>Mail</div><div class='span4'><input type='text' name='usr_edit_mail' value='" + a.mail + "' required/></div><div class='span2'><label>On Holiday?</label></div><div class='span4'><select class='form-control'  name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><button style='display:none' class='btn btn-info load_usr_rate' value='" + a.num + "' onclick='javascript:return false;'>Load Rates</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; 
 				$("#userlist").after(b);
 				$('select[name="usr_role"]:first option').filter(function(){return $(this).html() == a.status}).attr("selected", "selected");
 				$('select[name="usr_holiday"]:first option').filter(function () {return $(this).html() == a.holiday}).attr("selected", "selected");

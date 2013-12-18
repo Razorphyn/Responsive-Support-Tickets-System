@@ -53,51 +53,51 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
   </head>
 	<body>
 		<div class="container">
-		<div class='daddy'>
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand"><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li class="active"><a href="#home"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php }?>
-							</ul>
-						</div>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+						</ul>
 					</div>
 				</div>
+			</nav>
+			<div class='daddy'>
+				<hr>
+				<div class="jumbotron" >
+					<h1 class="muted pagefun"><a href='http://razorphyn.com'><img id='logo' src='../css/images/logo.png' alt='Razorphyn' title='Razorphyn'/></a></h1>
+					<h3 class='pagefun'>Welcome to the support center</h3>
+				</div>
+				<hr>
+				<div class='row main'>
+					<form id='passwordform' class='login activesec'>
+						<h1 class='titlesec'>Reset Password</h1>
+						<div class='row'>
+							<div class='col-md-2'><label>Your Email</label></div>
+							<div class='col-md-3'><input type="text" class='form-control'  id="rmail" placeholder="Email" autocomplete="off" required></div>
+						</div>
+						<div class='row'>
+							<div class='col-md-2'><label>New Password</label></div>
+							<div class='col-md-4'><input type="password" class='form-control'  id="npwd" placeholder="New Password" autocomplete="off" required></div>
+							<div class='col-md-2'><label>Reapeat New Password</label></div>
+							<div class='col-md-4'><input type="password" class='form-control'  id="rnpwd" placeholder="Repeat New Password" autocomplete="off" required></div>
+						</div>
+						<input type="submit" id='resetpass' onclick='javascript:return false;' class="btn btn-success" value='Update Password'/>
+					</form>
+				</div>
+				<hr>
 			</div>
-			<hr>
-			<div class="jumbotron" >
-				<h1 class="muted pagefun"><a href='http://razorphyn.com'><img id='logo' src='../css/images/logo.png' alt='Razorphyn' title='Razorphyn'/></a></h1>
-				<h3 class='pagefun'>Welcome to the support center</h3>
-			</div>
-			<hr>
-			<div class='row-fluid main'>
-				<form id='passwordform' class='login activesec'>
-					<h2 class='titlesec'>Reset Password</h2>
-					<div class='row-fluid'>
-						<div class='span2'><label>Your Email</label></div>
-						<div class='span3'><input type="text" id="rmail" placeholder="Email" autocomplete="off" required></div>
-					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>New Password</label></div>
-						<div class='span4'><input type="password" id="npwd" placeholder="New Password" autocomplete="off" required></div>
-						<div class='span2'><label>Reapeat New Password</label></div>
-						<div class='span4'><input type="password" id="rnpwd" placeholder="Repeat New Password" autocomplete="off" required></div>
-					</div>
-					<input type="submit" id='resetpass' onclick='javascript:return false;' class="btn btn-success" value='Update Password'/>
-				</form>
-			</div>
-			<hr>
-		</div>
 	</div>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
 	<script>

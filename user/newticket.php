@@ -72,136 +72,142 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	</head>
 	<body>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li class="active" ><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
+								<li class="dropdown" role='button'>
+									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
+									</a>
+									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+										<li role="presentation">
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
+										</li>
+										<li role="presentation">
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
+										</li>
+									</ul>
+								</li>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
 								<?php } ?>
-								<li class="active"><a href="#"><i class="icon-file"></i>New Ticket</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
-										</li>
-										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-							<?php } if(isset($_SESSION['status'])){ ?>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							<?php } ?>
-							</ul>
+						</ul>
+					</div>
+				</div>
+			</nav>
+			<div class='daddy'>
+				<hr>
+				<div class="jumbotron" >
+					<h1 class='pagefun'>Create New Ticket</h1>
+				</div>
+				<hr>
+				<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+				<form style='display:none' id='createticket' method="POST" action="../php/function.php" target='hidden_upload' enctype="multipart/form-data">
+					<input type='hidden' value='Dream' name='<?php echo $_SESSION['token']['act']; ?>' />
+					<div class='row main'>
+						<div class='sect login activesec'>
+								<h3 class='sectname'>Ticket Information</h3>
+								<div class='row form-group'>
+									<div class='col-md-2'><label for='title'>Title</label></div>
+									<div class='col-md-4'><input type="text" class='form-control'  name='title' id="title" placeholder="Title" required /></div>
+								</div>
+								<div class='row form-group'>
+									<div class='col-md-2'><label for='deplist'>Departement</label></div>
+									<div class='col-md-4' id='deplist'>
+
+									</div>
+									<div class='col-md-2'><label for='priority'>Priority</label></div>
+									<div class='col-md-4'>
+										<select class='form-control'  name='priority' id='priority'>
+											<option value='0'>Low</option>
+											<option value='1'>Medium</option>
+											<option value='2'>High</option>
+											<option value='3'>Urgent</option>
+											<option value='4'>Critical</option>
+										</select>
+									</div>
+								</div>
+								<br/><br/>
+								<h3 class='sectname'>Website Information</h3>
+								<div class='row form-group'>
+									<div class='col-md-2'><label for='wsurl'>URL</label></div>
+									<div class='col-md-4'><input type="url" name='wsurl' id="wsurl" placeholder="Website URL"/></div>
+								</div>
+								<div class='row form-group'>
+									<div class='col-md-2'><label for='contype'>Connection Type</label></div><div class='col-md-4'><select class='form-control'  name="contype" id="contype"><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
+									</div>
+								<div class='row form-group'>
+									<div class='col-md-2'><label for='ftpus'>FTP Username</label></div>
+									<div class='col-md-4'><input type="text" class='form-control'  name='ftpus' id="ftpus" placeholder="FTP Username"/></div>
+									<div class='col-md-2'><label for='ftppass'>FTP Password</label></div>
+									<div class='col-md-4'><input type="password" class='form-control'  name='ftppass' id="ftppass" placeholder="FTP Password" autocomplete="off"/></div>
+								</div>
+								<br/><br/>
+								<h3 class='sectname'>Message</h3>
+								<div class='row form-group'>
+										<div class='col-md-12 nwm'></div>
+								</div>
+								<br/>
+								<?php if(isset($setting[5]) && $setting[5]==1){ ?>
+								<div class='row form-group'>
+									<h3 class='sectname'>Attachments</h3>
+									<span class='attlist'></span>
+									<br/>
+									<p>To select multiple files: press ctrl+click on the chosen file</p>
+									<br/>
+									<input id='fielduploadinput' type="file" name="filename[]" multiple /> <span id='resetfile' class='btn btn-danger'>Reset</span>
+								</div>
+								<?php } ?>
+								<br/><br/>
+								<input type="submit" class="btn btn-success" name='createtk' value='Create New Ticket' id='createtk'/>
 						</div>
 					</div>
-				</div>
+				</form>
+				<hr>
 			</div>
-		<div class='daddy'>
-			<hr>
-			<div class="jumbotron" >
-				<h2 class='pagefun'>Create New Ticket</h2>
-			</div>
-			<hr>
-			<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-			<form style='display:none' id='createticket' method="POST" action="../php/function.php" target='hidden_upload' enctype="multipart/form-data">
-				<input type='hidden' value='Dream' name='<?php echo $_SESSION['token']['act']; ?>' />
-				<div class='row-fluid main'>
-					<div class='sect login activesec'>
-							<h3 class='sectname'>Ticket Information</h3>
-							<div class='row-fluid'>
-								<div class='span2'><label for='title'>Title</label></div>
-								<div class='span4'><input type="text" name='title' id="title" placeholder="Title" required /></div>
-							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label for='deplist'>Departement</label></div>
-								<div class='span4' id='deplist'>
-
-								</div>
-								<div class='span2'><label for='priority'>Priority</label></div>
-								<div class='span4'>
-									<select name='priority' id='priority'>
-										<option value='0'>Low</option>
-										<option value='1'>Medium</option>
-										<option value='2'>High</option>
-										<option value='3'>Urgent</option>
-										<option value='4'>Critical</option>
-									</select>
-								</div>
-							</div>
-							<br/><br/>
-							<h3 class='sectname'>Website Information</h3>
-							<div class='row-fluid'>
-								<div class='span2'><label for='wsurl'>URL</label></div>
-								<div class='span4'><input type="url" name='wsurl' id="wsurl" placeholder="Website URL"/></div>
-							</div><div class='row-fluid'>
-								<div class='span2'><label for='contype'>Connection Type</label></div><div class='span4'><select name="contype" id="contype"><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
-								</div><div class='row-fluid'>
-								<div class='span2'><label for='ftpus'>FTP Username</label></div>
-								<div class='span4'><input type="text" name='ftpus' id="ftpus" placeholder="FTP Username"/></div>
-								<div class='span2'><label for='ftppass'>FTP Password</label></div>
-								<div class='span4'><input type="password" name='ftppass' id="ftppass" placeholder="FTP Password" autocomplete="off"/></div>
-							</div>
-							<br/><br/>
-							<h3 class='sectname'>Message</h3>
-							<div class='row-fluid'>
-									<div class='span12 nwm'></div>
-							</div>
-							<br/>
-							<?php if(isset($setting[5]) && $setting[5]==1){ ?>
-								<h3 class='sectname'>Attachments</h3>
-								<span class='attlist'></span>
-								<br/>
-								<p>To select multiple files: press ctrl+click on the chosen file</p>
-								<input id='fielduploadinput' type="file" name="filename[]" multiple /> <span id='resetfile' class='btn btn-danger'>Reset</span>
-							<?php } ?>
-							<br/><br/>
-							<input type="submit" class="btn btn-success" name='createtk' value='Create New Ticket' id='createtk'/>
-					</div>
-				</div>
-			</form>
-			<hr>
-		</div>
 		</div>
 		<iframe style='display:none' name='hidden_upload' id='hidden_upload' src="about:blank" ></iframe>
 		<?php if(!$isMob) { ?>
@@ -228,7 +234,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							$("#message").wysihtml5()
 							<?php } ?> 
 							);
-							$("#deplist").html("<select name='dep' id='dep'>" + a.information + "</select>");
+							$("#deplist").html("<select class='form-control'  name='dep' id='dep'>" + a.information + "</select>");
 						}
 						else if("empty" == a.response){
 							 $("#loading").remove(), $("#createticket").html("<p>Sorry, you cannot open a new ticket because: " + a[1] + "</p>");

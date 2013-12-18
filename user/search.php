@@ -66,177 +66,178 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	</head>
 	<body>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
+								<li class="active dropdown" role='button'>
+									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
+									</a>
+									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+										<li role="presentation">
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
+										</li>
+										<li class="active" role="presentation">
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
+										</li>
+									</ul>
+								</li>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
 								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
-								<li class="dropdown active" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
-										</li>
-										<li role="presentation" class='active'>
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href="setting.php"><i class="icon-edit"></i>Settings</a></li>
-							<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){?>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown" role='button'>
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation">
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-							<?php } if(isset($_SESSION['status'])){ ?>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							<?php } ?>
-							</ul>
-						</div>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Search Ticket</h2>
+					<h1 class='pagefun'>Search Ticket</h1>
 				</div>
 				<hr>
 				<?php if($_SESSION['status']==0){ ?>
 					<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
 					<form style='display:none' id='searchform' action=''>
-						<div class='row-fluid main'>
-							<div class='row-fluid'>
-								<div class='span2'><label>Reference ID</label></div>
-								<div class='span4'><input type="text" name='rid' id="rid" placeholder="Reference ID" /></div>
+						<div class='row main'>
+							<div class='row'>
+								<div class='col-md-2'><label>Reference ID</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='rid' id="rid" placeholder="Reference ID" /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>Ticket Title</label></div>
-								<div class='span4'><input type="text" name='title' id="title" placeholder="Ticket Title" /></div>
-								<div class='span2'><label>Ticket Status</label></div>
-								<div class='span4'><select type="text" name='statk' id="statk"><option value=''></option><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assing</option></select></div>
+							<div class='row'>
+								<div class='col-md-2'><label>Ticket Title</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='title' id="title" placeholder="Ticket Title" /></div>
+								<div class='col-md-2'><label>Ticket Status</label></div>
+								<div class='col-md-4'><select class='form-control'  type="text" name='statk' id="statk"><option value=''></option><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assing</option></select></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>Department</label></div>
-								<div class='span4'><select type="text" name='dep' id="dep" placeholder="Department" ><option value=''></option></select></div>
+							<div class='row'>
+								<div class='col-md-2'><label>Department</label></div>
+								<div class='col-md-4'><select class='form-control'  type="text" name='dep' id="dep" placeholder="Department" ><option value=''></option></select></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>Operator Name</label></div>
-								<div class='span4'><input type="text" name='operatorn' id="operatorn" placeholder="Operator Name" /></div>
+							<div class='row'>
+								<div class='col-md-2'><label>Operator Name</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='operatorn' id="operatorn" placeholder="Operator Name" /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>From date</label></div>
-								<div class='span4'><input type="text" name='from' id="from" placeholder="From Date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
-								<div class='span2'><label>To</label></div>
-								<div class='span4'><input type="text" name='to' id="to" placeholder="To date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
+							<div class='row'>
+								<div class='col-md-2'><label>From date</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='from' id="from" placeholder="From Date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
+								<div class='col-md-2'><label>To</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='to' id="to" placeholder="To date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2 offset5'><input id='searchtk' type='submit' class='btn btn-success' onclick='javascript:return false;' value='Search Ticket' /></div>
+							<div class='row'>
+								<div class='col-md-2 col-md-offset-5'><input id='searchtk' type='submit' class='btn btn-success' onclick='javascript:return false;' value='Search Ticket' /></div>
 							</div>
 						</div>
 					</form>
 				<?php } else if ($_SESSION['status']==1) { ?>
 					<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
 					<form style='display:none' id='searchform' action=''>
-						<div class='row-fluid main'>
-							<div class='row-fluid'>
-								<div class='span2'><label>Reference ID</label></div>
-								<div class='span4'><input type="text" name='rid' id="rid" placeholder="Reference ID" /></div>
+						<div class='row main'>
+							<div class='row'>
+								<div class='col-md-2'><label>Reference ID</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='rid' id="rid" placeholder="Reference ID" /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>Ticket Title</label></div>
-								<div class='span4'><input type="text" name='title' id="title" placeholder="Ticket Title" /></div>
-								<div class='span2'><label>Ticket Status</label></div>
-								<div class='span4'><select type="text" name='statk' id="statk"><option value=''></option><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assing</option></select></div>
+							<div class='row'>
+								<div class='col-md-2'><label>Ticket Title</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='title' id="title" placeholder="Ticket Title" /></div>
+								<div class='col-md-2'><label>Ticket Status</label></div>
+								<div class='col-md-4'><select class='form-control'  type="text" name='statk' id="statk"><option value=''></option><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assing</option></select></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>Department</label></div>
-								<div class='span4'><select type="text" name='dep' id="dep" placeholder="Department" ><option value=''></option></select></div>
+							<div class='row'>
+								<div class='col-md-2'><label>Department</label></div>
+								<div class='col-md-4'><select class='form-control'  type="text" name='dep' id="dep" placeholder="Department" ><option value=''></option></select></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>From date</label></div>
-								<div class='span4'><input type="text" name='from' id="from" placeholder="From Date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
-								<div class='span2'><label>To</label></div>
-								<div class='span4'><input type="text" name='to' id="to" placeholder="To date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
+							<div class='row'>
+								<div class='col-md-2'><label>From date</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='from' id="from" placeholder="From Date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
+								<div class='col-md-2'><label>To</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='to' id="to" placeholder="To date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2 offset5'><input id='searchtk' type='submit' class='btn btn-success' onclick='javascript:return false;' value='Search Ticket' /></div>
+							<div class='row'>
+								<div class='col-md-2 col-md-offset-5'><input id='searchtk' type='submit' class='btn btn-success' onclick='javascript:return false;' value='Search Ticket' /></div>
 							</div>
 						</div>
 					</form>
 				<?php } else if ($_SESSION['status']==2) { ?>
 					<img id='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-					<form style='display:none' id='searchform' action=''>
-						<div class='row-fluid main'>
-							<div class='row-fluid'>
-								<div class='span2'><label>ID Number</label></div>
-								<div class='span4'><input type="text" name='id' id="id" placeholder="ID Number" pattern='[0-9]+' /></div>
-								<div class='span2'><label>Reference ID</label></div>
-								<div class='span4'><input type="text" name='rid' id="rid" placeholder="Reference ID" /></div>
+					<form style='display:none' id='searchform' action='' role='form'>
+						<div class='row main'>
+							<div class='row form-group'>
+								<div class='col-md-2'><label>ID Number</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='id' id="id" placeholder="ID Number" pattern='[0-9]+' /></div>
+								<div class='col-md-2'><label>Reference ID</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='rid' id="rid" placeholder="Reference ID" /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>Ticket Title</label></div>
-								<div class='span4'><input type="text" name='title' id="title" placeholder="Ticket Title" /></div>
-								<div class='span2'><label>Ticket Status</label></div>
-								<div class='span4'><select type="text" name='statk' id="statk"><option value=''></option><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assing</option></select></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label>Ticket Title</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='title' id="title" placeholder="Ticket Title" /></div>
+								<div class='col-md-2'><label>Ticket Status</label></div>
+								<div class='col-md-4'><select class='form-control'  type="text" name='statk' id="statk"><option value=''></option><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assing</option></select></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>User Mail</label></div>
-								<div class='span4'><input type="text" name='umail' id="umail" placeholder="User Mail" /></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label>User Mail</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='umail' id="umail" placeholder="User Mail" /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>Department</label></div>
-								<div class='span4'><select type="text" name='dep' id="dep" placeholder="Department"><option value=''></option></select></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label>Department</label></div>
+								<div class='col-md-4'><select class='form-control'  type="text" name='dep' id="dep" placeholder="Department"><option value=''></option></select></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>Operator Name</label></div>
-								<div class='span4'><input type="text" name='operatorn' id="operatorn" placeholder="Operator Name" /></div>
-								<div class='span2'><label>Operator ID</label></div>
-								<div class='span4'><input type="text" name='operatori' id="operatori" placeholder="Operator ID" pattern='[0-9]+' /></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label>Operator Name</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='operatorn' id="operatorn" placeholder="Operator Name" /></div>
+								<div class='col-md-2'><label>Operator ID</label></div>
+								<div class='col-md-4'><input type="text" class='form-control'  name='operatori' id="operatori" placeholder="Operator ID" pattern='[0-9]+' /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2'><label>From Date (yyyy-mm-dd)</label></div>
-								<div class='span4'><input type="date" name='from' id="from" placeholder="From Date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
-								<div class='span2'><label>To (yyyy-mm-dd)</label></div>
-								<div class='span4'><input type="date" name='to' id="to" placeholder="To date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
+							<div class='row form-group'>
+								<div class='col-md-2'><label>From Date (yyyy-mm-dd)</label></div>
+								<div class='col-md-4'><input type="date" class='form-control' name='from' id="from" placeholder="From Date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
+								<div class='col-md-2'><label>To (yyyy-mm-dd)</label></div>
+								<div class='col-md-4'><input type="date" class='form-control' name='to' id="to" placeholder="To date" pattern='[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])' /></div>
 							</div>
-							<div class='row-fluid'>
-								<div class='span2 offset5'><input id='searchtk' type='submit' class='btn btn-success' onclick='javascript:return false;' value='Search Ticket' /></div>
+							<div class='row form-group'>
+								<div class='col-md-2 col-md-offset-5'><input id='searchtk' type='submit' class='btn btn-success' onclick='javascript:return false;' value='Search Ticket' /></div>
 							</div>
 						</div>
 					</form>
@@ -245,7 +246,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<div class='rescont'>
 					<hr>
 					<h3 class='sectname'>Results</h3>
-					<div class='row-fluid' id='userlist'>
+					<div class='row' id='userlist'>
 						<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="restable">
 						</table>
 					</div>
@@ -368,7 +369,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				}, 1500);
 				else {
 					var f = $(a.title).text(),
-						d = "<hr><form action='' method='post' class='submit_changes_depa' id='" + b + "'><span>Edit " + f + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + d + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><input type='hidden' id='tablename' value='" + e + "'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + f + "' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assign</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
+						d = "<hr><form action='' method='post' class='submit_changes_depa' id='" + b + "'><span>Edit " + f + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + d + "'/><input type='hidden' name='depa_edit_pos' value='" + g + "'/><input type='hidden' id='tablename' value='" + e + "'/><div class='row'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='" + f + "' required /></div></div><div class='row'><div class='col-md-2'><label>Status</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option><option value='2'>To Assign</option></select></div><div class='col-md-2'><label>Priority</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 					$(".formcontainer").children('form:first').before(d);
 					if (-1 < a.status.search("Closed")) var c = 0;
 					else -1 < a.status.search("Open") ? c = 1 : -1 < a.status.search("Assign") && (c = 2);
@@ -397,7 +398,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				}
 			});
 		<?php } else { ?>
-			$(document).on("click",".editusr",function(){var d=$(this).val(),c=$(this).val().replace(/\./g,"_"),f=$(this).parent().parent().parent().parent().parent().parent().attr("id");oTable=$("#"+f).dataTable();var a=this.parentNode.parentNode.parentNode.parentNode,g=oTable.fnGetPosition(a,null,!0),a=oTable.fnGetData(a);if(0<$("#"+c).length)$("html,body").animate({scrollTop:$("#"+c).offset().top},500);else{var f=$(a.title).text(),d="<hr><form action='' method='post' class='submit_changes_depa' id='"+c+"'><span>Edit "+f+"</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='"+ d+"'/><input type='hidden' id='tablename' value='"+f+"'/><input type='hidden' name='depa_edit_pos' value='"+g+"'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='"+f+"' required /></div></div><div class='row-fluid'><div class='span2'><label>Status</label></div><div class='span4'><select name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option></select></div><div class='span2'><label>Priority</label></div><div class='span4'><select name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; $(".formcontainer").html('<form></form>');;if(-1<a.status.search("Closed"))var e=0;else-1<a.status.search("Open")&&(e=1);switch(a.priority){case "Low":var b=0;break;case "Medium":b=1;break;case "High":b=2;break;case "Urgent":b=3;break;case "Critical":b=4}$('select[name="edit_depa_active"]:first option[value='+e+"]").attr("selected","selected");$('select[name="edit_depa_public"]:first option[value='+b+"]").attr("selected","selected");2==e&&$('select[name="edit_depa_active"]:first option[value=1]').remove(); $("html,body").animate({scrollTop:$("#"+c).offset().top},1500)}});
+			$(document).on("click",".editusr",function(){var d=$(this).val(),c=$(this).val().replace(/\./g,"_"),f=$(this).parent().parent().parent().parent().parent().parent().attr("id");oTable=$("#"+f).dataTable();var a=this.parentNode.parentNode.parentNode.parentNode,g=oTable.fnGetPosition(a,null,!0),a=oTable.fnGetData(a);if(0<$("#"+c).length)$("html,body").animate({scrollTop:$("#"+c).offset().top},500);else{var f=$(a.title).text(),d="<hr><form action='' method='post' class='submit_changes_depa' id='"+c+"'><span>Edit "+f+"</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='"+ d+"'/><input type='hidden' id='tablename' value='"+f+"'/><input type='hidden' name='depa_edit_pos' value='"+g+"'/><div class='row'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' name='edit_depa_name' placeholder='Ticket Title' value='"+f+"' required /></div></div><div class='row'><div class='col-md-2'><label>Status</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='0'>Closed</option><option value='1'>Open</option></select></div><div class='col-md-2'><label>Priority</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='0'>Low</option><option value='1'>Medium</option><option value='2'>High</option><option value='3'>Urgent</option><option value='4'>Critical</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; $(".formcontainer").html('<form></form>');;if(-1<a.status.search("Closed"))var e=0;else-1<a.status.search("Open")&&(e=1);switch(a.priority){case "Low":var b=0;break;case "Medium":b=1;break;case "High":b=2;break;case "Urgent":b=3;break;case "Critical":b=4}$('select[name="edit_depa_active"]:first option[value='+e+"]").attr("selected","selected");$('select[name="edit_depa_public"]:first option[value='+b+"]").attr("selected","selected");2==e&&$('select[name="edit_depa_active"]:first option[value=1]').remove(); $("html,body").animate({scrollTop:$("#"+c).offset().top},1500)}});
 		<?php } ?>
 		$(document).on('click','.submit_changes',function(){
 			var dom=$(this).parent();
@@ -500,18 +501,27 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								var l=data.search.length;
 								if(l>0){
 									for(i=0;i<l;i++)
-										$.extend(data.search[i],{title:'<a href="view.php?id='+data.search[i].id+'" alt="View Ticket" title="View Ticket">'+data.search[i].title+"</a>",action:'<div class="btn-group"><button class="btn btn-warning editusr hidden-phone" value="'+data.search[i].id+'"><i class="icon-edit"></i></button><button class="btn btn-danger remusr" value="'+data.search[i].id+'"><i class="icon-remove"></i></button></div>'});
+										$.extend(data.search[i],{title:'<a href="view.php?id='+data.search[i].id+'" alt="View Ticket" title="View Ticket">'+data.search[i].title+"</a>",action:'<div class="btn-group"><button class="btn btn-warning editusr hidden-xs" value="'+data.search[i].id+'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'+data.search[i].id+'"><i class="glyphicon glyphicon-remove"></i></button></div>'});
 								}
 								$(".loading:first").remove(); 
 								if("ret"==data.response||"empty"==data.response){
 									table=$("#restable").dataTable({
-												sDom:"<<'span6'l><'span6'f>r>t<<'span6'i><'span6'p>>",
+												sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
 												sWrapper:"dataTables_wrapper form-inline",
 												bDestroy:!0,
 												bProcessing:!0,
 												aaData:data.search,
 												oLanguage:{sEmptyTable:"No Results"},
-												aoColumns:[{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Title: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-desktop",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Last Reply: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Department",mDataProp:"dname",sClass:"hidden-phone",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Department: </strong></span><span> " + $(nTd).html() + '</span>');}}, {sTitle:"Operator",mDataProp:"opname",sClass:"visible-desktop",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Operator: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Priority: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Status",mDataProp:"status",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}},{sTitle:"Tooggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-phone'>Tooggle: </strong></span><span> " + $(nTd).html() + '</span>');}}]
+												aoColumns:[
+													{sTitle:"Title",		mDataProp:"title",															fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span> " + $(nTd).html() + '</span>');}},
+													{sTitle:"Created Date",	mDataProp:"date",		sWidth:"140px",	sClass:"visible-md visible-lg",		fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+													{sTitle:"Last Reply",	mDataProp:"reply",		sWidth:"140px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span> " + $(nTd).html() + '</span>');}},
+													{sTitle:"Department",	mDataProp:"dname",						sClass:"hidden-xs",					fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span> " + $(nTd).html() + '</span>');}},
+													{sTitle:"Operator",		mDataProp:"opname",						sClass:"visible-md visible-lg",		fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span> " + $(nTd).html() + '</span>');}},
+													{sTitle:"Priority",		mDataProp:"priority",	sWidth:"80px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span> " + $(nTd).html() + '</span>');}},
+													{sTitle:"Status",		mDataProp:"status",		sWidth:"80px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}},
+													{sTitle:"Tooggle",		mDataProp:"action",		sWidth:"100px",	bSortable:!1,	bSearchable:!1,		fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Tooggle: </strong></span><span> " + $(nTd).html() + '</span>');}}
+												]
 											})
 									$(".rescont").css("display","block")
 								}

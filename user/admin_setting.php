@@ -86,147 +86,151 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	</head>
 	<body>
 		<div class="container">
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container">
-						<a class="btn btn-navbar hidden-desktop" data-toggle="collapse" data-target=".nav-collapse">
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class='container'>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
+							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
-						<div class="nav-collapse navbar-responsive-collapse collapse">
-							<ul class="nav">
-								<li><a href="../index.php"><i class="icon-home"></i>Home</a></li>
-								<?php if(isset($setting[9]) && $setting[9]==1){?>
-									<li><a href="faq.php"><i class="icon-flag"></i>FAQs</a></li>
-								<?php } ?>
-								<li><a href="newticket.php"><i class="icon-file"></i>New Ticket</a></li>
+							</button>
+							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+					</div>
+		  
+					<div class="collapse navbar-collapse" id="header-nav-collapse">
+						<ul class="nav navbar-nav">
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
+								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-folder-close"></i>Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="icon-th-list"></i> Tickets List</a>
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
 										</li>
 										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="icon-search"></i> Search Tickets</a>
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="icon-cog"></i>Settings</a></li>
-								<li><a href="users.php"><i class="icon-user"></i>Users</a></li>
-								<li class="dropdown active" role='button' >
-									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="icon-eye-open"></i>Administration<b class="caret"></b>
-									</a>
-									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-										<li role="presentation" class='active'>
-											<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="icon-globe"></i> Site Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="icon-briefcase"></i> Deaprtments Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="icon-envelope"></i> Mail Settings</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Payment Setting/List</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="icon-comment"></i> FAQs Managment</a>
-										</li>
-										<li role="presentation">
-											<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="icon-exclamation-sign"></i> Reported Tickets</a>
-										</li>
-									</ul>
-								</li>
-								<li><a href='#' onclick='javascript:logout();return false;'><i class="icon-off"></i>Logout</a></li>
-							</ul>
-						</div>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
+									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li class="dropdown active" role='button'>
+										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
+											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+											<li class="active" role="presentation">
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+											</li>
+											<li role="presentation">
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+											</li>
+										</ul>
+									</li>
+								<?php }} if(isset($_SESSION['name'])){ ?>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+								<?php } ?>
+						</ul>
 					</div>
 				</div>
-			</div>
+			</nav>
 			<div class='daddy'>
 				<hr>
 				<div class="jumbotron" >
-					<h2 class='pagefun'>Administration - Site Managment</h2>
+					<h1 class='pagefun'>Administration - Site Managment</h1>
 				</div>
 				<hr>
 				<form id='adminset' action=''>
 					<h3 class='sectname'>Site Information & Settings</h3>
-					<div class='row-fluid'>
-						<div class='span2'><label>Title</label></div>
-						<div class='span4'><input type="text" name='titsite' id="titsite" <?php if(isset($setting[0])) echo 'value="'.$setting[0].'"';?> ifplaceholder="Title" required/></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Title</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='titsite' id="titsite" <?php if(isset($setting[0])) echo 'value="'.$setting[0].'"';?> ifplaceholder="Title" required/></div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Time Zone</label></div>
-						<div class='span4'><input type="text" name='timezone' id="timezone" <?php if(isset($setting[4])) echo 'value="'.$setting[4].'"';?> ifplaceholder="Title" required/></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Time Zone</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='timezone' id="timezone" <?php if(isset($setting[4])) echo 'value="'.$setting[4].'"';?> ifplaceholder="Title" required/></div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Notifier Mail</label></div>
-						<div class='span4'><input type="text" name='notmail' id="notmail" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
-						<div class='span2'><label>Error Mail</label></div>
-						<div class='span4'><input type="text" name='errmail' id="errmail" <?php if(isset($setting[10])) echo 'value="'.$setting[10].'"';?> placeholder="Error Email" required /></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Notifier Mail</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='notmail' id="notmail" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
+						<div class='col-md-2'><label>Error Mail</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='errmail' id="errmail" <?php if(isset($setting[10])) echo 'value="'.$setting[10].'"';?> placeholder="Error Email" required /></div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Send Message on Reply</label></div>
-						<div class='span4'>
-							<select name='senrep' id='senrep'>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Send Message on Reply</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='senrep' id='senrep'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
 						</div>
-						<div class='span2'><label>Advise operator on New Assignment</label></div>
-						<div class='span4'>
-							<select name='senope' id='senope'>
+						<div class='col-md-2'><label>Advise operator on New Assignment</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='senope' id='senope'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
 						</div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Enable FAQs?</label></div>
-						<div class='span4'>
-							<select name='allfaq' id='allfaq'>
-								<option value='1'>Yes</option>
-								<option value='0'>No</option>
-							</select>
-						</div>
-					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Allow Upload?</label></div>
-						<div class='span4'>
-							<select name='allup' id='allup'>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Enable FAQs?</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='allfaq' id='allfaq'>
 								<option value='1'>Yes</option>
 								<option value='0'>No</option>
 							</select>
 						</div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Max File Size Allowed</label></div>
-						<div class='span4'>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Allow Upload?</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='allup' id='allup'>
+								<option value='1'>Yes</option>
+								<option value='0'>No</option>
+							</select>
+						</div>
+					</div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Max File Size Allowed</label></div>
+						<div class='col-md-4'>
 							<?php echo ini_get('upload_max_filesize'); ?>
 						</div>
-						<div class='span2'><label>Lower Max Size(MB)</label></div>
-						<div class='span4'><input type="text" name='maxsize' id="maxsize" <?php if(isset($setting[6])) echo 'value="'.($setting[6]/1048576).'"';?> placeholder="Lower File Size" /></div>
+						<div class='col-md-2'><label>Lower Max Size(MB)</label></div>
+						<div class='col-md-4'><input type="text" class='form-control'  name='maxsize' id="maxsize" <?php if(isset($setting[6])) echo 'value="'.($setting[6]/1048576).'"';?> placeholder="Lower File Size" /></div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Allow Opeartor Rating?</label></div>
-						<div class='span4'>
-							<select name='allrat' id='allrat'>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Allow Opeartor Rating?</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='allrat' id='allrat'>
 								<option value='0'>No</option>
 								<option value='1'>Yes</option>
 							</select>
 						</div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span2'><label>Command Line Option</label></div>
-						<div class='span3'>Usually <strong>php5-cli</strong> or <strong>php -f</strong></div><br/>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Command Line Option</label></div>
+						<div class='col-md-3'>Usually <strong>php5-cli</strong> or <strong>php -f</strong></div><br/>
 					</div>
-					<div class='row-fluid'>
-						<div class='span4'><input type="text" name='commlop' id="commlop" value="<?php if(isset($setting[8])) echo $setting[8]; else echo 'php5-cli'?>" placeholder="Command Line Option" required/></div>
+					<div class='row form-group'>
+						<div class='col-md-4'><input type="text" class='form-control'  name='commlop' id="commlop" value="<?php if(isset($setting[8])) echo $setting[8]; else echo 'php5-cli'?>" placeholder="Command Line Option" required/></div>
 					</div>
 					<input type="submit" class="btn btn-success" value='Save' id='saveopt'/>
 				</form>
@@ -235,13 +239,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<form action='../php/admin_function.php' method='POST' target='hidden_frame' enctype="multipart/form-data">
 					<input type='hidden' name='<?php echo $_SESSION['token']['act']; ?>' value='Doom' />
 					<h3 class='sectname'>Logo</h3>
-					<div class='row-fluid'>
-						<div class='span2'><label>Current Logo</label></div>
-						<div class='span12'><img src='<?php if(isset($logo) && rtrim($logo)!='') echo $logo;else echo "../css/logo/def/logo.png"; ?>' alt='Logo' id='cur_logo'/><br/><br/></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Current Logo</label></div>
+						<div class='col-md-12'><img src='<?php if(isset($logo) && rtrim($logo)!='') echo $logo;else echo "../css/logo/def/logo.png"; ?>' alt='Logo' id='cur_logo'/><br/><br/></div>
 					</div>
 					<br/><br/>
-					<div class='row-fluid'>
-						<div class='span2'><label>Select New Logo:</label></div><div class='span6'><input id="new_logo" name="new_logo" type="file" /></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Select New Logo:</label></div><div class='col-md-6'><input id="new_logo" name="new_logo" type="file" /></div>
 					</div>
 					<input type="submit" class="btn btn-success" value='Upload Logo' name='upload_logo'/>
 				</form>
@@ -249,17 +253,17 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<hr>
 				<form action='' method='POST'>
 					<h3 class='sectname'>Privacy Policy</h3>
-					<div class='row-fluid'>
-						<div class='span3'><label>Enable "Accept Privacy Policy"?</label></div>
-						<div class='span4'>
-							<select name='enprivacy' id='enprivacy'>
+					<div class='row form-group'>
+						<div class='col-md-3'><label>Enable "Accept Privacy Policy"?</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='enprivacy' id='enprivacy'>
 								<option value='1'>Yes</option>
 								<option value='0'>No</option>
 							</select>
 						</div>
 					</div>
-					<div class='row-fluid'>
-						<div class='span12'><textarea class='privacytext' id='privacytext' rows="5" placeholder='Privacy Policy Text' required><?php if(isset($privacy[1])) echo $privacy[1];?></textarea></div>	
+					<div class='row form-group'>
+						<div class='col-md-12'><textarea class='privacytext' id='privacytext' rows="5" placeholder='Privacy Policy Text' required><?php if(isset($privacy[1])) echo $privacy[1];?></textarea></div>	
 					</div>
 					<br/>
 					<input type="submit" class="btn btn-success" onclick='javascript:return !1;' value='Save' id='saveprivacyc'/>
@@ -268,27 +272,27 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<hr>
 				<form action='' method='POST'>
 					<h3 class='sectname'>Delete Tickets</h3>
-					<div class='row-fluid'>
-						<div class='span3'><label>Delete by</label></div>
-						<div class='span4'>
-							<select name='delby' id='delby'>
+					<div class='row form-group'>
+						<div class='col-md-3'><label>Delete by</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='delby' id='delby'>
 								<option value='1'>Last Reply</option>
 								<option value='0'>Opened Date</option>
 							</select>
 						</div>
 					</div>
 					<p>Tickets Status:</p>
-					<div class='row-fluid'>
-						<div class='span3'><input type="checkbox" name="stat[]" value="1"> Open</div>
-						<div class='span3'><input type="checkbox" name="stat[]" value="0"> Closed</div>
-						<div class='span3'><input type="checkbox" name="stat[]" value="2"> To Assign</div>
+					<div class='row form-group'>
+						<div class='col-md-3'><input type="checkbox" name="stat[]" value="1"> Open</div>
+						<div class='col-md-3'><input type="checkbox" name="stat[]" value="0"> Closed</div>
+						<div class='col-md-3'><input type="checkbox" name="stat[]" value="2"> To Assign</div>
 					</div>
 					<br/>
-					<div class='row-fluid'>
-						<div class='span2'><label>From Date</label></div>
-						<div class='span3'><input type="text" id="deltkfromdate" placeholder="Delete from Date" /></div>
-						<div class='span1'><label>to Date</label></div>
-						<div class='span3'><input type="text" id="deltktodeldate" placeholder="to Date" /></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>From Date</label></div>
+						<div class='col-md-3'><input type="text" class='form-control' id="deltkfromdate" placeholder="Delete from Date" /></div>
+						<div class='col-md-1'><label>to Date</label></div>
+						<div class='col-md-3'><input type="text" class='form-control' id="deltktodeldate" placeholder="to Date" /></div>
 					</div>
 					<input type="submit" class="btn btn-success" onclick='javascript:return !1;' value='Delete Tickects' id='deleteticket'/>
 				</form>
@@ -296,11 +300,11 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				<hr>
 				<form action='' method='POST'>
 					<h3 class='sectname'>Delete Uploaded File</h3>
-					<div class='row-fluid'>
-						<div class='span2'><label>From Date</label></div>
-						<div class='span3'><input type="text" id="delfromdate" placeholder="Delete from Date" /></div>
-						<div class='span1'><label>to Date</label></div>
-						<div class='span3'><input type="text" id="todeldate" placeholder="to Date" /></div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>From Date</label></div>
+						<div class='col-md-3'><input type="text" class='form-control' id="delfromdate" placeholder="Delete from Date" /></div>
+						<div class='col-md-1'><label>to Date</label></div>
+						<div class='col-md-3'><input type="text" class='form-control' id="todeldate" placeholder="to Date" /></div>
 					</div>
 					<input type="submit" class="btn btn-success" onclick='javascript:return !1;' value='Delete Files' id='deleteupload'/>
 				</form>
