@@ -73,9 +73,11 @@ else {
 						case 'pending':
 							$st=0;
 							break;
-						case 'partially_refunded':
 						case 'refunded':
 							$st=3;
+							break;
+						case 'partially_refunded':
+							$st=4;
 							break;
 						default:
 							$st=1;
