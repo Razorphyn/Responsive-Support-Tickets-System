@@ -168,7 +168,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 							<h1 class='titlesec'>New User</h1>
 							<div class='row form-group'>
 								<div class='col-md-2'><label for='rname'>Name</label></div>
-								<div class='col-md-4'><input type="text" class='form-control'  class='form-control' id="rname" placeholder="Name" autocomplete="off" required></div>
+								<div class='col-md-4'><input type="text" class='form-control'  id="rname" placeholder="Name" autocomplete="off" required></div>
 							</div>
 							<div class='row form-group'>
 								<div class='col-md-2'><label for='rmail'>Email</label></div>
@@ -181,8 +181,8 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 								<div class='col-md-4'><input type="password" class='form-control' id="rrpwd" placeholder="Repeat Password" autocomplete="off" required></div>
 							</div>
 							<?php if(isset($privacy[0]) && $privacy[0]==1){ ?>
-								Privacy Policy
-								<div class='row'>
+								<label>Privacy Policy</label>
+								<div class='row form-group'>
 									<div class='col-md-12 privacycont'><?php echo $privacy[1]; ?></div>
 								</div>
 								<div class='row form-group'>
@@ -193,7 +193,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 							<input type="submit" onclick='javascript:register();return false;' class="btn btn-success" value='Register'/>
 							<br/><br/>
 						</form>
-						<form class='sect pwdres' role='form'>
+						<form class='pwdres' role='form'>
 							<h1 class='titlesec'>Reset Password</h1>
 							<div class='row form-group'>
 								<div class='col-md-2'><label for='fname'>Name</label></div>
@@ -208,7 +208,9 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 						</form>
 						
 						<div class='row form-group act'>
-							<div class='col-md-2' ><span class='opthome' name='login'>Login</span></div><div class='col-md-2'><span class='opthome' name='register'>New User</span></div><div class='col-md-2'><span class='opthome' name='pwdres'>Reset Password?</span></div>
+							<div class='col-md-2' ><span class='opthome' name='login'>Login</span></div>
+							<div class='col-md-2'><span class='opthome' name='register'>New User</span></div>
+							<div class='col-md-2'><span class='opthome' name='pwdres'>Reset Password?</span></div>
 						</div>
 					</div>
 				<?php } ?>
@@ -249,7 +251,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 	
 		<?php } ?>
 		$(".opthome").on("click", function() { $(".activesec").removeClass("activesec").slideToggle(800); $('form[class*="' + $(this).attr("name") + '"]').slideToggle(800).addClass("activesec") });
-		
+		$('.register, .pwdres').slideToggle(400);
 		$(document).on('click','#resetpwd', function(){
 			$(".main").nimbleLoader("show", {position:"fixed",loaderClass:"loading_bar_body",hasBackground:true,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});
 			var mail=$('#fmail').val();

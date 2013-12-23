@@ -385,6 +385,95 @@ else{
 		}
 		exit();
 	}
+	
+	else if($_POST[$_SESSION['token']['act']]=='save_payment'){
+		if($_POST['gate']=='paypal'){
+			$currency=array("AUD",
+						"BRL",
+						"CAD",
+						"CZK",
+						"DKK",
+						"EUR",
+						"HKD",
+						"HUF",
+						"ILS",
+						"JPY",
+						"MYR",
+						"MXN",
+						"NOK",
+						"NZD",
+						"PHP",
+						"PLN",
+						"GBP",
+						"SGD",
+						"SEK",
+						"CHF",
+						"TWD",
+						"THB",
+						"TRY",
+						"USD"
+					);
+			$_POST['en']=(is_numeric($_POST['en'])) ? (($_POST['en']==1)? 1:0):exit();
+			$_POST['ensand']=(is_numeric($_POST['ensand'])) ? (($_POST['ensand']==1)? 1:0):exit();
+			$_POST['encurl']=(is_numeric($_POST['encurl'])) ? (($_POST['encurl']==1)? 1:0):exit();
+			$_POST['currency']=trim(strtoupper($_POST['currency']));
+			if(!in_array($_POST['currency'], $currency) || strlen($_POST['currency'])!=3){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Invalid Currency Code'));
+				exit();
+			}
+			
+			$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+			if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Invalid Mail'));
+				exit();
+			}
+			$info=array($_POST['en'],$_POST['mail'],$_POST['currency'],$_POST['ensand'],$_POST['encurl']);
+			$file='paypal.txt';
+		}
+		else if($_POST['gate']=='moneybookers'){
+			$currency=array("USD",
+							"CZK",
+							"EUR",
+							"GBP",
+							"HKD",
+							"THB",
+							"TWD"
+						);
+			$_POST['en']=(is_numeric($_POST['en'])) ? (($_POST['en']==1)? 1:0):exit();
+			$_POST['mer_id']=(is_numeric($_POST['mer_id']) && !empty($_POST['mer_id'])) ? $_POST['mer_id']:exit();
+			$_POST['currency']=trim(strtoupper($_POST['currency']));
+			if(!in_array($_POST['currency'], $currency) || strlen($_POST['currency'])!=3){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Invalid Currency Code'));
+				exit();
+			}
+			
+			$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
+			if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Invalid Mail'));
+				exit();
+			}
+			$info=array($_POST['en'],$_POST['mer_id'],$_POST['mail'],$_POST['currency'],$_POST['compname'],$_POST['encurl'],$_POST['mbsword']);
+			$file='paypal.txt';
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Wrong gateway Name'));
+			exit();
+		}
+		if(file_put_contents('config/payment/'.$file,implode("\n",$info))){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Saved'));
+		}
+		else{
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Cannot write on file, please check the path'));
+		}
+		exit();
+	}
 
 	else if($_POST[$_SESSION['token']['act']]=='save_stmp'){
 		if(is_file('config/mail/stmp.txt')){
@@ -805,10 +894,12 @@ else{
 			$STH->execute();
 			
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
+			$a = $STH->fetch();
 			$ret=array('res'=>'ok','rate'=>array());
-			$camaros=array();
-			while ($a = $STH->fetch()){
-				$ret['rate'][]=array($a['rate'],$a['note'],htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
+			if(!empty($a)){
+				while ($a = $STH->fetch()){
+					$ret['rate'][]=array($a['rate'],$a['note'],htmlspecialchars($a['mail'],ENT_QUOTES,'UTF-8'));
+				}
 			}
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($ret);

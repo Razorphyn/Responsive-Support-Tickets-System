@@ -323,7 +323,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		$('table:hidden').each(function(){
 			$(this).show(400);
 		});
-		
+
 		$("#payment_table").on("click", ".edituser", function () {
 			$(this).val();
 			var b = this.parentNode.parentNode.parentNode.parentNode,
@@ -455,12 +455,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				c=$("#mbmercid").val().replace(/\s+/g,""),
 				d=$("#mbmail").val().replace(/\s+/g,""),
 				e=$("#mbcurrency").val().replace(/\s+/g,""),
-				f=$("#mbcompanyname").val();
+				f=$("#mbcompanyname").val(),
+				g=$("#mbsword").val();
 			if(""!=a && ""!=c &&""!=d &&""!=e){
 				$.ajax({
 					type:"POST",
 					url:"../php/admin_function.php",
-					data:{<?php echo $_SESSION['token']['act']; ?>:"save_moneybookers",en:a,mer_id:c,mail:d,currency:e,compname:f},
+					data:{<?php echo $_SESSION['token']['act']; ?>:"save_payment",gate:'moneybookers',en:a,mer_id:c,mail:d,currency:e,compname:f,sword:g},
 					dataType:"json",
 					success:function(b){
 						if("Saved"==b[0])
@@ -501,7 +502,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				$.ajax({
 					type:"POST",
 					url:"../php/admin_function.php",
-					data:{<?php echo $_SESSION['token']['act']; ?>:"save_moneybookers",en:a,mer_id:c,mail:d,currency:e,compname:f},
+					data:{<?php echo $_SESSION['token']['act']; ?>:"save_payment",gate:'paypal',en:a,mail:c,currency:d,ensand:e,encurl:f},
 					dataType:"json",
 					success:function(b){
 						if("Saved"==b[0])

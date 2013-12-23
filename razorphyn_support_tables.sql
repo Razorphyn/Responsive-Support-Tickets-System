@@ -1,3 +1,12 @@
+CREATE TABLE IF NOT EXISTS `razorphyn_support_extension_version` (
+	`id` 					INT(1) 				UNSIGNED	NOT NULL DEFAULT 1,
+	`db_version` 			VARCHAR(11) 		NOT NULL,
+	PRIMARY KEY (`id`),
+	INDEX `info` (`db_version`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+INSERT INTO `razorphyn_support_extension_version` (`db_version`) VALUES ('1.0.3');
+
 CREATE TABLE IF NOT EXISTS `razorphyn_support_users` (
 	`id` 				BIGINT(15) 		UNSIGNED		NOT NULL AUTO_INCREMENT,
 	`name` 				VARCHAR(50) 					NOT NULL,
@@ -105,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_sales` (
 	`id` 				BIGINT(11) 		UNSIGNED	NOT NULL 	AUTO_INCREMENT,
 	`gateway` 			VARCHAR(60) 				NOT NULL,
 	`payer_mail` 		VARCHAR(50) 				NOT NULL,
-	`status` 			ENUM('0','1','2','3') 		NOT NULL 	DEFAULT '2',
+	`status` 			ENUM('0','1','2','3','4') 	NOT NULL,
 	`transaction_id` 	VARCHAR(40) 				NOT NULL,
 	`tk_id` 			BIGINT(15) 		UNSIGNED,
 	`user_id` 			BIGINT(15) 		UNSIGNED,
@@ -151,13 +160,3 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_faq_rate`(
 	PRIMARY KEY (`id`),
 	UNIQUE KEY(`faq_id`,`usr_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15;
-
-CREATE TABLE IF NOT EXISTS `razorphyn_support_moneybooker`(
-	`mail` 				INT(5)			UNSIGNED		NOT NULL,
-	`usr_id` 			BIGINT(15) 		UNSIGNED		NOT NULL,
-	`rate` 				DECIMAL(4,2) 	UNSIGNED		NOT NULL	DEFAULT 0,
-	`updated` 			ENUM('0','1') 					NOT NULL 	DEFAULT '0',
-	`note` 				VARCHAR(200) 					,
-	UNIQUE KEY(`faq_id`,`usr_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-

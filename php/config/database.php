@@ -18,5 +18,6 @@
 	$SupportRateTable = "razorphyn_support_operator_rate";
 	$SupportFaqTable = "razorphyn_support_faq";
 	$SupportRateFaqTable = "razorphyn_support_faq_rate";
-	$SupportSalesTable = "razorphyn_support_faq_rate";
+	$SupportSalesTable = "razorphyn_support_sales";
+	$SupportVersionTable = "razorphyn_support_extension_version";
 ?>

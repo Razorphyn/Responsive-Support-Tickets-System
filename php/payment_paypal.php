@@ -60,7 +60,6 @@ else {
 		if (strcmp ($res, 'VERIFIED') == 0) {
 			if(check_txnid($_POST['txn_id']) && check_price($_POST['mc_gross'],$_POST['custom']) && $paypal_setting[2]==$_POST['mc_currency'] && $_POST['receiver_email']==$paypal_setting[1]){
 					$date= date("Y-m-d H:i:s");
-					$query = "INSERT INTO ".$SupportSalesTable."(`gateway`,`payer_mail`,`status`,`transaction_id`,`tk_id`,`user_id`,`amount`,`support_time`,`payment_date`) VALUES ('PayPal',?,?,?,?,(SELECT user_id FROM ".$SupportTicketsTable." WHERE id=?),?,?,?)";
 					switch(strtolower($_POST['payment_status'])){
 						case 'completed':
 							$st=2;
@@ -84,22 +83,28 @@ else {
 							mail($adminmail[10],'Payment Error',$message,$headers);
 					}
 					try{
-						$STH = $DBH->prepare($query);
-						$STH->bindParam(1,$_POST['payer_email'],PDO::PARAM_STR);
-						$STH->bindParam(2,$st,PDO::PARAM_STR);
-						$STH->bindParam(3,$_POST['txn_id'],PDO::PARAM_STR);
-						$STH->bindParam(4,$_POST['item_number'],PDO::PARAM_STR);
-						$STH->bindParam(5,$userid,PDO::PARAM_INT);
-						$STH->bindParam(6,$_POST['mc_gross'],PDO::PARAM_STR);
-						$STH->bindParam(7,$minutes,PDO::PARAM_INT);
-						$STH->bindParam(8,$date,PDO::PARAM_STR);
-						$STH->execute();
-
-						if($st==2){
-							$query = "UPDATE ".$SupportTicketsTable." SET enabled='1' WHERE `id`=? LIMIT 1";
+						if($t
+							$query = "INSERT INTO ".$SupportSalesTable."
+													(`gateway`,`payer_mail`,`status`,`transaction_id`,`tk_id`,`user_id`,`amount`,`support_time`,`payment_date`) 
+												VALUES 
+													('PayPal',?,?,?,?,(SELECT user_id FROM ".$SupportTicketsTable." WHERE id=?),?,?,?)";
 							$STH = $DBH->prepare($query);
-							$STH->bindParam(1,$_POST['item_number'],PDO::PARAM_INT);
+							$STH->bindParam(1,$_POST['payer_email'],PDO::PARAM_STR);
+							$STH->bindParam(2,$st,PDO::PARAM_STR);
+							$STH->bindParam(3,$_POST['txn_id'],PDO::PARAM_STR);
+							$STH->bindParam(4,$_POST['item_number'],PDO::PARAM_STR);
+							$STH->bindParam(5,$userid,PDO::PARAM_INT);
+							$STH->bindParam(6,$_POST['mc_gross'],PDO::PARAM_STR);
+							$STH->bindParam(7,$minutes,PDO::PARAM_INT);
+							$STH->bindParam(8,$date,PDO::PARAM_STR);
 							$STH->execute();
+
+							if($st==2){
+								$query = "UPDATE ".$SupportTicketsTable." SET enabled='1' WHERE `id`=? LIMIT 1";
+								$STH = $DBH->prepare($query);
+								$STH->bindParam(1,$_POST['item_number'],PDO::PARAM_INT);
+								$STH->execute();
+							}
 						}
 						exit();
 					}

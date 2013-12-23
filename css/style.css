@@ -28,9 +28,8 @@ table tr{text-align:center!important}
 .jumbotron {text-align: center!important;}
 .jumbotron h1 {font-size: 2.3em!important;line-height: 1!important;font-weight: 700!important}.
 
-.register{display:none}
-.privacycont{max-height:200px;overflow:auto;padding:20px;border: 1px solid #ccc}
-.pwdres{display:none}
+.privacycont{max-height:200px!important;overflow:auto!important;padding:20px!important;border: 2px solid #ccc!important-webkit-border-radius: 5px;border-radius: 5px;behavior: url(PIE.htc)}
+
 .opthome{cursor:pointer}
 .opthome:hover{color:#F2860A}
 .act{margin-top:1.85% 1.04%}
@@ -38,7 +37,7 @@ table tr{text-align:center!important}
 #loading{position:relative;display:block;margin:0 auto}
 .loading{position:relative;display:block;margin:0 auto}
 
-.user_depa_container{margin:2.8% 0;padding:0.93% 0.52%;width:100%;border:1px solid #000;-webkit-border-radius: 5px;border-radius: 5px;behavior: url(../css/PIE.htc)}
+.user_depa_container{margin:2.8% 0;padding:0.93% 0.52%;width:100%;border:1px solid #000;-webkit-border-radius: 5px;border-radius: 5px;behavior: url(PIE.htc)}
 .pagefun{color:#CC3333!important}
 .sectname{color:#f2860a}
 
