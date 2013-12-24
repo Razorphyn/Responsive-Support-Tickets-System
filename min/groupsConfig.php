@@ -12,11 +12,11 @@
  **/
 
 return array(
-	'css_i' => array('//css/style.css','//css/bootstrap.css','//css/bootstrap-responsive.css'),
-	'css_d' => array('//lib/DataTables/css/jquery.dataTables.css','//css/jquery-ui-1.10.3.custom.css'),
+	'css_i' => array('//css/style.css','//css/bootstrap.css'),
+	'css_d' => array('//lib/DataTables/css/jquery.dataTables.css','//css/bootstrap_datatables.css','//css/jquery-ui-1.10.3.custom.css'),
 	'css_m' => array('//css/bootstrap-wysihtml5.css'),
 	
 	'js_i' => array('//js/jquery-1.10.2.js','//js/bootstrap.min.js','//js/noty/jquery.noty.js','//js/noty/layouts/top.js','//js/noty/themes/default.js','//js/jquery.nimble.loader.js'),
 	'js_m' => array('//js/wysihtml5-0.3.0.min.js','//js/bootstrap-wysihtml5.js'),
-	'js_d' => array('//lib/DataTables/js/jquery.dataTables.min.js','//js/jquery-ui-1.10.3.custom.min.js')
+	'js_d' => array('//lib/DataTables/js/jquery.dataTables.min.js','//js/bootstrap_datatables.js','//js/jquery-ui-1.10.3.custom.min.js')
 );

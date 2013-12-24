@@ -193,6 +193,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 									<div class='col-md-2'><label for='depname'>Name</label></div>
 									<div class='col-md-4'><input type="text" class='form-control'  name='depname' id="depname" placeholder="Department Name" required /></div>
 								</div>
+								
 								<div class='row form-group'>
 									<div class='col-md-2'><label for='activedep'>Is Active?</label></div>
 									<div class='col-md-4'>
@@ -209,6 +210,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 										</select>
 									</div>
 								</div>
+								
 								<div class='row form-group'>
 									<div class='col-md-2'><label for='freedep'>Is Free?</label></div>
 									<div class='col-md-4'>
@@ -217,7 +219,17 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 											<option value='0'>No</option>
 										</select>
 									</div>
+									<div class='optprem'>
+										<div class='col-md-2'><label for='depratetab'>Rate Rules</label></div>
+										<div class='col-md-4'>
+											<select class='form-control'  name='depratetab' id='depratetab'>
+												<option value='1'>Pay per Minute</option>
+												<option value='0'>Fixed Minute Quantity</option>
+											</select>
+										</div>
+									</div>
 								</div>
+								
 							<input type="submit" class="btn btn-success" value='Add New Department' onclick='javascript:return false;' id='btnadddep'/>
 						</form>
 					<?php
@@ -236,13 +248,26 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
 	
 	<script>
-	 $(document).ready(function() {
+	$('.optprem').css('display','none');
+	$(document).ready(function() {
 		var table=$("#deptable").dataTable({
-											sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-											sWrapper:"dataTables_wrapper form-inline",
 											bDestroy:!0,
 											bProcessing:!0,
 											oLanguage:{sEmptyTable:"No Departments"},
+											fnPreDrawCallback: function(oSettings, json) {
+												$('.dataTables_filter').addClass('col-xs-12'),
+												$('.dataTables_filter input').addClass('form-control'),
+												$('.dataTables_filter input').unwrap(),
+												$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+												$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+												$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+												$('.dataTables_length').addClass('col-xs-12'),
+												$('.dataTables_length select').addClass('form-control'),
+												$('.dataTables_length select').unwrap(),
+												$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+												$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+												$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+											},
 											aoColumns:[
 												{sTitle:"ID",mDataProp:"id",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>ID: </strong></span><span> " + $(nTd).html() + '</span>');}},
 												{sTitle:"Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}},
@@ -254,7 +279,17 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 								});
 		$("#loading").remove(),
 		$("#deptable").show(800);
-				
+		
+		$('#freedep').change(function(){
+			if($('#freedep').val()==0){
+				$('.optprem').slideToggle(800),
+				$('#freedep').parent().parent().after('<div class="row form-group"><div class="col-xs-2"><label for="depratelist">Price</label><p>[price]:[minute]<br/>"Fixed Minute Quantity" each row is an option</p></div><div class="col-xs-10"><textarea id="depratelist" name="depratelist" class="form-control"></textarea></div></div> ')
+			}
+			else{
+				$('.optprem').slideToggle(800)
+			}
+		});
+
 		$("#deptable").on("click", ".editdep", function () {
 			$(this).val();
 			var a = this.parentNode.parentNode.parentNode.parentNode,
@@ -358,12 +393,14 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 			var b = $("#depname").val().replace(/\s+/g, " "),
 				c = $("#activedep").val(),
 				d = $("#publicdep").val(),
-				e = $("#freedep").val();
+				e = $("#freedep").val(),
+				f = $("#depratetab").val(),
+				g = $("#depratelist").val(),
 			if(b.replace(/\s+/g, "")!=""){
 				$.ajax({
 					type: "POST",
 					url: "../php/admin_function.php",
-					data: { <?php echo $_SESSION['token']['act']; ?> : "add_depart",tit: b,active: c,pubdep: d,freedep: e},
+					data: { <?php echo $_SESSION['token']['act']; ?> : "add_depart",tit: b,active: c,pubdep: d,freedep: e, ratetype:f, ratetable:g},
 					dataType: "json",
 					success: function (a) {
 						if("Added" == a.response){

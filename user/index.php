@@ -397,7 +397,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			</div>
 		</div>
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js&amp;5259487' ?>"></script>
+	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
 		//var utab,otab,atab;
@@ -405,56 +405,92 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<?php if($_SESSION['status']==0){ ?>
 					
 						var utab=$("#usertable").dataTable({
-								sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
 								bProcessing:true,
 								aaSorting:[[2,"desc"]],
 								oLanguage:{sEmptyTable:"No Tickets"},
-									aoColumns:[
-										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
-									]
+								fnPreDrawCallback: function(oSettings, json) {
+									$('.dataTables_filter').addClass('col-xs-12'),
+									$('.dataTables_filter input').addClass('form-control'),
+									$('.dataTables_filter input').unwrap(),
+									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+									$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+									$('.dataTables_length').addClass('col-xs-12'),
+									$('.dataTables_length select').addClass('form-control'),
+									$('.dataTables_length select').unwrap(),
+									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+								},
+								aoColumns:[
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+								]
 						});
 						
 					<?php } else if($_SESSION['status']==1){ ?>
 					
 						var utab=$("#usertable").dataTable({
-										sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-										sWrapper:"dataTables_wrapper form-inline",
 										bDestroy:true,
 										bProcessing:true,
 										aaSorting:[[2,"desc"]],
 										oLanguage:{sEmptyTable:"No Tickets"},
-											aoColumns:[
-												{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-												{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"User",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-												{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
-											]
+										fnPreDrawCallback: function(oSettings, json) {
+											$('.dataTables_filter').addClass('col-xs-12'),
+											$('.dataTables_filter input').addClass('form-control'),
+											$('.dataTables_filter input').unwrap(),
+											$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+											$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+											$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+											$('.dataTables_length').addClass('col-xs-12'),
+											$('.dataTables_length select').addClass('form-control'),
+											$('.dataTables_length select').unwrap(),
+											$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+											$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+											$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+										},
+										aoColumns:[
+											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+											{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"User",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+										]
 									}),
 						
 							otab=$("#operatortable").dataTable({
-										sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-										sWrapper:"dataTables_wrapper form-inline",
 										bDestroy:true,
 										bProcessing:true,
 										aaSorting:[[2,"desc"]],
 										oLanguage:{sEmptyTable:"No Tickets"},
+										fnPreDrawCallback: function(oSettings, json) {
+											$('.dataTables_filter').addClass('col-xs-12'),
+											$('.dataTables_filter input').addClass('form-control'),
+											$('.dataTables_filter input').unwrap(),
+											$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+											$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+											$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+											$('.dataTables_length').addClass('col-xs-12'),
+											$('.dataTables_length select').addClass('form-control'),
+											$('.dataTables_length select').unwrap(),
+											$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+											$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+											$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+										},
 										aoColumns:[
 											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Operator",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Operator",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 										]
@@ -463,54 +499,90 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<?php } else if($_SESSION['status']==2){ ?>
 
 						var utab=$("#usertable").dataTable({
-								sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
 								bProcessing:true,
 								aaSorting:[[2,"desc"]],
 								oLanguage:{sEmptyTable:"No Tickets"},
-									aoColumns:[
-										{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-										{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Operator",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-										{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
-									]
+								fnPreDrawCallback: function(oSettings, json) {
+									$('.dataTables_filter').addClass('col-xs-12'),
+									$('.dataTables_filter input').addClass('form-control'),
+									$('.dataTables_filter input').unwrap(),
+									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+									$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+									$('.dataTables_length').addClass('col-xs-12'),
+									$('.dataTables_length select').addClass('form-control'),
+									$('.dataTables_length select').unwrap(),
+									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+								},
+								aoColumns:[
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+								]
 							}),
 						
 						otab=$("#operatortable").dataTable({
-								sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
 								bProcessing:true,
 								aaSorting:[[2,"desc"]],
 								oLanguage:{sEmptyTable:"No Tickets"},
+								fnPreDrawCallback: function(oSettings, json) {
+									$('.dataTables_filter').addClass('col-xs-12'),
+									$('.dataTables_filter input').addClass('form-control'),
+									$('.dataTables_filter input').unwrap(),
+									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+									$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+									$('.dataTables_length').addClass('col-xs-12'),
+									$('.dataTables_length select').addClass('form-control'),
+									$('.dataTables_length select').unwrap(),
+									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+								},
 								aoColumns:[
 									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"User",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"User",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 								]
 							}),
 						
 						atab=$("#admintable").dataTable({
-								sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-								sWrapper:"dataTables_wrapper form-inline",
 								bDestroy:true,
 								bProcessing:true,
 								aaSorting:[[2,"desc"]],
 								oLanguage:{sEmptyTable:"No Tickets"},
+								fnPreDrawCallback: function(oSettings, json) {
+									$('.dataTables_filter').addClass('col-xs-12'),
+									$('.dataTables_filter input').addClass('form-control'),
+									$('.dataTables_filter input').unwrap(),
+									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+									$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+									$('.dataTables_length').addClass('col-xs-12'),
+									$('.dataTables_length select').addClass('form-control'),
+									$('.dataTables_length select').unwrap(),
+									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+								},
 								aoColumns:[
 									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",sClass:"visible-md",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Operator",mDataProp:"opname", sClass:"visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 								]

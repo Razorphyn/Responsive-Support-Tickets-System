@@ -95,7 +95,7 @@ try{
 							'amount'=>$a['amount'],
 							'support_time'=>$a['support_time'],
 							'payment_date'=>$a['payment_date'],
-							'action'=>'<div class="btn-group"><button class="btn btn-info edituser" value="'.$a['id'].'"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="'.$a['id'].'"><i class="icon-remove"></i></button></div>'
+							'action'=>'<div class="btn-group"><button class="btn btn-info edituser" value="'.$a['id'].'"><i class="glyphicon glyphicon-eye-open"></i></button><button class="btn btn-danger remuser" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 						);
 			$c++;
 		}while ($a = $STH->fetch());
@@ -303,20 +303,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		<?php } ?>
 
 		var table = $("#payment_table").dataTable({
-						sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-						sWrapper: "dataTables_wrapper form-inline",
 						bProcessing: !0,
 						oLanguage: {sEmptyTable: "No Payments"},
+						fnPreDrawCallback: function(oSettings, json) {
+							$('.dataTables_filter input').addClass('form-control'),
+							$('.dataTables_length select').addClass('form-control')
+						},
 						aoColumns: [
-							{sTitle: "ID",			mDataProp: "id",				sWidth: "25px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>ID: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Date",		mDataProp: "payment_date",		sWidth: "100px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Date: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Gateway",		mDataProp: "gateway",			sWidth: "120px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Gateway: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Status",		mDataProp: "status",			sWidth: "50px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Mail",		mDataProp: "payer_mail",		sWidth: "100px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Payment ID",	mDataProp: "transaction_id",	sWidth: "150px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Payment ID: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Amount",		mDataProp: "amount",			sWidth: "50px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Amount: </strong></span><span> " + $(nTd).html() + '</span>');}},
-							{sTitle: "Time",		mDataProp: "support_time",		sWidth: "60px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Time: </strong></span><span> " + $(nTd).html() + '</span>');}},
-							{sTitle: "Tooggle",		mDataProp: "action",			sWidth: "100px",bSortable: !1,	bSearchable: !1,	fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
+							{sTitle: "ID",			mDataProp: "id",								sWidth: "25px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>ID: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Date",		mDataProp: "payment_date",						sWidth: "100px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Date: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Gateway",		mDataProp: "gateway",							sWidth: "120px",									fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Gateway: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Status",		mDataProp: "status",							sWidth: "50px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Mail",		mDataProp: "payer_mail",		bVisible: !1,														fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Payment ID",	mDataProp: "transaction_id",	bVisible: !1,														fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Payment ID: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Amount",		mDataProp: "amount",							sWidth: "80px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Amount: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle: "Time",		mDataProp: "support_time",						sWidth: "80px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Time: </strong></span><span> " + $(nTd).html() + '</span>');}},
+							{sTitle: "Tooggle",		mDataProp: "action",							sWidth: "100px",bSortable: !1,	bSearchable: !1,	fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
 						]
 					});
 		$('.loading').remove();

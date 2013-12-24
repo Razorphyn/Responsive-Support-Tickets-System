@@ -506,12 +506,24 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								$(".loading:first").remove(); 
 								if("ret"==data.response||"empty"==data.response){
 									table=$("#restable").dataTable({
-												sDom:"<<'col-xs-12'l><'col-xs-12'f>r>t<<'col-xs-12'i><'col-xs-12'p>>",
-												sWrapper:"dataTables_wrapper form-inline",
 												bDestroy:!0,
 												bProcessing:!0,
 												aaData:data.search,
 												oLanguage:{sEmptyTable:"No Results"},
+												fnPreDrawCallback: function(oSettings, json) {
+													$('.dataTables_filter').addClass('col-xs-12'),
+													$('.dataTables_filter input').addClass('form-control'),
+													$('.dataTables_filter input').unwrap(),
+													$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+													$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+													$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+													$('.dataTables_length').addClass('col-xs-12'),
+													$('.dataTables_length select').addClass('form-control'),
+													$('.dataTables_length select').unwrap(),
+													$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+													$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+													$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+												},						
 												aoColumns:[
 													{sTitle:"Title",		mDataProp:"title",															fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span> " + $(nTd).html() + '</span>');}},
 													{sTitle:"Created Date",	mDataProp:"date",		sWidth:"140px",	sClass:"visible-md visible-lg",		fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},

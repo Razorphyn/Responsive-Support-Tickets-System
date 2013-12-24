@@ -164,6 +164,7 @@ else{
 		$_POST['active']=($_POST['active']==1)? 1:0;
 		$_POST['pubdep']=($_POST['pubdep']==1)? 1:0;
 		$_POST['freedep']=($_POST['freedep']==1)? 1:0;
+		$_POST['ratetype']=($_POST['ratetype']==1)? 1:0;
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -175,12 +176,14 @@ else{
 			$STH->bindParam(3,$_POST['pubdep'],PDO::PARAM_STR);
 			$STH->bindParam(4,$_POST['freedep'],PDO::PARAM_STR);
 			$STH->execute();
+
 			$data=array();
 			$data['response']='Added';
 			$dpid=$DBH->lastInsertId();
 			$_POST['active']=($_POST['active']==0) ? 'No':'Yes';
 			$_POST['pubdep']=($_POST['pubdep']==0) ? 'No':'Yes';
 			$_POST['freedep']=($_POST['freedep']==0) ? 'No':'Yes';
+			file_put_contents('config/price/'.$dpid,$_POST['ratetable']);
 			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pubdep'],'free'=>$_POST['freedep']);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($data);
@@ -892,7 +895,7 @@ else{
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
-			
+
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
 			$ret=array('res'=>'ok','rate'=>array());

@@ -59,6 +59,7 @@ table tr{text-align:center!important}
 
 .loading_bar_body {height: 100%;width: 100%;top:0;left:0;background: url(images/ajax-loader.gif) no-repeat 50% 50%;}
 
+table{margin:20px 0!important}
 table.dataTable tr.odd td.sorting_1 {background-color:#F9F9F9 !important}
 table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
 

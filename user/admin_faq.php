@@ -263,10 +263,22 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script>
 	 $(document).ready(function() {
 		var table = $("#faqtable").dataTable({
-									sDom: "<<'col-md-6'l><'col-md-6'f>r>t<<'col-md-6'i><'col-md-6'p>>",
-									sWrapper: "dataTables_wrapper form-inline",
 									bProcessing: !0,
 									oLanguage: {sEmptyTable: "No FAQs"},
+									fnPreDrawCallback: function(oSettings, json) {
+										$('.dataTables_filter').addClass('col-xs-12'),
+										$('.dataTables_filter input').addClass('form-control'),
+										$('.dataTables_filter input').unwrap(),
+										$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+										$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+										$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+										$('.dataTables_length').addClass('col-xs-12'),
+										$('.dataTables_length select').addClass('form-control'),
+										$('.dataTables_length select').unwrap(),
+										$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+										$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+										$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
+									},
 									aoColumns: [
 										{sTitle: "ID",mDataProp: "id",sWidth: "60px",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-xs'>ID: </strong></span><span> " + $(a).html() + "</span>")}}, 
 										{sTitle: "Question",mDataProp: "question",fnCreatedCell: function (a, b, c, d, e) {$(a).html("<span><strong class='visible-xs'>Question: </strong></span><span> " + $(a).html() + "</span>")}}, 

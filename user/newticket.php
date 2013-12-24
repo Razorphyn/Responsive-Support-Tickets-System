@@ -152,7 +152,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								<h3 class='sectname'>Ticket Information</h3>
 								<div class='row form-group'>
 									<div class='col-md-2'><label for='title'>Title</label></div>
-									<div class='col-md-4'><input type="text" class='form-control'  name='title' id="title" placeholder="Title" required /></div>
+									<div class='col-md-10'><input type="text" class='form-control'  name='title' id="title" placeholder="Title" required /></div>
 								</div>
 								<div class='row form-group'>
 									<div class='col-md-2'><label for='deplist'>Departement</label></div>
@@ -174,7 +174,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								<h3 class='sectname'>Website Information</h3>
 								<div class='row form-group'>
 									<div class='col-md-2'><label for='wsurl'>URL</label></div>
-									<div class='col-md-4'><input type="url" name='wsurl' id="wsurl" placeholder="Website URL"/></div>
+									<div class='col-md-4'><input type="url" name='wsurl' class='form-control' id="wsurl" placeholder="Website URL"/></div>
 								</div>
 								<div class='row form-group'>
 									<div class='col-md-2'><label for='contype'>Connection Type</label></div><div class='col-md-4'><select class='form-control'  name="contype" id="contype"><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
@@ -188,17 +188,16 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								<br/><br/>
 								<h3 class='sectname'>Message</h3>
 								<div class='row form-group'>
-										<div class='col-md-12 nwm'></div>
+										<div class='col-md-12 nwm'><textarea name='message' id='message' rows='5' placeholder='Your Message'> </textarea></div>
 								</div>
 								<br/>
 								<?php if(isset($setting[5]) && $setting[5]==1){ ?>
+								<h3 class='sectname'>Attachments</h3>
+								<span class='attlist'></span>
+								<p>To select multiple files: press ctrl+click on the chosen file</p>
 								<div class='row form-group'>
-									<h3 class='sectname'>Attachments</h3>
-									<span class='attlist'></span>
-									<br/>
-									<p>To select multiple files: press ctrl+click on the chosen file</p>
-									<br/>
-									<input id='fielduploadinput' type="file" name="filename[]" multiple /> <span id='resetfile' class='btn btn-danger'>Reset</span>
+									<div class='col-xs-4'><input id='fielduploadinput' type="file" name="filename[]" multiple /></div>
+									<div class='col-xs-offset-1 col-xs-3'><span id='resetfile' class='btn btn-danger'>Reset</span></div>
 								</div>
 								<?php } ?>
 								<br/><br/>
@@ -227,13 +226,11 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					success: function (a) {
 						if("ret" == a.response){
 							$("#loading").remove();
-							$.when($('.nwm').append("<textarea name='message' id='message' rows='5' placeholder='Your Message'> </textarea>")).then(
 							<?php if (!$isMob) { ?> 
 								CKEDITOR.replace('message')
 							<?php } else { ?> 
 							$("#message").wysihtml5()
 							<?php } ?> 
-							);
 							$("#deplist").html("<select class='form-control'  name='dep' id='dep'>" + a.information + "</select>");
 						}
 						else if("empty" == a.response){
