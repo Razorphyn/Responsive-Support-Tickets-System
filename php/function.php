@@ -153,7 +153,7 @@ if($_POST[$_SESSION['token']['act']]=='register'){
 			}
 			else{
 				header('Content-Type: application/json; charset=utf-8');
-				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			}
 			$DBH=null;
@@ -191,7 +191,7 @@ else if(isset($_SESSION['status']) && $_SESSION['status']==3 && $_POST[$_SESSION
 			echo json_encode(array(0=>'Sent'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
@@ -239,7 +239,7 @@ else if(!isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='login
 		}
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
@@ -290,7 +290,7 @@ else if(isset($_POST['key']) && $_POST[$_SESSION['token']['act']]=='activate_acc
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
@@ -332,7 +332,7 @@ else if($_POST[$_SESSION['token']['act']]=='verify' && isset($_SESSION['status']
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
@@ -393,7 +393,7 @@ else if($_POST[$_SESSION['token']['act']]=='forgot'){
 		}
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
@@ -435,7 +435,7 @@ else if($_POST[$_SESSION['token']['act']]=='reset_password'){
 			echo json_encode(array(0=>'Updated'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
@@ -524,7 +524,7 @@ else if($_POST[$_SESSION['token']['act']]=='del_account'){//check
 		}
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 	}
@@ -693,7 +693,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 								$STH->execute();
 							}
 							catch(PDOException $e){
-								file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+								file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 								echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "An error has occurred, please contact the administrator.",type:"error",timeout:9000});</script>';
 							}
 						}
@@ -809,7 +809,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 			if ($e->errorInfo[1] == 1062)
 				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "You have already created a Ticket named: '.$_POST['title'].'",timeout:2000});</script>';
 			else{
-				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "We are sorry, but an error has occurred, please contact the administrator if it persist",type:"information",timeout:2000});</script>';
 			}
 		}
@@ -877,7 +877,7 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 						echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket",type:"error",timeout:9000});</script>';
 					}
 					catch(PDOException $e){
-						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 						echo '<script>parent.noty({text: "Cannot Automatically Reopen ticket",type:"error",timeout:9000});</script>';
 					}
 				}
@@ -973,7 +973,7 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 									}
 								}
 								catch(PDOException $e){
-									file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+									file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 									echo '<script>parent.$(".main").nimbleLoader("hide");parent.noty({text: "An error has occurred, please contact the administrator.",type:"error",timeout:9000});</script>';
 								}
 							}
@@ -1013,7 +1013,7 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 				//end
 			}
 			catch(PDOException $e){
-				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				echo '<script>parent.$("#formreply").nimbleLoader("hide");parent.noty({text: "We are sorry, but an error has occured, please contact the adminsitrator",type:"error",timeout:9000});</script>';
 			}
 		}
@@ -1102,7 +1102,7 @@ else if( $_POST[$_SESSION['token']['act']]=='delete_ticket' && $_SESSION['status
 		echo json_encode(array(0=>'Deleted'));
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
@@ -1159,7 +1159,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_depart' && isset($_SESSION['
 		}
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
@@ -1169,7 +1169,6 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_depart' && isset($_SESSION['
 
 else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION['status'])  && $_SESSION['status']<3){
 	if(!is_numeric($_POST['stat']) || $_POST['stat']>2 || $_POST['stat']<0){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'Wrong Status Code'));
 		exit();
@@ -1299,7 +1298,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 		}
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
@@ -1366,7 +1365,7 @@ else if($_POST['action']=='scrollpagination' && isset($_POST['action']) && isset
 						}
 					}
 					catch(PDOException $e){
-						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 					}
 					
 				}
@@ -1378,7 +1377,7 @@ else if($_POST['action']=='scrollpagination' && isset($_POST['action']) && isset
 				echo json_encode(array('ret'=>'End'));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
@@ -1479,7 +1478,7 @@ else if($_POST[$_SESSION['token']['act']]=='save_setting' && isset($_SESSION['st
 			echo json_encode(array(0=>"User with mail: ".$_POST['mail']." is already registred"));
 		}
 		else{
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
@@ -1574,7 +1573,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_status' && isset($_SESSION['s
 		echo json_encode(array(0=>'Saved'));
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
@@ -1658,7 +1657,7 @@ else if($_POST[$_SESSION['token']['act']]=='move_opera_ticket' && isset($_SESSIO
 		echo json_encode(array(0=>'Moved'));
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
@@ -1692,7 +1691,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_title' && isset($_SESS
 		echo json_encode(array(0=>'Updated',1=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8')));
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
@@ -1743,7 +1742,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_connection' && isset($
 		echo json_encode(array(0=>'Updated'));
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
@@ -1796,7 +1795,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 		}
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		echo '<script>parent.noty({text: "We are sorry, but an error has occurred, please contact the administrator if it persist",type:"error",timeout:9000});</script>';
 	}
@@ -1904,7 +1903,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESS
 		echo json_encode(array(0=>'Saved',1=>array($_POST['id'],htmlspecialchars($_POST['title'],ENT_QUOTES,'UTF-8'),$_POST['priority'],$_POST['status'])));
 	}
 	catch(Exception $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
@@ -1954,7 +1953,7 @@ else if($_POST['act']=='rating' && isset($_SESSION['status']) && $_SESSION['stat
 			echo json_encode(array(0=>'Voted'));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 		}
@@ -2017,7 +2016,7 @@ else if($_POST['act']=='faq_rating' && isset($_POST['act']) && isset($_SESSION['
 			echo json_encode(array(0=>'Voted'));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			$DBH=null;
 			
 			header('Content-Type: application/json; charset=utf-8');
@@ -2207,7 +2206,7 @@ else if($_POST[$_SESSION['token']['act']]=='search_ticket' && isset($_SESSION['s
 			echo json_encode($list);
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 	}
@@ -2261,7 +2260,7 @@ else if($_POST[$_SESSION['token']['act']]=='report_ticket' && isset($_SESSION['s
 			echo json_encode(array(0=>'Submitted'));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			$DBH=null;
@@ -2335,7 +2334,7 @@ else if($_POST[$_SESSION['token']['act']]=='del_post_file' && isset($_SESSION['s
 		}
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 	}
 	exit();
@@ -2391,7 +2390,7 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 			return 'No Operator Available';
 	}
 	catch(PDOException $e){
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$DBH=null;
 		return $e->getMessage();
 	}

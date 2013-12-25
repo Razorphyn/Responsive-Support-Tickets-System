@@ -144,7 +144,7 @@ else{
 				echo json_encode(array(0=>"User with mail: ".htmlspecialchars($_POST['mail'],ENT_QUOTES,'UTF-8')." is already registred"));
 			}
 			else{
-				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
 			}
@@ -194,7 +194,7 @@ else{
 				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8')." already exist"));
 			}
 			else{
-				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
@@ -237,7 +237,7 @@ else{
 				echo json_encode(array(0=>"Department name: ".json_encode($_POST['name'])." already exist"));
 			}
 			else{
-				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
@@ -268,7 +268,7 @@ else{
 				echo json_encode(array(0=>'Deleted'));
 			}
 			catch(PDOException $e){  
-				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
@@ -340,7 +340,7 @@ else{
 				}
 			}
 			catch(PDOException $e){  
-				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
@@ -829,7 +829,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -868,7 +868,7 @@ else{
 			echo json_encode($ret);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -908,7 +908,7 @@ else{
 			echo json_encode($ret);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -971,7 +971,7 @@ else{
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1022,7 +1022,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -1088,7 +1088,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1182,7 +1182,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1239,7 +1239,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -1373,7 +1373,7 @@ else{
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		exit();
@@ -1442,7 +1442,7 @@ else{
 			echo json_encode($data);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1470,7 +1470,7 @@ else{
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1522,7 +1522,7 @@ else{
 					}
 				}
 				catch(PDOException $e){
-					file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+					file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 				}
 			}
 			$query = "UPDATE ".$SupportFaqTable."
@@ -1544,7 +1544,7 @@ else{
 			echo json_encode(array(0=>'Succeed',1=>array('id'=>($_POST['id']-14),'question'=>htmlspecialchars($_POST['question'],ENT_QUOTES,'UTF-8'),'position'=>$_POST['position'],'active'=>$_POST['active'],'rate'=>'Unrated')));
 		}
 		catch(PDOException $e){
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1575,7 +1575,7 @@ else{
 			echo json_encode($list);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
@@ -1602,11 +1602,104 @@ else{
 			echo json_encode(array(0=>'Deleted'));
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 		}
 		
+	}
+	
+	else if($_POST[$_SESSION['token']['act']]=='edit_sale_info'){
+		$_POST['id']=(is_numeric($_POST['id'])) ? (int)$_POST['id']-1:exit();
+		$_POST['tanid']=trim(preg_replace('/\s+/','',$_POST['tanid']));
+		if(empty($_POST['name'])){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Transaction ID'));
+			exit();
+		}
+		$_POST['amount']=trim(str_replace(',', '.', $_POST['amount']););
+		if(!preg_match('/^\d+(?:\.\d{2})?$/', $_POST['price'])){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Amount'));
+			exit();
+		}
+		if(!is_numeric($_POST['time'])){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Support Time'));
+			exit();
+		}
+		else
+			$_POST['time']=round($_POST['time'],0);
+
+		if(!is_numeric($_POST['status']) || !filter_var($_POST['status'], FILTER_VALIDATE_INT, array('options' => array('min_range' => 0, 'max_range' => 4)))){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid Status'));
+			exit();
+		}
+
+		try{
+			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+			$query = "UPDATE ".$SupportDepaTable." SET `amount`=?,`support_time`=?,`status`=? WHERE `id`=? AND `transaction_id`=?";
+			$STH = $DBH->prepare($query);
+			$STH->bindParam(1,$_POST['amount'],PDO::PARAM_STR);
+			$STH->bindParam(2,$_POST['time'],PDO::PARAM_STR);
+			$STH->bindParam(3,$_POST['status'],PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['id'],PDO::PARAM_INT);
+			$STH->bindParam(5,$_POST['tanid'],PDO::PARAM_STR);
+			$STH->execute();
+			if($STH->rowCount()>0){
+				$query = "SELECT 
+							`gateway`,
+							CASE `status` WHEN '0' THEN '<span class=\'label label-warning\'>Pending</span>'  WHEN '1' THEN '<span class=\'label label-important\'>Cancelled</span>'  WHEN '2' THEN '<span class=\'label label-success\'>Processed</span>'  WHEN '3' THEN '<span class=\'label label-inverse\'>Refund</span>'  ELSE `status` END AS sale_stat,
+							`payer_mail`,
+							`transaction_id`,
+							`tk_id`,
+							`amount`,
+							`support_time`,
+							`payment_date`
+						FROM ".$SupportSalesTable." WHERE id=? LIMIT 1";
+						
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
+				$STH->execute();
+
+				$STH->setFetchMode(PDO::FETCH_ASSOC);
+				$a = $STH->fetch();
+				$users=array(0=>'Updated');
+				$users[1]=array('ID'=>$_POST['id']+1,
+								'gateway'=>htmlspecialchars($a['gateway'],ENT_QUOTES,'UTF-8'),
+								'payer_mail'=>htmlspecialchars($a['payer_mail'],ENT_QUOTES,'UTF-8'),
+								'status'=>$a['sale_stat'],
+								'transaction_id'=>$a['transaction_id'],
+								'tk_id'=>$a['tk_id'],
+								'amount'=>$a['amount'],
+								'support_time'=>$a['support_time'],
+								'payment_date'=>$a['payment_date'],
+							);
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode($users);
+				exit();
+			}
+			else{
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode('No Match Found');
+				exit();
+			}
+		}
+		catch(PDOException $e){
+			if ($e->errorInfo[1] == 1062){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>"Department name: ".json_encode($_POST['name'])." already exist"));
+			}
+			else{
+				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
+			}
+		}
+		exit();
 	}
 	
 	else{
@@ -1644,7 +1737,7 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 			}
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		}
 	}
 }
@@ -1687,7 +1780,7 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		return 'An Error has occurred, please read the PDOErrors file and contact a programmer';
 	}
 }

@@ -73,7 +73,7 @@ try{
 
 }
 catch(PDOException $e){  
-	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 	$error='An Error has occurred, please read the PDOErrors file and contact a programmer';
 }
 		

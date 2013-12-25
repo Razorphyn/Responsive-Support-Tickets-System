@@ -111,8 +111,8 @@ else {
 						exit();
 					}
 					catch(PDOException $e){
-						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
-						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
+						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 						$message="An error has been occurred during payment elaboration(PDO_ERROR).\n PDO ERROR:\nFile: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\nPayment Information:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
 						mail($adminmail[10],'Payment Error',$message,$headers);
 						exit();

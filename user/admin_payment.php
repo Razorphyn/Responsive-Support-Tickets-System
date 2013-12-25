@@ -73,8 +73,8 @@ try{
 				`tk_id`,
 				`amount`,
 				`support_time`,
-				`payment_date`,
-			FROM ".$SupportSalesTable." LIMIT 700 ORDER BY `payment_date`";
+				`payment_date`
+			FROM ".$SupportSalesTable." ORDER BY `payment_date` DESC LIMIT 700 ";
 			
 	$STH = $DBH->prepare($query);
 	$STH->execute();
@@ -102,7 +102,7 @@ try{
 	}
 }
 catch(PDOException $e){  
-	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 	$error='An Error has occurred, please read the PDOErrors file and contact a programmer';
 }
 
@@ -157,7 +157,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<li><a href="setting.php"><i class="glyphicon glyphglyphicon glyphicon-eye-open"></i>Settings</a></li>
 								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
 									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
 									<li class="dropdown active" role='button'>
@@ -306,8 +306,18 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						bProcessing: !0,
 						oLanguage: {sEmptyTable: "No Payments"},
 						fnPreDrawCallback: function(oSettings, json) {
+							$('.dataTables_filter').addClass('col-xs-12'),
 							$('.dataTables_filter input').addClass('form-control'),
-							$('.dataTables_length select').addClass('form-control')
+							$('.dataTables_filter input').unwrap(),
+							$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+							$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+							$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
+							$('.dataTables_length').addClass('col-xs-12'),
+							$('.dataTables_length select').addClass('form-control'),
+							$('.dataTables_length select').unwrap(),
+							$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
+							$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
+							$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 						},
 						aoColumns: [
 							{sTitle: "ID",			mDataProp: "id",								sWidth: "25px",										fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>ID: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
@@ -334,12 +344,9 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			if(0 < $("#" + a.num).length)
 				$("html,body").animate({scrollTop: $("#" + a.num).offset().top}, 1500)
 			else{
-				var b = "<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><input type='hidden' name='usr_old_stat' value='"+a.status+"'/><div class='row-fluid'><div class='span2'><label>Name</label></div><div class='span4'><input type='text' name='usr_edit_name' placeholder='Department Name' value='" + a.name + "'required /></div><div class='span2'>Role/Status</div><div class='span4'><select class='form-control'  class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row-fluid'><div class='span2'>Mail</div><div class='span4'><input type='text' name='usr_edit_mail' value='" + a.mail + "' required/></div><div class='span2'><label>On Holiday?</label></div><div class='span4'><select class='form-control'  name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><button style='display:none' class='btn btn-info load_usr_rate' value='" + a.num + "' onclick='javascript:return false;'>Load Rates</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; 
+				var b = "<hr><form action='../php/admin_function.php' method='POST' id='" + a.id + "'><input type='hidden' name='paym_edit_id' value='"+ a.id +"' /><input type='hidden' name='paym_edit_tranid' value='"+ a.transaction_id +"' /><span>Payment ID " + a.id + "</span><button class='btn btn-link btn_close_form'>Close</button><div class='row'><div class='col-md-2'><label>Gateway</label></div><div class='col-md-4'><p>" + a.gateway + "</p></div><div class='col-md-2'><label>Date</label></div><div class='col-md-4'><p>" + a.payment_date + "</p></div></div><div class='row'><div class='col-md-2'><label>Payer Email</label></div><div class='col-md-4'><p>" + a.payer_mail + "</p></div><div class='col-md-2'><label>Transaction ID</label></div><div class='col-md-4'><p>" + a.transaction_id + "</p></div></div><div class='row'><div class='col-md-2'>Amount</div><div class='col-md-4'><input type='text' name='paym_edit_amount' value='" + a.amount + "' placeholder='Amount' required/></div><div class='col-md-2'>Support Time</div><div class='col-md-4'><input type='text' name='paym_edit_time' value='" + a.support_time + "' placeholder='Support Time' required/></div></div><div class='row'><div class='col-md-2'><label>Status</label></div><div class='col-md-4'><select class='form-control'  name='paym_edit_status'><option value='2'>Completed</option><option value='0'>Pending</option><option value='1'>Failed</option><option value='1'>Expired</option><option value='3'>Refunded</option><option value='4'>Partially Refunded</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 				$("#userlist").after(b);
-				$('select[name="usr_role"]:first option').filter(function(){return $(this).html() == a.status}).attr("selected", "selected");
-				$('select[name="usr_holiday"]:first option').filter(function () {return $(this).html() == a.holiday}).attr("selected", "selected");
-				if("Operator" == a.status) $(".load_usr_depa:first").css("display", "block");
-				if("Operator" == a.status || "Administrator" == a.status) $(".load_usr_rate:first").css("display", "block");
+				$('select[name="paym_edit_status"]:first option').filter(function(){return $(this).html() == a.status}).attr("selected", "selected");
 			}
 		});
 
@@ -351,54 +358,50 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			a.children("select").each(function () {
 				$(this).attr("disabled", "disabled")
 			});
-			var b = a.children('input[name="usr_edit_id"]').val(),
-				k = parseInt(a.children('input[name="usr_edit_pos"]').val()),
-				e = a.find('input[name="usr_edit_name"]').val().replace(/\s+/g, " "),
-				f = a.find('input[name="usr_edit_mail"]').val().replace(/\s+/g, " "),
-				g = a.find('select[name="usr_role"]').val(),
-				c = a.find('select[name="usr_holiday"]').val(),
-				l = a.find('input[name="usr_rate"]').val(),
-				h = [];
-			"1" == g && a.find('input[name="ass_usr_depa"]:checked').each(function () {
-				h.push($(this).val())
-			});
-			"" != e.replace(/\s+/g, "") && "" != f.replace(/\s+/g, "") ? ($.ajax({
-				type: "POST",
-				url: "../php/admin_function.php",
-				data: {<?php echo $_SESSION['token']['act']; ?>: "edit_sale_info",id: b,name: e,mail: f,status: g,holiday: c,seldepa: h},
-				dataType: "json",
-				success: function (d) {
-					if("Updated" == d[0]){
-						d[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + b + '"><i class="icon-edit"></i></button><button class="btn btn-danger remuser" value="' + b + '"><i class="icon-remove"></i></button></div>', 
-						d[1]['rating']=($.isNumeric(l))? l:'Unrated',
-						table.fnDeleteRow(k, function(){table.fnAddData(d[1])}),
-						a.prev().remove(),
-						a.remove()
-					}
-					else if(d[0]=='sessionerror'){
-						switch(d[1]){
-							case 0:
-								window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
-								break;
-							case 1:
-								window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
-								break;
-							case 2:
-								window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
-								break;
-							case 3:
-								window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
-								break;
+			var b = parseInt(a.children('input[name="paym_edit_id"]').val().replace(/\s+/g, "")),
+				k = a.children('input[name="paym_edit_tranid"]').val().replace(/\s+/g, ""),
+				e = a.find('input[name="paym_edit_amount"]').val().replace(/\s+/g, ""),
+				f = a.find('input[name="paym_edit_time"]').val().replace(/\s+/g, ""),
+				g = a.find('select[name="paym_edit_status"]').val();
+			if("" != e.replace(/\s+/g, "") && "" != f.replace(/\s+/g, "")) {
+				$.ajax({
+					type: "POST",
+					url: "../php/admin_function.php",
+					data: {<?php echo $_SESSION['token']['act']; ?>: "edit_sale_info",id: b,tanid:k,amount:e, time:f, status:g},
+					dataType: "json",
+					success: function (d) {
+						if("Updated" == d[0]){
+							d[1]['action'] = '<div class="btn-group"><button class="btn btn-info edituser" value="' + d[1]['id'] + '"><i class="glyphicon glyphicon-eye-open"></i></button><button class="btn btn-danger remuser" value="' + d[1]['id'] + '"><i class="glyphicon glyphicon-remove"></i></button></div>', 
+							table.fnDeleteRow(k, function(){table.fnAddData(d[1])}),
+							a.prev().remove(),
+							a.remove()
+						}
+						else if(d[0]=='sessionerror'){
+							switch(d[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else{
+							a.children("input").each(function () {$(this).removeAttr("disabled", "disabled")});
+							a.children("select").each(function () {$(this).removeAttr("disabled", "disabled")});
+							noty({text: d[0],type: "error",timeout: 9E3})
 						}
 					}
-					else{
-						a.children("input").each(function () {$(this).removeAttr("disabled", "disabled")});
-						a.children("select").each(function () {$(this).removeAttr("disabled", "disabled")});
-						noty({text: d[0],type: "error",timeout: 9E3})
-					}
-				}
-			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})
-			})) : noty({text: data[0],type: "Empty Field",timeout: 9E3});
+				}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})})
+			}
+			else
+				noty({text: data[0],type: "Empty Field",timeout: 9E3});
 			return !1
 		});
 

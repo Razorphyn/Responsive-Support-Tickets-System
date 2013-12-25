@@ -70,7 +70,7 @@ try{
 	}
 }
 catch(PDOException $e){
-	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 	$error='We are sorry, but an error has occurred, please contact the administrator if it persist';
 }
 
@@ -395,7 +395,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 				d = $("#publicdep").val(),
 				e = $("#freedep").val(),
 				f = $("#depratetab").val(),
-				g = $("#depratelist").val(),
+				g = $("#depratelist").val();
 			if(b.replace(/\s+/g, "")!=""){
 				$.ajax({
 					type: "POST",

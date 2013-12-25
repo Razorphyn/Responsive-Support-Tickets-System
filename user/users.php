@@ -20,7 +20,7 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 	header("location: ../index.php?e=invalid");
 	exit();
 }
-session_start(); 
+session_start();
 
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
@@ -78,7 +78,7 @@ try{
 	}
 }
 catch(PDOException $e){  
-	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+	file_put_contents('../php/PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 	$error='An Error has occurred, please read the PDOErrors file and contact a programmer';
 }
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
@@ -181,15 +181,17 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<h3 class='sectname'>Users</h3>
 					<img class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
 					<div class='row' id='userlist'>
-						<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
-							<tbody>
-								<?php
-									for($i=0;$i<$c;$i++)
-										echo '<tr><td>'.$users[$i]['num'].'</td><td>'.$users[$i]['name'].'</td><td>'.$users[$i]['mail'].'</td><td>'.$users[$i]['status'].'</td><td>'.$users[$i]['holiday'].'</td><td>'.$users[$i]['rating'].'</td><td>'.$users[$i]['action'].'</td></tr>';
+						<div class='col-md-12'>
+							<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="usertable">
+								<tbody>
+									<?php
+										for($i=0;$i<$c;$i++)
+											echo '<tr><td>'.$users[$i]['num'].'</td><td>'.$users[$i]['name'].'</td><td>'.$users[$i]['mail'].'</td><td>'.$users[$i]['status'].'</td><td>'.$users[$i]['holiday'].'</td><td>'.$users[$i]['rating'].'</td><td>'.$users[$i]['action'].'</td></tr>';
 
-								?>
-							</tbody>
-						</table>
+									?>
+								</tbody>
+							</table>
+						</div>
 					</div>
 					<br/><br/>
 					<hr>
@@ -197,15 +199,15 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<form style='display:none'>
 						<h3 class='sectname'>New Users</h3>
 						<small><p>Every created user through this function is automatically activated</p></small>
-						<div class='row'>
+						<div class='row form-group'>
 							<div class='col-md-2'><label for='new_rname'>Name</label></div>
 							<div class='col-md-4'><input type="text" class='form-control'  id="new_rname" placeholder="Name" required></div>
 						</div>
-						<div class='row'>
+						<div class='row form-group'>
 							<div class='col-md-2'><label for='new_rmail'>Email</label></div>
 							<div class='col-md-4'><input type="email" class='form-control'  id="new_rmail" placeholder="Email" required></div>
 						</div>
-						<div class='row'>
+						<div class='row form-group'>
 							<div class='col-md-2'><label for='new_rmail'>User Role/Status</label></div>
 							<div class='col-md-4'>
 								<select class='form-control'  id='new_usr_role'>
@@ -231,7 +233,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		</div>
 	
 	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=lib/DataTables/js/jquery.dataTables.min.js,js/jquery-ui-1.10.3.custom.min.js&amp;5259487' ?>"></script>
+	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
 	<script>
 	 $(document).ready(function() {
 		var table = $("#usertable").dataTable({
@@ -252,12 +254,12 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 						},
 						aoColumns: [
-							{sTitle: "Number",mDataProp:"num",sWidth: "60px",sClass: "visible-md",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Number: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Number",mDataProp:"num",sWidth: "60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Number: </strong></span><span>" + $(nTd).html() + '</span>');}}, 
 							{sTitle: "Name",mDataProp:"name",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Name: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
 							{sTitle: "Mail",mDataProp:"mail",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Mail: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
 							{sTitle: "Status/Role",mDataProp:"status",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status/Role: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Holiday",mDataProp:"holiday",sWidth: "60px",sClass: "hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
-							{sTitle: "Rating",mDataProp:"rating",sWidth: "60px",sClass: "hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Holiday",mDataProp:"holiday",sWidth: "60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Holiday: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
+							{sTitle: "Rating",mDataProp:"rating",sWidth: "90px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Rating: </strong></span><span> " + $(nTd).html() + '</span>');}}, 
 							{sTitle: "Tooggle",mDataProp:"action",bSortable: !1,bSearchable: !1,sWidth: "100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}
 						}]
 					});
@@ -322,8 +324,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			if(0 < $("#" + a.num).length)
 				$("html,body").animate({scrollTop: $("#" + a.num).offset().top}, 1500)
 			else{
-				var b = "<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><input type='hidden' name='usr_old_stat' value='"+a.status+"'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='usr_edit_name' placeholder='Department Name' value='" + a.name + "'required /></div><div class='col-md-2'>Role/Status</div><div class='col-md-4'><select class='form-control'  class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row form-group'><div class='col-md-2'>Mail</div><div class='col-md-4'><input type='text' class='form-control' name='usr_edit_mail' value='" + a.mail + "' required/></div><div class='col-md-2'><label>On Holiday?</label></div><div class='col-md-4'><select class='form-control'  name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><button style='display:none' class='btn btn-info load_usr_rate' value='" + a.num + "' onclick='javascript:return false;'>Load Rates</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>"; 
-				$("#userlist").after(b);
+				var b="<hr><form action='' method='post' id='" + a.num + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='usr_edit_id' value='" + a.num + "'/><input type='hidden' name='usr_rate' value='" + a.rating + "'/><input type='hidden' name='usr_edit_pos' value='" + c + "'/><input type='hidden' name='usr_old_stat' value='"+a.status+"'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='usr_edit_name' placeholder='User Name' value='" + a.name + "'required /></div><div class='col-md-2'><label>Role/Status</label></div><div class='col-md-4'><select class='form-control'  class='usr_role' name='usr_role'><option value='0'>User</option><option value='1'>Operator</option><option value='2'>Administrator</option><option value='3'>Activation</option><option value='4'>Banned</option></select></div></div><div class='row form-group'><div class='col-md-2'><label>Mail</label></div><div class='col-md-4'><input type='text' class='form-control' name='usr_edit_mail' value='" + a.mail + "' placeholder='User Email' required/></div><div class='col-md-2'><label>On Holiday?</label></div><div class='col-md-4'><select class='form-control'  name='usr_holiday'><option value='0'>No</option><option value='1'>Yes</option></select></div></div><button style='display:none' class='btn btn-info load_usr_depa' value='" + a.num + "' onclick='javascript:return false;'>Load Departments</button><br/><button style='display:none' class='btn btn-info load_usr_rate' value='" + a.num + "' onclick='javascript:return false;'>Load Rates</button><br/><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";				$("#userlist").after(b);
 				$('select[name="usr_role"]:first option').filter(function(){return $(this).html() == a.status}).attr("selected", "selected");
 				$('select[name="usr_holiday"]:first option').filter(function () {return $(this).html() == a.holiday}).attr("selected", "selected");
 				if("Operator" == a.status) $(".load_usr_depa:first").css("display", "block");

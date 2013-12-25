@@ -199,7 +199,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 			}
 	}
 	catch(PDOException $e){  
-		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 		$error='We are sorry, but an error has occurred, please contact the administrator if it persist';
 	}
 	$DBH=null;
@@ -237,7 +237,7 @@ function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $Sup
 				return false;
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			return json_encode(array(0=>"Can't retrieve Departments"));
 		}
 	}
@@ -273,7 +273,7 @@ function retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, 
 			return json_encode($b);
 		}
 		catch(PDOException $e){  
-			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage(), FILE_APPEND);
+			file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 			$DBH=null;
 			return json_encode(array(0=>"Can't retrieve Operators"));
 		}
