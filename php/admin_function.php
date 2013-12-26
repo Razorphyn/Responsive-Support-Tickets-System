@@ -1763,7 +1763,11 @@ else{
 	}
 	
 	else if($_POST[$_SESSION['token']['act']]=='retrieve_price_tab'){
-		$_POST['id']=(is_numeric($_POST['id'])) ? $_POST['id']:exit();
+		if(!is_numeric($_POST['id'])){
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode(array(0=>'Invalid ID'));
+			exit();
+		}
 		if(is_file('../php/config/price/'.$_POST['id'])){
 			$price=file('../php/config/price/'.$_POST['id'],FILE_IGNORE_NEW_LINES);
 			unset($price[0]);

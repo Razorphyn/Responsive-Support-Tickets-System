@@ -249,6 +249,15 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 										</div>
 									</div>
 								</div>
+								<div class="pricetabletxt row form-group">
+									<div class="col-xs-2">
+										<label for="depratelist">Price</label>
+										<p>[minute]:[label]:[price]<br/>Charset: [0-9]:[a-zA-Z0-9 -]:[0-9 with 2 decimals]<br/>"Fixed Minute Quantity" each row is an option</p>
+									</div>
+									<div class="col-xs-10">
+										<textarea id="depratelist" name="depratelist" class="form-control" rows='7' ></textarea>
+									</div>
+								</div>
 								
 							<input type="submit" class="btn btn-success" value='Add New Department' onclick='javascript:return false;' id='btnadddep'/>
 						</form>
@@ -268,7 +277,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
 	
 	<script>
-	$('.optprem').css('display','none');
+	$('.optprem,.pricetabletxt').css('display','none');
 	$(document).ready(function() {
 		var table=$("#deptable").dataTable({
 											bDestroy:!0,
@@ -303,11 +312,10 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 
 		$('#freedep').change(function(){
 			if($('#freedep').val()==0){
-				$('.optprem').slideToggle(800),
-				$('#freedep').parent().parent().after('<div class="row form-group"><div class="col-xs-2"><label for="depratelist">Price</label><p>[minute]:[label]:[price]<br/>Charset: [0-9]:[a-zA-Z0-9 -]:[0-9 with 2 decimals]<br/>"Fixed Minute Quantity" each row is an option</p></div><div class="col-xs-10"><textarea id="depratelist" name="depratelist" class="form-control"></textarea></div></div> ')
+				$(this).parent().parent().find('.optprem,.pricetabletxt').show(800)		
 			}
 			else{
-				$('.optprem').slideToggle(800)
+				$(this).parent().parent().find('.optprem,.pricetabletxt').hide(800)
 			}
 		});
 
@@ -320,30 +328,36 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 				$("html,body").animate({scrollTop: $("#" + a.id).offset().top}, 1500)
 			}
 			else{
-				var b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row form-group'><div class='col-md-2'><label>Is Active?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='col-md-2'><label>Is Public?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><div class='row form-group'><div class='col-md-2'><label>Is Free?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_free'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='optprem'><div class='col-md-2'><label>Rate Rules</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_rate_rule' ><option value='1'>Pay per Minute</option><option value='0'>Fixed Minute Quantity</option></select></div></div></div><div class='row form-group'><div class='form-group'><button class='lrate btn btn-info'>Load Rates</button></div><div class='row form-group'><div class='col-xs-2'><label >Price</label><p>[minute]:[label]:[price]<br/>Charset: [0-9]:[a-zA-Z0-9 -]:[0-9 with 2 decimals]<br/>'Fixed Minute Quantity' each row is an option</p></div><div class='col-xs-10'><textarea name='edit_depa_rate_table' class='form-control'></textarea></div></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
+				var b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row form-group'><div class='col-md-2'><label>Is Active?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='col-md-2'><label>Is Public?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><div class='row form-group'><div class='col-md-2'><label>Is Free?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_free'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='optprem'><div class='col-md-2'><label>Rate Rules</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_rate_rule' ><option value='1'>Pay per Minute</option><option value='0'>Fixed Minute Quantity</option></select></div></div></div><div class='pricetabletxt row form-group'><div class='col-xs-2'><label >Price</label><p>[minute]:[label]:[price]<br/>Charset: [0-9]:[a-zA-Z0-9 -]:[0-9 with 2 decimals]<br/>'Fixed Minute Quantity' each row is an option</p></div><div class='col-xs-10'><textarea name='edit_depa_rate_table' class='form-control' rows='7'></textarea></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 				$("#deplist").after(b),
-				$('select[name="edit_depa_active"]:first option[value=' + ("Yes" == a.active ? 1 : 0) + "]").attr("selected", "selected"),
-				$('select[name="edit_depa_free"]:first option[value=' + ("Yes" == a.free ? 1 : 0) + "]").attr("selected", "selected"),
-				$('select[name="edit_depa_public"]:first option[value=' + ("Yes" == a.public ? 1 : 0) + "]").attr("selected", "selected"),
+				//$('.optprem:first,.pricetabletxt:first').css('display','none');
+
+				$('select[name="edit_depa_active"]:first').val(("No" == a.active ? 0 : 1)).change(),
+				$('select[name="edit_depa_public"]:first').val(("No" == a.public ? 0 : 1)).change(),
+				$('select[name="edit_depa_free"]:first').val(("No" == a.free ? 0 : 1)).change(),
+
 				$("html,body").animate({scrollTop: $("#" + a.id).offset().top}, 1500)
 			}
 		});
 		
-		$('select[name="edit_depa_free"]').change(function(){
-			if($('select[name="edit_depa_free"]').val()==0){
-				var p=$('select[name="edit_depa_free"]').parent().parent().parent().parent(),
-					id=p.attr('id');
+		$(document).on('change','select[name="edit_depa_free"]',function(){
+			var p=$(this).parent().parent().parent();
+			if($(this).val()==0){
+				var	id=p.attr('id');
 				p.find('.optprem').show(800),
 				$.ajax({
 						type: 'POST',
 						url: '../php/admin_function.php',
 						data: {<?php echo $_SESSION['token']['act']; ?>:'retrieve_price_tab',id:id},
 						dataType : 'json',
-						success : function (data) {
-							if(data[0]=='ret')
-								p.find('textarea[name="edit_depa_rate_table"]').html(data[1])
-							else if(data[0]=='sessionerror'){
-								switch(data[1]){
+						success : function (a) {
+							if(a[0]=='ret'){
+								var txt=p.find('textarea[name="edit_depa_rate_table"]');
+								txt.html(a[1]),
+								p.find('.pricetabletxt').show(800)
+							}
+							else if(a[0]=='sessionerror'){
+								switch(a[1]){
 									case 0:
 										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
 										break;
@@ -359,12 +373,12 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 								}
 							}
 							else
-								noty({text: 'Error: '+data[0],type:'error',timeout:9000});
+								noty({text: 'Error: '+a[0],type:'error',timeout:9000});
 						}
 					}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 			}
 			else if($('select[name="edit_depa_free"]').val()==1){
-				p.find('.optprem').hide(800)
+				p.find('.optprem,.pricetabletxt').hide(800)
 			}
 		});
 
@@ -465,7 +479,9 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 						if("Added" == a.response){
 							a.information.action = '<div class="btn-group"><button class="btn btn-info editdep" value="' + a.information.id + '"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remdep" value="' + a.information.id + '"><i class="glyphicon glyphicon-remove"></i></button></div>',
 							table.fnAddData(a.information),
-							$("#depname").val("")
+							$("#depname").val(""),
+							$("#depratelist").val(""),
+							$("#freedep").val(1).change()
 						}
 						else if(a[0]=='sessionerror'){
 							switch(a[1]){
@@ -535,7 +551,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 				}
 			}).fail(function (a, b) {noty({text: b,type: "error",timeout: 9E3})}) : noty({text: "Form Error - Empty Fields",type: "error",timeout: 9E3})
 		});
-		
+
 		$(document).on("click",".btn_close_form",function(){confirm("Do you want to close this edit form?")&&($(this).parent().prev().remove(),$(this).parent().remove());return!1});
 	});
 
