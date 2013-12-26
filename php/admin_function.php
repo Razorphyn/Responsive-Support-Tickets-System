@@ -164,12 +164,25 @@ else{
 		$_POST['active']=($_POST['active']==1)? 1:0;
 		$_POST['pubdep']=($_POST['pubdep']==1)? 1:0;
 		$_POST['freedep']=($_POST['freedep']==1)? 1:0;
-		$_POST['ratetype']=($_POST['ratetype']==1)? 1:0;
+		if($_POST['freedep']==0){
+			$_POST['ratetype']=($_POST['ratetype']==1)? 1:0;
+			$_POST['ratetable']=trim(str_replace(',','.',$_POST['ratetable']));
+
+			preg_match_all('/^(\d){1,}(\:[A-Za-z0-9-]+([ a-zA-Z0-9-]?+)?)?\:(\d){1,}(?:\.(\d){1,2})?$/m', $_POST['ratetable'], $out);
+			if($out[0]!=explode("\n",$_POST['ratetable'])){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Invalid price table at line: '.implode(", ", array_diff_key(array_flip(explode("\n",$_POST['ratetable'])),array_flip($out[0])))));
+				exit();
+			}
+		}
+		else
+			$_POST['ratetype']=null;
+
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			$query = "INSERT INTO ".$SupportDepaTable."(`department_name`,`active`,`public_view`,`free`) VALUES (?,?,?)";
+			$query = "INSERT INTO ".$SupportDepaTable."(`department_name`,`active`,`public_view`,`free`) VALUES (?,?,?,?)";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['tit'],PDO::PARAM_STR);
 			$STH->bindParam(2,$_POST['active'],PDO::PARAM_STR);
@@ -180,18 +193,31 @@ else{
 			$data=array();
 			$data['response']='Added';
 			$dpid=$DBH->lastInsertId();
+			
+			if($_POST['freedep']==0)
+				file_put_contents('config/price/'.$dpid,$_POST['ratetype']."\n".$_POST['ratetable']);
+
 			$_POST['active']=($_POST['active']==0) ? 'No':'Yes';
 			$_POST['pubdep']=($_POST['pubdep']==0) ? 'No':'Yes';
 			$_POST['freedep']=($_POST['freedep']==0) ? 'No':'Yes';
-			file_put_contents('config/price/'.$dpid,$_POST['ratetable']);
-			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pubdep'],'free'=>$_POST['freedep']);
+			switch($_POST['ratetype']){
+				case 0:
+					$_POST['ratetype']='Fixed Minute Quantity';
+					break;
+				case 1:
+					$_POST['ratetype']='Pay per Minute';
+					break;
+				default:
+					$_POST['ratetype']='Unnecessary';
+			}
+			$data['information']=array('id'=>$dpid,'name'=>htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pubdep'],'free'=>$_POST['freedep'],'rule'=>$_POST['ratetype']);
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode($data);
 		}
 		catch(PDOException $e){
 			if ($e->errorInfo[1] == 1062) {
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>"Department name: ".$htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8')." already exist"));
+				echo json_encode(array(0=>"Department name: ".htmlspecialchars($_POST['tit'],ENT_QUOTES,'UTF-8')." already exist"));
 			}
 			else{
 				file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
@@ -212,7 +238,20 @@ else{
 		}
 		$_POST['active']=($_POST['active']==1) ? 1:0;
 		$_POST['pub']=($_POST['pub']==1) ? 1:0;
-		$_POST['free']=($_POST['free']==1) ? 1:0;
+		$_POST['freedep']=($_POST['freedep']==1) ? 1:0;
+		if($_POST['freedep']==0){
+			$_POST['ratetype']=($_POST['ratetype']==1)? 1:0;
+			$_POST['ratetable']=trim(str_replace(',','.',$_POST['ratetable']));
+			preg_match_all('/^(\d){1,}(\:[A-Za-z0-9-]+([ a-zA-Z0-9-]?+)?)?\:(\d){1,}(?:\.(\d){1,2})?$/m', $_POST['ratetable'], $out);
+			if($out[0]!=explode("\n",$_POST['ratetable'])){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Invalid price table at line: '.implode(", ", array_diff_key(array_flip(explode("\n",$_POST['ratetable'])),array_flip($out[0])))));
+				exit();
+			}
+		}
+		else
+			$_POST['ratetype']=null;
+
 		try{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -222,14 +261,28 @@ else{
 			$STH->bindParam(1,$_POST['name'],PDO::PARAM_STR);
 			$STH->bindParam(2,$_POST['active'],PDO::PARAM_STR);
 			$STH->bindParam(3,$_POST['pub'],PDO::PARAM_STR);
-			$STH->bindParam(4,$_POST['free'],PDO::PARAM_STR);
+			$STH->bindParam(4,$_POST['freedep'],PDO::PARAM_STR);
 			$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
+
+			if($_POST['freedep']==0)
+				file_put_contents('config/price/'.$_POST['id'],$_POST['ratetype']."\n".$_POST['ratetable']);
+
 			$_POST['active']=($_POST['active']==0) ? 'No':'Yes';
 			$_POST['pub']=($_POST['pub']==0) ? 'No':'Yes';
-			$_POST['free']=($_POST['free']==0) ? 'No':'Yes';
+			$_POST['freedep']=($_POST['freedep']==0) ? 'No':'Yes';
+			switch($_POST['ratetype']){
+				case 0:
+					$_POST['ratetype']='Fixed Minute Quantity';
+					break;
+				case 1:
+					$_POST['ratetype']='Pay per Minute';
+					break;
+				default:
+					$_POST['ratetype']='Unnecessary';
+			}
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Succeed',1=>array('id'=>$_POST['id'],'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pub'],'free'=>$_POST['free'])));
+			echo json_encode(array(0=>'Succeed',1=>array('id'=>$_POST['id'],'name'=>htmlspecialchars($_POST['name'],ENT_QUOTES,'UTF-8'),'active'=>$_POST['active'],'public'=>$_POST['pub'],'free'=>$_POST['freedep'],'rule'=>$_POST['ratetype'])));
 		}
 		catch(PDOException $e){
 			if ($e->errorInfo[1] == 1062) {
@@ -264,6 +317,9 @@ else{
 				$STH = $DBH->prepare($delquery);
 				$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 				$STH->execute();
+				
+				if(is_file('config/price/'.$_POST['id'])) unlink('config/price/'.$_POST['id']);
+
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Deleted'));
 			}
@@ -326,15 +382,19 @@ else{
 						$delup="DELETE FROM ".$SupportUploadTable." WHERE `tk_id` IN (".$list.")";
 						$STH = $DBH->prepare($delup);
 						$STH->execute();
+
+						if(is_file('config/price/'.$_POST['id'])) unlink('config/price/'.$_POST['id']);
 						header('Content-Type: application/json; charset=utf-8');
 						echo json_encode(array(0=>'Deleted'));
 					}
 					else{
+						if(is_file('config/price/'.$_POST['id'])) unlink('config/price/'.$_POST['id']);
 						header('Content-Type: application/json; charset=utf-8');
 						echo json_encode(array(0=>'Deleted'));
 					}
 				}
 				else{
+					if(is_file('config/price/'.$_POST['id'])) unlink('config/price/'.$_POST['id']);
 					header('Content-Type: application/json; charset=utf-8');
 					echo json_encode(array(0=>'Deleted'));
 				}
@@ -1617,7 +1677,7 @@ else{
 			echo json_encode(array(0=>'Invalid Transaction ID'));
 			exit();
 		}
-		$_POST['amount']=trim(str_replace(',', '.', $_POST['amount']););
+		$_POST['amount']=trim(str_replace(',', '.', $_POST['amount']));
 		if(!preg_match('/^\d+(?:\.\d{2})?$/', $_POST['price'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Amount'));
@@ -1699,6 +1759,22 @@ else{
 				echo json_encode(array(0=>'An Error has occurred, please read the PDOErrors file and contact a programmer'));
 			}
 		}
+		exit();
+	}
+	
+	else if($_POST[$_SESSION['token']['act']]=='retrieve_price_tab'){
+		$_POST['id']=(is_numeric($_POST['id'])) ? $_POST['id']:exit();
+		if(is_file('../php/config/price/'.$_POST['id'])){
+			$price=file('../php/config/price/'.$_POST['id'],FILE_IGNORE_NEW_LINES);
+			unset($price[0]);
+		}
+		else
+			$price=array();
+
+		$price=array('ret',implode("\n",$price));
+
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode($price);
 		exit();
 	}
 	

@@ -59,11 +59,31 @@ try{
 	$dn=array();
 	if(!empty($a)){
 		do{
+			if($a['free']=='No' && is_file('../php/config/price/'.$a['id'])){
+				$rule=file('../php/config/price/'.$a['id'],FILE_IGNORE_NEW_LINES);
+				$rule=$rule[0];
+			}
+			else
+				$rule='e';
+			switch($rule){
+				case 'e':
+					$rule='Unnecessary';
+					break;
+				case 1:
+					$rule='Pay per Minute';
+					break;
+				case 0:
+					$rule='Fixed Minute Quantity';
+					break;
+				default:
+					$rule='Error';
+			}
 			$dn[]=array('id'=>$a['id'],
 						'name'=>htmlspecialchars($a['department_name'],ENT_QUOTES,'UTF-8'),
 						'active'=>$a['active'],
 						'public'=>$a['public'],
 						'free'=>$a['free'],
+						'rule'=>$rule,
 						'action'=>'<div class="btn-group"><button class="btn btn-info editdep" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remdep" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 			);
 		}while ($a = $STH->fetch());
@@ -180,7 +200,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 							<?php
 								$c=count($dn);
 								for($i=0;$i<$c;$i++)
-									echo '<tr><td>'.$dn[$i]['id'].'</td><td>'.$dn[$i]['name'].'</td><td>'.$dn[$i]['active'].'</td><td>'.$dn[$i]['public'].'</td><td>'.$dn[$i]['free'].'</td><td>'.$dn[$i]['action'].'</td></tr>';
+									echo '<tr><td>'.$dn[$i]['id'].'</td><td>'.$dn[$i]['name'].'</td><td>'.$dn[$i]['active'].'</td><td>'.$dn[$i]['public'].'</td><td>'.$dn[$i]['free'].'</td><td>'.$dn[$i]['rule'].'</td><td>'.$dn[$i]['action'].'</td></tr>';
 							?>
 							</tbody>
 							</table>
@@ -274,16 +294,17 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 												{sTitle:"Active",mDataProp:"active",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Active: </strong></span><span> " + $(nTd).html() + '</span>');}},
 												{sTitle:"Public",mDataProp:"public",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Public: </strong></span><span> " + $(nTd).html() + '</span>');}},
 												{sTitle:"Free",mDataProp:"free",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Free: </strong></span><span> " + $(nTd).html() + '</span>');}},
+												{sTitle:"Price Rule",mDataProp:"rule",sWidth:"120px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Price Rule: </strong></span><span> " + $(nTd).html() + '</span>');}},
 												{sTitle:"Toogle",mDataProp:"action",sWidth:"100px",bSortable:!1,bSearchable:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toogle: </strong></span><span> " + $(nTd).html() + '</span>');}}
 											]
 								});
 		$("#loading").remove(),
 		$("#deptable").show(800);
-		
+
 		$('#freedep').change(function(){
 			if($('#freedep').val()==0){
 				$('.optprem').slideToggle(800),
-				$('#freedep').parent().parent().after('<div class="row form-group"><div class="col-xs-2"><label for="depratelist">Price</label><p>[price]:[minute]<br/>"Fixed Minute Quantity" each row is an option</p></div><div class="col-xs-10"><textarea id="depratelist" name="depratelist" class="form-control"></textarea></div></div> ')
+				$('#freedep').parent().parent().after('<div class="row form-group"><div class="col-xs-2"><label for="depratelist">Price</label><p>[minute]:[label]:[price]<br/>Charset: [0-9]:[a-zA-Z0-9 -]:[0-9 with 2 decimals]<br/>"Fixed Minute Quantity" each row is an option</p></div><div class="col-xs-10"><textarea id="depratelist" name="depratelist" class="form-control"></textarea></div></div> ')
 			}
 			else{
 				$('.optprem').slideToggle(800)
@@ -299,7 +320,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 				$("html,body").animate({scrollTop: $("#" + a.id).offset().top}, 1500)
 			}
 			else{
-				b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row form-group'><div class='col-md-2'><label>Is Active?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='col-md-2'><label>Is Public?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><div class='row form-group'><div class='col-md-2'><label>Is Free?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_free'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>",
+				var b = "<hr><form action='' method='post' class='submit_changes_depa' id='" + a.id + "'><span>Edit " + a.name + "</span><button class='btn btn-link btn_close_form'>Close</button><input type='hidden' name='depa_edit_id' value='" + a.id + "'/><input type='hidden' name='depa_edit_pos' value='" + b + "'/><div class='row form-group'><div class='col-md-2'><label>Name</label></div><div class='col-md-4'><input type='text' class='form-control' name='edit_depa_name' placeholder='Department Name' value='" + a.name + "'required /></div></div><div class='row form-group'><div class='col-md-2'><label>Is Active?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_active' id='activedep'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='col-md-2'><label>Is Public?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_public'><option value='1'>Yes</option><option value='0'>No</option></select></div></div><div class='row form-group'><div class='col-md-2'><label>Is Free?</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_free'><option value='1'>Yes</option><option value='0'>No</option></select></div><div class='optprem'><div class='col-md-2'><label>Rate Rules</label></div><div class='col-md-4'><select class='form-control'  name='edit_depa_rate_rule' ><option value='1'>Pay per Minute</option><option value='0'>Fixed Minute Quantity</option></select></div></div></div><div class='row form-group'><div class='form-group'><button class='lrate btn btn-info'>Load Rates</button></div><div class='row form-group'><div class='col-xs-2'><label >Price</label><p>[minute]:[label]:[price]<br/>Charset: [0-9]:[a-zA-Z0-9 -]:[0-9 with 2 decimals]<br/>'Fixed Minute Quantity' each row is an option</p></div><div class='col-xs-10'><textarea name='edit_depa_rate_table' class='form-control'></textarea></div></div></div><input type='submit' class='btn btn-success submit_changes' value='Submit Changes' onclick='javascript:return false;' /></form>";
 				$("#deplist").after(b),
 				$('select[name="edit_depa_active"]:first option[value=' + ("Yes" == a.active ? 1 : 0) + "]").attr("selected", "selected"),
 				$('select[name="edit_depa_free"]:first option[value=' + ("Yes" == a.free ? 1 : 0) + "]").attr("selected", "selected"),
@@ -308,6 +329,45 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 			}
 		});
 		
+		$('select[name="edit_depa_free"]').change(function(){
+			if($('select[name="edit_depa_free"]').val()==0){
+				var p=$('select[name="edit_depa_free"]').parent().parent().parent().parent(),
+					id=p.attr('id');
+				p.find('.optprem').show(800),
+				$.ajax({
+						type: 'POST',
+						url: '../php/admin_function.php',
+						data: {<?php echo $_SESSION['token']['act']; ?>:'retrieve_price_tab',id:id},
+						dataType : 'json',
+						success : function (data) {
+							if(data[0]=='ret')
+								p.find('textarea[name="edit_depa_rate_table"]').html(data[1])
+							else if(data[0]=='sessionerror'){
+								switch(data[1]){
+									case 0:
+										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+										break;
+									case 1:
+										window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+										break;
+									case 2:
+										window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+										break;
+									case 3:
+										window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+										break;
+								}
+							}
+							else
+								noty({text: 'Error: '+data[0],type:'error',timeout:9000});
+						}
+					}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+			}
+			else if($('select[name="edit_depa_free"]').val()==1){
+				p.find('.optprem').hide(800)
+			}
+		});
+
 		$('#deptable').on('click','.remdep',function(){
 			var id=$(this).val();
 			var pos=table.fnGetPosition(this.parentNode.parentNode.parentNode.parentNode,null,true);
@@ -317,7 +377,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 				modal: true,
 				buttons: {
 					"Keep Related Tickets": function() {
-						var request= $.ajax({
+						$.ajax({
 							type: 'POST',
 							url: '../php/admin_function.php',
 							data: {<?php echo $_SESSION['token']['act']; ?>:'del_dep',sub:'del_name',id:id},
@@ -344,8 +404,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 								else
 									noty({text: 'Department cannot be deleted. Error: '+data[0],type:'error',timeout:9000});
 							}
-						});
-						request.fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+						}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
 						$( this ).dialog( "close" );
 					},
 					"Every Information": function() {
@@ -432,7 +491,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 			else
 				noty({text: "Form Error - Empty Field",type: "error",timeout: 9E3})
 		});
-		
+
 		$(document).on("click", ".submit_changes",function (){
 			var a = $(this).parent(),
 				b = a.children('input[name="depa_edit_id"]').val(),
@@ -440,11 +499,13 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 				f = a.find('input[name="edit_depa_name"]').val().replace(/\s+/g, " "),
 				c = a.find('select[name="edit_depa_active"]').val(),
 				d = a.find('select[name="edit_depa_public"]').val(),
-				h = a.find('select[name="edit_depa_free"]').val();
+				h = a.find('select[name="edit_depa_free"]').val(),
+				k = a.find('select[name="edit_depa_rate_rule"]').val(),
+				l = a.find('textarea[name="edit_depa_rate_table"]').val();
 			"" != f.replace(/\s+/g, "") ? $.ajax({
 				type: "POST",
 				url: "../php/admin_function.php",
-				data: {<?php echo $_SESSION['token']['act']; ?>: "edit_depart",id: b,name: f,active: c,pub: d,free:h},
+				data: {<?php echo $_SESSION['token']['act']; ?>: "edit_depart",id: b,name: f,active: c,pub: d,freedep:h,ratetype:k,ratetable:l},
 				dataType: "json",
 				success: function (e) {
 					if("Succeed" == e[0]){
