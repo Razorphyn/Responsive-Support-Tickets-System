@@ -168,7 +168,7 @@ else{
 			$_POST['ratetype']=($_POST['ratetype']==1)? 1:0;
 			$_POST['ratetable']=trim(str_replace(',','.',$_POST['ratetable']));
 
-			preg_match_all('/^(\d+)(:[A-Z0-9-]+(?: [A-Z0-9-]+)*)?:(\d+(?:\.\d{1,2})?)$/gmi', $_POST['ratetable'], $out);
+			preg_match_all('/^(\d+)(:[A-Z0-9-]+(?: [A-Z0-9-]+)*)?:(\d+(?:\.\d{1,2})?)$/mi', $_POST['ratetable'], $out);
 			if($out[0]!=explode("\n",$_POST['ratetable'])){
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Invalid price table at line: '.implode(", ", array_diff_key(array_flip(explode("\n",$_POST['ratetable'])),array_flip($out[0])))));
@@ -242,7 +242,7 @@ else{
 		if($_POST['freedep']==0){
 			$_POST['ratetype']=($_POST['ratetype']==1)? 1:0;
 			$_POST['ratetable']=trim(str_replace(',','.',$_POST['ratetable']));
-			preg_match_all('/^(\d+)(:[A-Z0-9-]+(?: [A-Z0-9-]+)*)?:(\d+(?:\.\d{1,2})?)$/gmi', $_POST['ratetable'], $out);
+			preg_match_all('/^(\d+)(:[A-Z0-9-]+(?: [A-Z0-9-]+)*)?:(\d+(?:\.\d{1,2})?)$/mi', $_POST['ratetable'], $out);
 			if($out[0]!=explode("\n",$_POST['ratetable'])){
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Invalid price table at line: '.implode(", ", array_diff_key(array_flip(explode("\n",$_POST['ratetable'])),array_flip($out[0])))));
