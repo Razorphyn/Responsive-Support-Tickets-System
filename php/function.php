@@ -649,6 +649,14 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 					$msid=$DBH->lastInsertId();
 					$count=count($_FILES['filename']['name']);
 					if($count>0){
+						$extension_list='config/allowedext.txt';
+						if(is_file($extension_list)){
+							global $extension_list=file($extension_list,FILE_IGNORE_NEW_LINES);
+							$checkextension=$extension_list[0];
+							unset($extension_list[0]);
+						}
+						else
+							$checkextension=0;
 						$maxsize=covert_size(ini_get('upload_max_filesize'));
 						if(isset($setting[6]) && $setting[6]!=null && $setting[6]!='')
 							$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
@@ -664,11 +672,17 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 											$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i].time()),true);
 											$target_path = "../upload/".$encname;
 										}while(is_file($target_path));
-										if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
-											$movedfiles[]=$_FILES['filename']['name'][$i];
-											$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$tkid.',"'.$msid.'","'.$date.'"),';
-											echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' has been uploaded",type:"success",timeout:2000});</script>';
+										if($checkextension==0 || ($checkextension==1 && retrive_mime($_FILES['filename']['tmp_name'][$i],$_FILES['filename']['name'][$i],1))){
+											if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
+												$movedfiles[]=$_FILES['filename']['name'][$i];
+												$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$tkid.',"'.$msid.'","'.$date.'"),';
+												echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' has been uploaded",type:"success",timeout:2000});</script>';
+											}
+											else
+												echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').'couldn\' be moved",type:"error",timeout:2000});</script>';
 										}
+										else
+											echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').': extension not allowed",type:"error",timeout:2000});</script>';
 									}
 								}
 								else
@@ -907,6 +921,14 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 						$msid=$DBH->lastInsertId();
 						$count=count($_FILES['filename']['name']);
 						if($count>0){
+							$extension_list='config/allowedext.txt';
+							if(is_file($extension_list)){
+								global $extension_list=file($extension_list,FILE_IGNORE_NEW_LINES);
+								$checkextension=$extension_list[0];
+								unset($extension_list[0]);
+							}
+							else
+								$checkextension=0;
 							$maxsize=covert_size(ini_get('upload_max_filesize'));
 							if(isset($setting[6]) && $setting[6]!=null && $setting[6]!='')
 								$maxsize=($setting[6]<=$maxsize)? $setting[6]:$maxsize;
@@ -919,17 +941,24 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 							for($i=0;$i<$count;$i++){
 								if($_FILES['filename']['error'][$i]==0){
 									if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 ){
-										if(count(array_keys($movedfiles,$_FILES['filename']['name'][$i]))==0){
+										if(!in_array($_FILES['filename']['name'][$i],$movedfiles)){
 											do{
 												$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i].time()),true);
 												$target_path = "../upload/".$encname;
 											}while(is_file($target_path));
-											if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
-												$movedfiles[]=$_FILES['filename']['name'][$i];
-												$uploadarr[]=array(0=>$_POST['id'],2=>$_FILES['filename']['name'][$i]);
-												$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$_POST['id'].',"'.$msid.'","'.$date.'"),';
-												echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' has been uploaded",type:"success",timeout:2000});</script>';
+											if($checkextension==0 || ($checkextension==1 && retrive_mime($_FILES['filename']['tmp_name'][$i],$_FILES['filename']['name'][$i],1))){
+												if(move_uploaded_file($_FILES['filename']['tmp_name'][$i], $target_path)){
+													$movedfiles[]=$_FILES['filename']['name'][$i];
+													$uploadarr[]=array(0=>$_POST['id'],2=>$_FILES['filename']['name'][$i]);
+													$query.='(?,'.$_SESSION['id'].',"'.$encname.'",'.$_POST['id'].',"'.$msid.'","'.$date.'"),';
+													echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').' has been uploaded",type:"success",timeout:2000});</script>';
+												}
+												else
+													echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').'couldn\' be moved",type:"error",timeout:2000});</script>';
 											}
+											else
+												echo '<script>parent.noty({text: "'.htmlspecialchars($_FILES['filename']['name'][$i],ENT_QUOTES,'UTF-8').': extension not allowed",type:"error",timeout:2000});</script>';
+
 										}
 									}
 									else
@@ -2396,7 +2425,7 @@ function retrive_avaible_operator($Hostname, $Username, $Password, $DatabaseName
 	}
 }
 
-function retrive_mime($encname,$mustang){
+function retrive_mime($encname,$mustang,$action=0){
 	$mime_types = array(
 		'txt' => 'text/plain',
 		'htm' => 'text/html',
@@ -2501,25 +2530,54 @@ function retrive_mime($encname,$mustang){
 		'odb' => 'application/vnd.oasis.opendocument.database',
 		'odi' => 'application/vnd.oasis.opendocument.image',
 		'oxt' => 'application/vnd.openofficeorg.extension',
-        );
-
-	$ext = explode('.',$mustang);
+	);
+	
+	$ext=explode('.',$mustang);
 	$count=count($ext)-1;
 	$ext=strtolower($ext[$count]);
-	if (function_exists('finfo_open')) {
-		$finfo = finfo_open(FILEINFO_MIME);
-		$mimetype = finfo_file($finfo, $encname);
-		finfo_close($finfo);
-		return $mimetype;
+	//Retrieve MIME-Type for Download
+	if($action==0){
+		if (function_exists('finfo_open')) {
+			$finfo = finfo_open(FILEINFO_MIME);
+			$mimetype = finfo_file($finfo, $encname);
+			finfo_close($finfo);
+			return $mimetype;
+		}
+		else if(function_exists('mime_content_type')) {
+			$mimetype = mime_content_type($mustang);
+			return $mimetype;
+		}
+		else if (isset($mime_types[$ext]))
+			return $mime_types[$ext];
+		else
+			return 'Error';
 	}
-	else if(function_exists('mime_content_type')) {
-		$mimetype = mime_content_type($mustang);
-		return $mimetype;
+	//Check MIME-Type for Upload
+	else{
+		if(!in_array($ext,$extension_list)){
+			return false;
+		}
+		if (function_exists('finfo_open')) {
+			$finfo = finfo_open(FILEINFO_MIME);
+			$mimetype = finfo_file($finfo, $encname);
+			finfo_close($finfo);
+			if($mimetype==$mime_types[$ext])
+				return true;
+			else
+				return false;
+		}
+		else if(function_exists('mime_content_type')) {
+			$mimetype = mime_content_type($mustang);
+			if($mimetype==$mime_types[$ext])
+				return true;
+			else
+				return false;
+		}
+		else if (isset($mime_types[$ext]))
+			return true;
+		else
+			return false;
 	}
-	else if (isset($mime_types[$ext]))
-		return $mime_types[$ext];
-	else
-		return 'Error';
 }
 
 function covert_size($val){if(empty($val))return 0;$val = trim($val);preg_match('#([0-9]+)[\s]*([a-z]+)#i', $val, $matches);$last = '';if(isset($matches[2]))$last = $matches[2];if(isset($matches[1]))$val = (int) $matches[1];switch (strtolower($last)){case 'g':case 'gb':$val *= 1024;case 'm':case 'mb':$val *= 1024;case 'k':case 'kb':$val *= 1024;}return (int) $val;}

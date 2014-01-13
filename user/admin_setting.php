@@ -57,6 +57,14 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 if(is_file('../php/config/privacy.txt')) $privacy=file('../php/config/privacy.txt',FILE_IGNORE_NEW_LINES);
 if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/logo.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
+if(is_file('../php/config/allowedext.txt')) {
+	$allowed_exentions=file('../php/config/allowedext.txt',FILE_IGNORE_NEW_LINES);
+	$check_extension=$allowed_exentions[0];
+	unset($allowed_exentions[0]);
+	$allowed_exentions=implode("\n",$allowed_exentions);
+}
+
+
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
@@ -217,10 +225,27 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						<div class='col-md-4'><input type="text" class='form-control'  name='maxsize' id="maxsize" <?php if(isset($setting[6])) echo 'value="'.($setting[6]/1048576).'"';?> placeholder="Lower File Size" /></div>
 					</div>
 					<div class='row form-group'>
+						<div class='col-md-2'><label>Check Extension?</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='check_extension' id='check_extension'>
+								<option value='0' selected>No</option>
+								<option value='1'>Yes</option>
+							</select>
+						</div>
+					</div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Allowed Extensions</label></div>
+						<div class='col-md-10'>
+							<textarea id='allowed_extension' name='allowed_extension' class='form-control' placeholder='Allowed Extensions, one per line'>
+								<?php echo if(isset($allowed_exentions) echo htmlspecialchars($allowed_exentions); ?>
+							</textarea>
+						</div>
+					</div>
+					<div class='row form-group'>
 						<div class='col-md-2'><label>Allow Opeartor Rating?</label></div>
 						<div class='col-md-4'>
 							<select class='form-control'  name='allrat' id='allrat'>
-								<option value='0'>No</option>
+								<option value='0' selected>No</option>
 								<option value='1'>Yes</option>
 							</select>
 						</div>
@@ -257,8 +282,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						<div class='col-md-3'><label>Enable "Accept Privacy Policy"?</label></div>
 						<div class='col-md-4'>
 							<select class='form-control'  name='enprivacy' id='enprivacy'>
+								<option value='0' selected>No</option>
 								<option value='1'>Yes</option>
-								<option value='0'>No</option>
 							</select>
 						</div>
 					</div>
@@ -357,8 +382,10 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			$("#allfaq > option[value='<?php echo $setting[8];?>']").attr('selected','selected');
 		<?php } if(isset($privacy[0])){?>
 			$("#enprivacy > option[value='<?php echo $privacy[0];?>']").attr('selected','selected');
+		<?php } if(isset($check_extension)){?>
+			$("#check_extension > option[value='<?php echo $check_extension;?>']").attr('selected','selected');
 		<?php } ?>
-		
+
 		$("#deleteupload").click(function() {
 			if(confirm("Do you want to delete all the files inside this period?")) {
 				var a = $("#delfromdate").val(), 
@@ -458,11 +485,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				h=$("#allup > option:checked").val(),
 				k=$("#allrat").val(),
 				q=$("#commlop").val(),
-				r=$("#allfaq").val();
+				r=$("#allfaq").val(),
+				s=$("#check_extension").val(),
+				t=$("#allowed_exentions").val();
 			$.ajax({
 				type:"POST",
 				url:"../php/admin_function.php",
-				data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,error_mail:error_mail,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r},
+				data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,error_mail:error_mail,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r,check_extension:s,allowed_exentions:t},
 				dataType:"json",
 				success:function(b){
 					if("Saved"==b[0])

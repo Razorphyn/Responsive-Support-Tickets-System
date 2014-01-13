@@ -84,8 +84,9 @@ else{
 	//Functions
 
 	if($_POST[$_SESSION['token']['act']]=='admin_user_add'){
-		$_POST['name']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['name']),FILTER_SANITIZE_STRING));
-		if(empty($_POST['name'])){
+		if(trim(preg_replace('/\s+/','',$_POST['name']))!='' && preg_match('/^[A-Za-z0-9À-ÿ\/\s\'-]+$/',$_POST['name'])) 
+			$_POST['name']=trim(preg_replace('/\s+/',' ',$_POST['name']));
+		else{
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Name: only alphanumeric and single quote allowed'));
 			exit();
@@ -413,14 +414,27 @@ else{
 	}
 
 	else if($_POST[$_SESSION['token']['act']]=='save_options'){
-		$_POST['senrep']=(is_numeric($_POST['senrep'])) ? (int)$_POST['senrep']:exit();
-		$_POST['senope']=(is_numeric($_POST['senope'])) ? (int)$_POST['senope']:exit();
-		$_POST['upload']=(is_numeric($_POST['upload'])) ? (int)$_POST['upload']:exit();
-		$_POST['faq']=(is_numeric($_POST['faq'])) ? (int)$_POST['faq']:exit();
+
+		$_POST['senrep']=(is_numeric($_POST['senrep']) && $_POST['senrep']==1) ? 1:0;
+		$_POST['senope']=(is_numeric($_POST['senope']) && $_POST['senope']==1) ? 1:0;
+		$_POST['upload']=(is_numeric($_POST['upload']) && $_POST['upload']==1) ? 1:0;
+		$_POST['check_extension']=(is_numeric($_POST['check_extension']) && $_POST['check_extension']==1) ? 1:0;
+		$_POST['faq']=(is_numeric($_POST['faq'])  && $_POST['enrat']==1) ? (int)$_POST['faq']:exit();
 		$_POST['maxsize']=(is_numeric($_POST['maxsize'])) ? ($_POST['maxsize']*1048576 ):null;
-		$_POST['enrat']=(is_numeric($_POST['enrat'])) ? $_POST['enrat']:exit();
+		$_POST['enrat']=(is_numeric($_POST['enrat']) && $_POST['enrat']==1) ? 1:0;
 		$_POST['commlop']=(trim(preg_replace('/\s+/',' ',$_POST['commlop']))=='php -f')? 'php -f':'php5-cli';
 		$_POST['tit']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
+		
+		$_POST['allowed_exentions']=trim(str_replace('.','',preg_replace('/\s+/','',$_POST['allowed_exentions']));
+		if(!empty($_POST['allowed_exentions'])){
+			preg_match_all('/^([a-zA-Z0-9+-]*)$/mi', $_POST['allowed_exentions'], $out);
+			if($out[0]!=explode("\n",$_POST['allowed_exentions'])){
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(array(0=>'Invalid extension at line: '.implode(", ", array_diff_key(array_flip(explode("\n",$_POST['allowed_exentions'])),array_flip($out[0]))).'. Only letters, numbers, "+" and "-" are allowed'));
+				exit();
+			}
+		}
+		
 		if(empty($_POST['tit'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Title'));
@@ -438,7 +452,7 @@ else{
 			echo json_encode(array(0=>'Invalid Error Mail'));
 			exit();
 		}
-		if(file_put_contents('config/setting.txt',$_POST['tit']."\n".$_POST['mail']."\n".$_POST['senrep']."\n".$_POST['senope']."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$_POST['maxsize']."\n".$_POST['enrat']."\n".$_POST['commlop']."\n".$_POST['faq']."\n".$_POST['error_mail'])){
+		if(file_put_contents('config/allowedext.txt',$_POST['check_extension']."\n".$_POST['allowed_exentions']) && file_put_contents('config/setting.txt',$_POST['tit']."\n".$_POST['mail']."\n".$_POST['senrep']."\n".$_POST['senope']."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$_POST['maxsize']."\n".$_POST['enrat']."\n".$_POST['commlop']."\n".$_POST['faq']."\n".$_POST['error_mail'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
 		}
