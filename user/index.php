@@ -99,9 +99,9 @@ try{
 					ON	b.id=a.department_id
 				JOIN ".$SupportUserTable." c
 					ON c.id=a.operator_id
-				WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status='1'
+				WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status='1' AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 				ORDER BY a.last_reply DESC 
-				LIMIT 350" ;
+				LIMIT 350";
 		$STH = $DBH->prepare($query);
 		$STH->execute();
 		$list=array('response'=>'ret','tickets'=>array('user'=>array(),'op'=>array()));
@@ -148,7 +148,7 @@ try{
 						ON	b.id=a.department_id
 					LEFT JOIN ".$SupportUserTable." c
 						ON c.id=a.operator_id
-					WHERE a.ticket_status='1'
+					WHERE a.ticket_status='1' AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 					ORDER BY a.last_reply DESC 
 					LIMIT 350";
 		$STH = $DBH->prepare($query);

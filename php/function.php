@@ -649,9 +649,10 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 					$msid=$DBH->lastInsertId();
 					$count=count($_FILES['filename']['name']);
 					if($count>0){
+						global $extension_list;
 						$extension_list='config/allowedext.txt';
 						if(is_file($extension_list)){
-							global $extension_list=file($extension_list,FILE_IGNORE_NEW_LINES);
+							$extension_list=file($extension_list,FILE_IGNORE_NEW_LINES);
 							$checkextension=$extension_list[0];
 							unset($extension_list[0]);
 						}
@@ -921,9 +922,10 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 						$msid=$DBH->lastInsertId();
 						$count=count($_FILES['filename']['name']);
 						if($count>0){
+							global $extension_list;
 							$extension_list='config/allowedext.txt';
 							if(is_file($extension_list)){
-								global $extension_list=file($extension_list,FILE_IGNORE_NEW_LINES);
+								$extension_list=file($extension_list,FILE_IGNORE_NEW_LINES);
 								$checkextension=$extension_list[0];
 								unset($extension_list[0]);
 							}
@@ -1253,7 +1255,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 						ON	b.id=a.department_id
 					JOIN ".$SupportUserTable." c
 						ON c.id=a.operator_id
-					WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status=?
+					WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status=?  AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 					ORDER BY a.last_reply DESC
 					LIMIT 350" ;
 			$STH = $DBH->prepare($query);
@@ -1301,7 +1303,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 							ON	b.id=a.department_id
 						LEFT JOIN ".$SupportUserTable." c
 							ON c.id=a.operator_id
-						WHERE a.ticket_status=?
+						WHERE a.ticket_status=?  AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 						ORDER BY a.last_reply DESC 
 						LIMIT 350";
 			$STH = $DBH->prepare($query);
@@ -2554,7 +2556,7 @@ function retrive_mime($encname,$mustang,$action=0){
 	}
 	//Check MIME-Type for Upload
 	else{
-		if(!in_array($ext,global $extension_list)){
+		if(!in_array($ext,$extension_list)){
 			return false;
 		}
 		if (function_exists('finfo_open')) {
