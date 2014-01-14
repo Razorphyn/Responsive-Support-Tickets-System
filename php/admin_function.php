@@ -171,6 +171,9 @@ else{
 
 			preg_match_all('/^(\d+)(:[A-Z0-9-]+(?: [A-Z0-9-]+)*)?:(\d+(?:\.\d{1,2})?)$/mi', $_POST['ratetable'], $out);
 			if($out[0]!=explode("\n",$_POST['ratetable'])){
+				array_unshift($out[0], "shift");
+				$_POST['ratetable']=explode("\n",$_POST['ratetable']);
+				array_unshift($_POST['ratetable'], "shift");
 				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode(array(0=>'Invalid price table at line: '.implode(", ", array_diff_key(array_flip(explode("\n",$_POST['ratetable'])),array_flip($out[0])))));
 				exit();
@@ -425,16 +428,19 @@ else{
 		$_POST['commlop']=(trim(preg_replace('/\s+/',' ',$_POST['commlop']))=='php -f')? 'php -f':'php5-cli';
 		$_POST['tit']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
 		
-		$_POST['allowed_exentions']=trim(str_replace('.','',preg_replace('/\s+/','',$_POST['allowed_exentions']));
+		$_POST['allowed_exentions']=trim(str_replace('.','',str_replace(' ','',$_POST['allowed_exentions'])));
 		if(!empty($_POST['allowed_exentions'])){
 			preg_match_all('/^([a-zA-Z0-9+-]*)$/mi', $_POST['allowed_exentions'], $out);
-			if($out[0]!=explode("\n",$_POST['allowed_exentions'])){
+			if(count($out[0])!=count(explode("\n",$_POST['allowed_exentions']))){
+				array_unshift($out[0], "shift");
+				$_POST['allowed_exentions']=explode("\n",$_POST['allowed_exentions']);
+				array_unshift($_POST['allowed_exentions'], "shift");
 				header('Content-Type: application/json; charset=utf-8');
-				echo json_encode(array(0=>'Invalid extension at line: '.implode(", ", array_diff_key(array_flip(explode("\n",$_POST['allowed_exentions'])),array_flip($out[0]))).'. Only letters, numbers, "+" and "-" are allowed'));
+				echo json_encode(array(0=>'Invalid extension at line: '.implode(", ", array_diff_key(array_flip($_POST['allowed_exentions']),array_flip($out[0]))).'. Only letters, numbers, "+" and "-" are allowed'));
 				exit();
 			}
 		}
-		
+
 		if(empty($_POST['tit'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Invalid Title'));
@@ -449,7 +455,7 @@ else{
 		$_POST['error_mail']= trim(preg_replace('/\s+/','',$_POST['error_mail']));
 		if(empty($_POST['error_mail']) || !filter_var($_POST['error_mail'], FILTER_VALIDATE_EMAIL)){
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Invalid Error Mail'));
+			echo json_encode(array(0=>'Invalid "Error Mail"'));
 			exit();
 		}
 		if(file_put_contents('config/allowedext.txt',$_POST['check_extension']."\n".$_POST['allowed_exentions']) && file_put_contents('config/setting.txt',$_POST['tit']."\n".$_POST['mail']."\n".$_POST['senrep']."\n".$_POST['senope']."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$_POST['maxsize']."\n".$_POST['enrat']."\n".$_POST['commlop']."\n".$_POST['faq']."\n".$_POST['error_mail'])){

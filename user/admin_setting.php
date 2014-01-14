@@ -58,7 +58,7 @@ if(is_file('../php/config/privacy.txt')) $privacy=file('../php/config/privacy.tx
 if(is_file('../php/config/logo.txt')) $logo=file_get_contents('../php/config/logo.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
 if(is_file('../php/config/allowedext.txt')) {
-	$allowed_exentions=file('../php/config/allowedext.txt',FILE_IGNORE_NEW_LINES);
+	$allowed_exentions=file('../php/config/allowedext.txt',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 	$check_extension=$allowed_exentions[0];
 	unset($allowed_exentions[0]);
 	$allowed_exentions=implode("\n",$allowed_exentions);
@@ -167,7 +167,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				</div>
 				<hr>
 				<form id='adminset' action=''>
-					<h3 class='sectname'>Site Information & Settings</h3>
+					<h3 class='sectname'>General Site Information</h3>
 					<div class='row form-group'>
 						<div class='col-md-2'><label>Title</label></div>
 						<div class='col-md-4'><input type="text" class='form-control'  name='titsite' id="titsite" <?php if(isset($setting[0])) echo 'value="'.$setting[0].'"';?> ifplaceholder="Title" required/></div>
@@ -176,6 +176,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 						<div class='col-md-2'><label>Time Zone</label></div>
 						<div class='col-md-4'><input type="text" class='form-control'  name='timezone' id="timezone" <?php if(isset($setting[4])) echo 'value="'.$setting[4].'"';?> ifplaceholder="Title" required/></div>
 					</div>
+					<h3 class='sectname'>Mail Advice</h3>
 					<div class='row form-group'>
 						<div class='col-md-2'><label>Notifier Mail</label></div>
 						<div class='col-md-4'><input type="text" class='form-control'  name='notmail' id="notmail" <?php if(isset($setting[1])) echo 'value="'.$setting[1].'"';?> placeholder="Notifier Email" required /></div>
@@ -198,6 +199,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							</select>
 						</div>
 					</div>
+					<h3 class='sectname'>FAQs</h3>
 					<div class='row form-group'>
 						<div class='col-md-2'><label>Enable FAQs?</label></div>
 						<div class='col-md-4'>
@@ -207,6 +209,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							</select>
 						</div>
 					</div>
+					<h3 class='sectname'>File Upload</h3>
 					<div class='row form-group'>
 						<div class='col-md-2'><label>Allow Upload?</label></div>
 						<div class='col-md-4'>
@@ -232,15 +235,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								<option value='1'>Yes</option>
 							</select>
 						</div>
-					</div>
-					<div class='row form-group'>
-						<div class='col-md-2'><label>Allowed Extensions</label></div>
-						<div class='col-md-10'>
-							<textarea id='allowed_extension' name='allowed_extension' class='form-control' placeholder='Allowed Extensions, one per line'>
-								<?php echo if(isset($allowed_exentions) echo htmlspecialchars($allowed_exentions); ?>
-							</textarea>
+						<div class='col-md-2'><label>Allowed Extensions</label><br/><small>One Extension Per Line</small></div>
+						<div class='col-md-4'>
+							<textarea id='allowed_exentions' name='allowed_exentions' class='form-control' rows='7' placeholder='Allowed Extensions, one per line'><?php if(isset($allowed_exentions)) echo htmlspecialchars($allowed_exentions); ?></textarea>
 						</div>
 					</div>
+
+					<h3 class='sectname'>Enable Ratings</h3>
 					<div class='row form-group'>
 						<div class='col-md-2'><label>Allow Opeartor Rating?</label></div>
 						<div class='col-md-4'>
@@ -250,6 +251,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							</select>
 						</div>
 					</div>
+
+					<h3 class='sectname'>Server Options</h3>
 					<div class='row form-group'>
 						<div class='col-md-2'><label>Command Line Option</label></div>
 						<div class='col-md-3'>Usually <strong>php5-cli</strong> or <strong>php -f</strong></div><br/>
