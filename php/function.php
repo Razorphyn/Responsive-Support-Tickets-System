@@ -2554,7 +2554,7 @@ function retrive_mime($encname,$mustang,$action=0){
 	}
 	//Check MIME-Type for Upload
 	else{
-		if(!in_array($ext,$extension_list)){
+		if(!in_array($ext,global $extension_list)){
 			return false;
 		}
 		if (function_exists('finfo_open')) {
@@ -2573,10 +2573,8 @@ function retrive_mime($encname,$mustang,$action=0){
 			else
 				return false;
 		}
-		else if (isset($mime_types[$ext]))
-			return true;
 		else
-			return false;
+			return true;
 	}
 }
 
