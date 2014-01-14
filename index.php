@@ -74,33 +74,37 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 		  
 					<div class="collapse navbar-collapse" id="header-nav-collapse">
 						<ul class="nav navbar-nav">
-							<li class="active"><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
-							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<li class="active"><a href="index.php"><i class="glyphicon glyphicon-home"></i> Home</a></li>
+							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i> FAQs</a></li>
 							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
-								<li><a href="user/newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i> Tickets<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
 											<a href="user/" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
 										</li>
 										<li role="presentation">
+											<a href="user/newticket.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-folder-close"></i> New Ticket</a>
+										</li>
+										<li role="presentation">
 											<a href="user/search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
 										</li>
 									</ul>
 								</li>
-								<li><a href="user/setting.php"><i class="glyphicon glyphicon-edit"></i>Settings</a></li>
+								<li><a href="user/setting.php"><i class="glyphicon glyphicon-edit"></i> Account</a></li>
 								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
-									<li><a href="user/users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
 									<li class="dropdown" role='button'>
 										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+											<i class="glyphicon glyphicon-eye-open"></i> Administration<b class="caret"></b>
 										</a>
 										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 											<li role="presentation">
 												<a href="user/admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+											</li>
+											<li>
+												<a href="user/admin_users.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-user"></i> Users</a>
 											</li>
 											<li role="presentation">
 												<a href="user/admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
@@ -120,7 +124,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 										</ul>
 									</li>
 								<?php }} if(isset($_SESSION['name'])){ ?>
-									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i> Logout</a></li>
 								<?php } ?>
 						</ul>
 					</div>

@@ -1,6 +1,6 @@
 <?php
 /*
-Status
+User Status
 0	user
 1	operator
 2	admin

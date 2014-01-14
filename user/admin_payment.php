@@ -141,12 +141,12 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<div class="collapse navbar-collapse" id="header-nav-collapse">
 						<ul class="nav navbar-nav">
 							<li><a href="../"><i class="glyphicon glyphicon-home"></i>Home</a></li>
-							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i> FAQs</a></li>
 							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
 								<li><a href="newticket.php"><i class="glyphicon glyphicon-file"></i>New Ticket</a></li>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="glyphicon glyphicon-folder-close"></i>Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i> Tickets<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
@@ -157,12 +157,12 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="glyphicon glyphglyphicon glyphicon-eye-open"></i>Settings</a></li>
+								<li><a href="setting.php"><i class="glyphicon glyphglyphicon glyphicon-eye-open"></i> Account</a></li>
 								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
-									<li><a href="users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
+									<li><a href="admin_users.php"><i class="glyphicon glyphicon-user"></i>Users</a></li>
 									<li class="dropdown active" role='button'>
 										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-											<i class="glyphicon glyphicon-eye-open"></i>Administration<b class="caret"></b>
+											<i class="glyphicon glyphicon-eye-open"></i> Administration<b class="caret"></b>
 										</a>
 										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 											<li role="presentation">
@@ -186,7 +186,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 										</ul>
 									</li>
 								<?php }} if(isset($_SESSION['name'])){ ?>
-									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i> Logout</a></li>
 								<?php } ?>
 						</ul>
 					</div>

@@ -1,6 +1,6 @@
 <?php
 /*
-Status
+User Status
 0	user
 1	operator
 2	admin
@@ -754,6 +754,11 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 			if($free==1)
 				echo "<script>parent.$('.main').nimbleLoader('hide');parent.created(0,null);</script>";
 			else{
+				$query = "UPDATE ".$SupportTicketsTable." enabled='0' WHERE id=?";
+				$STH = $DBH->prepare($query);
+				$STH->bindParam(1,$tkid,PDO::PARAM_INT);
+				$STH->execute();
+
 				if($_POST['method']==0){
 					$paypal_setting=file('config/payment/paypal.txt',FILE_IGNORE_NEW_LINES);
 					//0=>mail,1=>currency,2=>sandbox,3=>curl
@@ -762,9 +767,17 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 					$return_url=$url.'/user/inedx.php?payment=1';
 					$cancel_url=$url.'/user/inedx.php?payment=0';
 					$notify_url=$url.'/php/payment_paypal.php';
-					$item_name=$_POST['minutes'].' of support for ticket number .'.$tkid;
-					$item_amount=1;
-					
+					$item_name=$_POST['minutes'].' of support for ticket number: '.$tkid;
+
+					$file=file('config/payment/price.txt');
+					if($file[0]==0){
+						$prices=json_decode($file[1]);
+						$item_amount=round($prices[$_POST['minutes']],2);
+					}
+					else if($file[0]==1){
+						$item_amount=round($file[1]*$_POST['minutes'],2);
+					}
+
 					$querystring .= "?business=".urlencode($paypal_setting[0])."&";
 					$querystring .= "item_name=".urlencode($item_name)."&";
 					$querystring .= "amount=".urlencode($item_amount)."&";
@@ -788,7 +801,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 						echo "<script>parent.$('.main').nimbleLoader('hide');parent.created(1,'".urlencode('https://www.paypal.com/cgi-bin/webscr'.$querystring)."');</script>";
 				}
 				else if($_POST['method']==1){
-					$file=file('config/payment/price.txt');
+
 					$moneybooker_setting=file('config/payment/moneybooker.txt');
 					//0=>merchant_id, 1=>payment_mail, 2=>currency,3=>company, 4=>secret word
 					if($file[0]==0){

@@ -67,7 +67,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 		  
 					<div class="collapse navbar-collapse" id="header-nav-collapse">
 						<ul class="nav navbar-nav">
-							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i>Home</a></li>
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i> Home</a></li>
 							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
 						</ul>
 					</div>
