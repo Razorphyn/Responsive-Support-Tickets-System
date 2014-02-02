@@ -296,11 +296,11 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 		
 		<!--[if lt IE 9]><script src="js/html5shiv-printshiv.js"></script><![endif]-->
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_i&amp;5259487' ?>"/>
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_d&amp;5259487' ?>"/>
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?f=css/jRating.jquery.css&amp;5259487' ?>"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_i&amp;5259487"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_d&amp;5259487"/>
+		<link rel="stylesheet" type="text/css" href="../min/?f=css/jRating.jquery.css&amp;5259487"/>
 		<?php if($isMob) { ?>
-			<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_m&amp;5259487' ?>"/>
+			<link rel="stylesheet" type="text/css" href="../min/?g=css_m&amp;5259487"/>
 		<?php } ?>
 	</head>
 	<body>
@@ -519,17 +519,15 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 					</div>
 		</div>
 	<iframe style='display:none' name='hidden_upload' id='hidden_upload' src="about:blank"></iframe>
+	
+	<script type="text/javascript"  src="../min/?g=js_i&amp;5259487"></script>
+	<script type="text/javascript"  src="../min/?g=js_d&amp;5259487"></script>
 	<?php if(!$isMob) { ?>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/jRating.jquery.js,js/loadmessages.js&amp;5259487' ?>"></script>
 		<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
 	<?php }else { ?>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_m&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/jRating.jquery.js,js/loadmessages.js&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="../min/?g=js_m&amp;5259487"></script>
 	<?php } ?>
+	<script type="text/javascript"  src="../min/?f=js/jRating.jquery.js,js/loadmessages.js&amp;5259487"></script>
 	<script>
 	var add=0,editor, writing=false, totalmsg=<?php echo $totnummsg;?>;
 	$(document).ready(function(){

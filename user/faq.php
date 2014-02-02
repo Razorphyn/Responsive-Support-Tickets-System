@@ -90,8 +90,8 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 		
 		<!--[if lt IE 9]><script src="js/html5shiv-printshiv.js"></script><![endif]-->
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_i&amp;5259487' ?>"/>
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?f=css/jRating.jquery.css&amp;5259487' ?>"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_i&amp;5259487"/>
+		<link rel="stylesheet" type="text/css" href="../min/?f=css/jRating.jquery.css&amp;5259487"/>
 		
 	</head>
 	<body>
@@ -181,8 +181,8 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 					<hr>
 			</div>
 		</div>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/jRating.jquery.js&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="../min/?g=js_i&amp;5259487"></script>
+		<script type="text/javascript"  src="../min/?f=js/jRating.jquery.js&amp;5259487"></script>
 	<script>
 	 $(document).ready(function(){
 		$(".razorate").jRating();

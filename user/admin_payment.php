@@ -121,8 +121,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		<!--[if lt IE 9]><script src="../js/html5shiv-printshiv.js"></script><![endif]-->
 
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_i&amp;5259487' ?>"/>
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_d&amp;5259487' ?>"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_i&amp;5259487"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_d&amp;5259487"/>
 	</head>
 	<body>
 		<div class="container">
@@ -286,8 +286,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		</div>
 		<iframe name='hidden_frame' style='display:none;width:0;height:0' src="about:blank" ></iframe>
 	
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
+	<script type="text/javascript"  src="../min/?g=js_i&amp;5259487"></script>
+	<script type="text/javascript"  src="../min/?g=js_d&amp;5259487"></script>
 
 	<script type="text/javascript">
 	$(document).ready(function() {

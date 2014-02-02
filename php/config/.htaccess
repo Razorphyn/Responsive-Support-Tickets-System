@@ -13,19 +13,7 @@ IndexIgnore *
     #SetOutputFilter DEFLATE
     
     # Insert filter on selected content types only
-    #AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
-    
-	<files *.html>
-	   SetOutputFilter DEFLATE
-	</files>
-	
-	<files *.txt>
-	   SetOutputFilter DEFLATE
-	</files>
-	
-	<files *.php>
-	   SetOutputFilter DEFLATE
-	</files>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
 
     # Netscape 4.x has some problems...
     BrowserMatch ^Mozilla/4 gzip-only-text/html

@@ -86,10 +86,10 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		<!--[if lt IE 9]><script src="../js/html5shiv-printshiv.js"></script><![endif]-->
 
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_i&amp;5259487' ?>"/>
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_d&amp;5259487' ?>"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_i&amp;5259487"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_d&amp;5259487"/>
 		<?php if($isMob) { ?>
-			<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_m&amp;5259487' ?>"/>
+			<link rel="stylesheet" type="text/css" href="../min/?g=css_m&amp;5259487"/>
 		<?php } ?>
 	</head>
 	<body>
@@ -345,16 +345,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		</div>
 		<iframe name='hidden_frame' style='display:none;width:0;height:0' src="about:blank" ></iframe>
 	
+	<script type="text/javascript"  src="../min/?g=js_i&amp;5259487"></script>
+	<script type="text/javascript"  src="../min/?g=js_d&amp;5259487"></script>
+	<script type="text/javascript"  src="../min/?f=js/timezoneautocomplete.js&amp;5259487"></script>
 	<?php if(!$isMob) { ?>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/timezoneautocomplete.js&amp;5259487' ?>"></script>
 		<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
 	<?php }else { ?>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?f=js/timezoneautocomplete.js&amp;5259487' ?>"></script>
-		<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_m&amp;5259487' ?>"></script>
+		<script type="text/javascript"  src="../min/?g=js_m&amp;5259487"></script>
 	<?php } ?>
 	
 	<script>

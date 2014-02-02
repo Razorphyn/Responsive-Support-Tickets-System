@@ -101,8 +101,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 		
 		<!--[if lt IE 9]><script src="../js/html5shiv-printshiv.js"></script><![endif]-->
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_i&amp;5259487' ?>"/>
-		<link rel="stylesheet" type="text/css" href="<?php echo $siteurl.'/min/?g=css_d&amp;5259487' ?>"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_i&amp;5259487"/>
+		<link rel="stylesheet" type="text/css" href="../min/?g=css_d&amp;5259487"/>
 		
 	</head>
 	<body>
@@ -208,8 +208,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			<p>Irreversible Operation</p>
 		</div>
 
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_i&amp;5259487' ?>"></script>
-	<script type="text/javascript"  src="<?php echo $siteurl.'/min/?g=js_d&amp;5259487' ?>"></script>
+	<script type="text/javascript"  src="../min/?g=js_i&amp;5259487"></script>
+	<script type="text/javascript"  src="../min/?g=js_d&amp;5259487"></script>
 	<script>
 	 $(document).ready(function() {
 		
