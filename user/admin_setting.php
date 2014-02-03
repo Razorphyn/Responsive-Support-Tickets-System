@@ -273,7 +273,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					<h3 class='sectname'>Logo</h3>
 					<div class='row form-group'>
 						<div class='col-md-2'><label>Current Logo</label></div>
-						<div class='col-md-12'><img src='<?php if(isset($logo) && rtrim($logo)!='') echo $logo;else echo "../css/logo/def/logo.png"; ?>' alt='Logo' id='cur_logo'/><br/><br/></div>
+						<div class='col-md-12'><img class='img-responsive' src='<?php if(isset($logo) && rtrim($logo)!='') echo $logo;else echo "../css/logo/def/logo.png"; ?>' alt='Logo' id='cur_logo'/><br/><br/></div>
 					</div>
 					<br/><br/>
 					<div class='row form-group'>
