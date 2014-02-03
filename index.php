@@ -132,7 +132,9 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			</nav>
 			<div class='daddy'>
 				<div class="jumbotron" >
-					<h1 class="muted pagefun"><img id='logo' src='<?php if(isset($logo) && !empty($logo)) echo $logo; else echo 'css/images/logo.png'; ?>' alt='<?php if(isset($setting[0])) echo $setting[0];?>' title='<?php if(isset($setting[0])) echo $setting[0];?>'/></h1>
+					<h1 class="muted pagefun">
+						<img id='logo' class='logo img-responsive' src='<?php if(isset($logo) && !empty($logo)) echo $logo; else echo 'css/images/logo.png'; ?>' alt='<?php if(isset($setting[0])) echo $setting[0];?>' title='<?php if(isset($setting[0])) echo $setting[0];?>'/>
+					</h1>
 					<h1 class='pagefun'>Welcome to the support center</h1>
 				</div>
 				<hr>
