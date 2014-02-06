@@ -15,7 +15,7 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off'){
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{26,40}$/',$_COOKIE['RazorphynSupport'])){
 	unset($_COOKIE['RazorphynSupport']);
 }
 session_start(); 
@@ -26,13 +26,13 @@ if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){
 	session_unset();
 	session_destroy();
-	header("location: index.php");
+	header("location: index.php?e=expired");
 	exit();
 }
 else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
-	header("location: index.php");
+	header("location: index.php?e=local");
 	exit();
 }
 
@@ -254,7 +254,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 						noty({text: data[0],type:'error',timeout:9E3});
 				}
 			}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
-	
+
 		<?php } ?>
 		$(".opthome").on("click", function() { $(".activesec").removeClass("activesec").slideToggle(800); $('form[class*="' + $(this).attr("name") + '"]').slideToggle(800).addClass("activesec") });
 		$('.register, .pwdres').slideToggle(400);
@@ -280,8 +280,8 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			else
 				noty({text: 'Please complete all the fields.',type:'error',timeout:9E3});
 		});
-	
 	});
+
 	<?php if(isset($_SESSION['status']) && $_SESSION['status']==3){ ?>
 		function veirfy(){
 			$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});
@@ -358,7 +358,22 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 		<?php } ?>
 	}
 
-	function login(){$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});$.ajax({type:"POST",url:"php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"login",mail:$("#mail").val(),pwd:$("#pwd").val()},dataType:"json",success:function(a){$(".main").nimbleLoader("hide");"Logged"==a[0]? (window.location = '<?php echo $siteurl; ?>'):noty({text:a[0],type:"error",timeout:9E3})}}).fail(function(a,b){$(".main").nimbleLoader("hide");noty({text:b, type:"error",timeout:9E3})})};
+	function login(){
+		$(".main").nimbleLoader("show",{position:"fixed",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});
+		$.ajax({
+			type:"POST",
+			url:"php/function.php",
+			data:{<?php echo $_SESSION['token']['act']; ?>:"login",mail:$("#mail").val(),pwd:$("#pwd").val()},
+			dataType:"json",
+			success:function(a){
+				$(".main").nimbleLoader("hide");
+				if("Logged"==a[0])
+					window.location = '<?php echo $siteurl; ?>';
+				else
+					noty({text:a[0],type:"error",timeout:9E3})
+			}
+		}).fail(function(a,b){$(".main").nimbleLoader("hide");noty({text:b, type:"error",timeout:9E3})})
+	};
 	
 	function logout(){var request= $.ajax({type: 'POST',url: 'php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'logout'},dataType : 'json',success : function (data) {if(data[0]=='logout') window.location.reload();else alert(data[0]);}});request.fail(function(jqXHR, textStatus){alert('Error: '+ textStatus);});}
 

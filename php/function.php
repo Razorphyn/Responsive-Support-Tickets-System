@@ -28,8 +28,8 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[a-z0-9]{26,40}$/',$_COOKIE['RazorphynSupport'])){
 
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{26,40}$/',$_COOKIE['RazorphynSupport'])){
 	setcookie(session_name(),'invalid',time()-3600);
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 		header('Content-Type: application/json; charset=utf-8');
@@ -40,10 +40,6 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 	exit();
 }
 session_start(); 
-
-include_once 'config/database.php';
-if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
-if(isset($setting[4])) date_default_timezone_set($setting[4]);
 
 //Logout
 if($_POST[$_SESSION['token']['act']]=='logout' && isset($_SESSION['status'])){
@@ -90,6 +86,11 @@ else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_
 		echo '<script>top.window.location.replace("'.curPageURL().'?e=token");</script>';
 	exit();
 }
+
+//Load Database Info and Timezone
+include_once 'config/database.php';
+if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
+if(isset($setting[4])) date_default_timezone_set($setting[4]);
 
 //Function
 
