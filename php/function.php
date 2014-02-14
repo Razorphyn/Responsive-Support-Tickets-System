@@ -595,9 +595,16 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 				exit();
 			}
 			$free=$a['free'];
+			switch($free){
+				case 1:
+					$ena=1;
+					break;
+				default:
+					$ena=0;
+			}
 
 			//Create Ticket
-			$query = "INSERT INTO ".$SupportTicketsTable."(`department_id`,`user_id`,`title`,`priority`,`website`,`contype`,`ftp_user`,`ftp_password`,`created_time`,`last_reply`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+			$query = "INSERT INTO ".$SupportTicketsTable."(`department_id`,`user_id`,`title`,`priority`,`website`,`contype`,`ftp_user`,`ftp_password`,`created_time`,`last_reply`,`enabled`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
 			$STH = $DBH->prepare($query);
 			$date=date("Y-m-d H:i:s");
@@ -611,10 +618,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 			$STH->bindParam(8,$_POST['ftppass'],PDO::PARAM_STR);
 			$STH->bindParam(9,$date,PDO::PARAM_STR);
 			$STH->bindParam(10,$date,PDO::PARAM_STR);
-			if($free==1)
-				$STH->bindParam(11,'1',PDO::PARAM_STR);
-			else
-				$STH->bindParam(11,'0',PDO::PARAM_STR);
+			$STH->bindParam(11,$ena,PDO::PARAM_STR);
 			$STH->execute();
 
 			echo '<script>parent.$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});</script>';
@@ -669,7 +673,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 						for($i=0;$i<$count;$i++){
 							if($_FILES['filename']['error'][$i]==0){
 								if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0){
-									if(!in_array($_FILES['filename']['name'][$i],$movedfiles)){
+									if(preg_match('~^[^?*\\/<>|:"]{1,255}+$~',$_FILES['filename']['name'][$i]) && !in_array($_FILES['filename']['name'][$i],$movedfiles)){
 										do{
 											$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i].time()),true);
 											$target_path = "../upload/".$encname;
@@ -957,7 +961,7 @@ else if(isset($_POST['post_reply']) && $_POST['post_reply']=='Post Reply' && iss
 							for($i=0;$i<$count;$i++){
 								if($_FILES['filename']['error'][$i]==0){
 									if($_FILES['filename']['size'][$i]<=$maxsize && $_FILES['filename']['size'][$i]!=0 ){
-										if(!in_array($_FILES['filename']['name'][$i],$movedfiles)){
+										if(preg_match('~^[^?*\\/<>|:"]{1,255}+$~',$_FILES['filename']['name'][$i]) && !in_array($_FILES['filename']['name'][$i],$movedfiles)){
 											do{
 												$encname=uniqid(hash('sha256',$msid.$_FILES['filename']['name'][$i].time()),true);
 												$target_path = "../upload/".$encname;
@@ -1812,7 +1816,7 @@ else if(isset($_POST['file_download']) && isset($_SESSION['status']) && $_SESSIO
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		
-		$query="SELECT name,enc FROM ".$SupportUploadTable." WHERE ticket_id=? AND id=? LIMIT 1";
+		$query="SELECT name,enc FROM ".$SupportUploadTable." WHERE tk_id=? AND id=? LIMIT 1";
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$_SESSION['tickets'][$_POST['ticket_id']]['id'],PDO::PARAM_INT);
 		$STH->bindParam(2,$_POST['file_download'],PDO::PARAM_INT);
@@ -1956,7 +1960,7 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_index' && isset($_SESS
 	exit();
 }
 
-else if($_POST['act']=='rating' && isset($_SESSION['status']) && $_SESSION['status']<3){//deep check
+else if($_POST['act']=='rating' && isset($_SESSION['status']) && $_SESSION['status']<3){//check
 	$_POST['rate']=(is_numeric($_POST['rate']))? $_POST['rate']:0;
 	$_POST['tkid']=trim(preg_replace('/\s+/','',$_POST['tkid']));
 	if(!preg_match('/^[0-9]{1,15}$/',$_POST['tkid'])){

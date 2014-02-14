@@ -497,14 +497,14 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 						<?php 
 							for($i=0;$i<$count;$i++){
 								if($i==0)
-									echo '<div class="row evenmessage"><div class="row"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p><span class="label label-important newest">Newest</span></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
+									echo '<div class="row evenmessage"><div class="row"><div class="col-md-2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p><span class="label label-important newest">Newest</span></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
 								else if($i%2==0)
-									echo '<div class="row evenmessage"><div class="row"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
+									echo '<div class="row evenmessage"><div class="row"><div class="col-md-2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
 								else
-									echo '<div class="row oddmessage"><div class="row"><div class="span2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
+									echo '<div class="row oddmessage"><div class="row"><div class="col-md-2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
 								$upcount=count($list[$i]);
 								if($upcount>4){
-									echo '<div class="row form-group attachment"><div class="span2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">';
+									echo '<div class="row form-group attachment"><div class="col-md-2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">';
 									for($j=4;$j<$upcount;$j++)
 										echo $list[$i][$j];
 									echo'</div></div>';
@@ -769,9 +769,9 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 		});
 		$(".attlist").append("<div class='row uploadfilebox'></div>");
 		tail = [];
-		$("#messages").children(".row:first").hasClass("oddmessage") ? tail.push('<div class="row evenmessage" style="display:none"><div class="row"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row oddmessage" style="display:none"><div class="row"><div class="span2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>");
+		$("#messages").children(".row:first").hasClass("oddmessage") ? tail.push('<div class="row evenmessage" style="display:none"><div class="row"><div class="col-md-2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row oddmessage" style="display:none"><div class="row"><div class="col-md-2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>");
 		if (null != up){
-			tail.push('<div class="row attachment"><div class="span2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">');
+			tail.push('<div class="row attachment"><div class="col-md-2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">');
 			var count= up.length;
 			for (i=0; i < count; i++) 
 				tail.push("<form class='download_form' method='POST' action='../php/function.php' target='hidden_upload' enctype='multipart/form-data'><input type='hidden' name='ticket_id' value='" + up[i][0] + "'/><input type='hidden' name='file_download' value='" + up[i][1] + "'/><input type='submit' class='btn btn-link download' value='" + up[i][2] + "'> &nbsp;&nbsp; <i class='glyphicon glyphicon-remove-sign remfile' title='Delete File' alt='Delete File'></i></form>");

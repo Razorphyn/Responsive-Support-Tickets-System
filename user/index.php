@@ -54,6 +54,7 @@ try{
 					IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) AS opname,
 					a.title,
 					CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END as prio,
+					CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL,'Free','Premium') WHEN '0' THEN IF(d.tk_id IS NULL,'Unpaid',CASE d.status WHEN '0' THEN 'Pending' WHEN '1' THEN 'Failed' WHEN '3' THEN 'Refunded' WHEN '4' THEN 'Partially Refunded' END) END AS status,
 					a.created_time,
 					a.last_reply
 				FROM ".$SupportTicketsTable." a
@@ -61,6 +62,8 @@ try{
 					ON	b.id=a.department_id
 				LEFT JOIN ".$SupportUserTable." c
 					ON c.id=a.operator_id
+				LEFT JOIN ".$SupportUserTable." d
+					ON d.tk_id=a.id
 				WHERE a.user_id=".$_SESSION['id']."  AND a.ticket_status='1'
 				ORDER BY a.last_reply DESC 
 				LIMIT 350";
@@ -78,7 +81,7 @@ try{
 													'priority'=>$a['prio'],
 													'date'=>$a['created_time'],
 													'reply'=>$a['last_reply'],
-													'free'=>$a['last_reply'],
+													'status'=>$a['status'],
 													'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 												);
 			}while ($a = $STH->fetch());
@@ -91,6 +94,7 @@ try{
 					CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE (IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown'))) END AS opname,
 					a.operator_id,
 					a.title,
+					CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL,'Free','Premium') WHEN '0' THEN IF(d.tk_id IS NULL,'Unpaid',CASE d.status WHEN '0' THEN 'Pending' WHEN '1' THEN 'Failed' WHEN '3' THEN 'Refunded' WHEN '4' THEN 'Partially Refunded' END) END AS status,
 					CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
 					a.created_time,
 					a.last_reply
@@ -99,6 +103,8 @@ try{
 					ON	b.id=a.department_id
 				JOIN ".$SupportUserTable." c
 					ON c.id=a.operator_id
+				LEFT JOIN ".$SupportUserTable." d
+					ON d.tk_id=a.id
 				WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status='1' AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 				ORDER BY a.last_reply DESC 
 				LIMIT 350";
@@ -140,6 +146,7 @@ try{
 						CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE ( IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) ) END AS opname,
 						a.operator_id,
 						a.title,
+						CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL,'Free','Premium') WHEN '0' THEN IF(d.tk_id IS NULL,'Unpaid',CASE d.status WHEN '0' THEN 'Pending' WHEN '1' THEN 'Failed' WHEN '3' THEN 'Refunded' WHEN '4' THEN 'Partially Refunded' END) END AS status,
 						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
 						a.created_time,
 						a.last_reply
@@ -166,6 +173,7 @@ try{
 														'priority'=>$a['prio'],
 														'date'=>$a['created_time'],
 														'reply'=>$a['last_reply'],
+														'status'=>$a['status'],
 														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 												);
 				else if($a['user_id']==$_SESSION['id'])
@@ -176,6 +184,7 @@ try{
 														'priority'=>$a['prio'],
 														'date'=>$a['created_time'],
 														'reply'=>$a['last_reply'],
+														'status'=>$a['status'],
 														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 													);
 				else
@@ -186,6 +195,7 @@ try{
 														'priority'=>$a['prio'],
 														'date'=>$a['created_time'],
 														'reply'=>$a['last_reply'],
+														'status'=>$a['status'],
 														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 													);
 			}while ($a = $STH->fetch());

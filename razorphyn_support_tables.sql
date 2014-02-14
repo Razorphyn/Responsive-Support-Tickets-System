@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_extension_version` (
 	INDEX `info` (`db_version`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `razorphyn_support_extension_version` (`db_version`) VALUES ('1.0.3');
+INSERT INTO `razorphyn_support_extension_version` (`db_version`) VALUES ('1.0.4');
 
 CREATE TABLE IF NOT EXISTS `razorphyn_support_users` (
 	`id` 				BIGINT(15) 		UNSIGNED		NOT NULL AUTO_INCREMENT,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_list_messages` (
 
 CREATE TABLE IF NOT EXISTS `razorphyn_support_uploaded_file`(
 	`id` 				BIGINT(15) 	UNSIGNED		NOT NULL AUTO_INCREMENT,
-	`name` 				VARCHAR(50) 				NOT NULL,
+	`name` 				VARCHAR(255) 				NOT NULL,
 	`uploader` 			BIGINT(11) 	UNSIGNED		NOT NULL, 
 	`tk_id` 			BIGINT(15) 	UNSIGNED 		NOT NULL,
 	`ticket_id` 		BIGINT(15) 	UNSIGNED 		NOT NULL,
