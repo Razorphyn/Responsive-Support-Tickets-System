@@ -49,14 +49,14 @@
 							mess= new Array();
 							var count= data['messages'].length;
 							for(var i=0; i<count;i++){
-								if(i%2==0)
+								if(data['messages'][i][3]==1)
 									mess.push('<div class="row-fluid evenmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p><p class="postnumber">Post Number: '+(totalmsg-settings.nop-add-i)+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
 								else
 									mess.push('<div class="row-fluid oddmessage" style="display:none"><div class="row-fluid"><div class="span2 usrinfo"><p class="username">'+data['messages'][i][0]+'</p><p class="date">'+data['messages'][i][2]+'</p><p class="postnumber">Post Number: '+(totalmsg-settings.nop-add-i)+'</p></div><div class="span8 messagecell">'+data['messages'][i][1]+'</div></div>');
 								var upcount=data['messages'][i].length;
 								if(upcount>3){
 									mess.push('<div class="row attachment"><div class="span2 offset1 attachmentsec">Attachment</div><div class="span8">');
-									for(var j=3;j<upcount;j++)
+									for(var j=4;j<upcount;j++)
 										mess.push(data['messages'][i][j]);
 									mess.push('</div></div>');
 								}

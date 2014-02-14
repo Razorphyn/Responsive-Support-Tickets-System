@@ -386,19 +386,23 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 					<div class='col-md-2'><strong>Reference ID</strong></div>
 					<div class='col-md-10' ><span id='reference_id'><?php echo $refid; ?></span></div>
 				</div>
-				<div class='row form-group'>
-					<div class='col-md-2'><strong>Website</strong></div>
-					<div class='col-md-4'><input type='text' class='form-control'  id='webs' value="<?php echo $cweb; ?>"/></div>
-					<div class='col-md-2'><strong>Connection Type</strong></div>
-					<div class='col-md-4'><select class='form-control'  id='contype'><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
+				<hr>
+				<p class='cif'><i class='glyphicon glyphicon-plus-sign'></i> Website Information </p>
+				<div class='expande'>
+					<div class='row form-group'>
+						<div class='col-md-2'><strong>Website</strong></div>
+						<div class='col-md-4'><input type='text' class='form-control'  id='webs' value="<?php echo $cweb; ?>"/></div>
+						<div class='col-md-2'><strong>Connection Type</strong></div>
+						<div class='col-md-4'><select class='form-control'  id='contype'><option selected="" value="0">--</option><option value="1">FTP</option><option value="2">FTPS</option><option value="3">SFTP</option><option value="4">SSH</option><option value="5">Other</option></select></div>
+					</div>
+					<div class='row form-group'>
+						<div class='col-md-2'><strong>Username</strong></div>
+						<div class='col-md-4'><input type='text' class='form-control' id='conuser' value="<?php echo addslashes($usercred); ?>"/></div>
+						<div class='col-md-2'><div class='col-md-7'><strong>Password</strong></div><div class='col-md-5'><button id='showhide' class='btn btn-info'>Show</button></div></div>
+						<div class='col-md-4' id='passcont'><input class='form-control'  type='password' id='conpass' value="<?php echo addslashes($conpass); ?>" autocomplete="off" /></div>
+					</div>
+					<input type='submit' class='btn btn-success' id='updtconn' onclick='javascript:return false;' value='Update'/>
 				</div>
-				<div class='row form-group'>
-					<div class='col-md-2'><strong>Username</strong></div>
-					<div class='col-md-4'><input type='text' class='form-control' id='conuser' value="<?php echo addslashes($usercred); ?>"/></div>
-					<div class='col-md-2'><div class='col-md-7'><strong>Password</strong></div><div class='col-md-5'><button id='showhide' class='btn btn-info'>Show</button></div></div>
-					<div class='col-md-4' id='passcont'><input class='form-control'  type='password' id='conpass' value="<?php echo addslashes($conpass); ?>" autocomplete="off" /></div>
-				</div>
-				<input type='submit' class='btn btn-success' id='updtconn' onclick='javascript:return false;' value='Update'/>
 				<hr>
 				<p class='cif'><i class='glyphicon glyphicon-plus-sign'></i> Edit Ticket Title and Status </p>
 				<div class='expande'>
@@ -496,12 +500,11 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 					<div id="messages">
 						<?php 
 							for($i=0;$i<$count;$i++){
-								if($i==0)
-									echo '<div class="row evenmessage"><div class="row"><div class="col-md-2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p><span class="label label-important newest">Newest</span></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
-								else if($i%2==0)
+								if($list[$i]['usr_id']==$_SESSION['id'])
 									echo '<div class="row evenmessage"><div class="row"><div class="col-md-2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
 								else
 									echo '<div class="row oddmessage"><div class="row"><div class="col-md-2 usrinfo"><p class="username">'.$list[$i][0].'</p><p class="date">'.$list[$i][2].'</p><p class="postnumber">Post Number: '.$list[$i][3].'</p></div><div class="col-md-8 messagecell">'.$list[$i][1].'</div></div>';
+
 								$upcount=count($list[$i]);
 								if($upcount>4){
 									echo '<div class="row form-group attachment"><div class="col-md-2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">';
@@ -510,7 +513,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 									echo'</div></div>';
 								}
 								echo '</div>';
-							 } 
+							}
 						?>
 					</div>
 				<?php } else { ?>
@@ -764,12 +767,12 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 		<?php } else { ?> 
 			editor.setValue("", true); 
 		<?php } ?> 
-		$(".uploadfilebox").each(function () {
-			$(this).remove()
-		});
+
+		$(".uploadfilebox").each(function () {$(this).remove()});
+		
 		$(".attlist").append("<div class='row uploadfilebox'></div>");
 		tail = [];
-		$("#messages").children(".row:first").hasClass("oddmessage") ? tail.push('<div class="row evenmessage" style="display:none"><div class="row"><div class="col-md-2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>") : tail.push('<div class="row oddmessage" style="display:none"><div class="row"><div class="col-md-2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>");
+		tail.push('<div class="row evenmessage" style="display:none"><div class="row"><div class="col-md-2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>");
 		if (null != up){
 			tail.push('<div class="row attachment"><div class="col-md-2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">');
 			var count= up.length;

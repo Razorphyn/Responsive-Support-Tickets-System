@@ -54,7 +54,7 @@ try{
 					IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) AS opname,
 					a.title,
 					CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END as prio,
-					CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL,'Free','Premium') WHEN '0' THEN IF(d.tk_id IS NULL,'Unpaid',CASE d.status WHEN '0' THEN 'Pending' WHEN '1' THEN 'Failed' WHEN '3' THEN 'Refunded' WHEN '4' THEN 'Partially Refunded' END) END AS status,
+					CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL OR b.free='1','<span class=\"label label-info\">Free</span>','<span class=\"label label-warning\">Premium</span>') WHEN '0' THEN IF(d.tk_id IS NULL,'<span class=\"label label-danger\">Unpaid</span>',CASE d.status WHEN '0' THEN '<span class=\"label label-danger\">Pending</span>' WHEN '1' THEN '<span class=\"label label-danger\">Failed</span>' WHEN '3' THEN '<span class=\"label label-danger\">Refunded</span>' WHEN '4' THEN '<span class=\"label label-danger\">Partially Refunded</span>' END) END AS status,
 					a.created_time,
 					a.last_reply
 				FROM ".$SupportTicketsTable." a
@@ -62,7 +62,7 @@ try{
 					ON	b.id=a.department_id
 				LEFT JOIN ".$SupportUserTable." c
 					ON c.id=a.operator_id
-				LEFT JOIN ".$SupportUserTable." d
+				LEFT JOIN ".$SupportSalesTable." d
 					ON d.tk_id=a.id
 				WHERE a.user_id=".$_SESSION['id']."  AND a.ticket_status='1'
 				ORDER BY a.last_reply DESC 
@@ -94,7 +94,7 @@ try{
 					CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE (IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown'))) END AS opname,
 					a.operator_id,
 					a.title,
-					CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL,'Free','Premium') WHEN '0' THEN IF(d.tk_id IS NULL,'Unpaid',CASE d.status WHEN '0' THEN 'Pending' WHEN '1' THEN 'Failed' WHEN '3' THEN 'Refunded' WHEN '4' THEN 'Partially Refunded' END) END AS status,
+					CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL OR b.free='1','<span class=\"label label-info\">Free</span>','<span class=\"label label-warning\">Premium</span>') WHEN '0' THEN IF(d.tk_id IS NULL,'<span class=\"label label-danger\">Unpaid</span>',CASE d.status WHEN '0' THEN '<span class=\"label label-danger\">Pending</span>' WHEN '1' THEN '<span class=\"label label-danger\">Failed</span>' WHEN '3' THEN '<span class=\"label label-danger\">Refunded</span>' WHEN '4' THEN '<span class=\"label label-danger\">Partially Refunded</span>' END) END AS status,
 					CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
 					a.created_time,
 					a.last_reply
@@ -103,7 +103,7 @@ try{
 					ON	b.id=a.department_id
 				JOIN ".$SupportUserTable." c
 					ON c.id=a.operator_id
-				LEFT JOIN ".$SupportUserTable." d
+				LEFT JOIN ".$SupportSalesTable." d
 					ON d.tk_id=a.id
 				WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status='1' AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 				ORDER BY a.last_reply DESC 
@@ -146,7 +146,7 @@ try{
 						CASE WHEN a.operator_id=".$_SESSION['id']." THEN '".$_SESSION['name']."' ELSE ( IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) ) END AS opname,
 						a.operator_id,
 						a.title,
-						CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL,'Free','Premium') WHEN '0' THEN IF(d.tk_id IS NULL,'Unpaid',CASE d.status WHEN '0' THEN 'Pending' WHEN '1' THEN 'Failed' WHEN '3' THEN 'Refunded' WHEN '4' THEN 'Partially Refunded' END) END AS status,
+						CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL OR b.free='1','<span class=\"label label-info\">Free</span>','<span class=\"label label-warning\">Premium</span>') WHEN '0' THEN IF(d.tk_id IS NULL,'<span class=\"label label-danger\">Unpaid</span>',CASE d.status WHEN '0' THEN '<span class=\"label label-danger\">Pending</span>' WHEN '1' THEN '<span class=\"label label-danger\">Failed</span>' WHEN '3' THEN '<span class=\"label label-danger\">Refunded</span>' WHEN '4' THEN '<span class=\"label label-danger\">Partially Refunded</span>' END) END AS status,
 						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
 						a.created_time,
 						a.last_reply
@@ -155,6 +155,8 @@ try{
 						ON	b.id=a.department_id
 					LEFT JOIN ".$SupportUserTable." c
 						ON c.id=a.operator_id
+					LEFT JOIN ".$SupportSalesTable." d
+						ON d.tk_id=a.id
 					WHERE a.ticket_status='1' AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 					ORDER BY a.last_reply DESC 
 					LIMIT 350";
@@ -339,7 +341,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											if(isset($list['tickets']['user'])){
 												$c=count($list['tickets']['user']);
 												for($i=0;$i<$c;$i++)
-													echo '<tr><td>'.$list['tickets']['user'][$i]['title'].'</td><td>'.$list['tickets']['user'][$i]['date'].'</td><td>'.$list['tickets']['user'][$i]['reply'].'</td><td>'.$list['tickets']['user'][$i]['dname'].'</td><td>'.$list['tickets']['user'][$i]['opname'].'</td><td>'.$list['tickets']['user'][$i]['priority'].'</td><td>'.$list['tickets']['user'][$i]['action'].'</td></tr>';
+													echo '<tr><td>'.$list['tickets']['user'][$i]['status'].'</td><td>'.$list['tickets']['user'][$i]['title'].'</td><td>'.$list['tickets']['user'][$i]['date'].'</td><td>'.$list['tickets']['user'][$i]['reply'].'</td><td>'.$list['tickets']['user'][$i]['dname'].'</td><td>'.$list['tickets']['user'][$i]['opname'].'</td><td>'.$list['tickets']['user'][$i]['priority'].'</td><td>'.$list['tickets']['user'][$i]['action'].'</td></tr>';
 											}
 										?>
 										</tbody>
@@ -357,7 +359,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											if(isset($list['tickets']['op'])){
 												$c=count($list['tickets']['op']);
 												for($i=0;$i<$c;$i++)
-													echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
+													echo '<tr><td>'.$list['tickets']['op'][$i]['status'].'</td><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
 											}
 										?>
 										</tbody>
@@ -375,7 +377,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											if(isset($list['tickets']['op'])){
 												$c=count($list['tickets']['op']);
 												for($i=0;$i<$c;$i++)
-													echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
+													echo '<tr><td>'.$list['tickets']['op'][$i]['status'].'</td><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
 											}
 										?>
 										</tbody>
@@ -392,7 +394,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 										if(isset($list['tickets']['admin'])){
 											$c=count($list['tickets']['admin']);
 											for($i=0;$i<$c;$i++)
-												echo '<tr><td>'.$list['tickets']['admin'][$i]['title'].'</td><td>'.$list['tickets']['admin'][$i]['date'].'</td><td>'.$list['tickets']['admin'][$i]['reply'].'</td><td>'.$list['tickets']['admin'][$i]['dname'].'</td><td>'.$list['tickets']['admin'][$i]['opname'].'</td><td>'.$list['tickets']['admin'][$i]['priority'].'</td><td>'.$list['tickets']['admin'][$i]['action'].'</td></tr>';
+												echo '<tr><td>'.$list['tickets']['op'][$i]['admin'].'</td><td>'.$list['tickets']['admin'][$i]['title'].'</td><td>'.$list['tickets']['admin'][$i]['date'].'</td><td>'.$list['tickets']['admin'][$i]['reply'].'</td><td>'.$list['tickets']['admin'][$i]['dname'].'</td><td>'.$list['tickets']['admin'][$i]['opname'].'</td><td>'.$list['tickets']['admin'][$i]['priority'].'</td><td>'.$list['tickets']['admin'][$i]['action'].'</td></tr>';
 										}
 									?>
 									</tbody>
@@ -415,9 +417,6 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 	<script>
 	 $(document).ready(function() {
 		//var utab,otab,atab;
-
-					<?php if($_SESSION['status']==0){ ?>
-					
 						var utab=$("#usertable").dataTable({
 								bDestroy:true,
 								bProcessing:true,
@@ -438,6 +437,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 								},
 								aoColumns:[
+									{sTitle:"Status",mDataProp:"status",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
 									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
@@ -448,37 +448,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								]
 						});
 						
-					<?php } else if($_SESSION['status']==1){ ?>
+					<?php if($_SESSION['status']==1 || $_SESSION['status']==2){ ?>
 					
-						var utab=$("#usertable").dataTable({
-										bDestroy:true,
-										bProcessing:true,
-										aaSorting:[[2,"desc"]],
-										oLanguage:{sEmptyTable:"No Tickets"},
-										fnPreDrawCallback: function(oSettings, json) {
-											$('.dataTables_filter').addClass('col-xs-12'),
-											$('.dataTables_filter input').addClass('form-control'),
-											$('.dataTables_filter input').unwrap(),
-											$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
-											$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
-											$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
-											$('.dataTables_length').addClass('col-xs-12'),
-											$('.dataTables_length select').addClass('form-control'),
-											$('.dataTables_length select').unwrap(),
-											$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
-											$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
-											$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
-										},
-										aoColumns:[
-											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-											{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"User",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
-										]
-									}),
 						
 							otab=$("#operatortable").dataTable({
 										bDestroy:true,
@@ -500,6 +471,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 										},
 										aoColumns:[
+											{sTitle:"Status",mDataProp:"status",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
@@ -510,68 +482,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 										]
 									});
 						
-					<?php } else if($_SESSION['status']==2){ ?>
+					<?php } if($_SESSION['status']==2){ ?>
 
-						var utab=$("#usertable").dataTable({
-								bDestroy:true,
-								bProcessing:true,
-								aaSorting:[[2,"desc"]],
-								oLanguage:{sEmptyTable:"No Tickets"},
-								fnPreDrawCallback: function(oSettings, json) {
-									$('.dataTables_filter').addClass('col-xs-12'),
-									$('.dataTables_filter input').addClass('form-control'),
-									$('.dataTables_filter input').unwrap(),
-									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
-									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
-									$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
-									$('.dataTables_length').addClass('col-xs-12'),
-									$('.dataTables_length select').addClass('form-control'),
-									$('.dataTables_length select').unwrap(),
-									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
-									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
-									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
-								},
-								aoColumns:[
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Operator",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
-								]
-							}),
-						
-						otab=$("#operatortable").dataTable({
-								bDestroy:true,
-								bProcessing:true,
-								aaSorting:[[2,"desc"]],
-								oLanguage:{sEmptyTable:"No Tickets"},
-								fnPreDrawCallback: function(oSettings, json) {
-									$('.dataTables_filter').addClass('col-xs-12'),
-									$('.dataTables_filter input').addClass('form-control'),
-									$('.dataTables_filter input').unwrap(),
-									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
-									$('.dataTables_filter input').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
-									$('.dataTables_filter input').wrap('<div class="col-xs-9"></div>'),
-									$('.dataTables_length').addClass('col-xs-12'),
-									$('.dataTables_length select').addClass('form-control'),
-									$('.dataTables_length select').unwrap(),
-									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).wrap( "<div class='col-xs-3'></div>"),
-									$('.dataTables_length select').parent().contents().filter(function() {return this.nodeType === 3;}).remove(),
-									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
-								},
-								aoColumns:[
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"User",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
-								]
-							}),
-						
 						atab=$("#admintable").dataTable({
 								bDestroy:true,
 								bProcessing:true,
@@ -592,6 +504,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 								},
 								aoColumns:[
+									{sTitle:"Status",mDataProp:"status",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
@@ -736,7 +649,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					$(this).hide(400);
 					$(this).before("<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>");
 				});
-				
+
 					$.ajax({type: 'POST',url: '../php/function.php',data: {<?php echo $_SESSION['token']['act']; ?>:'retrive_tickets',stat:2},dataType : 'json',
 						success : function (a) {
 							if(a.response=='ret'){
@@ -787,7 +700,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 					$.when($('.loading').remove()).then($('.dataTables_wrapper').each(function(){$(this).show(400);}));
 
 			});
-		
+
 			$(document).on("click", "#aut_ass_tk", function () {
 				$.ajax({
 					type: "POST",

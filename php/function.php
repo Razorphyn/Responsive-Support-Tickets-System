@@ -1234,7 +1234,8 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 						IF(b.department_name IS NOT NULL, b.department_name,'Unknown') AS dname,
 						IF(c.name IS NOT NULL, c.name,IF(a.ticket_status='2','Not Assigned','Unknown')) AS opname,
 						a.title,
-						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio, 
+						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
+						CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL OR b.free='1','<span class=\"label label-info\">Free</span>','<span class=\"label label-warning\">Premium</span>') WHEN '0' THEN IF(d.tk_id IS NULL,'<span class=\"label label-danger\">Unpaid</span>',CASE d.status WHEN '0' THEN '<span class=\"label label-danger\">Pending</span>' WHEN '1' THEN '<span class=\"label label-danger\">Failed</span>' WHEN '3' THEN '<span class=\"label label-danger\">Refunded</span>' WHEN '4' THEN '<span class=\"label label-danger\">Partially Refunded</span>' END) END AS status,
 						a.created_time,
 						a.last_reply
 					FROM ".$SupportTicketsTable." a
@@ -1242,6 +1243,8 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 						ON	b.id=a.department_id
 					LEFT JOIN ".$SupportUserTable." c
 						ON c.id=a.operator_id
+					LEFT JOIN ".$SupportSalesTable." d
+						ON d.tk_id=a.id
 					WHERE a.user_id=".$_SESSION['id']."  AND a.ticket_status=?
 					ORDER BY a.last_reply DESC 
 					LIMIT 350";
@@ -1253,7 +1256,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 			$a = $STH->fetch();
 			if(!empty($a)){
 				do{
-					$list['tickets']['user'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+					$list['tickets']['user'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['status']);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -1266,6 +1269,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 						a.operator_id,
 						a.title,
 						CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
+						CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL OR b.free='1','<span class=\"label label-info\">Free</span>','<span class=\"label label-warning\">Premium</span>') WHEN '0' THEN IF(d.tk_id IS NULL,'<span class=\"label label-danger\">Unpaid</span>',CASE d.status WHEN '0' THEN '<span class=\"label label-danger\">Pending</span>' WHEN '1' THEN '<span class=\"label label-danger\">Failed</span>' WHEN '3' THEN '<span class=\"label label-danger\">Refunded</span>' WHEN '4' THEN '<span class=\"label label-danger\">Partially Refunded</span>' END) END AS status,
 						a.created_time,
 						a.last_reply
 					FROM ".$SupportTicketsTable." a
@@ -1273,6 +1277,8 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 						ON	b.id=a.department_id
 					JOIN ".$SupportUserTable." c
 						ON c.id=a.operator_id
+					LEFT JOIN ".$SupportSalesTable." d
+						ON d.tk_id=a.id
 					WHERE (a.operator_id='".$_SESSION['id']."' OR a.user_id='".$_SESSION['id']."') AND a.ticket_status=?  AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 					ORDER BY a.last_reply DESC
 					LIMIT 350" ;
@@ -1291,7 +1297,8 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 														'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),
 														'priority'=>$a['prio'],
 														'date'=>$a['created_time'],
-														'reply'=>$a['last_reply']
+														'reply'=>$a['last_reply'],
+														'status'=>$a['status']
 													);
 					else
 						$list['tickets']['user'][]=array(	'id'=>$a['id'],
@@ -1300,7 +1307,8 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 															'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),
 															'priority'=>$a['prio'],
 															'date'=>$a['created_time'],
-															'reply'=>$a['last_reply']
+															'reply'=>$a['last_reply'],
+															'status'=>$a['status']
 														);
 				}while ($a = $STH->fetch());
 			}
@@ -1314,6 +1322,7 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 							a.operator_id,
 							a.title,
 							CASE a.priority WHEN '0' THEN 'Low' WHEN '1' THEN 'Medium' WHEN '2' THEN 'High' WHEN '3' THEN 'Urgent' WHEN '4' THEN 'Critical' ELSE priority  END AS prio,
+							CASE a.enabled WHEN '1' THEN IF(d.tk_id IS NULL OR b.free='1','<span class=\"label label-info\">Free</span>','<span class=\"label label-warning\">Premium</span>') WHEN '0' THEN IF(d.tk_id IS NULL,'<span class=\"label label-danger\">Unpaid</span>',CASE d.status WHEN '0' THEN '<span class=\"label label-danger\">Pending</span>' WHEN '1' THEN '<span class=\"label label-danger\">Failed</span>' WHEN '3' THEN '<span class=\"label label-danger\">Refunded</span>' WHEN '4' THEN '<span class=\"label label-danger\">Partially Refunded</span>' END) END AS status,
 							a.created_time,
 							a.last_reply
 						FROM ".$SupportTicketsTable." a
@@ -1321,6 +1330,8 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 							ON	b.id=a.department_id
 						LEFT JOIN ".$SupportUserTable." c
 							ON c.id=a.operator_id
+						LEFT JOIN ".$SupportSalesTable." d
+							ON d.tk_id=a.id
 						WHERE a.ticket_status=?  AND a.enabled=(CASE WHEN (a.operator_id=".$_SESSION['id'].") THEN 1 ELSE a.enabled END)
 						ORDER BY a.last_reply DESC 
 						LIMIT 350";
@@ -1333,11 +1344,11 @@ else if($_POST[$_SESSION['token']['act']]=='retrive_tickets' && isset($_SESSION[
 			if(!empty($a)){
 				do{
 					if($a['operator_id']==$_SESSION['id'])
-						$list['tickets']['op'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['op'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['status']);
 					else if($a['user_id']==$_SESSION['id'])
-						$list['tickets']['user'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['user'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['status']);
 					else
-						$list['tickets']['admin'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['stat']);
+						$list['tickets']['admin'][]=array('id'=>$a['id'],'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),'title'=>htmlspecialchars($a['title'],ENT_QUOTES,'UTF-8'),'priority'=>$a['prio'],'date'=>$a['created_time'],'reply'=>$a['last_reply'],'status'=>$a['status']);
 				}while ($a = $STH->fetch());
 			}
 		}
@@ -1371,6 +1382,7 @@ else if($_POST['action']=='scrollpagination' && isset($_POST['action']) && isset
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			$query = "SELECT 
 							a.id,
+							a.user_id,
 							IF(b.name IS NOT NULL,b.name,'Unknown') as name,
 							a.message,
 							a.created_time,
@@ -1387,11 +1399,13 @@ else if($_POST['action']=='scrollpagination' && isset($_POST['action']) && isset
 			$STH->setFetchMode(PDO::FETCH_ASSOC);
 			$a = $STH->fetch();
 			if(!empty($a)){
-				$ret=array('ret'=>'Entry','messages'=>array());
+				$ret=array('ret'=>'Entry','id'=>$_SESSION['id'],'messages'=>array());
 				$messageid=array();
 				$count=0;
 				do{
-					$ret['messages'][$a['id']]=array(htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),$a['message'],$a['created_time']);
+					$u=($a['user_id']==$_SESSION['id'])? 1:0;
+
+					$ret['messages'][$a['id']]=array(htmlspecialchars($a['name'],ENT_QUOTES,'UTF-8'),$a['message'],$a['created_time'],$u);
 					if($a['attachment']==1)
 						$messageid[]=$a['id'];
 					$count++;

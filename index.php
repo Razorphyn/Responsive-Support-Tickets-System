@@ -369,6 +369,8 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 				$(".main").nimbleLoader("hide");
 				if("Logged"==a[0])
 					window.location = '<?php echo $siteurl; ?>';
+				else if("sessionerror"==a[0])
+					window.location = '<?php echo $siteurl; ?>';
 				else
 					noty({text:a[0],type:"error",timeout:9E3})
 			}
