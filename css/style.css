@@ -227,3 +227,11 @@ table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
 .remfile{
 	cursor:pointer
 }
+
+.cke_editor_message_dialog {
+	position: absolute !important;
+    top: 0 !important;
+    width: 100%!important;
+	height: 100%!important;
+    min-height: 100%!important;
+}

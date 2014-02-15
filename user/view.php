@@ -527,6 +527,7 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 	<script type="text/javascript"  src="../min/?g=js_d&amp;5259487"></script>
 	<?php if(!$isMob) { ?>
 		<script type="text/javascript"  src="../lib/ckeditor/ckeditor.js"></script>
+		<script type="text/javascript"  src="../js/ckbotfix.js"></script>
 	<?php }else { ?>
 		<script type="text/javascript"  src="../min/?g=js_m&amp;5259487"></script>
 	<?php } ?>
