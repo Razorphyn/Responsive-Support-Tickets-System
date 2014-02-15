@@ -189,9 +189,48 @@ table tr{
 
 .loading_bar_body {height: 100%;width: 100%;top:0;left:0;background: url(images/ajax-loader.gif) no-repeat 50% 50%;}
 
-table{margin:20px 0!important}
+table{margin:20px 0!important;width: 100%!important;}
 table.dataTable tr.odd td.sorting_1 {background-color:#F9F9F9 !important}
 table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
+.dataTables_wrapper input,
+.dataTables_wrapper select{width:100%!important}
+.dataTables_filter {text-align:left!important}
+@media (max-width: 768px) {
+	table.dataTable thead{
+		display:none!important;
+	}
+
+	table.dataTable tr td{
+		display:block!important;
+		text-align:left!important;
+	}
+	
+	table.dataTable tr td .cell_title{
+		width:95px!important;
+	}
+	
+	table.dataTable tr td .visible-xs {
+		display: inline-block !important;
+	}
+	
+	table.dataTable tr td .expand_cell{
+		width:50px!important;
+		cursor:pointer!important;
+		float:right!important;
+		position:relative!important;
+	}
+
+	table.dataTable tr td.collapsable_cell_hidden {
+		display: none !important;
+	}
+	
+	table.dataTable tr td.collapsable_cell_visible {
+		display: block !important;
+	}
+
+}
+
+
 
 .loadinfo{position:relative;display:block;margin:3px auto;text-align:center;}
 .rescont{display:none}

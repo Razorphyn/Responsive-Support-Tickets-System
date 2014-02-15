@@ -341,66 +341,49 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											if(isset($list['tickets']['user'])){
 												$c=count($list['tickets']['user']);
 												for($i=0;$i<$c;$i++)
-													echo '<tr><td>'.$list['tickets']['user'][$i]['status'].'</td><td>'.$list['tickets']['user'][$i]['title'].'</td><td>'.$list['tickets']['user'][$i]['date'].'</td><td>'.$list['tickets']['user'][$i]['reply'].'</td><td>'.$list['tickets']['user'][$i]['dname'].'</td><td>'.$list['tickets']['user'][$i]['opname'].'</td><td>'.$list['tickets']['user'][$i]['priority'].'</td><td>'.$list['tickets']['user'][$i]['action'].'</td></tr>';
+													echo '<tr><td>'.$list['tickets']['user'][$i]['title'].'</td><td>'.$list['tickets']['user'][$i]['date'].'</td><td>'.$list['tickets']['user'][$i]['reply'].'</td><td>'.$list['tickets']['user'][$i]['dname'].'</td><td>'.$list['tickets']['user'][$i]['opname'].'</td><td>'.$list['tickets']['user'][$i]['priority'].'</td><td>'.$list['tickets']['user'][$i]['status'].'</td><td>'.$list['tickets']['user'][$i]['action'].'</td></tr>';
 											}
 										?>
 										</tbody>
 									</table>
 								</div>
 							</div>
-							<?php if($_SESSION['status']==1){ ?>
-							<h3 class='sectname'>Assigned Tickets</h3>
-							<div class='row'>
-								<div class='col-md-12'>
-									<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-									<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
+							<?php if($_SESSION['status']==1 || $_SESSION['status']==2){ ?>
+								<h3 class='sectname'>Assigned Tickets</h3>
+								<div class='row'>
+									<div class='col-md-12'>
+										<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+										<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
+											<tbody>
+											<?php
+												if(isset($list['tickets']['op'])){
+													$c=count($list['tickets']['op']);
+													for($i=0;$i<$c;$i++)
+														echo '<tr><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['status'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
+												}
+											?>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							<?php } if($_SESSION['status']==2){ ?>
+								<h3 class='sectname admin_ticket'>Tickets Adminsitration</h3>
+								<div class='row'>
+									<div class='col-md-12'>
+										<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
+										<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="admintable">
 										<tbody>
 										<?php
-											if(isset($list['tickets']['op'])){
-												$c=count($list['tickets']['op']);
+											if(isset($list['tickets']['admin'])){
+												$c=count($list['tickets']['admin']);
 												for($i=0;$i<$c;$i++)
-													echo '<tr><td>'.$list['tickets']['op'][$i]['status'].'</td><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
+													echo '<tr><td>'.$list['tickets']['admin'][$i]['title'].'</td><td>'.$list['tickets']['admin'][$i]['date'].'</td><td>'.$list['tickets']['admin'][$i]['reply'].'</td><td>'.$list['tickets']['admin'][$i]['dname'].'</td><td>'.$list['tickets']['admin'][$i]['opname'].'</td><td>'.$list['tickets']['admin'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['admin'].'</td><td>'.$list['tickets']['admin'][$i]['action'].'</td></tr>';
 											}
 										?>
 										</tbody>
-									</table>
+										</table>
+									</div>
 								</div>
-							</div>
-							<?php } else if($_SESSION['status']==2){ ?>
-							<h3 class='sectname'>Assigned Tickets</h3>
-							<div class='row'>
-								<div class='col-md-12'>
-									<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-									<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="operatortable">
-										<tbody>
-										<?php
-											if(isset($list['tickets']['op'])){
-												$c=count($list['tickets']['op']);
-												for($i=0;$i<$c;$i++)
-													echo '<tr><td>'.$list['tickets']['op'][$i]['status'].'</td><td>'.$list['tickets']['op'][$i]['title'].'</td><td>'.$list['tickets']['op'][$i]['date'].'</td><td>'.$list['tickets']['op'][$i]['reply'].'</td><td>'.$list['tickets']['op'][$i]['dname'].'</td><td>'.$list['tickets']['op'][$i]['opname'].'</td><td>'.$list['tickets']['op'][$i]['priority'].'</td><td>'.$list['tickets']['op'][$i]['action'].'</td></tr>';
-											}
-										?>
-										</tbody>
-									</table>
-								</div>
-							</div>
-							<h3 class='sectname admin_ticket'>Tickets Adminsitration</h3>
-							<div class='row'>
-								<div class='col-md-12'>
-									<img id='loading' class='loading' src='../css/images/loader.gif' alt='Loading' title='Loading'/>
-									<table style='display:none' cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="admintable">
-									<tbody>
-									<?php
-										if(isset($list['tickets']['admin'])){
-											$c=count($list['tickets']['admin']);
-											for($i=0;$i<$c;$i++)
-												echo '<tr><td>'.$list['tickets']['op'][$i]['admin'].'</td><td>'.$list['tickets']['admin'][$i]['title'].'</td><td>'.$list['tickets']['admin'][$i]['date'].'</td><td>'.$list['tickets']['admin'][$i]['reply'].'</td><td>'.$list['tickets']['admin'][$i]['dname'].'</td><td>'.$list['tickets']['admin'][$i]['opname'].'</td><td>'.$list['tickets']['admin'][$i]['priority'].'</td><td>'.$list['tickets']['admin'][$i]['action'].'</td></tr>';
-										}
-									?>
-									</tbody>
-									</table>
-								</div>
-							</div>
 							<?php } ?>
 							<br/><br/>
 						</div>
@@ -437,19 +420,18 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 								},
 								aoColumns:[
-									{sTitle:"Status",mDataProp:"status",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
-									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Operator",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Priority",mDataProp:"priority",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><span class="expand_cell visible-xs glyphicon glyphicon-plus"></span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sClass:"collapsable_cell_hidden",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sClass:"collapsable_cell_hidden",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname",sClass:"collapsable_cell_hidden", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sClass:"collapsable_cell_hidden",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Status",mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",sClass:"collapsable_cell_hidden",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 								]
 						});
-						
+
 					<?php if($_SESSION['status']==1 || $_SESSION['status']==2){ ?>
-					
 						
 							otab=$("#operatortable").dataTable({
 										bDestroy:true,
@@ -471,17 +453,17 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 										},
 										aoColumns:[
-											{sTitle:"Status",mDataProp:"status",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Operator",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><span class="expand_cell visible-xs glyphicon glyphicon-plus"></span>');}},
+											{sTitle:"Created Date",mDataProp:"date",sClass:"collapsable_cell_hidden",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+											{sTitle:"Last Reply",mDataProp:"reply",sClass:"collapsable_cell_hidden",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Operator",mDataProp:"opname",sClass:"collapsable_cell_hidden", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Priority",mDataProp:"priority",sClass:"collapsable_cell_hidden",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Status",mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Toggle",mDataProp:"action",sClass:"collapsable_cell_hidden",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 										]
 									});
-						
+
 					<?php } if($_SESSION['status']==2){ ?>
 
 						atab=$("#admintable").dataTable({
@@ -504,24 +486,38 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 								},
 								aoColumns:[
-									{sTitle:"Status",mDataProp:"status",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Title: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Created Date",mDataProp:"date",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Created Date: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Last Reply",mDataProp:"reply",sWidth:"140px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Department",mDataProp:"dname",sClass:"hidden-xs",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Operator",mDataProp:"opname", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Priority",mDataProp:"priority",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Toggle",mDataProp:"action",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span><strong class='visible-xs'>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><span class="expand_cell visible-xs glyphicon glyphicon-plus"></span>');}},
+									{sTitle:"Created Date",mDataProp:"date",sClass:"collapsable_cell_hidden",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
+									{sTitle:"Last Reply",mDataProp:"reply",sClass:"collapsable_cell_hidden",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Operator",mDataProp:"opname",sClass:"collapsable_cell_hidden", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Priority",mDataProp:"priority",sClass:"collapsable_cell_hidden",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Status",mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Toggle",mDataProp:"action",sClass:"collapsable_cell_hidden",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 								]
 							});
 
-						
 					<?php } ?>
 		$('.loading').remove();
 		$('table:hidden').each(function(){
 			$(this).show(400);
 		});
 		
+		$(document).on('click','.expand_cell', function (){
+			var hclass=$(this).hasClass('glyphicon-plus');
+			if(hclass)
+				$(this).addClass('glyphicon-minus').removeClass('glyphicon-plus');
+			else
+				$(this).addClass('glyphicon-plus').removeClass('glyphicon-minus');
+			
+			$(this).parent().parent().children('td.collapsable_cell_hidden , td.collapsable_cell_visible').each(function(){
+				if(hclass)
+					$(this).addClass('collapsable_cell_visible').removeClass('collapsable_cell_hidden');
+				else
+					$(this).addClass('collapsable_cell_hidden').removeClass('collapsable_cell_visible');
+			});
+		});
+
 		$(document).on('click','#tkopen', function(){
 			$('#tkstatnav > li.active').removeClass('active');
 			$(this).addClass('active');
@@ -676,8 +672,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 								
 								<?php } ?>
 							}
-							else if(data[0]=='sessionerror'){
-								switch(data[1]){
+							else if(a[0]=='sessionerror'){
+								switch(a[1]){
 									case 0:
 										window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
 										break;
@@ -712,8 +708,8 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 							if(confirm("Do you want to refresh the page to see the changes?"))
 								window.location = "<?php echo curPageURL(); ?>";
 						}
-						else if(data[0]=='sessionerror'){
-							switch(data[1]){
+						else if(a[0]=='sessionerror'){
+							switch(a[1]){
 								case 0:
 									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
 									break;
