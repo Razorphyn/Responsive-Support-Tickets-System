@@ -5,7 +5,8 @@
 body {
 	background:#f2f2f2 url('images/bk.jpg')!important;
 	transition: all 400ms ease;
-	-webkit-transition: all 400ms ease
+	-webkit-transition: all 400ms ease;
+	padding-bottom:20px;
 }
 
 textarea{
@@ -214,11 +215,16 @@ table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
 	}
 	
 	table.dataTable tr td .expand_cell{
-		width:50px!important;
 		cursor:pointer!important;
-		float:right!important;
-		position:relative!important;
+		display:block!important;
+		text-decoration:none;
 	}
+	table.dataTable tr td .expand_cell:hover{
+		cursor:pointer!important;
+		display:block!important;
+		text-decoration:underline;
+	}
+	
 
 	table.dataTable tr td.collapsable_cell_hidden {
 		display: none !important;

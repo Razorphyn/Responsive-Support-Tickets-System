@@ -420,7 +420,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 								},
 								aoColumns:[
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><span class="expand_cell visible-xs glyphicon glyphicon-plus"></span>');}},
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><p class="expand_cell visible-xs">Expand</p>');}},
 									{sTitle:"Created Date",mDataProp:"date",sClass:"collapsable_cell_hidden",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
 									{sTitle:"Last Reply",mDataProp:"reply",sClass:"collapsable_cell_hidden",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
@@ -453,7 +453,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 											$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 										},
 										aoColumns:[
-											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><span class="expand_cell visible-xs glyphicon glyphicon-plus"></span>');}},
+											{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><p class="expand_cell visible-xs">Expand</p>');}},
 											{sTitle:"Created Date",mDataProp:"date",sClass:"collapsable_cell_hidden",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
 											{sTitle:"Last Reply",mDataProp:"reply",sClass:"collapsable_cell_hidden",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
@@ -486,7 +486,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 									$('.dataTables_length select').wrap('<div class="col-xs-9"></div>')
 								},
 								aoColumns:[
-									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><span class="expand_cell visible-xs glyphicon glyphicon-plus"></span>');}},
+									{sTitle:"Title",mDataProp:"title",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Title: </strong></span><span>" + $(nTd).html() + '</span><p class="expand_cell visible-xs">Expand</p>');}},
 									{sTitle:"Created Date",mDataProp:"date",sClass:"collapsable_cell_hidden",sWidth:"140px",bVisible:!1,fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Created Date: </strong></span><span> " + $(nTd).html() + '</span>');}},
 									{sTitle:"Last Reply",mDataProp:"reply",sClass:"collapsable_cell_hidden",sWidth:"80px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Last Reply: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
@@ -504,12 +504,13 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		});
 		
 		$(document).on('click','.expand_cell', function (){
-			var hclass=$(this).hasClass('glyphicon-plus');
+
+			var hclass=($(this).text()=='Expand') ? true:false;
 			if(hclass)
-				$(this).addClass('glyphicon-minus').removeClass('glyphicon-plus');
+				$(this).text('Collapse');
 			else
-				$(this).addClass('glyphicon-plus').removeClass('glyphicon-minus');
-			
+				$(this).text('Expand');
+
 			$(this).parent().parent().children('td.collapsable_cell_hidden , td.collapsable_cell_visible').each(function(){
 				if(hclass)
 					$(this).addClass('collapsable_cell_visible').removeClass('collapsable_cell_hidden');
