@@ -22,8 +22,6 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 }
 session_start(); 
 
-
-
 include_once '../php/config/database.php';
 
 //Session Check
@@ -35,7 +33,7 @@ else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['
 	header("location: ../index.php?e=expired");
 	exit();
 }
-else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
+if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
 	header("location: ../index.php?e=local");
@@ -80,6 +78,7 @@ $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -186,6 +185,16 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 	<script>
 	 $(document).ready(function(){
 		$(".razorate").jRating();
+		<?php if(isset($_SESSION['status']) && $_SESSION['status']<=3){ ?>
+			setInterval(function(){
+				$.ajax({
+					type: 'POST',
+					url: '../php/admin_function.php',
+					async : 'false',
+					data: {<?php echo $_SESSION['token']['act']; ?>:'timeout_update'}
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+			},1200000);
+		<?php } ?>
 	});
 	function logout(){$.ajax({type:"POST",url:"../php/function.php",data:{<?php echo $_SESSION['token']['act']; ?>:"logout"},dataType:"json",success:function(a){"logout"==a[0]?window.location.reload():noty({text: a[0],type:'error',timeout:9000});}}).fail(function(a,b){noty({text:b,type:"error",timeout:9E3})})};
 	</script>
@@ -194,5 +203,6 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 <?php } else {header("location: ../index.php");exit();} 
 function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
+function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])){$ip=$_SERVER['HTTP_CLIENT_IP'];}elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])){$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];}else{$ip=$_SERVER['REMOTE_ADDR'];}return $ip;}
 
 ?>

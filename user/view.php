@@ -34,18 +34,18 @@ else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['
 	header("location: ../index.php?e=expired");
 	exit();
 }
-else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
+
+if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
 	header("location: ../index.php?e=local");
 	exit();
 }
-else if(!isset($_SESSION['status']) || $_SESSION['status']>2){
+if(!isset($_SESSION['status']) || $_SESSION['status']>2){
 	 header("location: ../index.php");
 	 exit();
 }
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
-function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
 include_once '../php/config/database.php';
 
@@ -136,9 +136,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 				if(!empty($conpass)){
 					include_once ('../php/endecrypt.php');
 					$e = new Encryption(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-					file_put_contents('1',$conpass);
 					$conpass = $e->decrypt($conpass, $enckey);
-					file_put_contents('2',$conpass);
 				}
 				$query = "SELECT 
 								(SELECT COUNT(*) FROM ".$SupportMessagesTable." WHERE ticket_id=?) as qta,
@@ -282,7 +280,10 @@ function retrive_depa_operators($Hostname, $Username, $Password, $DatabaseName, 
 $siteurl=dirname(dirname(curPageURL()));
 $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
+
 function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
+function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])){$ip=$_SERVER['HTTP_CLIENT_IP'];}elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])){$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];}else{$ip=$_SERVER['REMOTE_ADDR'];}return $ip;}
+function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 
 ?>
 <!DOCTYPE html>
@@ -554,7 +555,16 @@ function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["
 		<?php } if($_SESSION['tickets'][$_GET['id']]['usr_id']==$_SESSION['id'] && $setting[7]==1){ ?>
 		$(".razorate").jRating();
 		<?php } ?>
-
+		
+		setInterval(function(){
+			$.ajax({
+				type: 'POST',
+				url: '../php/admin_function.php',
+				async : 'false',
+				data: {<?php echo $_SESSION['token']['act']; ?>:'timeout_update'}
+			}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+		},1200000);
+		
 		$("#formreply").submit(function(){if(""==<?php if(!$isMob) { ?>CKEDITOR.instances.message.getData().replace(/\s+/g,"")<?php }else { ?>$('#message').val().replace(/\s+/g,'')<?php } ?>)return noty({text:"Empty Message",type:"error",timeout:9E3}),!1;$("#formreply").nimbleLoader("show",{position:"absolute",loaderClass:"loading_bar_body",hasBackground:!0,zIndex:999,backgroundColor:"#fff",backgroundOpacity:0.9});return!0});
 		
 		//Add redirect

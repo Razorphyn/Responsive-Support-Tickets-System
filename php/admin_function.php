@@ -58,7 +58,7 @@ else{
 			echo '<script>window.location.replace("'.curPageURL().'?e=expired");</script>';
 		exit();
 	}
-	else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
+	if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 		session_unset();
 		session_destroy();
 		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
@@ -69,7 +69,7 @@ else{
 			echo '<script>window.location.replace("'.curPageURL().'?e=local");</script>';
 		exit();
 	}
-	else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
+	if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
 		session_unset();
 		session_destroy();
 		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
@@ -505,7 +505,7 @@ else{
 				echo json_encode(array(0=>'Invalid Currency Code'));
 				exit();
 			}
-			
+
 			$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
 			if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 				header('Content-Type: application/json; charset=utf-8');
@@ -532,7 +532,7 @@ else{
 				echo json_encode(array(0=>'Invalid Currency Code'));
 				exit();
 			}
-			
+
 			$_POST['mail']= trim(preg_replace('/\s+/','',$_POST['mail']));
 			if(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)){
 				header('Content-Type: application/json; charset=utf-8');

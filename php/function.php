@@ -50,6 +50,14 @@ if($_POST[$_SESSION['token']['act']]=='logout' && isset($_SESSION['status'])){
 	exit();
 }
 
+if($_POST[$_SESSION['token']['act']]=='timeout_update' && isset($_SESSION['status'])){
+	session_unset();
+	session_destroy();
+	header('Content-Type: application/json; charset=utf-8');
+	echo json_encode(array(0=>'up'));
+	exit();
+}
+
 //Session Check
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
@@ -64,7 +72,7 @@ else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['
 		echo '<script>top.window.location.replace("'.curPageURL().'?e=expired");</script>';
 	exit();
 }
-else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
+if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
@@ -75,7 +83,7 @@ else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 		echo '<script>top.window.location.replace("'.curPageURL().'?e=local");</script>';
 	exit();
 }
-else if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
+if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
 	session_unset();
 	session_destroy();
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
@@ -2117,8 +2125,7 @@ else if($_POST[$_SESSION['token']['act']]=='search_ticket' && isset($_SESSION['s
 		$_POST['id']=(is_numeric($_POST['id']))? (int)$_POST['id']:'';
 		$_POST['opid']=(is_numeric($_POST['opid']))? (int)$_POST['opid']:'';
 		$_POST['mail']=trim(preg_replace('/\s+/','',$_POST['mail']));
-		$_POST['mail']=trim(preg_replace('/\s+/','',$_POST['mail']));
-		$_POST['mail']=(empty($_POST['mail']) || !filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL))? '':$_POST['mail'];
+		$_POST['mail']=(!empty($_POST['mail']) && filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL))? $_POST['mail']:'';
 	}
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
@@ -2139,109 +2146,68 @@ else if($_POST[$_SESSION['token']['act']]=='search_ticket' && isset($_SESSION['s
 							ON c.id=a.operator_id
 						WHERE " ;
 			$merge=array();
-			if($_SESSION['status']==0){
+			$tail=array();
+			
+			if($_SESSION['status']==0)
 				$query.=' a.user_id='.$_SESSION['id'];
-				if($_POST['enid']!=''){
-					$query.=' AND a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['enid']);
-				}
-				if($_POST['title']!=''){
-					$query.=' AND a.title LIKE ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['title'].'%');
-				}
-				if($_POST['statk']!=''){
-					$tail[]=' AND a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['statk']);
-				}
-				if($_POST['dep']!=''){
-					$query.=' AND a.department_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['dep']);
-				}
-				if($_POST['op']!=''){
-					$query.=' AND a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['op'].'%');
-				}
-				if($_POST['from']!=''){
-					$query.=' AND a.created_time >= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['from']);
-				}
-				if($_POST['to']!=''){
-					$query.=' AND a.created_time =< ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['to']);
-				}
-			}
-			else if($_SESSION['status']==1){
-				$query.=' a.user_id='.$_SESSION['id'].' OR a.operator_id='.$_SESSION['id'];
-				if($_POST['enid']!=''){
-					$query.=' AND a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['enid']);
-				}
-				if($_POST['title']!=''){
-					$query.=' AND a.title LIKE ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['title'].'%');
-				}
-				if($_POST['statk']!=''){
-					$tail[]=' AND a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['statk']);
-				}
-				if($_POST['dep']!=''){
-					$query.=' AND a.department_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['dep']);
-				}
-				if($_POST['from']!=''){
-					$query.=' AND a.created_time >= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['from']);
-				}
-				if($_POST['to']!=''){
-					$query.=' AND a.created_time <= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['to']);
-				}
-			}
-			else if($_SESSION['status']==2){
-				$tail=array();
-				if($_POST['id']!=''){
+			else if($_SESSION['status']==1)
+				$query.=' (a.user_id='.$_SESSION['id'].' OR a.operator_id='.$_SESSION['id'].')' ;
+			
+			if($_SESSION['status']==2){
+				if(!empty($_POST['id'])){
 					$tail[]='a.user_i`=?';
 					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['id']);
 				}
-				if($_POST['enid']!=''){
-					$tail[]='a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['enid']);
-				}
-				if($_POST['title']!=''){
-					$tail[]='a.title LIKE ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['title'].'%');
-				}
-				if($_POST['statk']!=''){
-					$tail[]='a.ref_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['statk']);
-				}
-				if($_POST['dep']!=''){
-					$tail[]='a.department_id=?';
-					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['dep']);
-				}
-				if($_POST['opid']!=''){
+
+				if(!empty($_POST['opid'])){
 					$tail[]='a.operator_id=?';
 					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['opid']);
 				}
-				if($_POST['op']!=''){
-					$tail[]='a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['op'].'%');
-				}
-				if($_POST['from']!=''){
-					$tail[]='a.created_time >= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['from']);
-				}
-				if($_POST['to']!=''){
-					$tail[]='a.created_time <= ?';
-					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['to']);
-				}
-				if($_POST['mail']!=''){
+
+				if(!empty($_POST['mail'])){
 					$tail[]='(a.user_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1) OR operator_id=(SELECT `id` FROM '.$SupportUserTable.' WHERE `mail`=? LIMIT 1))';
 					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['mail'].'%');
 					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['mail'].'%');
 				}
-				$query.=implode(' AND ',$tail);
 			}
+			
+			if($_SESSION['status']<=3){
+				if(!empty($_POST['enid'])){
+					$tail[]='a.ref_id=?';
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['enid']);
+				}
+				if(!empty($_POST['title'])){
+					$title_part=array_values(array_filter(explode(' ',$_POST['title'])));
+					file_put_contents('c',print_r($title_part,true));
+					$c=count($title_part);
+					for($i=0;$i<$c;$i++){
+						$tail[]='a.title LIKE ?';
+						$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$title_part[$i].'%');
+					}
+				}
+				if(!empty($_POST['statk'])){
+					$tail[]='a.ref_id=?';
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['statk']);
+				}
+				if(!empty($_POST['dep'])){
+					$tail[]='a.department_id=?';
+					$merge[]=array('type'=>PDO::PARAM_INT,'val'=>$_POST['dep']);
+				}
+				if(!empty($_POST['op'])){
+					$tail[]='a.operator_id IN (SELECT `id` FROM '.$SupportUserTable.' WHERE `name`=? AND 0!=`status`)';
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>'%'.$_POST['op'].'%');
+				}
+				if(!empty($_POST['from'])){
+					$tail[]='a.created_time >= ?';
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['from']);
+				}
+				if(!empty($_POST['to'])){
+					$tail[]='a.created_time =< ?';
+					$merge[]=array('type'=>PDO::PARAM_STR,'val'=>$_POST['to']);
+				}
+			}
+			
+			$query.=implode(' AND ',$tail);
 			$query.=' ORDER BY a.last_reply DESC';
 
 			$STH = $DBH->prepare($query);

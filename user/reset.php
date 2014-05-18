@@ -102,6 +102,16 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 	<script type="text/javascript"  src="../min/?g=js_i&amp;5259487"></script>
 	<script>
 		$(document).ready(function() {
+		
+			setInterval(function(){
+				$.ajax({
+					type: 'POST',
+					url: '../php/admin_function.php',
+					async : 'false',
+					data: {<?php echo $_SESSION['token']['act']; ?>:'timeout_update'}
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+			},1200000);
+			
 			$("#resetpass").click(function () {
 				var a = $("#npwd").val(),
 					b = $("#rnpwd").val(),

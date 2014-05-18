@@ -29,7 +29,7 @@ else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['
 	header("location: index.php?e=expired");
 	exit();
 }
-else if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
+if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	session_unset();
 	session_destroy();
 	header("location: index.php?e=local");
@@ -256,6 +256,18 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 			}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 
 		<?php } ?>
+		
+		<?php if(isset($_SESSION['status']) && $_SESSION['status']<=3){ ?>
+			setInterval(function(){
+				$.ajax({
+					type: 'POST',
+					url: 'php/admin_function.php',
+					async : 'false',
+					data: {<?php echo $_SESSION['token']['act']; ?>:'timeout_update'}
+				}).fail(function(jqXHR, textStatus){noty({text: textStatus,type:'error',timeout:9000});});
+			},1200000);
+		<?php } ?>
+		
 		$(".opthome").on("click", function() { $(".activesec").removeClass("activesec").slideToggle(800); $('form[class*="' + $(this).attr("name") + '"]').slideToggle(800).addClass("activesec") });
 		$('.register, .pwdres').slideToggle(400);
 		$(document).on('click','#resetpwd', function(){

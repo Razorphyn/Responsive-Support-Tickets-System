@@ -47,7 +47,7 @@ else{
 }
 
 if(!$fp){
-	$message="An error has been occurred during payment elaboration(PAYPAL_CONNECTION_ERROR).";
+	$message="An error has occurred during payment elaboration(PAYPAL_CONNECTION_ERROR).";
 	mail($adminmail[10],'Payment Error',$message,$headers);
 }
 else {
@@ -81,7 +81,7 @@ else {
 							break;
 						default:
 							$st=1;
-							$message="An error has been occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Paypal\nTransition ID:".$_POST['txn_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email']."\nStatus: ".$_POST['payment_status'];
+							$message="An error has occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Paypal\nTransition ID:".$_POST['txn_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email']."\nStatus: ".$_POST['payment_status'];
 							mail($adminmail[10],'Payment Error',$message,$headers);
 					}
 					try{
@@ -113,19 +113,19 @@ else {
 					catch(PDOException $e){
 						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
 						file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
-						$message="An error has been occurred during payment elaboration(PDO_ERROR).\n PDO ERROR:\nFile: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\nPayment Information:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
+						$message="An error has occurred during payment elaboration(PDO_ERROR).\n PDO ERROR:\nFile: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\nPayment Information:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
 						mail($adminmail[10],'Payment Error',$message,$headers);
 						exit();
 					}
 			}
 			else{
-				$message="An error has been occurred during payment elaboration(EDITED_INFORMATION_MAIL_ERROR).\nInformation:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
+				$message="An error has occurred during payment elaboration(EDITED_INFORMATION_MAIL_ERROR).\nInformation:\nGateway: PayPal\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
 				mail($adminmail[10],'Payment Error',$message,$headers);
 				exit();
 			}
 		}
 		else if (strcmp ($res, "INVALID") == 0) {
-			$message="An error has been occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
+			$message="An error has occurred during payment elaboration(PAYMENT_STATUS_ERROR).\nInformation:\nGateway: Moneybooker\nTransition ID:".$_POST['transaction_id']."\nTicket ID: ".$_POST['tkid']."\nUser ID: ".$userid."\nPayer Mail: ".$_POST['payer_email'];
 			mail($adminmail[10],'Payment Error',$message,$headers);
 			exit();
 		}
