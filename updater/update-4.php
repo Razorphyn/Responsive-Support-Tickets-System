@@ -5,7 +5,7 @@
 </head>
 <body>
 	<?php
-		//Third Table Update 05/11/2013
+		//Fourth Table Update
 
 		include_once '../php/config/database.php';
 		try{
@@ -33,7 +33,7 @@
 					include_once 'update-2.php';
 				}
 			}
-			else if{
+			else{
 				$query = "SELECT `db_version` FROM ".$SupportVersionTable." WHERE `id`=1 LIMIT 1";
 				$STH = $DBH->prepare($query);
 				$STH->execute();

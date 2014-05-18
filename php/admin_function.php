@@ -583,17 +583,13 @@ else{
 		
 		$_POST['usr']=(string)$_POST['usr'];
 		$_POST['pass']=(string)$_POST['pass'];
-		if(trim(preg_replace('/\s+/','',$_POST['pass']))!=''){
-			$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
-			$_POST['pass']=str_split($_POST['pass']);
-			$c=count($_POST['pass']);
-			for($i=0;$i<$c;$i++){
-				if(array_key_exists($_POST['pass'][$i],$crypttable))
-					$_POST['pass'][$i]=$crypttable[$crypttable[$_POST['pass'][$i]]];
-			}
-			$_POST['pass']=implode('',$_POST['pass']);
+		if(!empty($_POST['pass'])){
+			include_once ('endecrypt.php');
+			$key=uniqid('',true);
+			$e = new Encryption(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+			$_POST['pass'] = $e->encrypt($_POST['pass'], $key);
 		}
-		$string='<?php $smailservice='.$_POST['serv'].";\n".'$smailname=\''.$_POST['name']."';\n".'$settingmail=\''.$_POST['mail']."';\n".'$smailhost=\''.$_POST['host']."';\n".'$smailport='.$_POST['port'].";\n".'$smailssl='.$_POST['ssl'].";\n".'$smailauth='.$_POST['auth'].";\n".'$smailuser=\''.$_POST['usr']."';\n".'$smailpassword=\''.$_POST['pass']."';\n ?>";
+		$string='<?php $smailservice='.$_POST['serv'].";\n".'$smailname=\''.$_POST['name']."';\n".'$settingmail=\''.$_POST['mail']."';\n".'$smailhost=\''.$_POST['host']."';\n".'$smailport='.$_POST['port'].";\n".'$smailssl='.$_POST['ssl'].";\n".'$smailauth='.$_POST['auth'].";\n".'$smailuser=\''.$_POST['usr']."';\n".'$smailpassword=\''.$_POST['pass']."';\n".'$smailenckey=\''.$key."';\n ?>";
 		if(file_put_contents('config/mail/stmp.php',$string)){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));

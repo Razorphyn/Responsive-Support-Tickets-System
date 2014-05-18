@@ -569,15 +569,11 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 		$_POST['contype']=(trim(is_numeric($_POST['contype'])))? (int)$_POST['contype']:exit();
 		$_POST['ftppass']=(trim(preg_replace('/\s+/','',$_POST['ftppass'])!=''))? $_POST['ftppass']:'';
 		$_POST['ftpus']=(trim(preg_replace('/\s+/','',$_POST['ftpus'])!=''))? trim($_POST['ftpus']):'';
-		if($_POST['ftppass']!=''){
-			$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
-			$_POST['ftppass']=str_split($_POST['ftppass']);
-			$c=count($_POST['ftppass']);
-			for($i=0;$i<$c;$i++){
-				if(array_key_exists($_POST['ftppass'][$i],$crypttable))
-					$_POST['ftppass'][$i]=$crypttable[$crypttable[$_POST['ftppass'][$i]]];
-			}
-			$_POST['ftppass']=implode('',$_POST['ftppass']);
+		if(!empty($_POST['ftppass'])){
+			include_once ('endecrypt.php');
+			$key=uniqid('',true);
+			$e = new Encryption(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+			$_POST['ftppass'] = $e->encrypt($_POST['ftppass'], $key);
 		}
 
 		try{
@@ -604,7 +600,7 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 			}
 
 			//Create Ticket
-			$query = "INSERT INTO ".$SupportTicketsTable."(`department_id`,`user_id`,`title`,`priority`,`website`,`contype`,`ftp_user`,`ftp_password`,`created_time`,`last_reply`,`enabled`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+			$query = "INSERT INTO ".$SupportTicketsTable."(`department_id`,`user_id`,`title`,`priority`,`website`,`contype`,`ftp_user`,`ftp_password`,`enc_key`,`created_time`,`last_reply`,`enabled`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
 			$STH = $DBH->prepare($query);
 			$date=date("Y-m-d H:i:s");
@@ -616,9 +612,10 @@ else if($_POST['createtk']=='Create New Ticket' && isset($_POST['createtk']) && 
 			$STH->bindParam(6,$_POST['contype'],PDO::PARAM_STR);
 			$STH->bindParam(7,$_POST['ftpus'],PDO::PARAM_STR);
 			$STH->bindParam(8,$_POST['ftppass'],PDO::PARAM_STR);
-			$STH->bindParam(9,$date,PDO::PARAM_STR);
+			$STH->bindParam(9,$key,PDO::PARAM_STR);
 			$STH->bindParam(10,$date,PDO::PARAM_STR);
-			$STH->bindParam(11,$ena,PDO::PARAM_STR);
+			$STH->bindParam(11,$date,PDO::PARAM_STR);
+			$STH->bindParam(12,$ena,PDO::PARAM_STR);
 			$STH->execute();
 
 			echo '<script>parent.$(".main").nimbleLoader("show", {position : "fixed",loaderClass : "loading_bar_body",hasBackground : true,zIndex : 999,backgroundColor : "#fff",backgroundOpacity : 0.9});</script>';
@@ -1778,27 +1775,24 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_connection' && isset($
 	$_POST['website']=(trim(preg_replace('/\s+/','',$_POST['website']))!='')?trim(preg_replace('/\s+/','',$_POST['website'])):'';
 	$_POST['user']=(trim(preg_replace('/\s+/','',$_POST['user'])!=''))? trim($_POST['user']):'';
 	$_POST['pass']=(trim(preg_replace('/\s+/','',$_POST['pass'])!=''))? $_POST['pass']:'';
-	if($_POST['pass']!='' && $_POST['pass']!=null){
-		$crypttable=array('a'=>'X','b'=>'k','c'=>'Z','d'=>2,'e'=>'d','f'=>6,'g'=>'o','h'=>'R','i'=>3,'j'=>'M','k'=>'s','l'=>'j','m'=>8,'n'=>'i','o'=>'L','p'=>'W','q'=>0,'r'=>9,'s'=>'G','t'=>'C','u'=>'t','v'=>4,'w'=>7,'x'=>'U','y'=>'p','z'=>'F',0=>'q',1=>'a',2=>'H',3=>'e',4=>'N',5=>1,6=>5,7=>'B',8=>'v',9=>'y','A'=>'K','B'=>'Q','C'=>'x','D'=>'u','E'=>'f','F'=>'T','G'=>'c','H'=>'w','I'=>'D','J'=>'b','K'=>'z','L'=>'V','M'=>'Y','N'=>'A','O'=>'n','P'=>'r','Q'=>'O','R'=>'g','S'=>'E','T'=>'I','U'=>'J','V'=>'P','W'=>'m','X'=>'S','Y'=>'h','Z'=>'l');
-								
-		$_POST['pass']=str_split($_POST['pass']);
-		$c=count($_POST['pass']);
-		for($i=0;$i<$c;$i++){
-			if(array_key_exists($_POST['pass'][$i],$crypttable))
-				$_POST['pass'][$i]=$crypttable[$crypttable[$_POST['pass'][$i]]];
-		}
-		$_POST['pass']=implode('',$_POST['pass']);
+
+	if(!empty($_POST['pass'])){
+		include_once ('endecrypt.php');
+		$key=uniqid('',true);
+		$e = new Encryption(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+		$_POST['pass'] = $e->encrypt($_POST['pass'], $key);
 	}
 	try{
 		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		$query="UPDATE ".$SupportTicketsTable." SET website=?,contype=?,ftp_user=?,ftp_password=? WHERE id=? LIMIT 1";
+		$query="UPDATE ".$SupportTicketsTable." SET website=?,contype=?,ftp_user=?,ftp_password=?,enc_key=? WHERE id=? LIMIT 1";
 		$STH = $DBH->prepare($query);
 		$STH->bindParam(1,$_POST['website'],PDO::PARAM_STR);
 		$STH->bindParam(2,$_POST['contype'],PDO::PARAM_STR);
 		$STH->bindParam(3,$_POST['user'],PDO::PARAM_STR);
 		$STH->bindParam(4,$_POST['pass'],PDO::PARAM_STR);
-		$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
+		$STH->bindParam(5,$key,PDO::PARAM_STR);
+		$STH->bindParam(6,$_POST['id'],PDO::PARAM_INT);
 		$STH->execute();
 
 		header('Content-Type: application/json; charset=utf-8');

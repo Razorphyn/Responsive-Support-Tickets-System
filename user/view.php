@@ -72,6 +72,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							a.contype,
 							a.ftp_user,
 							a.ftp_password,
+							a.enc_key,
 							b.rate,
 							b.note,
 							c.reason
@@ -95,6 +96,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							a.contype,
 							a.ftp_user,
 							a.ftp_password,
+							a.enc_key,
 							b.rate,
 							b.note,
 							c.reason
@@ -119,27 +121,24 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					$opid=$a['operator_id'];
 					$stat=$a['ticket_status'];
 					$departmentid=$a['department_id'];
-					$cweb=htmlspecialchars(mb_convert_encoding($a['website'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
+					$cweb=htmlspecialchars($a['website'],ENT_QUOTES,'UTF-8');
 					$connection=$a['contype'];
-					$usercred=htmlspecialchars(mb_convert_encoding($a['ftp_user'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
+					$usercred=htmlspecialchars($a['ftp_user'],ENT_QUOTES,'UTF-8');
 					$conpass=$a['ftp_password'];
+					$enckey=$a['enc_key'];
 					$rate=$a['rate'];
-					$note=htmlspecialchars(mb_convert_encoding($a['note'], "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
+					$note=htmlspecialchars($a['note'],ENT_QUOTES,'UTF-8');
 					$reason=htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8');
 					$_SESSION['tickets'][$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
 				}while ($a = $STH->fetch());
 				unset($a);
 				$rate=($rate!=NULL)? $rate:'';
-				if($conpass!='' && $conpass!=null){
-					$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
-
-					$conpass=str_split($conpass);
-					$c=count($conpass);
-					for($i=0;$i<$c;$i++){
-						if(array_key_exists($conpass[$i],$crypttable))
-							$conpass[$i]=$crypttable[$crypttable[$conpass[$i]]];
-					}
-					$conpass=htmlspecialchars(mb_convert_encoding(implode('',$conpass), "UTF-8", "UTF-8"),ENT_QUOTES,'UTF-8');
+				if(!empty($conpass)){
+					include_once ('../php/endecrypt.php');
+					$e = new Encryption(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+					file_put_contents('1',$conpass);
+					$conpass = $e->decrypt($conpass, $enckey);
+					file_put_contents('2',$conpass);
 				}
 				$query = "SELECT 
 								(SELECT COUNT(*) FROM ".$SupportMessagesTable." WHERE ticket_id=?) as qta,

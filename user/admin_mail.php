@@ -67,15 +67,10 @@ $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 function curPageURL() {$pageURL= "//";if (isset($_SERVER["HTTPS"]) && $_SERVER["SERVER_PORT"] != "80") $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];return $pageURL;}
 
-if(isset($smailpassword)){
-	$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
-	$smailpassword=str_split($smailpassword);
-	$c=count($smailpassword);
-	for($i=0;$i<$c;$i++){
-		if(array_key_exists($smailpassword[$i],$crypttable))
-			$smailpassword[$i]=$crypttable[$crypttable[$smailpassword[$i]]];
-	}
-	$smailpassword=implode('',$smailpassword);
+if(!empty($smailpassword)){
+	include_once ('../php/endecrypt.php');
+	$e = new Encryption(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+	$smailpassword = $e->decrypt($smailpassword, $smailenckey);
 }
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}

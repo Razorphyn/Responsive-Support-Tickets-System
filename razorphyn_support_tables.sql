@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `razorphyn_support_extension_version` (
 	`id` 					INT(1) 				UNSIGNED	NOT NULL DEFAULT 1,
-	`db_version` 			VARCHAR(11) 		NOT NULL,
+	`db_version` 			VARCHAR(11) 		NOT NULL DEFAULT '1.0.5',
 	PRIMARY KEY (`id`),
 	INDEX `info` (`db_version`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
@@ -39,10 +39,11 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_list_tickets` (
 	`user_id` 			BIGINT(11) 					UNSIGNED 		NOT NULL,
 	`title` 			VARCHAR(255)								NOT NULL,
 	`priority` 			INT(2) 						UNSIGNED		NOT NULL,
-	`website` 			VARCHAR(200) 								NOT NULL,
+	`website` 			VARCHAR(200) 								DEFAULT NULL,
 	`contype` 			ENUM('0','1','2','3','4','5') 				NOT NULL 	DEFAULT '0',
-	`ftp_user` 			VARCHAR(60) 								NOT NULL,
-	`ftp_password` 		VARCHAR(60) 								NOT NULL,
+	`ftp_user` 			VARCHAR(100) 								DEFAULT NULL,
+	`ftp_password` 		VARCHAR(16) 								DEFAULT NULL,
+	`enc_key`	 		VARCHAR(23) 								NULL,
 	`created_time` 		DATETIME 									NOT NULL,
 	`last_reply` 		DATETIME  									NOT NULL,
 	`closed_date` 		DATETIME  									NULL,
