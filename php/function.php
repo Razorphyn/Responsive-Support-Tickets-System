@@ -83,7 +83,7 @@ if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 		echo '<script>top.window.location.replace("'.curPageURL().'?e=local");</script>';
 	exit();
 }
-if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
+if(!isset($_POST[$_SESSION['token']['act']]) && !isset($_POST['file_download']) && !isset($_POST['act']) && $_POST['act']!='faq_rating' || $_POST['token']!=$_SESSION['token']['faq']){
 	session_unset();
 	session_destroy();
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
