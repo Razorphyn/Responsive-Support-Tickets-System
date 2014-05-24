@@ -26,6 +26,12 @@ if(!preg_match('/^[0-9]{1,15}$/',$_GET['id']))
 	header("location: index.php");
 
 //Session Check
+if(!isset($_SESSION['status'])){
+	$_SESSION['redirect_url']=curPageURL();
+	header("location: ../index.php");
+	exit();
+}
+
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){

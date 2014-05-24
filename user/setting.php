@@ -23,6 +23,12 @@ if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport'
 session_start(); 
 
 //Session Check
+if(!isset($_SESSION['status'])){
+	$_SESSION['redirect_url']=curPageURL();
+	header("location: ../index.php");
+	exit();
+}
+
 if(isset($_SESSION['time']) && time()-$_SESSION['time']<=1800)
 	$_SESSION['time']=time();
 else if(isset($_SESSION['id']) && !isset($_SESSION['time']) || isset($_SESSION['time']) && time()-$_SESSION['time']>1800){

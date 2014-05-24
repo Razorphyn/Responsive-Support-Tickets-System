@@ -240,7 +240,13 @@ else if(!isset($_SESSION['status']) && $_POST[$_SESSION['token']['act']]=='login
 				$_SESSION['ip']=retrive_ip();
 			}while ($a = $STH->fetch());
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(array(0=>'Logged'));
+			if(isset($_SESSION['redirect_url'])){
+				$c=$_SESSION['redirect_url'];
+				unset($_SESSION['redirect_url']);
+				echo json_encode(array(0=>'Logged',1=>$c));
+			}
+			else
+				echo json_encode(array(0=>'Logged'));
 		}
 		else{
 			header('Content-Type: application/json; charset=utf-8');

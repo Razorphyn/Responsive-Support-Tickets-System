@@ -39,7 +39,8 @@ if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 }
 
 if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
-	header('Content-Type: application/json; charset=utf-8');
+	if(!isset($_SESSION['status']))
+		$_SESSION['redirect_url']=curPageURL();
 	header("location: ../index.php");
 	exit();
 }

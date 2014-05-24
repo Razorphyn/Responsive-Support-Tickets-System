@@ -38,8 +38,10 @@ if(isset($_SESSION['ip']) && $_SESSION['ip']!=retrive_ip()){
 	exit();
 }
 if(!isset($_SESSION['status']) || $_SESSION['status']!=2){
-	 header("location: ../index.php");
-	 exit();
+	if(!isset($_SESSION['status']))
+		$_SESSION['redirect_url']=curPageURL();
+	header("location: ../index.php");
+	exit();
 }
 include_once '../php/config/database.php';
 try{
