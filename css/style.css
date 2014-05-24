@@ -186,7 +186,9 @@ table tr{
 .date{font-size:0.8em;font-weight:300}
 .postnumber{font-size:0.8em;font-weight:300;color:#ccc}
 .attachment{margin-top:5.678%!important;color:#777;font-size:0.9}
-.download{font-size:0.85em}
+
+.download_form{position:relative;float:left;max-width:100%!important}
+.download{font-size:0.85em!important;white-space: nowrap!important;overflow: hidden!important;text-overflow: ellipsis!important;max-width:86%!important}
 
 .loading_bar_body {height: 100%;width: 100%;top:0;left:0;background: url(images/ajax-loader.gif) no-repeat 50% 50%;}
 
@@ -242,8 +244,6 @@ table.dataTable tr.even td.sorting_1 {background-color:#FFF !important}
 .rescont{display:none}
 .refid{font-size:0.8em;word-break:break-all;}
 .flagcont{border:1px solid #ccc;-webkit-border-radius: 5px;border-radius: 5px;padding:10px;font-size:1em;margin-bottom:7px;behavior: url(PIE.htc)}
-
-.download_form{position:relative;float:left}
 
 .showcompl{width:100%;cursor:pointer}
 .question{font-size:1.1em;color:#0d9125}
