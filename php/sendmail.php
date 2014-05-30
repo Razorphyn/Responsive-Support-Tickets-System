@@ -226,15 +226,11 @@ if(isset($argv[0]) && isset($argv[1]) && isset($argv[2])){
 								else
 									exit();
 								if($smailauth==1){
-									$transport->setUsername($smailuser);
-									$crypttable=array('X'=>'a','k'=>'b','Z'=>'c',2=>'d','d'=>'e',6=>'f','o'=>'g','R'=>'h',3=>'i','M'=>'j','s'=>'k','j'=>'l',8=>'m','i'=>'n','L'=>'o','W'=>'p',0=>'q',9=>'r','G'=>'s','C'=>'t','t'=>'u',4=>'v',7=>'w','U'=>'x','p'=>'y','F'=>'z','q'=>0,'a'=>1,'H'=>2,'e'=>3,'N'=>4,1=>5,5=>6,'B'=>7,'v'=>8,'y'=>9,'K'=>'A','Q'=>'B','x'=>'C','u'=>'D','f'=>'E','T'=>'F','c'=>'G','w'=>'H','D'=>'I','b'=>'J','z'=>'K','V'=>'L','Y'=>'M','A'=>'N','n'=>'O','r'=>'P','O'=>'Q','g'=>'R','E'=>'S','I'=>'T','J'=>'U','P'=>'V','m'=>'W','S'=>'X','h'=>'Y','l'=>'Z');
-									$smailpassword=str_split($smailpassword, ENT_QUOTES, 'UTF-8');
-									$c=count($smailpassword);
-									for($i=0;$i<$c;$i++){
-										if(array_key_exists($smailpassword[$i],$crypttable))
-											$smailpassword[$i]=$crypttable[$crypttable[$smailpassword[$i]]];
+									if(!empty($smailpassword)){
+										include_once ('../php/endecrypt.php');
+										$e = new Encryption(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+										$smailpassword = $e->decrypt($smailpassword, $smailenckey);
 									}
-									$smailpassword=implode('',$smailpassword);
 									$transport->setPassword($smailpassword);
 								}
 							}

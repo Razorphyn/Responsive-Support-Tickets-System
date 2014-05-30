@@ -997,16 +997,6 @@ else{
 			$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
 			$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
-			$query = "DELETE FROM ".$SupportMessagesTable." WHERE user_id=? ";
-			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
-			$STH->execute();
-		
-			$query = "DELETE FROM ".$SupportTicketsTable." WHERE user_id=? ";
-			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
-			$STH->execute();
-			
 			$query = "SELECT enc FROM ".$SupportUploadTable." WHERE `uploader`=?";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
@@ -1022,23 +1012,22 @@ else{
 					}
 				}while ($a = $STH->fetch());
 			}
-
-			$query = "DELETE FROM ".$SupportUploadTable." WHERE uploader=? ";
+			
+			$query = "	DELETE FROM ".$SupportMessagesTable." WHERE user_id=?;
+						DELETE FROM ".$SupportTicketsTable." WHERE user_id=?;
+						DELETE FROM ".$SupportUploadTable." WHERE uploader=?;
+						DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=?;
+						DELETE FROM ".$SupportUserTable." WHERE id=?;
+					";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
+			$STH->bindParam(2,$_POST['id'],PDO::PARAM_INT);
+			$STH->bindParam(3,$_POST['id'],PDO::PARAM_INT);
+			$STH->bindParam(4,$_POST['id'],PDO::PARAM_INT);
+			$STH->bindParam(5,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
 															
 			$query = "UPDATE ".$SupportTicketsTable." SET operator_id=0,ticket_status= CASE WHEN '1' THEN '2' ELSE ticket_status END  WHERE operator_id=?";
-			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
-			$STH->execute();
-			
-			$query = "DELETE FROM ".$SupportUserPerDepaTable." WHERE user_id=? ";
-			$STH = $DBH->prepare($query);
-			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
-			$STH->execute();
-			
-			$query = "DELETE FROM ".$SupportUserTable." WHERE id=? ";
 			$STH = $DBH->prepare($query);
 			$STH->bindParam(1,$_POST['id'],PDO::PARAM_INT);
 			$STH->execute();
@@ -1812,7 +1801,7 @@ else{
 	}
 
 }
-	
+
 function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable){
 	if(isset($_SESSION['status']) && $_SESSION['status']<3){
 		try{
