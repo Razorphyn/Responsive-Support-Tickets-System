@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `razorphyn_support_extension_version` (
 	INDEX `info` (`db_version`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `razorphyn_support_extension_version` (`db_version`) VALUES ('1.0.4');
+INSERT INTO `razorphyn_support_extension_version` (`db_version`) VALUES ('1.0.5');
 
 CREATE TABLE IF NOT EXISTS `razorphyn_support_users` (
 	`id` 				BIGINT(15) 		UNSIGNED		NOT NULL AUTO_INCREMENT,
