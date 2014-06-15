@@ -15,7 +15,7 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{22,40}$/',$_COOKIE['RazorphynSupport'])){
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{22,128}$/',$_COOKIE['RazorphynSupport'])){
 	setcookie(session_name(),'invalid',time()-3600);
 	header("location: ../index.php?e=invalid");
 	exit();
@@ -57,7 +57,6 @@ include_once '../php/config/database.php';
 
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 
-
 	include_once '../php/mobileESP.php';
 	$uagent_obj = new uagent_info();
 	$isMob=$uagent_obj->DetectMobileQuick();
@@ -68,6 +67,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 		if($_SESSION['status']==2 || $_SESSION['status']==1){
 			$query = "SELECT 
 							a.id,
+							a.enabled,
 							a.ref_id,
 							a.title,
 							a.user_id,
@@ -81,17 +81,22 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							a.enc_key,
 							b.rate,
 							b.note,
-							c.reason
+							c.reason,
+							d.free,
+							IF(d.free=0,a.support_time,NULL) AS support_time
 						FROM ".$SupportTicketsTable." a
 						LEFT JOIN ".$SupportRateTable." b
 							ON b.id=a.id
 						LEFT JOIN ".$SupportFlagTable." c
 							ON (c.tk_id=a.id AND c.usr_id='".$_SESSION['id']."')
+						LEFT JOIN ".$SupportDepaTable." d
+							ON d.id=a.department_id
 						WHERE a.id=?  LIMIT 1";
 		}
 		else{
 			$query = "SELECT 
 							a.id,
+							a.enabled,
 							a.ref_id,
 							a.title,
 							a.user_id,
@@ -105,12 +110,16 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 							a.enc_key,
 							b.rate,
 							b.note,
-							c.reason
+							c.reason,
+							d.free,
+							IF(d.free=0,a.support_time,NULL) AS support_time
 						FROM ".$SupportTicketsTable." a
 						LEFT JOIN ".$SupportRateTable." b
 							ON b.id=a.id
 						LEFT JOIN ".$SupportFlagTable." c
 							ON (c.tk_id=a.id AND c.usr_id=".$_SESSION['id'].")
+						LEFT JOIN ".$SupportDepaTable." d
+							ON d.id=a.department_id
 						WHERE a.id=? AND a.user_id=".$_SESSION['id']." LIMIT 1";
 		}
 		$STH = $DBH->prepare($query);
@@ -135,6 +144,9 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					$rate=$a['rate'];
 					$note=htmlspecialchars($a['note'],ENT_QUOTES,'UTF-8');
 					$reason=htmlspecialchars($a['reason'],ENT_QUOTES,'UTF-8');
+					$enabled=$a['enabled'];
+					$free=$a['free'];
+					$supportTime=$a['support_time'];
 					$_SESSION['tickets'][$_GET['id']]=array('id'=>$tkid,'usr_id'=>$usrid,'op_id'=>$opid,'status'=>$stat,'ref_id'=>$refid);
 				}while ($a = $STH->fetch());
 				unset($a);
@@ -193,11 +205,14 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 					}
 					$list=array_values($list);
 				}
-				else{
-					header("location: index.php");
+
+				/*if($free==0 && $enabled==0){
 				}
+				else{
+				}*/
 			}
 			else{
+				file_put_contents('errr','');
 				header("location: index.php");
 			}
 	}
@@ -206,7 +221,7 @@ if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.tx
 		$error='We are sorry, but an error has occurred, please contact the administrator if it persist';
 	}
 	$DBH=null;
-										
+
 
 function retrive_depa_names($Hostname, $Username, $Password, $DatabaseName, $SupportDepaTable,$except){
 	if(isset($_SESSION['status'])){
@@ -389,9 +404,31 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				</div>
 				<hr>
 				<div class='row form-group refid'>
-					<div class='col-md-2'><strong>Reference ID</strong></div>
-					<div class='col-md-10' ><span id='reference_id'><?php echo $refid; ?></span></div>
+					<div class='col-xs-6 col-md-2'><strong>Reference ID</strong></div>
+					<div class='col-xs-6 col-md-10' ><span id='reference_id'><?php echo $refid; ?></span></div>
 				</div>
+				<?php if(!is_null($supportTime)){ ?>
+				<div class='row form-group'>
+					<div class='col-xs-4 col-md-2'><strong>Left Support Time</strong></div>
+					<div class='col-xs-8 col-md-10' >
+					<?php if($_SESSION['status']==0) { ?>
+						<div class='col-xs-6' >
+							<span><?php echo $supportTime; ?></span>
+						</div>
+						<div class='col-xs-6' >
+							<input type='submit' id='addtime' class='btn btn-success' onclick='javascript:return false;' value='Buy Additional Time' />
+						</div>
+					<?php }else { ?>
+						<div class='col-xs-6' >
+							<input id='support_time' class='form-control' value='<?php echo $supportTime; ?>' />
+						</div>
+						<div class='col-xs-6' >
+							<input type='submit' id='updatetimesupport' class='btn btn-success' onclick='javascript:return false;' value='Update' />
+						</div>
+					<?php }?>
+					</div> 
+				</div>
+				<?php } ?>
 				<hr>
 				<p class='cif'><i class='glyphicon glyphicon-plus-sign'></i> Website Information </p>
 				<div class='expande'>
@@ -662,7 +699,47 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 				}
 			}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})})
 		});
-		
+
+		<?php if($_SESSION['status']>0) { ?>
+		//Update Support Time
+		$("#updatetimesupport").click(function () {
+			var time = parseInt($('#support_time').val());
+			if( time>0){
+				$.ajax({
+					type: "POST",
+					url: "../php/function.php",
+					data: {<?php echo $_SESSION['token']['act']; ?>: "update_ticket_supporttime",left_time: time,id: "<?php echo $_GET['id'];?>"},
+					dataType: "json",
+					success: function (b) {
+						if("Updated" == b[0])
+							noty({text: "Updated",type: "success",timeout: 9E3})
+						else if(b[0]=='sessionerror'){
+							switch(b[1]){
+								case 0:
+									window.location.replace("<?php echo $siteurl.'?e=invalid'; ?>");
+									break;
+								case 1:
+									window.location.replace("<?php echo $siteurl.'?e=expired'; ?>");
+									break;
+								case 2:
+									window.location.replace("<?php echo $siteurl.'?e=local'; ?>");
+									break;
+								case 3:
+									window.location.replace("<?php echo $siteurl.'?e=token'; ?>");
+									break;
+							}
+						}
+						else
+							noty({text: b[0],type: "error",timeout: 9E3})
+					}
+				}).fail(function (b, a) {noty({text: a,type: "error",timeout: 9E3})})
+			}
+			else{
+				noty({text: 'Invalid Left Time' ,type: "error",timeout: 9E3})
+			}
+		});
+		<?php } ?>
+
 		//Show Hidden Form
 		$('.cif').click(function(){
 			el=$(this).children('i');
@@ -788,7 +865,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 		
 		$(".attlist").append("<div class='row uploadfilebox'></div>");
 		tail = [];
-		tail.push('<div class="row evenmessage" style="display:none"><div class="row"><div class="col-md-2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>");
+		tail.push('<div class="row oddmessage" style="display:none"><div class="row"><div class="col-md-2 usrinfo"><p class="username">' + name + '</p><p class="date">' + dat + '</p><p class="postnumber">Post Number: '+totalmsg+'</p></div><div class="col-md-8 messagecell">' + mess + "</div></div>");
 		if (null != up){
 			tail.push('<div class="row attachment"><div class="col-md-2 col-md-offset-1 attachmentsec">Attachment</div><div class="col-md-8">');
 			var count= up.length;
@@ -811,6 +888,7 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 			return 'Do you want to leave the page and discard the post?';
 		}
 	});
+	
 	</script>
   </body>
 </html>

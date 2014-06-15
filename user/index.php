@@ -15,7 +15,7 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{22,40}$/',$_COOKIE['RazorphynSupport'])){
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{22,128}$/',$_COOKIE['RazorphynSupport'])){
 	setcookie(session_name(),'invalid',time()-3600);
 	header("location: ../index.php?e=invalid");
 	exit();
@@ -173,7 +173,7 @@ try{
 		$a = $STH->fetch();
 		if(!empty($a)){
 			do{
-				if($a['operator_id']==$_SESSION['id'])
+				if($a['operator_id']==$_SESSION['id']){
 					$list['tickets']['op'][]=array(	
 														'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
 														'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
@@ -184,7 +184,7 @@ try{
 														'status'=>$a['status'],
 														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 												);
-				else if($a['user_id']==$_SESSION['id'])
+				}else if($a['user_id']==$_SESSION['id']){
 					$list['tickets']['user'][]=array(
 														'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
 														'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
@@ -195,7 +195,7 @@ try{
 														'status'=>$a['status'],
 														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 													);
-				else
+				}else{
 					$list['tickets']['admin'][]=array(
 														'dname'=>htmlspecialchars($a['dname'],ENT_QUOTES,'UTF-8'),
 														'opname'=>htmlspecialchars($a['opname'],ENT_QUOTES,'UTF-8'),
@@ -206,7 +206,9 @@ try{
 														'status'=>$a['status'],
 														'action'=>'<div class="btn-group"><button class="btn btn-warning editusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-edit"></i></button><button class="btn btn-danger remusr" value="'.$a['id'].'"><i class="glyphicon glyphicon-remove"></i></button></div>'
 													);
+				}
 			}while ($a = $STH->fetch());
+			
 		}
 	}
 }
@@ -433,7 +435,7 @@ function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['
 									{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Operator",mDataProp:"opname",sClass:"collapsable_cell_hidden", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Priority",mDataProp:"priority",sClass:"collapsable_cell_hidden",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Status",mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Status",bVisible:false,mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Toggle",mDataProp:"action",sClass:"collapsable_cell_hidden",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 								]
 						});
@@ -466,7 +468,7 @@ function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['
 											{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Operator",mDataProp:"opname",sClass:"collapsable_cell_hidden", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Priority",mDataProp:"priority",sClass:"collapsable_cell_hidden",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-											{sTitle:"Status",mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+											{sTitle:"Status",bVisible:false,mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
 											{sTitle:"Toggle",mDataProp:"action",sClass:"collapsable_cell_hidden",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 										]
 									});
@@ -499,7 +501,7 @@ function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['
 									{sTitle:"Department",mDataProp:"dname",sClass:"collapsable_cell_hidden",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Department: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Operator",mDataProp:"opname",sClass:"collapsable_cell_hidden", fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Operator: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Priority",mDataProp:"priority",sClass:"collapsable_cell_hidden",sWidth:"75px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Priority: </strong></span><span>" + $(nTd).html() + '</span>');}},
-									{sTitle:"Status",mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
+									{sTitle:"Status",bVisible:false,mDataProp:"status",sClass:"collapsable_cell_hidden",sWidth:"60px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Status: </strong></span><span>" + $(nTd).html() + '</span>');}},
 									{sTitle:"Toggle",mDataProp:"action",sClass:"collapsable_cell_hidden",bSortable:!1,bSearchable:!1,sWidth:"100px",fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {$(nTd).html("<span class='visible-xs cell_title'><strong>Toggle: </strong></span><span>" + $(nTd).html() + '</span>');}}
 								]
 							});

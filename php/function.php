@@ -29,7 +29,7 @@ if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !
 	ini_set('session.cookie_secure', '1');
 }
 
-if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{22,40}$/',$_COOKIE['RazorphynSupport'])){
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{22,128}$/',$_COOKIE['RazorphynSupport'])){
 	setcookie(session_name(),'invalid',time()-3600);
 	if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
 		header('Content-Type: application/json; charset=utf-8');
@@ -1807,6 +1807,41 @@ else if($_POST[$_SESSION['token']['act']]=='update_ticket_connection' && isset($
 		$STH->bindParam(4,$_POST['pass'],PDO::PARAM_STR);
 		$STH->bindParam(5,$key,PDO::PARAM_STR);
 		$STH->bindParam(6,$_POST['id'],PDO::PARAM_INT);
+		$STH->execute();
+
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Updated'));
+	}
+	catch(PDOException $e){  
+		file_put_contents('PDOErrors', "File: ".$e->getFile().' on line '.$e->getLine()."\nError: ".$e->getMessage()."\n", FILE_APPEND);
+		$DBH=null;
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'We are sorry, but an error has occurred, please contact the administrator if it persist'));
+	}
+	exit();
+}
+
+else if($_POST[$_SESSION['token']['act']]=='update_ticket_supporttime' && isset($_SESSION['status']) && ($_SESSION['status']==1 || $_SESSION['status']==2)){
+	$_POST['id']=trim(preg_replace('/\s+/','',$_POST['id']));
+	if(!preg_match('/^[0-9]{1,15}$/',$_POST['id'])){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Invalid ID'));
+		exit();
+	}
+	if(!isset($_SESSION['tickets'][$_POST['id']]['id'])){
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array(0=>'Access Denied'));
+		exit();
+	}
+	$_POST['update_ticket_supporttime']=(is_numeric($_POST['update_ticket_supporttime']) && $_POST['update_ticket_supporttime']>=0)? round($_POST['update_ticket_supporttime'],0):exit();
+
+	try{
+		$DBH = new PDO("mysql:host=$Hostname;dbname=$DatabaseName", $Username, $Password);  
+		$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		$query="UPDATE ".$SupportTicketsTable." SET support_time=? WHERE id=? LIMIT 1";
+		$STH = $DBH->prepare($query);
+		$STH->bindParam(1,$_POST['update_ticket_supporttime'],PDO::PARAM_INT);
+		$STH->bindParam(2,$_POST['id'],PDO::PARAM_INT);
 		$STH->execute();
 
 		header('Content-Type: application/json; charset=utf-8');
