@@ -15,7 +15,7 @@ session_name("RazorphynSupport");
 if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off'){
 	ini_set('session.cookie_secure', '1');
 }
-if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{26,40}$/',$_COOKIE['RazorphynSupport'])){
+if(isset($_COOKIE['RazorphynSupport']) && !is_string($_COOKIE['RazorphynSupport']) || !preg_match('/^[^[:^ascii:];,\s]{26,128}$/',$_COOKIE['RazorphynSupport'])){
 	unset($_COOKIE['RazorphynSupport']);
 }
 session_start(); 
