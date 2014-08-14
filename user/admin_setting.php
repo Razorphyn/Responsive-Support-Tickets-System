@@ -72,9 +72,24 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHILMNOPQRSTUVZKJWXYZ';$random_string = "";$num_valid_chars = strlen($valid_chars);for($i=0;$i<$length;$i++){$random_pick=mt_rand(1, $num_valid_chars);$random_char = $valid_chars[$random_pick-1];$random_string .= $random_char;}return $random_string;}
 function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])){$ip=$_SERVER['HTTP_CLIENT_IP'];}elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])){$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];}else{$ip=$_SERVER['REMOTE_ADDR'];}return $ip;}
 
+require_once '../php/translator/class.translation.php';
+if(isset($setting[11]) && $setting[11]==0 && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
+	$lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+	if(!is_file('../php/translator/lang/'.$lang.'.csv'))
+		$lang='en';
+}
+else if(isset($setting[11]) && $setting[11]!=0){
+	$lang=$setting[11];
+	if(!is_file('../php/translator/lang/'.$lang.'.csv'))
+		$lang='en';
+}
+else 
+	$lang='en';
+$translate = new Translator($lang,'../php/');
+
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo $lang; ?>">
 	<head>
 		<meta name="robots" content="noindex,nofollow">
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
@@ -96,67 +111,67 @@ function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['
 				<div class='container'>
 					<div class="navbar-header">
 						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
-							<span class="sr-only">Toggle navigation</span>
+							<span class="sr-only"><?php $translate->__("Toggle navigation",false); ?></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-							</button>
-							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+						</button>
+						<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
 					</div>
 		  
 					<div class="collapse navbar-collapse" id="header-nav-collapse">
 						<ul class="nav navbar-nav">
-							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i> Home</a></li>
-							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i> FAQs</a></li>
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i> <?php $translate->__("Home",false); ?></a></li>
+							<li><a href="faq.php"><i class="glyphicon glyphicon-flag"></i> <?php $translate->__("FAQs",false); ?></a></li>
 							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="glyphicon glyphicon-folder-close"></i> Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i> <?php $translate->__("Tickets",false); ?><b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
-											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
+											<a href="index.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> <?php $translate->__("Tickets List",false); ?></a>
 										</li>
 										<li role="presentation">
-											<a href="newticket.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-folder-close"></i> New Ticket</a>
+											<a href="newticket.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-folder-close"></i> <?php $translate->__("New Ticket",false); ?></a>
 										</li>
 										<li role="presentation">
-											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
+											<a href="search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> <?php $translate->__("Search Tickets",false); ?></a>
 										</li>
 									</ul>
 								</li>
-								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i> Account</a></li>
+								<li><a href="setting.php"><i class="glyphicon glyphicon-edit"></i> <?php $translate->__("Account",false); ?></a></li>
 								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
 									<li class="dropdown active" role='button'>
 										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-											<i class="glyphicon glyphicon-eye-open"></i> Administration<b class="caret"></b>
+											<i class="glyphicon glyphicon-eye-open"></i> <?php $translate->__("Administration",false); ?><b class="caret"></b>
 										</a>
 										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 											<li class="active" role="presentation">
-												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+												<a href="admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> <?php $translate->__("Site Management",false); ?></a>
 											</li>
 											<li>
-												<a href="admin_users.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-user"></i> Users</a>
+												<a href="admin_users.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-user"></i> <?php $translate->__("Users",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+												<a href="admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> <?php $translate->__("Departments Management",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+												<a href="admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> <?php $translate->__("Mail Settings",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+												<a href="admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> <?php $translate->__("Payment Setting/List",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+												<a href="admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> <?php $translate->__("FAQs Management",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+												<a href="admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> <?php $translate->__("Reported Tickets",false); ?></a>
 											</li>
 										</ul>
 									</li>
 								<?php }} if(isset($_SESSION['name'])){ ?>
-									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i> Logout</a></li>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i> <?php $translate->__("Logout",false); ?></a></li>
 								<?php } ?>
 						</ul>
 					</div>
@@ -177,6 +192,26 @@ function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['
 					<div class='row form-group'>
 						<div class='col-md-2'><label>Time Zone</label></div>
 						<div class='col-md-4'><input type="text" class='form-control'  name='timezone' id="timezone" <?php if(isset($setting[4])) echo 'value="'.$setting[4].'"';?> ifplaceholder="Title" required/></div>
+					</div>
+					<div class='row form-group'>
+						<div class='col-md-2'><label>Language</label></div>
+						<div class='col-md-4'>
+							<select class='form-control'  name='sitelang' id='sitelang'>
+								<option value='0'>Automatic</option>
+								<?php
+									$scan=array_values(array_diff(scandir('../php/translator/lang'), array('..', '.','.htaccess')));
+									$mailist=array();
+									$count=count($scan);
+									if(isset($scan[0])){
+										for($i=0;$i<$count;$i++){
+											$opt=substr($scan[$i], 0, (strlen ($scan[$i])) - (strlen (strrchr($scan[$i],'.'))));
+											echo '<option value="'.$opt.'">'.$opt.'</option>';
+										}
+									}
+								?>
+								
+							</select>
+						</div>
 					</div>
 					<h3 class='sectname'>Mail Advice</h3>
 					<div class='row form-group'>
@@ -380,6 +415,8 @@ function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['
 			$("#allup > option[value='<?php echo $setting[5];?>']").attr('selected','selected');
 		<?php } if(isset($setting[7])){?>
 			$("#allrat > option[value='<?php echo $setting[7];?>']").attr('selected','selected');
+		<?php } if(isset($setting[11])){?>
+			$("#sitelang > option[value='<?php echo $setting[11];?>']").attr('selected','selected');
 		<?php } if(isset($setting[9])){?>
 			$("#allfaq > option[value='<?php echo $setting[8];?>']").attr('selected','selected');
 		<?php } if(isset($privacy[0])){?>
@@ -498,11 +535,12 @@ function retrive_ip(){if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['
 				q=$("#commlop").val(),
 				r=$("#allfaq").val(),
 				s=$("#check_extension").val(),
-				t=$("#allowed_exentions").val();
+				t=$("#allowed_exentions").val(),
+				u=$("#sitelang > option:checked").val();
 			$.ajax({
 				type:"POST",
 				url:"../php/admin_function.php",
-				data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,error_mail:error_mail,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r,check_extension:s,allowed_exentions:t},
+				data:{<?php echo $_SESSION['token']['act']; ?>:"save_options",tit:a,mail:c,error_mail:error_mail,senrep:d,senope:e,timezone:f,upload:h,maxsize:g,enrat:k,commlop:q,faq:r,check_extension:s,allowed_exentions:t,site_lang:u},
 				dataType:"json",
 				success:function(b){
 					if("Saved"==b[0])

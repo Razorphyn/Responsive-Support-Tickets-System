@@ -48,9 +48,24 @@ function random_token($length){$valid_chars='abcdefghilmnopqrstuvzkjwxyABCDEFGHI
 
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 
+require_once 'php/translator/class.translation.php';
+if(isset($setting[11]) && $setting[11]==0 && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
+	$lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+	if(!is_file('php/translator/lang/'.$lang.'.csv'))
+		$lang='en';
+}
+else if(isset($setting[11]) && $setting[11]!=0){
+	$lang=$setting[11];
+	if(!is_file('php/translator/lang/'.$lang.'.csv'))
+		$lang='en';
+}
+else 
+	$lang='en';
+$translate = new Translator($lang,'php/');
+	
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo $lang; ?>">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<meta name="viewport" content="width=device-width">
@@ -66,67 +81,67 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 				<div class='container'>
 					<div class="navbar-header">
 						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
-							<span class="sr-only">Toggle navigation</span>
+							<span class="sr-only"><?php $translate->__("Toggle navigation",false); ?></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-							</button>
-							<a class="navbar-brand" href='index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+						</button>
+						<a class="navbar-brand" href='index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
 					</div>
 		  
 					<div class="collapse navbar-collapse" id="header-nav-collapse">
 						<ul class="nav navbar-nav">
-							<li class="active"><a href="index.php"><i class="glyphicon glyphicon-home"></i> Home</a></li>
-							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i> FAQs</a></li>
+							<li class="active"><a href="index.php"><i class="glyphicon glyphicon-home"></i> <?php $translate->__("Home",false); ?></a></li>
+							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i> <?php $translate->__("FAQs",false); ?></a></li>
 							<?php if(isset($_SESSION['name']) && isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
 								<li class="dropdown" role='button'>
 									<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-										<i class="glyphicon glyphicon-folder-close"></i> Tickets<b class="caret"></b>
+										<i class="glyphicon glyphicon-folder-close"></i> <?php $translate->__("Tickets",false); ?><b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 										<li role="presentation">
-											<a href="user/" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> Tickets List</a>
+											<a href="user/" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-th-list"></i> <?php $translate->__("Tickets List",false); ?></a>
 										</li>
 										<li role="presentation">
-											<a href="user/newticket.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-folder-close"></i> New Ticket</a>
+											<a href="user/newticket.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-folder-close"></i> <?php $translate->__("New Ticket",false); ?></a>
 										</li>
 										<li role="presentation">
-											<a href="user/search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> Search Tickets</a>
+											<a href="user/search.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-search"></i> <?php $translate->__("Search Tickets",false); ?></a>
 										</li>
 									</ul>
 								</li>
-								<li><a href="user/setting.php"><i class="glyphicon glyphicon-edit"></i> Account</a></li>
+								<li><a href="user/setting.php"><i class="glyphicon glyphicon-edit"></i> <?php $translate->__("Account",false); ?>Account</a></li>
 								<?php if(isset($_SESSION['status']) && $_SESSION['status']==2){ ?>
 									<li class="dropdown" role='button'>
 										<a id="drop1" class="dropdown-toggle" role='button' data-toggle="dropdown" href="#">
-											<i class="glyphicon glyphicon-eye-open"></i> Administration<b class="caret"></b>
+											<i class="glyphicon glyphicon-eye-open"></i> <?php $translate->__("Administration",false); ?><b class="caret"></b>
 										</a>
 										<ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 											<li role="presentation">
-												<a href="user/admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> Site Managment</a>
+												<a href="user/admin_setting.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-globe"></i> <?php $translate->__("Site Management",false); ?></a>
 											</li>
 											<li>
-												<a href="user/admin_users.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-user"></i> Users</a>
+												<a href="user/admin_users.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-user"></i> <?php $translate->__("Users",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> Deaprtments Managment</a>
+												<a href="user/admin_departments.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-briefcase"></i> <?php $translate->__("Departments Management",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> Mail Settings</a>
+												<a href="user/admin_mail.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-envelope"></i> <?php $translate->__("Mail Settings",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> Payment Setting/List</a>
+												<a href="user/admin_payment.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-euro"></i> <?php $translate->__("Payment Setting/List",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> FAQs Managment</a>
+												<a href="user/admin_faq.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-comment"></i> <?php $translate->__("FAQs Management",false); ?></a>
 											</li>
 											<li role="presentation">
-												<a href="user/admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> Reported Tickets</a>
+												<a href="user/admin_reported.php" tabindex="-1" role="menuitem"><i class="glyphicon glyphicon-exclamation-sign"></i> <?php $translate->__("Reported Tickets",false); ?></a>
 											</li>
 										</ul>
 									</li>
 								<?php }} if(isset($_SESSION['name'])){ ?>
-									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i> Logout</a></li>
+									<li><a href='#' onclick='javascript:logout();return false;'><i class="glyphicon glyphicon-off"></i> <?php $translate->__("Logout",false); ?></a></li>
 								<?php } ?>
 						</ul>
 					</div>
@@ -137,78 +152,78 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 					<h1 class="muted pagefun">
 						<img id='logo' class='img-responsive' src='<?php if(isset($logo) && !empty($logo)) echo $logo; else echo 'css/images/logo.png'; ?>' alt='<?php if(isset($setting[0])) echo $setting[0];?>' title='<?php if(isset($setting[0])) echo $setting[0];?>'/>
 					</h1>
-					<h1 class='pagefun'>Welcome to the support center</h1>
+					<h1 class='pagefun'><?php $translate->__("Welcome to the support center",false); ?></h1>
 				</div>
 				<hr>
 				<?php if(isset($_SESSION['status']) && $_SESSION['status']<3){ ?>
 					<div class='row form-group main'>
-						<h1 class='titlesec'>Hello <?php echo htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8'); ?>!</h1>
-						<p>You are already logged in, you can start to ask for support.</p>
+						<h1 class='titlesec'><?php $translate->__("Hello",false); ?> <?php echo htmlspecialchars($_SESSION['name'],ENT_QUOTES,'UTF-8'); ?>!</h1>
+						<p><?php $translate->__("You are already logged in, you can start to ask for support",false); ?></p>
 					</div>
 				<?php } else if(isset($_SESSION['status']) && $_SESSION['status']==4){ ?>
 					<div class='row form-group main'>
-						<h1 class='titlesec'>You Are Banned</h1>
-						<p>Sorry,but your behaviour wasn't acceptable.</p>
+						<h1 class='titlesec'><?php $translate->__("You Are Banned",false); ?></h1>
+						<p><?php $translate->__("Your behaviour was not acceptable",false); ?></p>
 					</div>
 				<?php } else if(isset($_SESSION['status']) && $_SESSION['status']==3){ ?>
 					<div class='row form-group main'>
-						<h1 class='titlesec'>Activation</h1>
-						<p>You must activate your account to proceed, please check your inbox.</p>
-						<button class='btn btn-info verify' onclick='javascript:veirfy();return !1;'>Verify Status</button>
-						<button class='btn' onclick='javascript:resend();return !1;'>Send Mail Again</button>
+						<h1 class='titlesec'><?php $translate->__("Activation",false); ?></h1>
+						<p><?php $translate->__("You must activate your account to proceed, please check your inbox",false); ?></p>
+						<button class='btn btn-info verify' onclick='javascript:veirfy();return !1;'><?php $translate->__("Verify Status",false); ?></button>
+						<button class='btn' onclick='javascript:resend();return !1;'><?php $translate->__("Send Mail Again",false); ?></button>
 					</div>
 				<?php } else { ?>
 					<div class='row form-group main'>
 						<form id='passwordform' class='login activesec' role='form'>
-							<h1 class='titlesec'>Login</h1>
+							<h1 class='titlesec'><?php $translate->__("Login",false); ?></h1>
 							<div class='row form-group'>
-								<div class='col-md-2'><label for='mail'>Email</label></div>
+								<div class='col-md-2'><label for='mail'><?php $translate->__("Email",false); ?></label></div>
 								<div class='col-md-3'><input type="email" class='form-control' id="mail" placeholder="Email" required></div>
 							</div>
 							<div class='row form-group'>
-								<div class='col-md-2'><label for='pwd'>Password</label></div>
+								<div class='col-md-2'><label for='pwd'><?php $translate->__("Password",false); ?></label></div>
 								<div class='col-md-3'><input type="password" class='form-control' id="pwd" placeholder="Password" autocomplete="off" required></div>
 							</div>
 							<input type="submit" onclick='javascript:login();return false;' class="btn btn-success" value='Login'/>
 							<br/><br/>
 						</form>
 						<form class='register' role='form'>
-							<h1 class='titlesec'>New User</h1>
+							<h1 class='titlesec'><?php $translate->__("New User",false); ?></h1>
 							<div class='row form-group'>
-								<div class='col-md-2'><label for='rname'>Name</label></div>
+								<div class='col-md-2'><label for='rname'><?php $translate->__("Name",false); ?></label></div>
 								<div class='col-md-4'><input type="text" class='form-control'  id="rname" placeholder="Name" autocomplete="off" required></div>
 							</div>
 							<div class='row form-group'>
-								<div class='col-md-2'><label for='rmail'>Email</label></div>
+								<div class='col-md-2'><label for='rmail'><?php $translate->__("Email",false); ?></label></div>
 								<div class='col-md-4'><input type="email" class='form-control' id="rmail" placeholder="Email" autocomplete="off" required></div>
 							</div>
 							<div class='row form-group'>
-								<div class='col-md-2'><label for='rpwd'>Password</label></div>
+								<div class='col-md-2'><label for='rpwd'><?php $translate->__("Password",false); ?></label></div>
 								<div class='col-md-4'><input type="password" class='form-control' id="rpwd" placeholder="Password" autocomplete="off" required></div>
-								<div class='col-md-2'><label for='rrpwd'>Repeat Password</label></div>
+								<div class='col-md-2'><label for='rrpwd'><?php $translate->__("Repeat Password",false); ?></label></div>
 								<div class='col-md-4'><input type="password" class='form-control' id="rrpwd" placeholder="Repeat Password" autocomplete="off" required></div>
 							</div>
 							<?php if(isset($privacy[0]) && $privacy[0]==1){ ?>
-								<label>Privacy Policy</label>
+								<label><?php $translate->__("Privacy Policy",false); ?></label>
 								<div class='row form-group'>
 									<div class='col-md-12 privacycont'><?php echo $privacy[1]; ?></div>
 								</div>
 								<div class='row form-group'>
-									<div class='col-md-3'><label for='privacy'>Do you accept the Privacy policy?</label></div>
-									<div class='col-md-3'><input type="checkbox" name="privacy" id="privacy" value="1"> Yes</div>
+									<div class='col-md-3'><label for='privacy'><?php $translate->__("Do you accept the Privacy policy?",false); ?></label></div>
+									<div class='col-md-3'><input type="checkbox" name="privacy" id="privacy" value="1"> <?php $translate->__("Yes",false); ?></div>
 								</div>
 							<?php } ?>
 							<input type="submit" onclick='javascript:register();return false;' class="btn btn-success" value='Register'/>
 							<br/><br/>
 						</form>
 						<form class='pwdres' role='form'>
-							<h1 class='titlesec'>Reset Password</h1>
+							<h1 class='titlesec'><?php $translate->__("Forgotten Password",false); ?></h1>
 							<div class='row form-group'>
-								<div class='col-md-2'><label for='fname'>Name</label></div>
+								<div class='col-md-2'><label for='fname'><?php $translate->__("Name",false); ?></label></div>
 								<div class='col-md-3'><input type="text"  class='form-control' id="fname" placeholder="Name" autocomplete="off" required></div>
 							</div>
 							<div class='row form-group'>
-								<div class='col-md-2'><label for='fmail'>Email</label></div>
+								<div class='col-md-2'><label for='fmail'><?php $translate->__("Email",false); ?></label></div>
 								<div class='col-md-3'><input type="email" class='form-control' id="fmail" placeholder="Email" autocomplete="off" required></div>
 							</div>
 							<input type="submit" id='resetpwd' onclick='javascript:return false;' class="btn btn-success" value='Reset Password'/>
@@ -216,9 +231,9 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 						</form>
 						
 						<div class='row form-group act'>
-							<div class='col-md-2' ><span class='opthome' name='login'>Login</span></div>
-							<div class='col-md-2'><span class='opthome' name='register'>New User</span></div>
-							<div class='col-md-2'><span class='opthome' name='pwdres'>Reset Password?</span></div>
+							<div class='col-md-2' ><span class='opthome' name='login'><?php $translate->__("Login",false); ?></span></div>
+							<div class='col-md-2'><span class='opthome' name='register'><?php $translate->__("New User",false); ?></span></div>
+							<div class='col-md-2'><span class='opthome' name='pwdres'><?php $translate->__("Forgotten Password",false); ?></span></div>
 						</div>
 					</div>
 				<?php } ?>
@@ -232,13 +247,13 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 	$(document).ready(function() {
 		
 		<?php if(isset($_GET['e']) && $_GET['e']=='expired'){ ?>
-			noty({text: 'Your Session has Expired, please log in again',type:'error',timeout:9E3});
+			noty({text: '<?php $translate->__("Your Session has Expired, please log in again",true); ?>',type:'error',timeout:9E3});
 		<?php } else if(isset($_GET['e']) && $_GET['e']=='local'){ ?>
-			noty({text: 'Your ip is different from the one where you have logged in, please log in again',type:'error',timeout:9E3});
+			noty({text: '<?php $translate->__("Your IP is different from the one where you have logged in, please log in again",true); ?>',type:'error',timeout:9E3});
 		<?php } else if(isset($_GET['e']) && $_GET['e']=='invalid'){ ?>
-			noty({text: 'Invalid Session ID, please log in again',type:'error',timeout:9E3});
+			noty({text: '<?php $translate->__("Invalid Session ID, please log in again",true); ?>',type:'error',timeout:9E3});
 		<?php } else if(isset($_GET['e']) && $_GET['e']=='token'){ ?>
-			noty({text: 'Invalid Token, please log in again',type:'error',timeout:9E3});
+			noty({text: '<?php $translate->__("Invalid Token, please log in again",true); ?>',type:'error',timeout:9E3});
 		<?php }  if(isset($_GET['act']) && $_GET['act']=='activate'){ ?>
 			$(".main").nimbleLoader("show", {position: "fixed",loaderClass: "loading_bar_body",hasBackground: true,zIndex: 999,backgroundColor: "#fff",backgroundOpacity: 0.9});
 			
@@ -285,14 +300,14 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 					success : function (data) {
 						$(".main").nimbleLoader("hide");
 						if(data[0]=='Reset')
-							noty({text: 'An email has been sent to your inbox',type:'success',timeout:9E3});
+							noty({text: '<?php $translate->__("An email has been sent to your inbox",true); ?>',type:'success',timeout:9E3});
 						else
 							noty({text: data[0],type:'error',timeout:9E3});
 					}
 				}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 			}
 			else
-				noty({text: 'Please complete all the fields.',type:'error',timeout:9E3});
+				noty({text: '<?php $translate->__("Please complete all the fields",true); ?>',type:'error',timeout:9E3});
 		});
 	});
 
@@ -310,7 +325,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 						window.location.reload();
 					}
 					else if(data[0]=='Time'){
-						noty({text: 'No changes has been made, please wait 5 minutes from your last check',type:'information',timeout:9E3});
+						noty({text: '<?php $translate->__("No changes has been made, please wait 5 minutes from your last check",true); ?>',type:'information',timeout:9E3});
 					}
 					else
 						noty({text: data[0],type:'error',timeout:9E3});
@@ -328,7 +343,7 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 				success : function (data) {
 					$(".main").nimbleLoader("hide");
 					if(data[0]=='Sent'){
-						noty({text: 'A new Email has been sent, the previous code now is invalid.',type:'success',timeout:9E3});
+						noty({text: '<?php $translate->__("A new Email has been sent, the previous code now is invalid",true); ?>',type:'success',timeout:9E3});
 					}
 					else
 						noty({text: data[0],type:'error',timeout:9E3});
@@ -363,12 +378,12 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 				}).fail(function(jqXHR, textStatus){$(".main").nimbleLoader("hide");noty({text: textStatus,type:'error',timeout:9E3});});
 			}
 			else{
-				noty({text: 'Empty Field or Password mismatch',type:'error',timeout:9E3});
+				noty({text: '<?php $translate->__("Empty Field or Password mismatch",true); ?>',type:'error',timeout:9E3});
 			}
 		<?php if(isset($privacy[0]) && $privacy[0]==1){ ?>
 		}
 		else
-			noty({text: 'You must accept our Privacy Policy to proceed.',type:'error',timeout:9E3});
+			noty({text: '<?php $translate->__("You must accept our Privacy Policy to proceed",true); ?>',type:'error',timeout:9E3});
 		<?php } ?>
 	}
 

@@ -38,9 +38,24 @@ $siteurl=explode('?',$siteurl);
 $siteurl=$siteurl[0];
 if(is_file('../php/config/setting.txt')) $setting=file('../php/config/setting.txt',FILE_IGNORE_NEW_LINES);
 if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
+
+require_once '../php/translator/class.translation.php';
+if(isset($setting[11]) && $setting[11]==0 && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
+	$lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+	if(!is_file('../php/translator/lang/'.$lang.'.csv'))
+		$lang='en';
+}
+else if(isset($setting[11]) && $setting[11]!=0){
+	$lang=$setting[11];
+	if(!is_file('../php/translator/lang/'.$lang.'.csv'))
+		$lang='en';
+}
+else 
+	$lang='en';
+$translate = new Translator($lang,'../php/');
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo $lang; ?>">
 	<head>
 		<meta name="robots" content="noindex,nofollow">
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
@@ -57,29 +72,23 @@ if(!isset($_SESSION['token']['act'])) $_SESSION['token']['act']=random_token(7);
 				<div class='container'>
 					<div class="navbar-header">
 						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-nav-collapse">
-							<span class="sr-only">Toggle navigation</span>
+							<span class="sr-only"><?php $translate->__("Toggle navigation",false); ?></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
-							</button>
-							<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
+						</button>
+						<a class="navbar-brand" href='../index.php'><?php if(isset($setting[0])) echo $setting[0];?></a>
 					</div>
 		  
 					<div class="collapse navbar-collapse" id="header-nav-collapse">
 						<ul class="nav navbar-nav">
-							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i> Home</a></li>
-							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i>FAQs</a></li>
+							<li><a href="index.php"><i class="glyphicon glyphicon-home"></i> <?php $translate->__("Home",false); ?></a></li>
+							<li><a href="user/faq.php"><i class="glyphicon glyphicon-flag"></i> <?php $translate->__("FAQs",false); ?></a></li>
 						</ul>
 					</div>
 				</div>
 			</nav>
 			<div class='daddy'>
-				<hr>
-				<div class="jumbotron" >
-					<h1 class="muted pagefun"><a href='http://razorphyn.com'><img id='logo' src='../css/images/logo.png' alt='Razorphyn' title='Razorphyn'/></a></h1>
-					<h3 class='pagefun'>Welcome to the support center</h3>
-				</div>
-				<hr>
 				<div class='row main'>
 					<form id='passwordform' class='login activesec'>
 						<h1 class='titlesec'>Reset Password</h1>

@@ -427,6 +427,7 @@ else{
 		$_POST['enrat']=(is_numeric($_POST['enrat']) && $_POST['enrat']==1) ? 1:0;
 		$_POST['commlop']=(trim(preg_replace('/\s+/',' ',$_POST['commlop']))=='php -f')? 'php -f':'php5-cli';
 		$_POST['tit']=trim(filter_var(preg_replace('/\s+/',' ',$_POST['tit']),FILTER_SANITIZE_STRING));
+		$_POST['site_lang']=(is_file('translator/lang/'.$_POST['site_lang'].'.csv'))? $_POST['site_lang']:0;
 		
 		$_POST['allowed_exentions']=trim(str_replace('.','',str_replace(' ','',$_POST['allowed_exentions'])));
 		if(!empty($_POST['allowed_exentions'])){
@@ -458,7 +459,7 @@ else{
 			echo json_encode(array(0=>'Invalid "Error Mail"'));
 			exit();
 		}
-		if(file_put_contents('config/allowedext.txt',$_POST['check_extension']."\n".$_POST['allowed_exentions']) && file_put_contents('config/setting.txt',$_POST['tit']."\n".$_POST['mail']."\n".$_POST['senrep']."\n".$_POST['senope']."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$_POST['maxsize']."\n".$_POST['enrat']."\n".$_POST['commlop']."\n".$_POST['faq']."\n".$_POST['error_mail'])){
+		if(file_put_contents('config/allowedext.txt',$_POST['check_extension']."\n".$_POST['allowed_exentions']) && file_put_contents('config/setting.txt',$_POST['tit']."\n".$_POST['mail']."\n".$_POST['senrep']."\n".$_POST['senope']."\n".$_POST['timezone']."\n".$_POST['upload']."\n".$_POST['maxsize']."\n".$_POST['enrat']."\n".$_POST['commlop']."\n".$_POST['faq']."\n".$_POST['error_mail']."\n".$_POST['site_lang'])){
 			header('Content-Type: application/json; charset=utf-8');
 			echo json_encode(array(0=>'Saved'));
 		}
